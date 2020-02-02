@@ -1,0 +1,57 @@
+\documentclass{standalone}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.15}
+\pgfplotsset{
+    data/.style={
+        black,
+    },
+    exp/.style={
+        blue,
+    },
+    gauss/.style={
+        red,
+    },
+}
+
+\begin{document}
+\BLOCK{ set var = variable if variable else '' }
+\begin{tikzpicture}
+\begin{axis}[
+    \BLOCK{ if var.range and not histogram.ranges }
+    xmin = \VAR{ var.range[0] },
+    xmax = \VAR{ var.range[1] },
+    \BLOCK{ endif }
+    \BLOCK{ if histogram.ranges }
+    xmin = \VAR{ histogram.ranges[0][0] },
+    xmax = \VAR{ histogram.ranges[0][1] },
+    \BLOCK{ endif }
+    ymin = 0,
+    \BLOCK{ if var.latex_name }
+    xlabel = {$\VAR{ var.latex_name }$ \BLOCK{ if var.unit }[$\mathrm{\VAR{ var.unit }}$]\BLOCK{ endif }},
+    \BLOCK{ endif }
+    \BLOCK{ if var }
+        \BLOCK{ if var.variable_y }
+        \BLOCK{ if var.variable_y.latex_name }
+    ylabel = {$\VAR{ var.variable_y.latex_name }$ \BLOCK{ if var.variable_y.unit }[$\mathrm{\VAR{ var.variable_y.unit }}$]\BLOCK{ endif }},
+        \BLOCK{ endif }
+        \BLOCK{ endif }
+    \BLOCK{ endif }
+]
+\addplot [
+    data,
+    % gauss,
+    const plot,
+    %red,
+    % domain=-1:1,
+] table [col sep=comma, header=false] {\VAR{ output.filepath }};
+\BLOCK{ if plot and plot.vertical_line }
+\BLOCK{ set vert = plot.vertical_line}
+\draw[\VAR{ vert.color }] 
+(axis cs:\VAR{ vert.x },\pgfkeysvalueof{/pgfplots/ymin})
+-- (axis cs:\VAR{ vert.x },\pgfkeysvalueof{/pgfplots/ymax});
+\BLOCK{ endif }
+\end{axis}
+\end{tikzpicture}
+\end{document}
+

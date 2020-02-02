@@ -1,0 +1,16 @@
+:class:`Chain` can be used as a ``Source`` to generate data.
+
+:class:`ISlice` (*start, stop* [*, step*])
+Similar to :func:`itertools.islice`
+
+*iterables* will be chained during ``__call__()``,
+
+:exc:`~lena.core.LenaValueError`
+
+(no markup)
+if it is a tuple of length 2,
+and the second element is a dictionary or its subclass.
+
+Return ``True`` if file with cache exists and is readable.
+but
+If *allow_zero_scale* and *allow_unknown_scale* are set to True,

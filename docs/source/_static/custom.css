@@ -1,0 +1,37 @@
+/* Copy buttons */
+button.copybtn {
+  webkit-transition: opacity .3s ease-in-out;
+  -o-transition: opacity .3s ease-in-out;
+  transition: opacity .3s ease-in-out;
+  opacity: 0;
+  padding: 2px 6px;
+  position: absolute;
+  right: 4px;
+  bottom: 4px;
+  /* top: 4px; */
+}
+div.highlight:hover .copybtn, div.highlight .copybtn:focus {
+    opacity: .3;
+}
+div.highlight .copybtn:hover {
+    opacity: 1;
+}
+div.highlight {
+    position: relative;
+}
+
+.noscrollbar .line-block {
+    margin: 0;
+}
+/* copied from nature.css pre element */
+.noscrollbar {
+    white-space: normal;
+    padding: 10px;
+    background-color: White;
+    color: #222;
+    line-height: 1.2em;
+    border: 1px solid #C6C9CB;
+    margin: 1.5em 0 1.5em 0;
+    -webkit-box-shadow: 1px 1px 1px #d8d8d8;
+    -moz-box-shadow: 1px 1px 1px #d8d8d8;
+}

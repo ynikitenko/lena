@@ -1,0 +1,30 @@
+\documentclass{standalone}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\usepgfplotslibrary{colorbrewer}
+\pgfplotsset{compat=1.15}
+
+\BLOCK{ set varx = variable.combine[0] }
+\BLOCK{ set vary = variable.combine[1] }
+
+\begin{document}
+\begin{tikzpicture}
+    \begin{axis}[
+        view={0}{90},
+        grid=both, 
+        \BLOCK{ set xcols = histogram.nbins[0]|int + 1 }
+        \BLOCK{ set ycols = histogram.nbins[1]|int + 1 }
+        mesh/cols=\VAR{xcols},
+        mesh/rows=\VAR{ycols},
+        colorbar horizontal,
+        xlabel = {$\VAR{ varx.latex_name }$ \BLOCK{ if varx.unit }[$\mathrm{\VAR{ varx.unit }}$]\BLOCK{ endif }},
+        ylabel = {$\VAR{ vary.latex_name }$ \BLOCK{ if vary.unit }[$\mathrm{\VAR{ vary.unit }}$]\BLOCK{ endif }},
+    ]
+    \addplot3 [
+        surf,
+        domain=-1500:1500,
+        mesh/ordering=y varies,
+    ] table [col sep=comma, header=false] {\VAR{ output.filepath }};
+    \end{axis}
+\end{tikzpicture}
+\end{document}

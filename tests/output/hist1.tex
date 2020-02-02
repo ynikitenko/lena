@@ -1,0 +1,11 @@
+\BLOCK{ extends "base.tex" }
+\BLOCK{ block tikzpicture }
+\begin{axis}[
+    xmin = 0,
+    xmax = 250,
+]
+\addplot [
+    const plot,
+] table [col sep=comma, header=false] {\VAR{ output.filepath }};
+\end{axis}
+\BLOCK{ endblock }

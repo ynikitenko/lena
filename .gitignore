@@ -1,0 +1,35 @@
+*.pyc
+*.swp
+.coverage
+*.hypothesis
+.pytest_cache
+
+*.root
+*.pcm
+*.d
+*.so
+
+*.pdf
+*.png
+*.csv
+
+# LaTeX 
+*tmp0*
+*.aux
+*.log
+*.out
+*.gnuplot
+*.table
+
+# output and executables
+docs/examples/tutorial/*/output
+
+# Sphinx
+docs/build
+docs/source/lena.*.rst
+docs/source/lena.rst
+docs/source/modules.rst
+
+.tox
+dist/
+*.egg-info

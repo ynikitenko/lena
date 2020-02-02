@@ -1,0 +1,16 @@
+\documentclass{standalone}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.15}
+\begin{document}
+\begin{tikzpicture}
+\begin{axis}[
+    xmin = 0,
+    xmax = 250,
+]
+\addplot [
+    const plot,
+] table [col sep=comma, header=false] {output.csv};
+\end{axis}
+\end{tikzpicture}
+\end{document}
