@@ -331,10 +331,8 @@ Now we are ready to do some real data processing.
 Let us read data from a file and make a histogram of *x* coordinates.
 The complete example can be seen below,
 and it with other files for this tutorial can be found
-in the `examples directory <*** a link>`_ of the framework's tree.
-
-..
-   todo: change link above!
+in *docs/examples/tutorial* directory of the framework's tree
+(or online `here <https://github.com/ynikitenko/lena/tree/master/docs/examples/tutorial>`_).
 
 .. _main_py:
 

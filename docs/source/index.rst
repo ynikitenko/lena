@@ -46,7 +46,7 @@ From github
 ^^^^^^^^^^^
 ::
 
-    git clone ...
+    git clone https://github.com/ynikitenko/lena
     pip install -r lena/requirements.txt
 
 and write ``export PYTHONPATH=$PYTHONPATH:path-to-lena`` to your profile 
