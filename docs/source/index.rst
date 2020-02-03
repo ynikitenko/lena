@@ -129,7 +129,7 @@ Complete documentation on Lena classes and specific topics can be found in the :
 
 License
 -------
-Lena is free software licenced under Apache software license (version 2).
+Lena is free software licensed under Apache software license (version 2).
 You can use it freely for your data analysis, read its source code and modify it.
 
 .. It is tested and actively used, but we take no responsibility 

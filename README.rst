@@ -6,4 +6,4 @@ Lena is an architectural framework for data analysis. It is written in Python an
 
 Lena's idea is to distinguish common patterns in data analysis so that each scientist doesn't have to reimplement same things.
 It goes beyond that and simplifies analysis that would be difficult or impossible without advanced programming tools.
-More information can be found in the documentation.
+More information can be found in the documentation at https://lena.readthedocs.io .
