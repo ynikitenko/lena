@@ -31,7 +31,8 @@ Output
 ------
 
 .. automodule:: lena.output
-    :exclude-members: MakeFilename, format_context, LaTeXToPDF, RenderLaTeX
+    :exclude-members: MakeFilename, format_context, LaTeXToPDF, RenderLaTeX,
+        Template, Environment
 
 LaTeX
 -----
