@@ -522,7 +522,7 @@ during only one reading of a file.
 .. rubric::
     Exercises
 
-#. Ivan wants to become more familiar with generators and implements *End* element.
+#. Ivan wants to become more familiar with generators and implements an element *End*.
    He writes this class:
 
    .. code-block:: python
@@ -554,41 +554,42 @@ during only one reading of a file.
 
    It seems that no further elements were executed, indeed.
    However, Ivan recalls that *StopIteration* inside a generator
-   leads to a normal exit, it should not be an error. What was done wrong?
+   should lead to a normal exit and should not be an error. What was done wrong?
 
 #. Svetlana wants to make sure
    that no statement is really executed during a generator call.
    Write a simple generator to check that.
 
-#. *Print* outputs values passing through that.
+#. *Count* counts values passing through that.
+   In order for that not to change the data flow,
+   it should add results to the context.
+   What other design decisions should be considered?
    Write its simple implementation and check that it works as a *sequence* element.
-
-    .. 
-        #. *End* gets all previous flow and produces no further flow.
-           Implement that and check that it works.
 
 #. Lev doesn't like how the output in previous examples is organised.
 
    "In our object-oriented days,
-   I could use only one object to make the whole analysis", - says he.
+   I could use only one object to make the whole analysis", - he says.
    "Histogram to CSV, Write, Render, Write again,...:
-   if our output system is the same, and we need to repeat that in every script,
+   if our output system remains the same,
+   and we need to repeat that in every script,
    this is a code bloat".
 
    How to make only one element for the whole output process?
-   What are advantages and disadvantages of this and the previous approach?
+   What are advantages and disadvantages of these two approaches?
 
-#. \* Lev feels that the framework is limiting his code.
+    ..
+        #. \* Lev feels that the framework is limiting his code.
 
-   "Why do I need to name a generator a *run* method of some class?",- he says.
-   "If an object makes some work, it should be called appropriately: run, or go, or fly,
-   or paint - depending on the object itself.
-   And, definitely, Python must allow to distinguish between a function and a generator.
-   Why then should a programmer manually choose appropriate names to satisfy some framework?"
+           "Why do I need to name a generator a *run* method of some class?",- he says.
+           "If an object makes some work, it should be called appropriately: run, or go, or fly,
+           or paint - depending on the object itself.
+           And, definitely, Python must allow to distinguish between a function and a generator.
+           Why then should a programmer manually choose appropriate names to satisfy some framework?"
 
-   In the next part we will say about adapters,
-   that allow to use elements with methods named differently (not *run* or *__call__*).
-   Do you know whether generators and simple functions can be distinguished in Python?
+           In the next part we will say about adapters,
+           that allow to use elements with methods named differently (not *run* or *__call__*).
+           Do you know whether generators and simple functions can be distinguished in Python?
 
 #. \*\* Remember the implementation of :ref:`Sum <1_sum>` earlier.
    Suppose you need to split one flow into two to make two analyses,

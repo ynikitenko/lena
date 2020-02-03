@@ -4,7 +4,7 @@ from . import functions
 
 
 class Count(object):
-    """Count items which pass through.
+    """Count items that pass through.
 
     After the flow is exhausted, add {*name*: count} to the *context*.
 
@@ -59,10 +59,14 @@ class Count(object):
         If the flow was empty, nothing is yielded
         (so *count* can be zero only from :meth:`compute`).
         """
-        # may raise StopIteration and finish this function
-        prev_val = next(flow)
-        # to do:
-        # probably, rewrite this so that count updates every context,
+        try:
+            prev_val = next(flow)
+        except StopIteration:
+            # otherwise it will be an error since PEP 479
+            # https://stackoverflow.com/a/51701040/952234
+            return
+            # raise StopIteration
+        # todo: add an option to update context with every count,
         # not only last
         count = 1
         for val in flow:
@@ -84,6 +88,12 @@ class TransformIf(object):
     In some cases, however, there emerge values of very different types
     (like in :class:`~lena.flow.SplitIntoBins`),
     and this class may be useful.
+    Todo: probably it should be structure-transparent
+    (that is work for histogram content directly)
+
+    Warning
+    -------
+        This class may be changed or deleted.
     """
 
     def __init__(self, select, seq):
@@ -141,6 +151,6 @@ class End(object):
         """
         for val in flow:
             pass
-        raise StopIteration()
+        return
         # otherwise it won't be a generator
         yield "unreachable"

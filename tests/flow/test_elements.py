@@ -1,4 +1,4 @@
-from lena.flow import Count, TransformIf
+from lena.flow import Count, TransformIf, End
 from tests.examples.fill import StoreFilled
 
 
@@ -9,6 +9,8 @@ def test_count():
     assert list(c.run(iter(flow))) == [
         1, 2, 3, ('foo', {'counter': 4})
     ]
+    assert list(c.run(iter([]))) == []
+
     # test FillCompute
     c = Count(name="counter")
     for val in flow:
@@ -47,3 +49,11 @@ def test_transform_if():
     assert list(t2.run(data)) == [1, 3.5]
     t3 = TransformIf([lambda val: isinstance(val, float), int], lambda num: num + 1)
     assert list(t3.run(data)) == [2, 3.5]
+
+
+def test_end():
+    flow = [1, 2, 3]
+    flit = iter(flow)
+    res = list(End().run(flit))
+    assert res == []
+    assert list(flit) == []
