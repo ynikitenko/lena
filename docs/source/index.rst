@@ -49,8 +49,10 @@ From github
     git clone https://github.com/ynikitenko/lena
     pip install -r lena/requirements.txt
 
-and write ``export PYTHONPATH=$PYTHONPATH:path-to-lena`` to your profile 
-(e.g. ``.profile`` or ``.bashrc`` on Linux). 
+and write ``export PYTHONPATH=$PYTHONPATH:<path-to-lena>``
+to your profile 
+(e.g. ``.profile`` or ``.bashrc`` on Linux)
+(and substitute <path-to-lena> with the actual path).
 
 .. .bashrc is for non-interactive shells, which are used with 'ssh command'.
 

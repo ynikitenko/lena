@@ -80,8 +80,10 @@ In this case use a sequence *Source*:
     # [3.1415916535897743]
 
 The first element in *Source* must have a *__call__* special method,
-which accepts no argument and generates values itself.
-These values are propagated by the sequence to following elements.
+which accepts no arguments and generates values itself.
+These values are propagated by the sequence:
+each following element receives as input the results of the previous element,
+and the sequence call gives the results of the last element.
 
 A *CountFrom* is an element, which produces an infinite series of numbers.
 *Elements* must be functions or objects, but not classes [#f1]_.
@@ -329,10 +331,11 @@ A real analysis example
 -----------------------
 Now we are ready to do some real data processing.
 Let us read data from a file and make a histogram of *x* coordinates.
-The complete example can be seen below,
-and it with other files for this tutorial can be found
-in *docs/examples/tutorial* directory of the framework's tree
-(or online `here <https://github.com/ynikitenko/lena/tree/master/docs/examples/tutorial>`_).
+
+.. note::
+    The complete example with other files for this tutorial can be found
+    in *docs/examples/tutorial* directory of the framework's tree
+    or `online <https://github.com/ynikitenko/lena/tree/master/docs/examples/tutorial>`_.
 
 .. _main_py:
 
@@ -472,25 +475,23 @@ which are joined into *sequences*.
 This allows to substitute, add or remove any element
 or transform the *flow* at any place,
 which may be very useful for development.
-*Sequences* can be elements of other sequences,
-and this allows their *reuse*.
+Sequences can be elements of other sequences,
+which allows their *reuse*.
 
 *Elements* can be callables or *generators*.
 Simple callables can be easily added to transform each value from the *flow*,
-while *generators* can transform the *flow*,
+while generators can transform the *flow*,
 adding more values or reducing that.
-*Generators* allow lazy evaluation, which benefits memory impact
+Generators allow lazy evaluation, which benefits memory impact
 and generalizes algorithms to use potentially many values instead of one.
 
 Complete information about the analysis is provided through the *context*.
 It is the user's responsibility to add the needed context
 and to write templates for plots.
-The user doesn't have to pass and gather the context for rendering:
-this is done by the framework.
-We have learned how to produce several plots from one template
-with different context.
+The user must also provide some initial context for naming files and plots,
+but apart from that the framework transfers and updates context itself.
 
-In the first part of the tutorial we learned about two basic sequences.
+We introduced two basic sequences.
 A *Sequence* can be placed before, after or inside another *Sequence*.
 A *Source* is similar to a *Sequence*, but no other sequence can precede that.
 
@@ -513,11 +514,13 @@ A *Source* is similar to a *Sequence*, but no other sequence can precede that.
         others form a *Sequence*
       - s()
 
-We had an example how to make a simple analysis of data read from a file.
-In the next part
-new types of elements and sequences will be introduced.
-We will learn how to make several analyses
-during only one reading of a file.
+In this part of the tutorial
+we have learnt how to make a simple analysis of data read from a file
+and how to produce several plots using only one template.
+In the next part we'll learn about
+new types of elements and sequences
+and how to make several analyses
+reading a data file only once.
 
 .. rubric::
     Exercises
@@ -536,8 +539,8 @@ during only one reading of a file.
                    pass
                raise StopIteration()
 
-   and adds this element to :ref:`main.py <main_py>` example before.
-   When he runs the program, he gets:
+   and adds this element to :ref:`main.py <main_py>` example above.
+   When he runs the program, he gets
 
    .. container:: noscrollbar
 
@@ -564,7 +567,7 @@ during only one reading of a file.
    In order for that not to change the data flow,
    it should add results to the context.
    What other design decisions should be considered?
-   Write its simple implementation and check that it works as a *sequence* element.
+   Write its simple implementation and check that it works as a sequence element.
 
 #. Lev doesn't like how the output in previous examples is organised.
 
