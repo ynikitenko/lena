@@ -17,16 +17,24 @@ class Split(object):
     """Split data flow and run analysis in parallel."""
 
     def __init__(self, seqs, bufsize=1000):
-        """Split the flow into parallel sequences.
-
-        *seqs* must be a list of sequences
+        """*seqs* must be a list of Sequence, Source, FillComputeSeq
+        or FillRequestSeq sequences
         (any other container will raise :exc:`~lena.core.LenaTypeError`).
+        If *seqs* is empty, *Split* acts as an empty *Sequence* and
+        yields all values it receives.
 
-        *bufsize* is the size of the buffer for the input flow
-        (not used with *FillCompute* elements).
-        If *bufsize* is None, all input is materialized in the buffer.
-        *bufsized* must be a natural number or None,
+        *bufsize* is the size of the buffer for the input flow.
+        If *bufsize* is ``None``,
+        whole input flow is materialized in the buffer.
+        *bufsized* must be a natural number or ``None``,
         otherwise :exc:`~lena.core.LenaValueError` is raised.
+
+        Common type:
+            If each sequence from *seqs* has a common type,
+            *Split* obtains this type and creates corresponding methods.
+            For example, if each sequence is *FillCompute*,
+            *Split* creates methods *fill* and *compute*
+            and can be used as a *FillCompute* sequence.
         """
         if not isinstance(seqs, list):
             raise exceptions.LenaTypeError(
@@ -70,10 +78,10 @@ class Split(object):
                         seq = sequence.Sequence(seq)
                 except exceptions.LenaTypeError:
                     raise exceptions.LenaTypeError(
-                        "unknown argument type. Could not initialize Sequence "
-                        + "from {}".format(seq)
+                        "unknown argument type. Must be one of "
+                        "FillComputeSeq, FillRequestSeq or Source, "
+                        "{} provided".format(seq)
                     )
-                    # todo: add more error message
                 else:
                     seq_type = "sequence"
 
@@ -104,15 +112,18 @@ class Split(object):
         self._bufsize = bufsize
 
     def __call__(self):
-        """Generate flow.
+        """Each initialization sequence generates flow.
+        After its flow is empty, next sequence is called, etc.
 
-        This method is available only if all self sequences are Sources.
-        Otherwise AttributeError is raised during the execution.
+        This method is available only if each self sequence is a
+        :class:`~lena.core.Source`,
+        otherwise :exc:`~lena.core.LenaAttributeError` is raised during the execution.
         """
         if self._n_seq_types != 1 or not ct.is_source(self._sequences[0]):
-            raise exceptions.LenaAttributeError("Split has no method '__call__'. "
-                                     + "It should contain only Source "
-                                     + "sequences to be callable")
+            raise exceptions.LenaAttributeError(
+                "Split has no method '__call__'. It should contain "
+                "only Source sequences to be callable"
+            )
         for seq in self._sequences:
             for result in seq():
                 yield result
@@ -144,10 +155,16 @@ class Split(object):
         n_of_active_seqs = len(active_seqs)
         ind = 0
         flow = iter(flow)
+        flow_was_empty = True
         while True:
-            # iterate on flow
+            ## iterate on flow
+            # If stop is None, then iteration continues
+            # until the iterator is exhausted, if at all
+            # https://docs.python.org/3/library/itertools.html#itertools.islice
             buf = list(itertools.islice(flow, self._bufsize))
-            if not buf:
+            if buf:
+                flow_was_empty = False
+            else:
                 break
 
             # iterate on active sequences
@@ -164,55 +181,49 @@ class Split(object):
                     n_of_active_seqs -= 1
                     continue
                 elif seq_type == "fill_compute":
-                    if buf:
-                        stopped = False
-                        for val in buf:
-                            try:
-                                seq.fill(val)
-                            except exceptions.LenaStopFill:
-                                stopped = True
-                                break
-                        if stopped:
-                            for result in seq.compute():
-                                yield result
-                            # we don't have goto in Python,
-                            # so we break double cycle like this.
-                            del active_seqs[ind]
-                            del active_seq_types[ind]
-                            n_of_active_seqs -= 1
-                            continue
-                    else:
+                    stopped = False
+                    for val in buf:
+                        try:
+                            seq.fill(val)
+                        except exceptions.LenaStopFill:
+                            stopped = True
+                            break
+                    if stopped:
                         for result in seq.compute():
                             yield result
+                        # we don't have goto in Python,
+                        # so we have to repeat this
+                        # each time we break double cycle.
+                        del active_seqs[ind]
+                        del active_seq_types[ind]
+                        n_of_active_seqs -= 1
+                        continue
                 elif seq_type == "fill_request":
-                    if buf:
-                        stopped = False
-                        for val in buf:
-                            try:
-                                seq.fill(val)
-                            except exceptions.LenaStopFill:
-                                stopped = True
-                                break
-                            else:
-                                # Test whether it will be faster to yield
-                                # when having fed all buffer.
-                                # This implementation is better for memory
-                                # (results don't have to be stored in FillRequest).
-                                for result in seq.request():
-                                    yield result
-                        if stopped:
-                            for result in seq.request():
-                                yield result
-                            del active_seqs[ind]
-                            del active_seq_types[ind]
-                            n_of_active_seqs -= 1
-                            continue
+                    stopped = False
+                    for val in buf:
+                        try:
+                            seq.fill(val)
+                        except exceptions.LenaStopFill:
+                            stopped = True
+                            break
+                    # FillRequest yields each time after buffer is filled
+                    for result in seq.request():
+                        yield result
+                    if stopped:
+                        del active_seqs[ind]
+                        del active_seq_types[ind]
+                        n_of_active_seqs -= 1
+                        continue
                 elif seq_type == "sequence":
                     # run buf as a whole flow.
                     # this may be very wrong if seq has internal state,
                     # e.g. contains a Cache
                     for res in seq.run(buf):
                         yield res
+                else:
+                    raise exceptions.LenaRuntimeError(
+                        "unknown sequence type {}".format(seq_type)
+                    )
 
                 ind += 1
                 # end internal while on sequences
@@ -221,8 +232,15 @@ class Split(object):
         # yield computed data
         for seq, seq_type in zip(active_seqs, active_seq_types):
             if seq_type == "source":
+                # otherwise it is a logic error
+                assert flow_was_empty
                 for val in seq():
                     yield val
             elif seq_type == "fill_compute":
                 for val in seq.compute():
                     yield val
+            elif seq_type == "fill_request":
+                # otherwise FillRequest yielded after each buffer
+                if flow_was_empty:
+                    for val in seq.request():
+                        yield val

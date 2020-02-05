@@ -69,6 +69,8 @@ Sequences
 .. _Split:
 .. autoclass:: Split
     :members:
+
+..
     :special-members: __call__
 
 Adapters
