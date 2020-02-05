@@ -9,10 +9,29 @@ Overview
 
 Lena is an architectural framework for data analysis. It is written in Python and works with Python versions 2, 3 and PyPy.
 
-Lena's idea is to distinguish common patterns in data analysis so that each scientist doesn't have to reimplement same things.
-It goes beyond that and simplifies analysis that would be difficult or impossible without advanced programming tools.
+These are Lena features from programming point of view:
 
-Lena originated from experimental neutrino physics, and is named after a great Siberian river.
+- modularity, weak coupling. Algorithms can be easily added, replaced or reused.
+
+- performance. Lazy evaluation is good for memory and speed. Several analyses can be done reading data once. PyPy with just-in-time compiler can be used if needed.
+
+- code reuse. Logic is separated from presentation. One template can be used for several plots.
+
+- rapid development. One can run only those elements which already work. During development only a small subset of data can be analysed. Results of heavy calculations can be easily saved.
+
+- easy to understand, structured and beautiful code.
+
+From data analysis perspective:
+
+- comparison of analyses with arbitrary changes (including different input data or algorithms).
+
+- algorithm reuse for a subset of data (for example, to see how an algorithm works at different coordinates in the detector).
+
+- analysis consistency. When we run several algorithms for same data or reuse an algorithm, we are sure that we use same data and algorithm.
+
+- algorithms can be combined into a more complex analysis.
+
+Lena originated from experimental neutrino physics and is named after a great Siberian river.
 
 .. .. rst-class:: hidden
 
@@ -49,14 +68,20 @@ From github
     git clone https://github.com/ynikitenko/lena
     pip install -r lena/requirements.txt
 
-and write ``export PYTHONPATH=$PYTHONPATH:<path-to-lena>``
+Replace *<path-to-lena>* with the actual path to the directory *lena*
+and write
+
+.. code-block:: console
+
+    export PYTHONPATH=$PYTHONPATH:<path-to-lena>
+
 to your profile 
-(e.g. ``.profile`` or ``.bashrc`` on Linux)
-(and substitute <path-to-lena> with the actual path).
+(e.g. ``.profile`` or ``.bashrc`` on Linux).
 
 .. .bashrc is for non-interactive shells, which are used with 'ssh command'.
 
-Replace *path-to-lena* with the actual path to the directory containing Lena.
+Additional programs
+^^^^^^^^^^^^^^^^^^^
 
 To fully use all available tools, you may need the following programs:
 
@@ -66,7 +91,7 @@ To fully use all available tools, you may need the following programs:
 
 .. * *# ssh-agent* to use Lena on remote servers.
 
-They are not necessary, and you can replace them with your own versions.
+They are not necessary if you don't need to make plots or want to provide your own tools for that.
 
 Documentation
 -------------
@@ -136,7 +161,7 @@ You can use it freely for your data analysis, read its source code and modify it
 
 .. It is tested and actively used, but we take no responsibility 
 
-It is intended to help many people in their data analysis, 
+It is intended to help people in their data analysis, 
 but we don't take responsibility if something goes wrong.
 
 .. English. It is intended?
