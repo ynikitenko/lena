@@ -2,6 +2,7 @@ from __future__ import print_function
 
 from . import lena_sequence
 from . import fill_compute_seq
+from . import check_sequence_type
 from . import sequence
 from . import adapters
 from . import exceptions
