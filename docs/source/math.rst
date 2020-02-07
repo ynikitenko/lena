@@ -1,5 +1,30 @@
 math package
 ============
+**Functions of multidimensional arguments:**
+
+.. currentmodule:: lena.math.meshes
+.. autosummary::
+    mesh
+    md_map
+
+**Functions of scalar and multidimensional arguments:**
+
+.. currentmodule:: lena.math.utils
+.. autosummary::
+    clip
+    isclose
+
+**Elements:**
+
+.. currentmodule:: lena.math.elements
+.. autosummary::
+    Mean
+
+**3-dimensional vector:**
+
+.. currentmodule:: lena.math.vector3
+.. autosummary::
+    vector3
 
 Functions of multidimensional arguments
 ---------------------------------------
@@ -16,6 +41,10 @@ Functions of scalar and multidimensional arguments
 
 .. _isclose_label:
 .. autofunction:: isclose
+
+Elements
+--------
+.. automodule:: lena.math.elements
 
 3-dimensional vector
 --------------------
