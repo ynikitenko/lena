@@ -137,7 +137,7 @@ class FillCompute(object):
 class FillInto(object):
     """Adapter for a FillInto element."""
 
-    def __init__(self, el, fill_into=_SENTINEL):
+    def __init__(self, el, fill_into=_SENTINEL, explicit=True):
         """Element *el* must implement *fill_into* method,
         be callable or be a Run element.
 
@@ -156,10 +156,11 @@ class FillInto(object):
         (element and value) and fills the element itself.
         This allows to use lambdas directly in *FillInto*.
 
-        A *Run* element is converted to *FillInto* in this way:
+        A *Run* element is converted to *FillInto* this way:
         for each value the *el* runs a flow
         consisting of this one value
         and fills the results into the output element.
+        This can be done only if *explicit* is True.
         """
         if fill_into is _SENTINEL:
             fill_into_m = getattr(el, "fill_into", None)
@@ -169,7 +170,7 @@ class FillInto(object):
             elif callable(el):
                 # use default implementation
                 pass
-            elif ct.is_run_el(el):
+            elif ct.is_run_el(el) and explicit:
                 self.fill_into = self._run_fill_into
             else:
                 raise exceptions.LenaTypeError(
