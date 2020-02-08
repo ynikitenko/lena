@@ -35,7 +35,7 @@ def _init_sequence_with_el(self, args, el_attr, check_el_type,
     for arg in args[ind+1:]:
         after.append(arg)
 
-    # for syntactical reasons, otherwise (*before, el) is impossible
+    # for syntactical reasons; otherwise (*before, el) is impossible
     before.append(el)
     try:
         before_seq = fill_seq.FillSeq(*before)
@@ -59,8 +59,8 @@ class FillComputeSeq(lena_sequence.LenaSequence):
     Input flow is preprocessed with the *Sequence*
     before the *FillCompute* element,
     then it fills the *FillCompute* element.
-    After the flow is exhausted
-    and the results are yielded from the *FillCompute*,
+    
+    When the results are *computed*,
     they are postprocessed with the *Sequence* after
     that element.
     """
@@ -72,14 +72,14 @@ class FillComputeSeq(lena_sequence.LenaSequence):
         only the first one is chosen
         (the subsequent ones are used as simple *Run* elements).
         To change that, explicitly cast the first element
-        to :class:`~lena.core.Run`.
-        *args* can consist of one tuple, which is in that case expanded.
+        to :class:`~lena.core.FillInto`.
 
         If *FillCompute* element was not found,
         or if the sequences before and after that
         could not be correctly initialized,
         :exc:`~lena.core.LenaTypeError` is raised.
         """
+        # *args* can consist of one tuple, which is in that case expanded.
         _init_sequence_with_el(
             self, args, "_fill_compute",
             check_sequence_type.is_fill_compute_el,

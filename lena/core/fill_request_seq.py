@@ -14,8 +14,8 @@ class FillRequestSeq(lena_sequence.LenaSequence):
     Input flow is preprocessed with the *Sequence*
     before the *FillRequest* element,
     then it fills the *FillRequest* element.
-    After the flow is exhausted
-    and the results are yielded from the *FillRequest*,
+    
+    When the results are yielded from the *FillRequest*,
     they are postprocessed with the *Sequence* after
     that element.
     """
@@ -23,34 +23,38 @@ class FillRequestSeq(lena_sequence.LenaSequence):
     def __init__(self, *args, **kwargs):
         """*args* form a sequence with a *FillRequest* element.
 
-        If *args* contain several *FillRequest* elements,
+        If *args* contains several *FillRequest* elements,
         only the first one is chosen
         (the subsequent ones are used as simple *Run* elements).
         To change that, explicitly cast the first element
-        to :class:`~lena.core.Run`.
-        *args* can consist of one tuple, which is in that case expanded.
+        to :class:`~lena.core.FillInto`.
+
+        *kwargs* can contain *bufsize*, which is used during *run*.
+        See :class:`FillRequest` for more information on *run*.
+        By default *bufsize* is *1*. Other *kwargs* raise 
+        :exc:`~lena.core.LenaTypeError`.
 
         If *FillRequest* element was not found,
-        or if the sequences before and after that
+        or if the sequences before or after that
         could not be correctly initialized,
         :exc:`~lena.core.LenaTypeError` is raised.
         """
+        # *args* can consist of one tuple, which in that case is expanded.
+        if "bufsize" in kwargs:
+            self.bufsize = kwargs.pop("bufsize")
+        else:
+            self.bufsize = 1
+        if kwargs:
+            raise exceptions.LenaTypeError(
+                "unknown kwargs {}".format(kwargs)
+            )
         fill_compute_seq._init_sequence_with_el(
             self, args, "_fill_request",
             check_sequence_type.is_fill_request_el,
             el_name="FillRequest", seq_name="FillRequestSeq"
         )
-
-    def _fill_directly(self, val):
-        self._fill_request.fill(val)
-
-    def _fill_from_sequence(self, val):
-        self._before.fill_into(self._fill_request, val)
-
-    def _fill_with_preprocess(self, val):
-        args = self._before.run([val,])
-        for arg in args:
-            self._fill_request.fill(arg)
+        fr = adapters.FillRequest(self, bufsize=self.bufsize)
+        self.run = fr.run
 
     def fill(self, value):
         """Fill *self* with *value*.
@@ -59,6 +63,7 @@ class FillRequestSeq(lena_sequence.LenaSequence):
         it preprocesses the *value*
         before filling *FillRequest*.
         """
+        raise exceptions.LenaNotImplementedError
 
     def request(self):
         """Request the results and yield.

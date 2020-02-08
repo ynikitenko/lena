@@ -2,8 +2,8 @@ from __future__ import print_function
 
 import pytest
 
-from lena.core import Sequence, Source
-from lena.core import FillCompute, FillComputeSeq
+from lena.core import Sequence, Source, FillCompute, FillComputeSeq, Run
+from lena.core import LenaNotImplementedError, LenaTypeError
 from lena.core import is_fill_compute_seq
 from lena.flow import Print
 from lena.flow import ISlice
@@ -21,6 +21,14 @@ def cnt1():
 
 
 def test_fill_compute_seq():
+    # wrong initialization
+    # no FillCompute element
+    with pytest.raises(LenaTypeError):
+        FillComputeSeq(lambda x: x)
+    # Run can't be cast to a FillInto element
+    with pytest.raises(LenaTypeError):
+        FillComputeSeq(Run(Mean()), Mean())
+
     s1 = Source(cnt1, mul2, ISlice(10), FillCompute(Mean()))
     assert next(s1()) == 11.
 
@@ -31,7 +39,10 @@ def test_fill_compute_seq():
     assert next(s3()) == 11.0
 
     s4 = Source(cnt1, ISlice(10), FillComputeSeq(mul2, FillCompute(Mean()), Print()))
+    # tuple initialization works
+    s41 = Source(cnt1, ISlice(10), FillComputeSeq((mul2, FillCompute(Mean()), Print())))
     assert next(s4()) == 11.0
+    assert next(s41()) == 11.0
     # 11.0
 
     s5 = FillComputeSeq(mul2, FillCompute(Mean()), Print())
@@ -60,3 +71,11 @@ def test_fill_compute_seq():
     # setting elements is prohibited
     with pytest.raises(TypeError):
         s5[0] = 0
+
+    # wrong subclass
+    class MyFC(FillComputeSeq):
+        def __init__(self):
+            pass
+    myfc = MyFC()
+    with pytest.raises(LenaNotImplementedError):
+        myfc.fill(0)
