@@ -54,3 +54,8 @@ class LenaTypeError(LenaException, TypeError):
 
 class LenaValueError(LenaException, ValueError):
     pass
+
+
+class LenaZeroDivisionError(LenaException, ZeroDivisionError):
+    # raised when, for example, mean can't be calculated
+    pass

@@ -8,13 +8,18 @@ import lena.flow
 class Mean(object):
     """Calculate mean (average) of input values."""
 
-    def __init__(self, start=0):
-        """*start* is the initial value of sum."""
+    def __init__(self, start=0, pass_on_empty=False):
+        """*start* is the initial value of sum.
+
+        If *pass_on_empty* is True, then if nothing was filled,
+        don't yield anything.
+        By default it raises an error (see :meth:`compute`)."""
         # Initialization resets this object.
         # start is similar to Python's builtin *sum* start.
         # a special keyword would be needed
         # if we want default context of other type
         self._start = start
+        self._pass_on_empty = pass_on_empty
         self.reset()
 
     def fill(self, value):
@@ -38,10 +43,14 @@ class Mean(object):
 
         If no values were filled (count is zero),
         mean can't be calculated and
-        :exc:`~lena.core.LenaRuntimeError` is raised.
+        :exc:`~lena.core.LenaZeroDivisionError` is raised.
+        This can be changed to yielding nothing
+        if *pass_on_empty* was initialized to True.
         """
         if not self._count:
-            raise lena.core.LenaRuntimeError(
+            if self._pass_on_empty:
+                return
+            raise lena.core.LenaZeroDivisionError(
                 "can't calculate average. No values were filled"
             )
         mean = self._sum / float(self._count)

@@ -7,7 +7,8 @@ from lena.core.exceptions import (
     LenaException,
     LenaAttributeError, LenaEnvironmentError, LenaIndexError, LenaKeyError,
     LenaNotImplementedError,
-    LenaRuntimeError, LenaStopFill, LenaTypeError, LenaValueError
+    LenaRuntimeError, LenaStopFill, LenaTypeError, LenaValueError,
+    LenaZeroDivisionError,
 )
 from lena.core.lena_sequence import LenaSequence
 
@@ -39,7 +40,7 @@ __all__ = [
     'LenaEnvironmentError',
     'LenaIndexError', 'LenaKeyError', 'LenaNotImplementedError',
     'LenaRuntimeError', 'LenaStopFill', 'LenaTypeError',
-    'LenaValueError',
+    'LenaValueError', 'LenaZeroDivisionError',
     'is_source',
     'is_fill_compute_seq', 'is_fill_request_seq',
     'is_fill_compute_el', 'is_fill_request_el', 'is_run_el',
