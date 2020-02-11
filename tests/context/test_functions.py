@@ -71,9 +71,15 @@ def test_get_recursively():
 
 
 def test_intersection():
+    # intersection with self is self
     d1 = {1: "1", 2: "2"}
     d2 = dict(d1)
     assert intersection(d1, d2) == d1
+
+    # intersection with empty dictionary is empty
+    assert intersection(d1, {}) == {}
+    assert intersection({}, d1) == {}
+
     d3 = {3: "3"}
     assert intersection(d1, d3) == {}
     d4 = {1: "3"}

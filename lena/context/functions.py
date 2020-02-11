@@ -180,26 +180,24 @@ def intersection(*dicts, **kwargs):
     >>> intersection(d1, d2, level=2)
     {2: {4: '4'}}
     """
+    if not all([isinstance(d, dict) for d in dicts]):
+        raise lena.core.LenaTypeError(
+            "all dicts must be dictionaries, "
+            "{} given".format(dicts)
+        )
+
     level = kwargs.pop("level", -1)
     if kwargs:
         raise lena.core.LenaTypeError(
             "unknown kwargs {}".format(kwargs)
         )
-    res = {}
+
     if not dicts:
-        return res
-    for d in dicts:
-        if not isinstance(d, dict):
-            raise lena.core.LenaTypeError(
-                "all dicts must be dictionaries, "
-                "{} given".format(d)
-            )
-        if not res:
-            # res was not initialized yet
-            res = copy.deepcopy(d)
-            continue
+        return {}
+    res = copy.deepcopy(dicts[0])
+    for d in dicts[1:]:
         if level == 0:
-            if d == res:
+            if d == res and d:
                 continue
             else:
                 return {}
