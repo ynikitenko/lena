@@ -6,9 +6,19 @@ import lena
 import lena.core
 import lena.context.functions as lf
 from lena.context import (
-    get_recursively, iterate_update, update_recursively, update_nested,
+    difference, get_recursively,
+    iterate_update, update_recursively, update_nested,
     intersection,
 )
+
+
+def test_difference():
+    d0 = {}
+    d1 = {'a': {'b': 'c d'}, 'e': 'f'}
+    d2 = {'a': d1['a']}
+    assert difference(d0, d1) == d0
+    assert difference(d1, d0) == d1
+    assert difference(d1, d2) == {'e': 'f'}
 
 
 def test_check_context_str():
@@ -86,6 +96,10 @@ def test_intersection():
     assert intersection(d1, d2, level=0) == {}
     assert intersection(d1, d2, level=1) == {}
     assert intersection(d1, d2, level=2) == d2
+
+    # wrong keyword arguments
+    with pytest.raises(lena.core.LenaTypeError):
+        intersection(d1, d2, wrong_kw=True)
 
 
 def test_iterate_update():

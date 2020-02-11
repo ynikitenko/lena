@@ -13,6 +13,7 @@ Context
 .. autosummary::
 
     check_context_str
+    difference
     get_recursively
     intersection
     iterate_update

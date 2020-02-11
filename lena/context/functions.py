@@ -35,6 +35,19 @@ def check_context_str(d, s):
         return subdict == last_val
 
 
+def difference(d1, d2):
+    """Return dictionary with items from *d1* not contained in *d2*.
+
+    If a key is present both in *d1* and *d2* but has different values,
+    it is included into the difference.
+    """
+    result = {}
+    for key in d1:
+        if key not in d2 or d1[key] != d2[key]:
+            result[key] = d1[key]
+    return result
+
+
 _sentinel = object()
 
 def get_recursively(d, keys, default=_sentinel):
