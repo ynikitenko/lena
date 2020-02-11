@@ -64,6 +64,7 @@ def test_split_init():
     res = list(s.run([]))
     assert res == [True, 0]
 
+
 def test_split_buffer():
     s = Split([ascii_lowercase, ascii_uppercase])
     LOW_UP = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"

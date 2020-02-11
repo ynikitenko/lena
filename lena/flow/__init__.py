@@ -12,11 +12,13 @@ from lena.flow.split_into_bins import (
     SplitIntoBins, ReduceBinContent, TransformBins,
     get_example_bin,
 )
+from lena.flow.zip import Zip
 
 
 __all__ = [
     'Cache', 'Count', 'DropContext', 'End', 'Print',
     'Chain', 'CountFrom', 'ISlice',
+    'Zip',
     'get_context', 'get_data', 'get_data_context',
     'GroupBy', 'GroupScale',
     'Selector',
