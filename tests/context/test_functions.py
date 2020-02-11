@@ -81,6 +81,12 @@ def test_intersection():
     with pytest.raises(lena.core.LenaTypeError):
         lena.context.intersection([])
 
+    # test level
+    assert intersection(d1, d1, level=0) == d1
+    assert intersection(d1, d2, level=0) == {}
+    assert intersection(d1, d2, level=1) == {}
+    assert intersection(d1, d2, level=2) == d2
+
 
 def test_iterate_update():
     context = {"output": {"latex": {"name": "x"}}}

@@ -129,21 +129,49 @@ def get_recursively(d, keys, default=_sentinel):
         )
 
 
-def intersection(*dicts):
+def intersection(*dicts, **kwargs):
     """Return a dictionary, such that each of its items
     are contained in all *dicts* (recursively).
 
     *dicts* are several dictionaries.
     If *dicts* is empty, an empty dictionary is returned.
 
+    A keyword argument *level* sets maximum number of recursions.
+    For example, if *level* is 0, all *dicts* must be equal
+    (otherwise an empty dict is returned).
+    If *level* is 1, the result contains those subdictionaries
+    which are equal.
+    For arbitrarily nested subdictionaries set *level* to -1 (default).
+
     This function always returns a dictionary
     or its subtype (copied from dicts[0]).
     All values are deeply copied.
     No dictionary or subdictionary is changed.
 
-    If any of *dicts* is not a dictionary,
+    If any of *dicts* is not a dictionary
+    or if some *kwargs* are unknown,
     :exc:`~lena.core.LenaTypeError` is raised.
+
+    Example:
+
+    >>> from lena.context import intersection
+    >>> d1 = {1: "1", 2: {3: "3", 4: "4"}}
+    >>> d2 = {2: {4: "4"}}
+    >>> # by default level is -1, which means infinite recursion
+    >>> intersection(d1, d2) == d2
+    True
+    >>> intersection(d1, d2, level=0)
+    {}
+    >>> intersection(d1, d2, level=1)
+    {}
+    >>> intersection(d1, d2, level=2)
+    {2: {4: '4'}}
     """
+    level = kwargs.pop("level", -1)
+    if kwargs:
+        raise lena.core.LenaTypeError(
+            "unknown kwargs {}".format(kwargs)
+        )
     res = {}
     if not dicts:
         return res
@@ -157,12 +185,19 @@ def intersection(*dicts):
             # res was not initialized yet
             res = copy.deepcopy(d)
             continue
+        if level == 0:
+            if d == res:
+                continue
+            else:
+                return {}
         to_delete = []
         for key in res:
             if key in d:
                 if d[key] != res[key]:
-                    if isinstance(res[key], dict) and isinstance(d[key], dict):
-                        res[key] = intersection(res[key], d[key])
+                    if level == 1:
+                        to_delete.append(key)
+                    elif isinstance(res[key], dict) and isinstance(d[key], dict):
+                        res[key] = intersection(res[key], d[key], level=level-1)
                     else:
                         to_delete.append(key)
             else:
