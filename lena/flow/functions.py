@@ -29,6 +29,22 @@ def get_data(value):
         return value
 
 
+def get_data_context(value):
+    """Get (data, context) from *value* (a possible *(data, context)* pair).
+
+    If context is not found, (value, {}) is returned.
+
+    Since :func:`get_data` and :func:`get_context`
+    both check whether context is present,
+    this function may be slightly more efficient
+    and compact than the other two.
+    """
+    if _has_context(value):
+        return (value[0], value[1])
+    else:
+        return (value, {})
+
+
 def _has_context(value):
     """A *value* is a *(data, context)* pair, if it is a tuple of length 2,
     where the second element is derived from a *dictionary*.

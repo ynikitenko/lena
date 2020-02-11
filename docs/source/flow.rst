@@ -21,6 +21,7 @@ Flow
 
     get_context
     get_data
+    get_data_context
     seq_map
 
 **Group plots:**

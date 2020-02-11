@@ -2,7 +2,18 @@ import pytest
 
 import lena.core
 import lena.flow
-from lena.flow import seq_map
+from lena.flow import seq_map, get_context, get_data, get_data_context
+
+
+def test_get_data_context():
+    val = (0, 1)
+    assert get_data(val) == val
+    assert get_context(val) == {}
+    assert get_data_context(val) == (val, {})
+    val = (0, {"a": "b"})
+    assert get_data(val) == 0
+    assert get_context(val) == val[1]
+    assert get_data_context(val) == (0, val[1])
 
 
 def test_seq_map():
