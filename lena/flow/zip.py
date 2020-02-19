@@ -1,5 +1,7 @@
 from __future__ import print_function
 
+import collections
+
 import lena.context
 from lena.core import exceptions
 from lena.core import split
@@ -9,11 +11,17 @@ from . import functions
 class Zip(object):
     """Like :class:`Split`, but zip output values into tuples."""
 
-    def __init__(self, sequences, **kwargs):
+    def __init__(self, sequences, name="zip", fields=[]):
         """Initialize a list of *sequences* to work in parallel.
         *Sequences* must be of one common type.
+
+        If *fields* are provided, the resulting values will be
+        *namedtuples* (both data and context.zip parts)
+        with these fields and *name* (by default "zip").
+        *Fields* in this case must have same length as *sequences*
+        (unless they are a string),
+        or :exc:`~lena.core.LenaTypeError* is raised.
         """
-        # create_data=None, create_value=None
         if not sequences:
             raise exceptions.LenaTypeError(
                 "at least one sequence must be given"
@@ -50,6 +58,18 @@ class Zip(object):
         else:
             raise exceptions.LenaNotImplementedError
 
+        self._name = name
+        if fields:
+            if len(fields) != len(sequences) and not isinstance(fields, str):
+                raise exceptions.LenaTypeError(
+                    "fields, if provided, must have same length as sequences, "
+                    "{} and {} given".format(fields, sequences)
+                )
+            self._fields = fields
+            self._namedtuple = collections.namedtuple(name, fields)
+        else:
+            self._namedtuple = None
+
     def _create_context(self, values):
         common_context = lena.context.intersection(*values, level=1)
         diff_context = tuple((
@@ -58,11 +78,16 @@ class Zip(object):
         if any(diff_context):
             # in normal circumstances zip can never contain same values
             # unless one zips completely same analyses
+            if self._namedtuple:
+                diff_context = self._namedtuple(*diff_context)
             lena.context.update_nested(common_context, {"zip": diff_context})
         return common_context
 
     def _create_data(self, values):
-        return tuple(values)
+        if self._namedtuple:
+            return self._namedtuple(*values)
+        else:
+            return tuple(values)
 
     def _fill(self, val):
         for seq in self._sequences:

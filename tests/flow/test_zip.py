@@ -1,5 +1,6 @@
 from __future__ import print_function
 
+from collections import namedtuple
 import pytest
 
 import lena.core
@@ -51,3 +52,33 @@ def test_zip_with_fill_compute():
     # assert list(z1.compute()) == [((3, 6), {'new_context': 1})]
     assert list(z1.compute()) == [((3, 6), {"zip": ({}, {'new_context': 1})})]
 
+    zn0 = Zip([
+            Sum(),
+            (
+                lambda x: x + 1,
+                Sum(),
+            ),
+        ],
+        fields=["sum", "sum_plus_one"]
+    )
+    for val in flow:
+        zn0.fill(val)
+    zipnamed = namedtuple("zip", ["sum", "sum_plus_one"])
+    assert list(zn0.compute()) == [zipnamed(3, 6)]
+    zn1 = Zip([
+            Sum(),
+            (
+                lambda x: (x + 1, {"new_context": 1}),
+                Sum(),
+            ),
+        ],
+        name="other_zip",
+        fields=["sum", "sum_plus_one"]
+    )
+    for val in flow:
+        zn1.fill(val)
+    other_zip = namedtuple("other_zip", ["sum", "sum_plus_one"])
+    assert list(zn1.compute()) == [
+        (other_zip(sum=3, sum_plus_one=6),
+        {'zip': other_zip(sum={}, sum_plus_one={'new_context': 1})})
+    ]
