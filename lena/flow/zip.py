@@ -67,6 +67,8 @@ class Zip(object):
                 )
             self._fields = fields
             self._namedtuple = collections.namedtuple(name, fields)
+            # needed to be able to pickle and unpickle these namedtuples
+            globals()[name] = self._namedtuple
         else:
             self._namedtuple = None
 
