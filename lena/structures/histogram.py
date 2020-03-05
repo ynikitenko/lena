@@ -55,9 +55,10 @@ class Histogram(lena.core.FillCompute):
 
         Histogram bins by default are initialized with *initial_value*.
         It can be any object,
-        which supports addition of a *weight* during *fill*.
+        which supports addition of a *weight* during *fill*
+        (but that is not necessary if you don't plan to fill the histogram).
         If the *initial_value* is compound and requires special copying,
-        create initial bins yourself.
+        create initial bins yourself (see :func:`~lena.structures.init_bins`).
 
         *Histogram* may be created from existing *bins* and *edges*.
         In this case a simple check of the shape of *bins* is done.
