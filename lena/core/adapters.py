@@ -115,13 +115,13 @@ class FillCompute(object):
             self.fill = fill_method
         else:
             raise exceptions.LenaTypeError(
-                "fill method {} must be callable".format(fill)
+                "fill method {} must exist and be callable".format(fill)
             )
         if callable(compute_method):
             self.compute = compute_method
         else:
             raise exceptions.LenaTypeError(
-                "compute method {} must be callable".format(compute)
+                "compute method {} must exist and be callable".format(compute)
             )
         self._el = el
 
@@ -239,7 +239,7 @@ class FillRequest(object):
         request = getattr(el, request, None)
         if not callable(fill):
             raise exceptions.LenaTypeError(
-                "fill must be callable"
+                "fill must exist and be callable"
             )
         self.fill = fill
         if callable(request):
@@ -250,7 +250,7 @@ class FillRequest(object):
             reset = getattr(el, "reset", None)
             if not callable(compute) or not callable(reset):
                 raise exceptions.LenaTypeError(
-                    "request must be callable"
+                    "request must exist and be callable"
                 )
             self.request = self._compute_reset
 

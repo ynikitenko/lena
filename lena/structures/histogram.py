@@ -46,12 +46,12 @@ class Histogram(lena.core.FillCompute):
     # https://docs.scipy.org/doc/numpy/reference/generated/numpy.histogram.html
     # https://root.cern.ch/root/htmldoc/guides/users-guide/Histograms.html#bin-numbering
 
-    def __init__(self, edges, bins=None, initial_value=0):
+    def __init__(self, edges, bins=None, make_bins=None, initial_value=0):
         """*edges* is a sequence of one-dimensional arrays,
         each containing strictly increasing bin edges.
         If *edges*' subarrays are not increasing
         or any of them has length less than 2,
-        :exc:`LenaValueError` is raised.
+        :exc:`~lena.core.LenaValueError` is raised.
 
         Histogram bins by default are initialized with *initial_value*.
         It can be any object,
@@ -62,7 +62,13 @@ class Histogram(lena.core.FillCompute):
 
         *Histogram* may be created from existing *bins* and *edges*.
         In this case a simple check of the shape of *bins* is done.
-        If that is incorrect, :exc:`LenaValueError` is raised.
+        If that is incorrect, :exc:`~lena.core.LenaValueError` is raised.
+
+        *make_bins* is a function without arguments, which creates new bins
+        (it will be called during :meth:`__init__` and :meth:`reset`).
+        *initial_value* in this case is ignored, but bin check is being done.
+        If both *bins* and *make_bins* are provided,
+        :exc:`~lena.core.LenaTypeError` is raised.
 
         **Attributes**
 
@@ -115,8 +121,19 @@ class Histogram(lena.core.FillCompute):
             self.dim = len(edges)
         else:
             self.dim = 1
+
+        self._initial_bins = bins
+        self._make_bins = make_bins
+        if make_bins is not None and bins is not None:
+            raise lena.core.LenaTypeError(
+                "either initial bins or make_bins must be provided, "
+                "not both: {} and {}".format(bins, make_bins)
+            )
+        if make_bins:
+            bins = make_bins()
         if bins is None:
             self.bins = hf.init_bins(self.edges, initial_value)
+            self._initial_value = initial_value
         else:
             self.bins = bins
             # We can't make scale for an arbitrary histogram,
@@ -160,7 +177,7 @@ class Histogram(lena.core.FillCompute):
         is returned, the original histogram remains unchanged.
 
         Histograms with scale equal to zero can't be rescaled.
-        :exc:`LenaValueError` is raised if one tries to do that.
+        :exc:`~lena.core.LenaValueError` is raised if one tries to do that.
         """
         if other is None:
             # return scale
@@ -214,11 +231,7 @@ class Histogram(lena.core.FillCompute):
             return
 
     def compute(self):
-        """Yield this histogram with context.
-
-        Current context is reset to an empty dict,
-        while bins remain unchanged.
-        """
+        """Yield this histogram with context."""
         ## When used in split_into_bins, some cells might not be filled.
         ## This should not be an error.
         ## If your code really requires filled histograms, check it yourself.
@@ -226,7 +239,27 @@ class Histogram(lena.core.FillCompute):
         #     # no data filled, no histogram is returned.
         #     raise StopIteration
         yield (self, hf.make_hist_context(self, self._cur_context))
+
+    def reset(self):
+        """Reset the histogram.
+
+        Current context is reset to an empty dict.
+        Bins are reinitialized with the *initial_value*
+        or with *make_bins* (depending on the initialization).
+
+        If bins were set explicitly during the initialization,
+        :exc:`~lena.core.LenaRuntimeError` is raised.
+        """
         self._cur_context = {}
+        if self._make_bins is not None:
+            self.bins = self._make_bins()
+        elif self._initial_bins is None:
+            self.bins = hf.init_bins(self.edges, self._initial_value)
+        else:
+            raise lena.core.LenaRuntimeError(
+                "Histogram.reset() is called, but no make_bins is provided, "
+                "because bins were set explicitly during the initialization"
+            )
 
     def __eq__(self, other):
         """Note that in many cases floating numbers should be compared

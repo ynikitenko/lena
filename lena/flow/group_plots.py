@@ -56,7 +56,7 @@ class GroupPlots(object):
 
         *yield_selected* defines whether selected items should be
         yielded during *run* like other items.
-        Use it if you want to have single and combined plots.
+        Use it if you want to have both single and combined plots.
         By default, selected plots are not yielded.
         """
         if isinstance(select, lena.flow.Selector):
