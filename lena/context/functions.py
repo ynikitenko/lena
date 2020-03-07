@@ -331,6 +331,9 @@ def update_nested(d, other):
 def update_recursively(d, other):
     """Update dictionary *d* with items from *other* dictionary.
 
+    *other* can be a dot-separated string, in this case
+    :func:`str_to_context` is used to convert it to a dictionary.
+
     Existing values are updated recursively,
     that is including nested subdictionaries.
     For example:
@@ -348,6 +351,8 @@ def update_recursively(d, other):
     >>> d1 == {'a': 1, 'b': 2}
     True
     """
+    if isinstance(other, str):
+        other = str_to_context(other)
     if not isinstance(d, dict) or not isinstance(other, dict):
         raise lena.core.LenaTypeError(
             "d and other must be dicts, {} and {} provided".format(d, other)
