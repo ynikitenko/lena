@@ -1,8 +1,4 @@
-"""Functions and a class to convert histograms to CSV.
-
-Only 1- and 2-dimensional histograms containing scalar values
-can be converted.
-"""
+"""Functions and a class to convert data to CSV."""
 from __future__ import print_function
 
 import lena.context
@@ -77,87 +73,99 @@ def hist2d_to_csv(hist, header=None, separator=',', duplicate_last_bin=True):
         yield format_line(x, y, bin_content)
 
 
-class HistToCSV(object):
-    """Convert :class:`~lena.structures.Histogram` to text."""
+class ToCSV(object):
+    """Convert data to CSV text.
+
+    These objects are converted:
+        * :class:`~lena.structures.Histogram`
+          (implemented only for 1- and 2-dimensional histograms).
+        * any object (including :class:`~lena.structures.Graph`)
+          with *to_csv* method.
+    """
 
     def __init__(self, separator=",", header=None, duplicate_last_bin=True):
         """*separator* delimits values in the output text,
 
         *header* is a string which becomes the first line of the output,
 
-        If *duplicate_last_bin* is True,
+        If *duplicate_last_bin* is ``True``,
         contents of the last bin will be written in the end twice.
         This may be useful for graphical representation:
-        if last bin is from 9 to 10, then the plot may end on 9.
-        This parameter allows to write bin content at 10,
-        creating a horizontal step.
-
-        Currently only 1- or 2-dimensional histograms can be dumped to CSV.
+        if last bin is from 9 to 10, then the plot may end on 9,
+        while this parameter allows to write bin content at 10,
+        creating the last horizontal step.
         """
-        self.separator = separator
-        self.header = header
-        self.duplicate_last_bin = duplicate_last_bin
-        # todo: header and format should be derived from histogram itself.
-        # format should be passed as an option (maybe as a function).
+        self._separator = separator
+        self._header = header
+        self._duplicate_last_bin = duplicate_last_bin
 
     def run(self, flow):
-        """Convert Histograms to CSV text.
+        """Convert values from *flow* to CSV text.
 
-        If context.type is "extended histogram", it is skipped,
-        because it has non scalar bin content.
+        *data.to_csv* may also produce context,
+        which in this case updates the current context.
+        *Context.output* is updated with {"filetype": "csv"}.
+        All not converted data is yielded unchanged.
+
+        If *context.output.to_csv* is False,
+        the value is skipped.
 
         Data is yielded as a whole CSV block.
-        Context.output is updated with "filetype" = "csv".
         To generate CSV line by line,
-        use *hist1d_to_csv* and *hist2d_to_csv*.
-
-        All not converted data is yielded unchanged.
+        use :func:`hist1d_to_csv` and :func:`hist2d_to_csv`.
         """
         def is_writable_hist(val):
             """Test whether a value from flow can be converted to CSV."""
             data, context = lena.flow.get_data(val), lena.flow.get_context(val)
-            if isinstance(data, lena.structures.Histogram):
-                if "type" in context \
-                    and context["type"] == "extended histogram":
-                    # Not all Histograms can be written to CSV.
-                    # Only those containing scalars.
-                    return False
-                return True
-            return False
+            return isinstance(data, lena.structures.Histogram)
+            ## If *context.type* is "extended histogram", it is skipped,
+            ## because it has non scalar bin content.
+            # seems it's not used anywhere.
+            # if lena.context.get_recursively(context, "type", None) == "extended histogram":
+            #     return False
+
         for val in flow:
             data, context = lena.flow.get_data(val), lena.flow.get_context(val)
+
+            # output.to_csv set to False
+            if not lena.context.get_recursively(context, "output.to_csv", True):
+                yield val
+                continue
+
             if hasattr(data, "to_csv") and callable(data.to_csv):
                 new_val = data.to_csv()
                 new_data, new_context = (lena.flow.get_data(new_val),
                                          lena.flow.get_context(new_val))
-                lena.context.update_recursively(
-                    new_context, {"output": {"filetype": "csv"}}
-                )
+                lena.context.update_recursively(context, new_context)
+                lena.context.update_recursively(context, "output.filetype.csv")
                 yield (new_data, new_context)
             elif is_writable_hist(val):
                 if data.dim == 1:
                     lines_iter = hist1d_to_csv(
-                        data, header=self.header, separator=self.separator,
-                        duplicate_last_bin=self.duplicate_last_bin,
+                        data, header=self._header, separator=self._separator,
+                        duplicate_last_bin=self._duplicate_last_bin,
                     )
                 elif data.dim == 2:
                     lines_iter = hist2d_to_csv(
-                        data, header=self.header, separator=self.separator,
-                        duplicate_last_bin=self.duplicate_last_bin,
+                        data, header=self._header, separator=self._separator,
+                        duplicate_last_bin=self._duplicate_last_bin,
                     )
                 else:
-                    # todo: warning here?
+                    # todo: warning here
                     print(
                         "{}-dimensional hist_to_csv not implemented"
                         .format(data.dim)
                     )
+                    yield val
                     continue
-                lena.context.update_recursively(context, {"output": {"filetype": "csv"}})
-                # todo: rewrite without this access.
-                # Why do I need this update,
-                # why wasn't it in context?
-                context.update(hf.make_hist_context(data, {}))
+                lena.context.update_recursively(context, "output.filetype.csv")
                 lines = "\n".join(list(lines_iter))
                 yield (lines, context)
             else:
-                yield (data, context)
+                yield val
+
+
+class HistToCSV(ToCSV):
+    def __init__(self, **kwargs):
+        print("HistToCSV is deprecated. Use ToCSV instead.")
+        super(HistToCSV, self).__init__(**kwargs)
