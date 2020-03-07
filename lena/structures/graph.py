@@ -172,22 +172,37 @@ class Graph(lena.core.FillCompute):
                               sort=True)
             return new_graph
 
-    def to_csv(self, separator=None):
+    def to_csv(self, separator=",", header=None):
         """Convert graph's points to CSV.
 
         *separator* delimits values, default is a comma.
-        Other classes, like :class:`~lena.output.HistToCSV`
-        can provide their own separators.
+
+        *header*, if not ``None``, is the first string of the output
+        (new line is added automatically).
+
+        Since a graph can be multidimensional,
+        for each point first its coordinate is converted to string
+        (separated by *separator*), than each part of its value.
+
+        To convert :class:`Graph` to CSV inside a Lena sequence,
+        use :class:`~lena.output.ToCSV`.
         """
+        if self._sort:
+            self._update()
+
         # no explicit separator provided
         if separator is None:
             separator = ","
         def pt_to_str(pt, separ):
             return separ.join([str(coord) for coord in pt[0]] +
                               [str(val) for val in pt[1]])
-        if self._sort:
-            self._update()
-        lines = "\n".join([pt_to_str(pt, separator) for pt in self.points])
+
+        if header is not None:
+            # if one needs an empty header line, they may provide ""
+            lines = header + "\n"
+        else:
+            lines = ""
+        lines += "\n".join([pt_to_str(pt, separator) for pt in self.points])
         return (lines, self._context)
 
     def _update(self):

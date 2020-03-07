@@ -1,6 +1,4 @@
-"""Context with easy-to-read formatting.
-
-Example:
+"""Make better output for context. Example:
 
 >>> from lena.context import Context
 >>> c = Context({"1": 1, "2": {"3": 4}})
@@ -11,7 +9,6 @@ Example:
         "3": 4
     }
 }
->>>
 """
 from __future__ import print_function
 
@@ -32,7 +29,7 @@ class Context(dict):
         which should accept a dictionary and return a string.
         The default is ``json.dumps``.
 
-        If formatter is not callable,
+        If formatter is given but is not callable,
         :exc:`~lena.core.LenaTypeError` is raised.
         """
         super(Context, self).__init__(d)

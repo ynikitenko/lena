@@ -102,10 +102,13 @@ class ToCSV(object):
     def run(self, flow):
         """Convert values from *flow* to CSV text.
 
-        *data.to_csv* may also produce context,
-        which in this case updates the current context.
         *Context.output* is updated with {"filetype": "csv"}.
         All not converted data is yielded unchanged.
+
+        If *data* has *to_csv* method, it must accept
+        keyword arguments *separator* and *header*.
+        *data.to_csv* may produce context,
+        which in this case updates the current context.
 
         If *context.output.to_csv* is False,
         the value is skipped.
@@ -133,7 +136,8 @@ class ToCSV(object):
                 continue
 
             if hasattr(data, "to_csv") and callable(data.to_csv):
-                new_val = data.to_csv()
+                new_val = data.to_csv(separator=self._separator,
+                                      header=self._header)
                 new_data, new_context = (lena.flow.get_data(new_val),
                                          lena.flow.get_context(new_val))
                 lena.context.update_recursively(context, new_context)

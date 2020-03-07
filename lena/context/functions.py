@@ -16,8 +16,10 @@ def check_context_str(d, s):
     *s* must have at least two dot-separated parts,
     otherwise :exc:`~lena.core.LenaValueError` is raised.
 
-    See also *str_to_context*.
+    See also :func:`str_to_context`.
     """
+    # todo: rename to is_subdictionary?
+    # add examples
     levels = s.split(".")
     if len(levels) < 2:
         raise lena.core.LenaValueError(
@@ -156,15 +158,6 @@ def intersection(*dicts, **kwargs):
     which are equal.
     For arbitrarily nested subdictionaries set *level* to -1 (default).
 
-    This function always returns a dictionary
-    or its subtype (copied from dicts[0]).
-    All values are deeply copied.
-    No dictionary or subdictionary is changed.
-
-    If any of *dicts* is not a dictionary
-    or if some *kwargs* are unknown,
-    :exc:`~lena.core.LenaTypeError` is raised.
-
     Example:
 
     >>> from lena.context import intersection
@@ -179,6 +172,15 @@ def intersection(*dicts, **kwargs):
     {}
     >>> intersection(d1, d2, level=2)
     {2: {4: '4'}}
+
+    This function always returns a dictionary
+    or its subtype (copied from dicts[0]).
+    All values are deeply copied.
+    No dictionary or subdictionary is changed.
+
+    If any of *dicts* is not a dictionary
+    or if some *kwargs* are unknown,
+    :exc:`~lena.core.LenaTypeError` is raised.
     """
     if not all([isinstance(d, dict) for d in dicts]):
         raise lena.core.LenaTypeError(
@@ -248,6 +250,8 @@ def make_context(obj, *attrs):
     it is inserted without the underscore.
     If an attribute is absent or None, it is skipped.
     """
+    # todo: rename to to_dict
+    # add examples.
     context = {}
     for attr in attrs:
         val = getattr(obj, attr, None)
@@ -331,7 +335,7 @@ def update_nested(d, other):
 def update_recursively(d, other):
     """Update dictionary *d* with items from *other* dictionary.
 
-    *other* can be a dot-separated string, in this case
+    *other* can be a dot-separated string. In this case
     :func:`str_to_context` is used to convert it to a dictionary.
 
     Existing values are updated recursively,
@@ -345,11 +349,14 @@ def update_recursively(d, other):
     True
     >>> # Usual update would have made d1["b"] = {"d": 4}, erasing "c".
 
-    Items from *other* overwrite those in *d*:
+    Non-dictionary items from *other* overwrite those in *d*:
 
     >>> update_recursively(d1, {"b": 2})
     >>> d1 == {'a': 1, 'b': 2}
     True
+
+    Both *d* and *other* must be dictionaries,
+    otherwise :exc:`~lena.core.LenaTypeError` is raised.
     """
     if isinstance(other, str):
         other = str_to_context(other)
