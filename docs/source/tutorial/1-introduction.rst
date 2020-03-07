@@ -423,7 +423,7 @@ and add some more elements to the sequence:
         Context(),
         Cache("x_hist.pkl"),
         # End(),
-        HistToCSV(),
+        ToCSV(),
         # ...
     )
 
@@ -462,7 +462,7 @@ simply delete the file to refill that with the new flow.
 *End* runs all previous elements and stops analysis here.
 If we enabled that in this example,
 *Cache* would be filled or read (as without the *End* element),
-but nothing would be passed to *HistToCSV* and further.
+but nothing would be passed to *ToCSV* and further.
 One can use *End* if they know for sure, that the following analysis is incomplete and will fail.
 
 -----------

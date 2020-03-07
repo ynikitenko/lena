@@ -170,6 +170,7 @@ class ToCSV(object):
 
 
 class HistToCSV(ToCSV):
+    """Deprecated. Use :class:`ToCSV` instead."""
     def __init__(self, **kwargs):
         print("HistToCSV is deprecated. Use ToCSV instead.")
         super(HistToCSV, self).__init__(**kwargs)

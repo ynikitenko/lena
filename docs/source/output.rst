@@ -7,6 +7,7 @@ Output
 
     HistToCSV
     PDFToPNG
+    ToCSV
     Writer
 
 .. not covered yet: JSONEncoder, ExtendedHistToHist
