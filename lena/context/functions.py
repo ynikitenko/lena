@@ -251,6 +251,7 @@ def make_context(obj, *attrs):
     If an attribute is absent or None, it is skipped.
     """
     # todo: rename to to_dict
+    # not used anywhere, change it freely.
     # add examples.
     context = {}
     for attr in attrs:

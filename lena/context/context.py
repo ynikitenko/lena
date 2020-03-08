@@ -29,7 +29,13 @@ class Context(dict):
         which should accept a dictionary and return a string.
         The default is ``json.dumps``.
 
-        If formatter is given but is not callable,
+        Tip
+        ---
+            JSON and Python representations are different.
+            In particular, JSON *True* is written lowercase *true*.
+            To convert JSON back to Python, use ``json.loads(string)``.
+
+        If *formatter* is given but is not callable,
         :exc:`~lena.core.LenaTypeError` is raised.
         """
         super(Context, self).__init__(d)

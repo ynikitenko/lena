@@ -1,6 +1,7 @@
 from __future__ import print_function
 
 import collections
+import copy
 
 import lena.context
 from lena.core import exceptions
@@ -93,7 +94,7 @@ class Zip(object):
 
     def _fill(self, val):
         for seq in self._sequences:
-            seq.fill(val)
+            seq.fill(copy.deepcopy(val))
 
     def _compute(self):
         results = []
