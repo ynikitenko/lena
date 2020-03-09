@@ -5,12 +5,12 @@ from lena.flow import ISlice, Print
 from lena.core import Source
 
 
-class RunAll():
-    def run(self, it):
-        for val in it:
-            pass
-        return
-        yield "this is a generator"
+# class RunAll():
+#     def run(self, it):
+#         for val in it:
+#             pass
+#         return
+#         yield "this is a generator"
 
 
 def test_print(capsys):
@@ -22,7 +22,7 @@ def test_print(capsys):
     [print(val, sep=" ", end=" ") for val in seq1()]
     captured = capsys.readouterr()
     assert captured.out == "0 0 1 1 2 2 3 3 4 4 "
-    seq2 = Source(lena.flow.CountFrom(0), printel, it5(), RunAll())
+    seq2 = Source(lena.flow.CountFrom(0), printel, it5(), lena.flow.End())
     list(seq2())
     captured = capsys.readouterr()
     assert captured.out == "0 1 2 3 4 "
