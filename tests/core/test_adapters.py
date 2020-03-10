@@ -9,24 +9,25 @@ from lena.core import (
     Call, FillInto, FillCompute, FillRequest, SourceEl, Run
 )
 from lena.flow import ISlice, CountFrom
+from lena.math import Sum
 from tests.examples.fill import StoreFilled
 from tests.examples.numeric import Add
 
 
-class Sum():
-    """Sum elements which *fill* this.
-    """
-    def __init__(self):
-        self.sum = 0
-
-    def fill(self, val):
-        self.sum += val
-
-    def reset(self):
-        self.sum = 0
-
-    def compute(self):
-        yield self.sum
+# class Sum():
+#     """Sum elements which *fill* this.
+#     """
+#     def __init__(self):
+#         self.sum = 0
+# 
+#     def fill(self, val):
+#         self.sum += val
+# 
+#     def reset(self):
+#         self.sum = 0
+# 
+#     def compute(self):
+#         yield self.sum
 
 
 class StrangeCallable():
@@ -126,15 +127,20 @@ def test_fill_into():
 
 
 def test_fill_request():
-    # no fill method
+    # no fill method raises
     with pytest.raises(LenaTypeError):
         FillRequest(lambda _: 0)
-    s1 = Source(CountFrom(), ISlice(100), FillRequest(Sum(), request="compute", bufsize=10))
+
+    # bufsize 10
+    s1 = Source(CountFrom(), ISlice(100), FillRequest(Sum(), reset=False, bufsize=10))
     results = list(s1())
     assert results == [45, 190, 435, 780, 1225, 1770, 2415, 3160, 4005, 4950]
-    s2 = Source(CountFrom(), ISlice(10), FillRequest(Sum(), request="compute", bufsize=1))
+
+    # bufsize 1
+    s2 = Source(CountFrom(), ISlice(10), FillRequest(Sum(), reset=False, bufsize=1))
     results = list(s2())
     assert results == [0, 1, 3, 6, 10, 15, 21, 28, 36, 45]
+
     # derive from FillCompute
     s3 = Source(CountFrom(), ISlice(10), FillRequest(Sum(), bufsize=1.))
     results = list(s3())
@@ -151,8 +157,8 @@ def test_fill_request():
             pass
     with pytest.raises(LenaNotImplementedError):
         MyFillRequest().fill(1)
-    with pytest.raises(LenaNotImplementedError):
-        MyFillRequest().request()
+    # with pytest.raises(LenaNotImplementedError):
+    #     MyFillRequest().request()
 
     # test if run is initialized correctly
     class MyRun():
@@ -160,6 +166,9 @@ def test_fill_request():
             pass
 
         def request(self):
+            pass
+
+        def reset(self):
             pass
 
         def run(self, flow):

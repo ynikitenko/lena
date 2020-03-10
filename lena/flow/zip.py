@@ -56,6 +56,7 @@ class Zip(object):
         elif seq_type == "fill_request":
             self.fill = self._fill
             self.request = self._request
+            self.reset = self._reset
         else:
             raise exceptions.LenaNotImplementedError
 
@@ -109,6 +110,10 @@ class Zip(object):
             results.append(seq.request())
         for val in self._yield(results):
             yield val
+
+    def _reset(self):
+        for seq in self._sequences:
+            seq.reset()
 
     def _yield(self, results):
         # general yield from various sequences

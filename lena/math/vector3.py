@@ -432,7 +432,7 @@ class vector3(object):
     # Cf. http://vpython.org/contents/docs/vector.html
 
     def angle(self, B):
-        """The angle between self and *B*, radians.
+        """The angle between self and *B*, in radians.
 
         >>> v1 = vector3([0, 3, 4])
         >>> v2 = vector3([0, 3, 4])

@@ -211,7 +211,7 @@ class FillRequest(object):
     A *FillRequest* element has methods *fill(value)* and *request()*.
     """
 
-    def __init__(self, el, fill="fill", request="request", bufsize=1):
+    def __init__(self, el, fill="fill", request="request", reset=True, bufsize=1):
         """Names for *fill* and *request* can be customized
         during initialization.
 
@@ -237,20 +237,27 @@ class FillRequest(object):
         """
         fill = getattr(el, fill, None)
         request = getattr(el, request, None)
+        el_reset = getattr(el, "reset", None)
         if not callable(fill):
             raise exceptions.LenaTypeError(
-                "fill must exist and be callable"
+                "fill method {} must exist and be callable".format(fill)
+            )
+        if not callable(el_reset):
+            raise exceptions.LenaTypeError(
+                "reset must exist and be callable"
             )
         self.fill = fill
+
+        self._reset = reset
         if callable(request):
-            self.request = request
+            self._request_meth = request
         else:
             # derive from compute and reset
             compute = getattr(el, "compute", None)
-            reset = getattr(el, "reset", None)
-            if not callable(compute) or not callable(reset):
+            # reset = getattr(el, "reset", None)
+            if not callable(compute): # or not callable(reset):
                 raise exceptions.LenaTypeError(
-                    "request must exist and be callable"
+                    "request or compute must exist and be callable"
                 )
             self.request = self._compute_reset
 
@@ -268,20 +275,28 @@ class FillRequest(object):
     def _compute_reset(self):
         for val in self._el.compute():
             yield val
-        self._el.reset()
+        if self._reset:
+            self._el.reset()
 
     def fill(self, value): # pylint: disable=no-self-use,unused-argument
-        """Fill *self* with *value*.
-        """
+        """Fill *self* with *value*."""
         raise exceptions.LenaNotImplementedError
 
-    def request(self): # pylint: disable=no-self-use
+    def request(self):
         """Yield computed values.
 
         May be called at any time,
         the flow may still contain zero or more items.
         """
-        raise exceptions.LenaNotImplementedError
+        for val in self._request_meth():
+            yield val
+        if self._reset:
+            self._el.reset()
+        # raise exceptions.LenaNotImplementedError
+
+    def reset(self):
+        """Reset the element *el*."""
+        self._el.reset()
 
     def run(self, flow):
         """Implement *run* method.
@@ -325,6 +340,8 @@ class FillRequest(object):
                 self.fill(arg)
             for result in self.request():
                 yield result
+            if self._reset:
+                self._el.reset()
 
 
 class Run(object):

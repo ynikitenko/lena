@@ -28,7 +28,7 @@ def test_graph():
     sorted_points = copy.deepcopy(points)
     random.shuffle(points)
     graph2 = Graph(points)
-    gr_points, gr_context = next(graph2.compute())
+    gr_points, gr_context = next(graph2.request())
     assert gr_points.points == sorted_points
 
     # test repr
@@ -39,13 +39,13 @@ def test_graph():
     graph = Graph(points)
     # sort works
     assert repr(graph) == ("Graph(points=[(0, 1), (1, 2), (2, 3)], "
-                           "context={'dim': 1}, sort=True)")
+                           "scale=None, sort=True)")
 
     # doesn't sort when False
     points = [(2, 3), (0, 1), (1, 2)]
     unsorted_graph = Graph(points, sort=False)
     assert (repr(unsorted_graph) == 
-            "Graph(points=[(2, 3), (0, 1), (1, 2)], context={'dim': 1}, sort=False)")
+            "Graph(points=[(2, 3), (0, 1), (1, 2)], scale=None, sort=False)")
 
     # fill works same as initialization
     new_unsorted_graph = Graph(sort=False)
@@ -66,12 +66,8 @@ def test_graph():
     assert repr(rescaled) == (
         "Graph(points=[((0, 0), 0.0), ((0, 1), 2.0), "
         "((1, 0), 2.0), ((1, 1), 4.0), ((2, 0), 4.0)], "
-        "context={'dim': 2, 'scale': 2}, sort=True)"
-    ) or repr(rescaled) == (
-        "Graph(points=[((0, 0), 0.0), ((0, 1), 2.0), "
-        "((1, 0), 2.0), ((1, 1), 4.0), ((2, 0), 4.0)], "
-        "context={'scale': 2, 'dim': 2}, sort=True)"
-    ) # context dict representation may change the order of elements
+        "scale=2, sort=True)"
+    )
 
     # rescale of composite values works
     pt = ((2, 3), (10, {"5th element": "5"}))

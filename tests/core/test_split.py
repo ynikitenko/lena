@@ -1,5 +1,6 @@
 from __future__ import print_function
 
+import copy
 import pytest
 
 import lena.core
@@ -14,7 +15,9 @@ from lena.core import (
 from lena.flow import Cache, ISlice
 from tests.example_sequences import (ASCIILowercase, ASCIIUppercase,
     ascii_lowercase, ascii_uppercase, lowercase_cached_filename, lowercase_cached_seq, id_)
-from tests.examples.fill_compute import Count, Sum
+# from tests.examples.fill_compute import Count
+from lena.math import Sum
+from lena.flow import Count
 from tests.core.test_fill_compute_seq import cnt1
 
 
@@ -116,36 +119,41 @@ def test_split_sequence_with_cache():
 def test_split_with_fill_computes():
     seq = Split([Sum(), Count()])
     assert seq._seq_types == ['fill_compute', 'fill_compute']
+
     flow = [0, 1, 2, 3, 4, 0]
     context = {'type': 'extended histogram'}
-    flowc = [(val, context) for val in flow]
-    res = seq.run(flowc)
-    seq_res = list(res)
-    assert seq_res == [10, 6]
+    orig_context = copy.deepcopy(context)
+    counter_context = {'type': 'extended histogram', 'counter': 6}
+    # otherwise context is updated by the last sequence.
+    flowc = [(val, copy.deepcopy(context)) for val in flow]
+    seq_res = list(seq.run(flowc))
+    assert seq_res == [(10, orig_context), (6, counter_context)]
+
     # common methods fill and compute work
     seq2 = Split([Sum(), Count()], copy_buf=False)
     for val in flowc:
         seq2.fill(val)
     seq2_res = list(seq2.compute())
-    assert seq2_res == seq_res
+    assert seq2_res == [(10, counter_context), (6, counter_context)]
+
     # explicit FillComputeSeq initialization
     seq3 = Split([FillComputeSeq(Sum()), FillComputeSeq(Count())])
     seq3_res = list(seq3.run(flowc))
-    assert seq3_res == seq_res
+    assert seq3_res == seq2_res
     with pytest.raises(LenaAttributeError):
-        print(list(seq3()))
-        # this won't work, because it's a generator:
-        # seq3()
+        # print(list(seq3()))
+        list(seq3())
 
     seq = Split([(ISlice(2), Sum()), Count()])
-    print(seq._sequences[0])
-    assert list(seq.run(flowc)) == [1, 6]
+    # print(seq._sequences[0])
+    assert list(seq.run(flowc)) == [(1, orig_context), (6, counter_context)]
 
 
 def test_split_with_fill_request():
-    seq1 = Split([(ISlice(1000), FillRequest(Sum(), request="compute"))])
-    seq2 = Split([FillRequestSeq(FillRequest(Sum(), request="compute"))])
-    seq3 = Split([FillRequest(Sum(), request="compute")])
+    FillRequest(Sum())
+    seq1 = Split([(ISlice(1000), FillRequest(Sum()))])
+    seq2 = Split([FillRequestSeq(FillRequest(Sum()))])
+    seq3 = Split([FillRequest(Sum())])
     flow = [0, (1, {}), 2, 3]
     for val in flow:
         seq2.fill(val)
@@ -161,6 +169,6 @@ def test_split_with_fill_request():
     assert res3 == [0]
 
     # test LenaStopFill
-    seq4 = Split([(StopFill(2), FillRequest(Sum(), request="compute"))])
+    seq4 = Split([(StopFill(2), FillRequest(Sum()))])
     res4 = list(seq4.run(flow))
     assert res4 == [1]

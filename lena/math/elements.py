@@ -85,7 +85,7 @@ class Sum(object):
 
         The *value* can be a *(data, context)* pair.
         The last *context* value (if missing, it is considered empty)
-        is saved for output.
+        sets the current context.
         """
         data, context = (lena.flow.get_data(value),
                          lena.flow.get_context(value))

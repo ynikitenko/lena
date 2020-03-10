@@ -28,7 +28,7 @@ def test_group_plots():
             [1], {'group': [{}]}
         ),
         (
-            [Graph(points=[(0, 1), (1, 2)], context={'dim': 1}, sort=True)],
+            [Graph(points=[(0, 1), (1, 2)], sort=True)],
             {'group': [{}]}
         ),
     ]

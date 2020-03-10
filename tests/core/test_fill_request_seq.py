@@ -21,33 +21,40 @@ def cnt1():
 
 def test_fill_request_seq():
     # FR with preprocess
+    # todo: really 3 reset=False?
     s1 = Source(
         cnt1,
         # this FillRequest is optional
-        FillRequest(FillRequestSeq(
-            lambda x: x-1,
-            FillRequest(Sum(start=0), request="compute"),
-            # lambda x: x
-            )
+        FillRequest(
+            FillRequestSeq(
+                lambda x: x-1,
+                FillRequest(Sum(start=0), reset=False),
+                # lambda x: x
+                reset=False,
+            ),
+            reset=False,
         ),
         ISlice(10)
     )
     assert list(s1()) == [0, 1, 3, 6, 10, 15, 21, 28, 36, 45]
+
     # FR with postprocess
     s2 = Source(
         cnt1,
         FillRequestSeq(
-            FillRequest(Sum(start=0), request="compute"),
+            FillRequest(Sum(start=0), reset=False),
             lambda x: x-1,
+            reset=False,
         ),
         ISlice(10)
     )
     assert list(s2()) == [0, 2, 5, 9, 14, 20, 27, 35, 44, 54]
+
     # this works
     frs = FillRequestSeq(FillRequest(Sum()))
-    assert frs.bufsize == 1
+    assert frs._bufsize == 1
     frs2 = FillRequestSeq(FillRequest(Sum()), bufsize=2)
-    assert frs2.bufsize == 2
+    assert frs2._bufsize == 2
     # wrong keyword
     with pytest.raises(LenaTypeError):
         FillRequestSeq(FillRequest(Sum()), unknown=True)

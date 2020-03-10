@@ -41,9 +41,12 @@ class FillRequestSeq(lena_sequence.LenaSequence):
         """
         # *args* can consist of one tuple, which in that case is expanded.
         if "bufsize" in kwargs:
-            self.bufsize = kwargs.pop("bufsize")
+            self._bufsize = kwargs.pop("bufsize")
         else:
-            self.bufsize = 1
+            self._bufsize = 1
+        reset = kwargs.pop("reset", True)
+        self._reset = reset
+
         if kwargs:
             raise exceptions.LenaTypeError(
                 "unknown kwargs {}".format(kwargs)
@@ -53,7 +56,7 @@ class FillRequestSeq(lena_sequence.LenaSequence):
             check_sequence_type.is_fill_request_el,
             el_name="FillRequest", seq_name="FillRequestSeq"
         )
-        fr = adapters.FillRequest(self, bufsize=self.bufsize)
+        fr = adapters.FillRequest(self, reset=reset, bufsize=self._bufsize)
         self.run = fr.run
 
     def fill(self, value):
@@ -81,3 +84,7 @@ class FillRequestSeq(lena_sequence.LenaSequence):
 
         # FillRequest must produce a generator, so no conversion is needed.
         return results
+
+    def reset(self):
+        """Reset the *FillRequest* element."""
+        self._fill_request.reset()

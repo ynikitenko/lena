@@ -106,9 +106,8 @@ class ToCSV(object):
         All not converted data is yielded unchanged.
 
         If *data* has *to_csv* method, it must accept
-        keyword arguments *separator* and *header*.
-        *data.to_csv* may produce context,
-        which in this case updates the current context.
+        keyword arguments *separator* and *header*
+        and return text.
 
         If *context.output.to_csv* is False,
         the value is skipped.
@@ -136,13 +135,20 @@ class ToCSV(object):
                 continue
 
             if hasattr(data, "to_csv") and callable(data.to_csv):
-                new_val = data.to_csv(separator=self._separator,
+                text = data.to_csv(separator=self._separator,
                                       header=self._header)
-                new_data, new_context = (lena.flow.get_data(new_val),
-                                         lena.flow.get_context(new_val))
-                lena.context.update_recursively(context, new_context)
+                ## *data.to_csv* may produce context,
+                ## which in this case updates the current context.
+                # no need to allow this. All necessary context
+                # must be contained in the data and provided with that.
+                # new_val = data.to_csv(separator=self._separator,
+                #                       header=self._header)
+                # new_data, new_context = (lena.flow.get_data(new_val),
+                #                          lena.flow.get_context(new_val))
+                # lena.context.update_recursively(context, new_context)
+                # yield (new_data, new_context)
                 lena.context.update_recursively(context, "output.filetype.csv")
-                yield (new_data, new_context)
+                yield (text, context)
             elif is_writable_hist(val):
                 if data.dim == 1:
                     lines_iter = hist1d_to_csv(

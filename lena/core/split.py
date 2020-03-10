@@ -91,6 +91,7 @@ class Split(object):
             yields values from all sequences in turn
             (as would also do *request* or *Source.__call__*).
         """
+        # todo: copy_buf must be always True. Isn't that?
         if not isinstance(seqs, list):
             raise exceptions.LenaTypeError(
                 "seqs must be a list of sequences, "

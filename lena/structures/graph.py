@@ -12,12 +12,8 @@ def _rescale_value(rescale, value):
     return rescale * lena.flow.get_data(value)
 
 
-class Graph(lena.core.FillCompute):
+class Graph(object):
     """Function at given points.
-
-    Warning
-    -------
-        Under construction. Scale, initialization and docs will be rethought.
 
     Graph can be set during the initialization and
     during :meth:`fill`. It can be rescaled (producing a new graph).
@@ -36,7 +32,7 @@ class Graph(lena.core.FillCompute):
     To reduce data, use histograms.
     """
 
-    def __init__(self, points=None, context=None, sort=True, rescale_value=None):
+    def __init__(self, points=None, scale=None, sort=True):
         """*points* is an array of *(coordinate, value)* tuples.
 
         *context* will be added to graph context.
@@ -51,12 +47,6 @@ class Graph(lena.core.FillCompute):
         This is usually needed to plot graphs of functions.
         If you need to keep the order of insertion, set *sort* to False.
 
-        *rescale_value* is a function, which can be used to scale
-        complex graph values.
-        It must accept a rescale parameter and the value at a data point.
-        By default, it is multiplication of rescale and the value
-        (which must be a number).
-
         By default, sorting is done using standard Python
         lists and functions. You can disable *sort* and provide your own
         sorting container for *points*.
@@ -65,17 +55,22 @@ class Graph(lena.core.FillCompute):
         Note that a rescaled graph uses a default list.
         """
         self._points = points if points is not None else []
-        context = context if context is not None else {}
-        self._scale = context.get("scale") # or None
-        self._context = context
+        self._scale = scale
+        self._init_context = {"scale": scale}
         self._cur_context = {}
         self._sort = sort
 
-        if rescale_value is None:
-            self._rescale_value = _rescale_value
+        ## probably this function is not needed.
+        ## it can't be copied, graphs won't be possible to compare.
+        # *rescale_value* is a function, which can be used to scale
+        # complex graph values.
+        # It must accept a rescale parameter and the value at a data point.
+        # By default, it is multiplication of rescale and the value
+        # (which must be a number).
+        # if rescale_value is None:
+        #     self._rescale_value = _rescale_value
+        self._rescale_value = _rescale_value
         self._update()
-        # run method is inherited automatically from FillCompute
-        super(Graph, self).__init__(self)
 
     def fill(self, value):
         """Fill the graph with *value*.
@@ -100,12 +95,14 @@ class Graph(lena.core.FillCompute):
         self._update()
         yield (self, self._context)
 
-    def compute(self):
-        """Yield graph with context (as in :meth:`request`),
-        and :meth:`reset`."""
-        self._update()
-        yield (self, self._context)
-        self.reset()
+    # compute method shouldn't be in this class,
+    # because it is a pure FillRequest.
+    # def compute(self):
+    #     """Yield graph with context (as in :meth:`request`),
+    #     and :meth:`reset`."""
+    #     self._update()
+    #     yield (self, self._context)
+    #     self.reset()
 
     @property
     def points(self):
@@ -115,14 +112,16 @@ class Graph(lena.core.FillCompute):
         return self._points
 
     def reset(self):
-        """Reset points to empty list and context to empty dict."""
+        """Reset points to an empty list
+        and current context to an empty dict.
+        """
         self._points = []
-        self._context = {}
+        self._cur_context = {}
 
     def __repr__(self):
         self._update()
-        return ("Graph(points={}, context={}, sort={})"
-                .format(self._points, self._context, self._sort))
+        return ("Graph(points={}, scale={}, sort={})"
+                .format(self._points, self._scale, self._sort))
 
     def scale(self, other=None):
         """Get or set the scale.
@@ -132,7 +131,7 @@ class Graph(lena.core.FillCompute):
         this may be its integral passed via context during :meth:`fill`.
         Once the scale is set, it is stored in the graph.
         If one attempts to use scale which was not set,
-        :exc:`LenaAttributeError` is raised.
+        :exc:`~lena.core.LenaAttributeError` is raised.
 
         If *other* is None, return the scale.
 
@@ -142,8 +141,8 @@ class Graph(lena.core.FillCompute):
         Note that in this case its *points* will be a simple list
         and new graph *sort* parameter will be True.
 
-        Graphs with scale equal to zero can't be rescaled.
-        :exc:`LenaValueError` is raised if one tries to do that.
+        Graphs with scale equal to zero can't be rescaled. 
+        Attempts to do that raise :exc:`~lena.core.LenaValueError`.
         """
         if other is None:
             # return scale
@@ -160,15 +159,19 @@ class Graph(lena.core.FillCompute):
                 raise lena.core.LenaValueError(
                     "can't rescale graph with 0 scale"
                 )
-            new_context = copy.deepcopy(self._context)
-            new_context.update({"scale": other})
+
+            # new_init_context = copy.deepcopy(self._init_context)
+            # new_init_context.update({"scale": other})
+
             rescale = float(other) / scale
             new_points = []
             for coord, val in self._points:
+                # probably not needed, because tuples are immutable:
                 # make a deep copy so that new values
                 # are completely independent from old ones.
                 new_points.append((coord, self._rescale_value(rescale, val)))
-            new_graph = Graph(points=new_points, context=new_context,
+            # todo: not sort=self._sort?
+            new_graph = Graph(points=new_points, scale=other,
                               sort=True)
             return new_graph
 
@@ -190,12 +193,21 @@ class Graph(lena.core.FillCompute):
         if self._sort:
             self._update()
 
-        # no explicit separator provided
-        if separator is None:
-            separator = ","
+        def unpack_pt(pt):
+            coord = pt[0]
+            value = pt[1]
+            if isinstance(coord, tuple):
+                unpacked = list(coord)
+            else:
+                unpacked = [coord]
+            if isinstance(value, tuple):
+                unpacked += list(coord)
+            else:
+                unpacked.append(value)
+            return unpacked
+
         def pt_to_str(pt, separ):
-            return separ.join([str(coord) for coord in pt[0]] +
-                              [str(val) for val in pt[1]])
+            return separ.join([str(val) for val in unpack_pt(pt)])
 
         if header is not None:
             # if one needs an empty header line, they may provide ""
@@ -203,7 +215,12 @@ class Graph(lena.core.FillCompute):
         else:
             lines = ""
         lines += "\n".join([pt_to_str(pt, separator) for pt in self.points])
-        return (lines, self._context)
+
+        # don't do that. Context is already present in value passed.
+        # to_csv just converts the data to string.
+        # context = copy.deepcopy(self._cur_context)
+        # context.update(self._init_context)
+        return lines
 
     def _update(self):
         """Sort points if needed, update context."""
@@ -220,9 +237,13 @@ class Graph(lena.core.FillCompute):
             self._scale = context_scale
         if self._sort:
             self._points = sorted(self._points)
-        context = self._context
-        context.update(self._cur_context)
-        context.update(lena.context.make_context(self, "dim", "_scale"))
+
+        self._context = copy.deepcopy(self._cur_context)
+        self._context.update(self._init_context)
+        # why this? Not *graph.scale*?
+        self._context.update({"scale": self._scale})
+        # self._context.update(lena.context.make_context(self, "_scale"))
+
         if self._points:
             # check points correctness
             points = self._points
@@ -239,7 +260,7 @@ class Graph(lena.core.FillCompute):
                     "{} given".format(points)
                 )
             self.dim = dim
-            context["dim"] = self.dim
+            self._context["dim"] = self.dim
 
     def __eq__(self, other):
         if not isinstance(other, Graph):
