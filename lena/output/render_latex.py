@@ -1,6 +1,7 @@
 """Create LaTeX text from templates and data."""
 from __future__ import print_function
 
+import copy
 import jinja2
 
 import lena.core
@@ -140,16 +141,15 @@ class RenderLaTeX(object):
         of the tuple (no write to filesystem occurs).
         context.output.filetype updates to "tex".
 
-        If context contains a list output.latex.repeat,
-        rendering will be iterated,
-        and yielded several times (one time for unchanged context
-        and remaining for all list items).
+        If context contains a list *output.plot.repeat*,
+        rendering will be iterated and yielded for each of its items.
         Each repeat item must be a dictionary, which will update
-        a deep copy of context (each update won't affect other ones).
+        a deep copy of *output.plot* (each update won't affect other ones).
+        If you want the original context to be preserved,
+        add an empty dictionary to *repeat*.
         For example, if you want to make two renderings of a plot
-        with a normal and a logarithmic scale,
-        add output.latex.repeat = [{"scale": "log"}],
-        and "scale" will be available in the rendered context.
+        with normal and logarithmic scales,
+        add *output.plot.repeat* equal to [{}, {"scale": "log"}].
 
         Not selected values pass unchanged.
         """
@@ -166,13 +166,21 @@ class RenderLaTeX(object):
                     context, {"output": {"fileext": "tex"}}
                 )
                 repeat = lena.context.get_recursively(
-                        context, "output.latex.repeat", default=None
+                        context, "output.plot.repeat", default=None
                 )
-                if not isinstance(repeat, list):
-                    repeat = []
-                for context in lena.context.iterate_update(context,
-                                                           [{}] + repeat):
+                if repeat is None:
                     data = template.render(context)
                     yield (data, context)
+                else:
+                    for rep in repeat:
+                        upd_context = copy.deepcopy(context)
+                        lena.context.update_recursively(
+                            upd_context, {"output": {"plot": rep}}
+                        )
+                        data = template.render(upd_context)
+                        yield (data, upd_context)
+                    # for upd_context in lena.context.iterate_update(
+                    #     context, {"output": {"plot": repeat}}
+                    # ):
             else:
                 yield val

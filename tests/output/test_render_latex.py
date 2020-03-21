@@ -9,6 +9,7 @@ import sys
 from copy import deepcopy
 
 from lena.output import RenderLaTeX, Template, Environment
+from lena.context import get_recursively, update_recursively
 
 
 def test_template():
@@ -32,7 +33,7 @@ def test_template():
     assert t2.render({"name1": 'John Doe'}) == u'Hello !'
     t3 = Template(r'Hello \VAR{ name }!', undefined=jinja2.DebugUndefined)
     assert t3.render({"name1": 'John Doe'}) == u'Hello {{ name }}!'
-    assert t3.render({"name1": 'John Doe'}) != 'Hello \VAR{ name }!'
+    assert t3.render({"name1": 'John Doe'}) != r'Hello \VAR{ name }!'
 
 
 def test_environment():
@@ -45,16 +46,16 @@ def test_environment():
     t2 = env.from_string(r'Hello \VAR{ name }!')
     assert t2.render(name='John Doe') == u'Hello John Doe!'
     
-    assert jinja2.Environment(variable_start_string='\VAR{', undefined=jinja2.DebugUndefined).from_string("{{ val }}").render({"val": "Hello"}) ==  u'{{ val }}'
-    assert jinja2.Environment(variable_start_string='\VAR{', variable_end_string='}').from_string(r'\VAR{ val }').render({"val": "Hello"}) == u'Hello'
-    assert jinja2.Environment(variable_start_string='\VAR{', variable_end_string='}', undefined=jinja2.DebugUndefined).from_string("{{ val }}").render({"val": "Hello"}) == u'{{ val }}'
-    assert jinja2.Environment(variable_start_string='\VAR{', undefined=jinja2.DebugUndefined).from_string("\VAR{ val }}").render({"val": "Hello"}) == u'Hello'
+    assert jinja2.Environment(variable_start_string=r'\VAR{', undefined=jinja2.DebugUndefined).from_string("{{ val }}").render({"val": "Hello"}) ==  u'{{ val }}'
+    assert jinja2.Environment(variable_start_string=r'\VAR{', variable_end_string='}').from_string(r'\VAR{ val }').render({"val": "Hello"}) == u'Hello'
+    assert jinja2.Environment(variable_start_string=r'\VAR{', variable_end_string='}', undefined=jinja2.DebugUndefined).from_string("{{ val }}").render({"val": "Hello"}) == u'{{ val }}'
+    assert jinja2.Environment(variable_start_string=r'\VAR{', undefined=jinja2.DebugUndefined).from_string(r"\VAR{ val }}").render({"val": "Hello"}) == u'Hello'
     # Incorrect, should be "\VAR{ val }}"
     # Submitted to https://github.com/pallets/jinja/issues/958
     # That bug was closed, a new wrapper was suggested (DIY).
-    assert jinja2.Environment(variable_start_string='\VAR{', undefined=jinja2.DebugUndefined).from_string("\VAR{ val }}").render({"val1": "Hello"}) == u'{{ val }}'
+    assert jinja2.Environment(variable_start_string=r'\VAR{', undefined=jinja2.DebugUndefined).from_string(r"\VAR{ val }}").render({"val1": "Hello"}) == u'{{ val }}'
     assert jinja2.Environment(undefined=jinja2.DebugUndefined).from_string("{{ val }}").render({"val1": "Hello"}) == u'{{ val }}'
-    assert jinja2.Environment(variable_start_string='\VAR{').from_string("\VAR{ val }}").render({"val": "Hello"}) == u'Hello'
+    assert jinja2.Environment(variable_start_string=r'\VAR{').from_string(r"\VAR{ val }}").render({"val": "Hello"}) == u'Hello'
 
 
 def test_render_latex():
@@ -82,7 +83,7 @@ def test_render_latex():
     assert new_context == {'output': {'fileext': 'tex', 'filetype': 'tex', "filepath": "output.csv"}}
 
     ## repeat works ##
-    context["output"].update({"latex": {"repeat": [{"scale": "log"}]}})
+    context["output"].update({"plot": {"repeat": [{}, {"scale": "log"}]}})
     rendered_l = list(renderer.run([("output.csv", context)]))
     assert len(rendered_l) == 2
     # for res in rendered_l:
@@ -91,11 +92,11 @@ def test_render_latex():
     assert "scale" not in context_1
     assert context_1 == {
         'output': {'fileext': 'tex', 'filetype': 'tex', "filepath": "output.csv",
-                   'latex': {'repeat': [{'scale': 'log'}]}}
+                   'plot': {'repeat': [{}, {'scale': 'log'}]}}
         }
     context_2 = rendered_l[1][1]
-    assert context_2["scale"] == "log"
-    context_1.update({"scale": "log"})
+    assert get_recursively(context_2, "output.plot.scale") == "log"
+    update_recursively(context_1, {"output": {"plot": {"scale": "log"}}})
     assert context_1 == context_2
 
     # not selected data passes unchanged
