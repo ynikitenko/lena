@@ -12,6 +12,13 @@ Context
 .. currentmodule:: lena.context.functions
 .. autosummary::
 
+    difference
+    get_recursively
+    intersection
+    update_nested
+    update_recursively
+
+..
     check_context_str
     difference
     get_recursively
@@ -32,4 +39,11 @@ Context
 
 Functions
 ---------
-.. automodule:: lena.context.functions
+.. .. automodule:: lena.context.functions
+.. currentmodule:: lena.context.functions
+
+.. autofunction:: difference
+.. autofunction:: get_recursively
+.. autofunction:: intersection
+.. autofunction:: update_nested
+.. autofunction:: update_recursively

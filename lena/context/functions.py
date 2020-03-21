@@ -38,7 +38,7 @@ def check_context_str(d, s):
 
 
 def difference(d1, d2):
-    """Return dictionary with items from *d1* not contained in *d2*.
+    """Return a dictionary with items from *d1* not contained in *d2*.
 
     If a key is present both in *d1* and *d2* but has different values,
     it is included into the difference.
@@ -51,6 +51,7 @@ def difference(d1, d2):
 
 
 _sentinel = object()
+
 
 def get_recursively(d, keys, default=_sentinel):
     """Get value from a dictionary *d* recursively.
@@ -235,6 +236,7 @@ def iterate_update(d, updates):
 
     If *updates* is empty, nothing is yielded.
     """
+    # todo: do I need this function?
     for update in updates:
         d_copy = copy.deepcopy(d)
         update_recursively(d_copy, update)
