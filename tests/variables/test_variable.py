@@ -146,7 +146,7 @@ def test_compose():
         "variable.compose.latex_name.x",
         "variable.compose.name.x",
     ]:
-        cont = lena.context.str_to_context(update_str)
+        cont = lena.context.str_to_dict(update_str)
         lena.context.update_recursively(res1[1], cont)
     del res1[1]["variable"]["compose"]["particle"]
     del res1[1]["variable"]["compose"]["type"]

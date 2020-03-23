@@ -229,7 +229,7 @@ class MakeFilename(object):
                 modified = False
 
                 for kw in ["filename", "fileext", "dirname"]:
-                    context_key = lena.context.str_to_context("output." + kw)
+                    context_key = lena.context.str_to_dict("output." + kw)
                     if self._overwrite or not lena.context.get_recursively(
                         context, context_key, default=""
                     ):

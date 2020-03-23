@@ -3,7 +3,7 @@ from lena.context.functions import (
     check_context_str,
     difference, get_recursively,
     intersection, iterate_update, make_context,
-    str_to_context, update_nested, update_recursively,
+    str_to_dict, update_nested, update_recursively,
 )
 
 __all__ = [
@@ -14,6 +14,6 @@ __all__ = [
     'intersection',
     'iterate_update',
     'make_context',
-    'str_to_context',
+    'str_to_dict',
     'update_nested', 'update_recursively',
 ]

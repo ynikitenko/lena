@@ -15,6 +15,7 @@ Context
     difference
     get_recursively
     intersection
+    str_to_dict
     update_nested
     update_recursively
 
@@ -25,7 +26,7 @@ Context
     intersection
     iterate_update
     make_context
-    str_to_context
+    str_to_dict
     update_nested
     update_recursively
 
@@ -45,5 +46,6 @@ Functions
 .. autofunction:: difference
 .. autofunction:: get_recursively
 .. autofunction:: intersection
+.. autofunction:: str_to_dict
 .. autofunction:: update_nested
 .. autofunction:: update_recursively

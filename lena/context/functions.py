@@ -16,7 +16,7 @@ def check_context_str(d, s):
     *s* must have at least two dot-separated parts,
     otherwise :exc:`~lena.core.LenaValueError` is raised.
 
-    See also :func:`str_to_context`.
+    See also :func:`str_to_dict`.
     """
     # todo: rename to is_subdictionary?
     # add examples
@@ -265,7 +265,7 @@ def make_context(obj, *attrs):
     return context
 
 
-def str_to_context(s):
+def str_to_dict(s):
     """Create a dictionary from a dot-separated string *s*.
 
     Dots represent nested dictionaries.
@@ -274,7 +274,7 @@ def str_to_context(s):
 
     Example:
 
-    >>> str_to_context("a.b.c d")
+    >>> str_to_dict("a.b.c d")
     {'a': {'b': 'c d'}}
     """
     # todo: add a parameter to recover ints from ints?
@@ -339,7 +339,7 @@ def update_recursively(d, other):
     """Update dictionary *d* with items from *other* dictionary.
 
     *other* can be a dot-separated string. In this case
-    :func:`str_to_context` is used to convert it to a dictionary.
+    :func:`str_to_dict` is used to convert it to a dictionary.
 
     Existing values are updated recursively,
     that is including nested subdictionaries.
@@ -362,7 +362,7 @@ def update_recursively(d, other):
     otherwise :exc:`~lena.core.LenaTypeError` is raised.
     """
     if isinstance(other, str):
-        other = str_to_context(other)
+        other = str_to_dict(other)
     if not isinstance(d, dict) or not isinstance(other, dict):
         raise lena.core.LenaTypeError(
             "d and other must be dicts, {} and {} provided".format(d, other)

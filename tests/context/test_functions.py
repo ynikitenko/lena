@@ -140,9 +140,9 @@ def test_make_context():
             {'dim': 1, 'scale': 2})
 
 
-def test_str_to_context():
+def test_str_to_dict():
     with pytest.raises(lena.core.LenaValueError):
-        lena.context.str_to_context("s")
+        lena.context.str_to_dict("s")
 
 
 def test_update_nested():
