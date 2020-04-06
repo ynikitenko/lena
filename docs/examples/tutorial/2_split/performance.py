@@ -14,7 +14,7 @@ from lena.variables import Variable
 from read_data import ReadData
 
 
-def main():
+def main(copy_buf=True):
     # 10**6 events
     data_file = os.path.join("..", "data", "normal_3d_large.csv")
     writer = Writer("output")
@@ -33,7 +33,9 @@ def main():
                 Variable("z", lambda vec: vec[2]),
                 Histogram(mesh((-10, 10), 10)),
             ),
-        ]),
+        ],
+            copy_buf=copy_buf,
+        ),
         MakeFilename("{variable.name}"),
         HistToCSV(),
         # writer,
@@ -48,10 +50,17 @@ def main():
 
 
 if __name__ == "__main__":
-    perf_filename = "perf_usual_split.txt"
+    # copy_buf = False
+    copy_buf = True
+    # with that total time is 105.642 s, deepcopy time (still largest) is 20.791
+    # by default, total time is 128.379, deepcopy time is 31.038
+    if copy_buf:
+        perf_filename = "perf_usual_split.txt"
+    else:
+        perf_filename = "perf_no_copybuf.txt"
     if not os.path.exists(perf_filename):
         # 1 million events, takes around 2 minutes on laptop
-        cProfile.run("main()", perf_filename)
+        cProfile.run("main(copy_buf={})".format(copy_buf), perf_filename)
     stats = pstats.Stats(perf_filename)
     stats.sort_stats("cumulative")
     # copy.deepcopy is longest
