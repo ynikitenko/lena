@@ -65,8 +65,7 @@ class GroupScale(object):
         # rescale
         new_group = []
         for val in group:
-            data = lena.flow.get_data(val)
-            context = lena.flow.get_context(val)
+            data, context = lena.flow.get_data_context(val)
             try:
                 new_data = data.scale(scale)
             except AttributeError as err:

@@ -41,13 +41,13 @@ class NumpyHistogram(object):
             self._kwargs.update({"bins": "auto"})
         # numpy.array can't be extended on the fly
         self._data = []
-        self._context = {}
+        self._cur_context = {}
 
     def fill(self, val):
         """Add data to the internal storage."""
-        data, context = lena.flow.get_data(val), lena.flow.get_context(val)
+        data, context = lena.flow.get_data_context(val)
         self._data.append(data)
-        self._context = context
+        self._cur_context = context
 
     def compute(self):
         """Compute the final histogram.
@@ -58,9 +58,9 @@ class NumpyHistogram(object):
         """
         bins, edges = numpy.histogram(self._data, *self._args, **self._kwargs)
         self._data = []
-        # self._context.update({"type": "histogram"})
+        # self._cur_context.update({"type": "histogram"})
         hist = lena.structures.Histogram(edges, bins)
-        context = hf.make_hist_context(hist, self._context)
+        context = hf.make_hist_context(hist, self._cur_context)
         yield (hist, context)
 
     def request(self):
@@ -70,5 +70,5 @@ class NumpyHistogram(object):
         """
         bins, edges = numpy.histogram(self._data, *self._args, **self._kwargs)
         hist = lena.structures.Histogram(edges, bins)
-        context = hf.make_hist_context(hist, self._context)
+        context = hf.make_hist_context(hist, self._cur_context)
         yield (hist, context)

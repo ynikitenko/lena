@@ -246,10 +246,9 @@ def hist_to_graph(hist, context, make_graph_value=None, bin_coord="left"):
     from lena.flow.split_into_bins import _iter_bins_with_edges as ibe
     for value, edges in ibe(hist.bins, hist.edges):
         coord = get_coord(edges, bin_coord)
-        bin_value = lena.flow.get_data(value)
+        bin_value, bin_context = lena.flow.get_data_context(value)
         if not hasattr(bin_value, "__iter__"):
             bin_value = (bin_value,)
-        bin_context = lena.flow.get_context(value)
         if make_graph_value is None:
             graph_value = bin_value
         else:

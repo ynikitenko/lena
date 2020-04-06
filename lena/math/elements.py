@@ -29,8 +29,7 @@ class Mean(object):
         The last *context* value (if missing, it is considered empty)
         is saved for output.
         """
-        data, context = (lena.flow.get_data(value),
-                         lena.flow.get_context(value))
+        data, context = lena.flow.get_data_context(value)
         self._sum += data
         self._count += 1
         self._cur_context = context
@@ -57,7 +56,7 @@ class Mean(object):
         if not self._cur_context:
             yield mean
         else:
-            yield (mean, self._cur_context)
+            yield (mean, copy.deepcopy(self._cur_context))
 
     def reset(self):
         """Reset sum, count and context.
@@ -87,8 +86,7 @@ class Sum(object):
         The last *context* value (if missing, it is considered empty)
         sets the current context.
         """
-        data, context = (lena.flow.get_data(value),
-                         lena.flow.get_context(value))
+        data, context = lena.flow.get_data_context(value)
         self._sum += data
         self._cur_context = context
 
@@ -101,7 +99,7 @@ class Sum(object):
         if not self._cur_context:
             yield self._sum
         else:
-            yield (self._sum, self._cur_context)
+            yield (self._sum, copy.deepcopy(self._cur_context))
 
     def reset(self):
         """Reset sum, count and context.

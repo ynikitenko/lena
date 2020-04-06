@@ -1,7 +1,7 @@
 """Numerical utilities functions."""
 from numbers import Number
 
-from lena.core import LenaTypeError, LenaValueError
+import lena.core
 
 
 def clip(a, interval):
@@ -31,14 +31,16 @@ def clip(a, interval):
     try:
         l = len(interval)
     except TypeError:
-        raise LenaTypeError("interval must be a container of size 2.")
+        raise lena.core.LenaTypeError("interval must be a container of size 2.")
     if l != 2:
-        raise LenaValueError("interval must be a container of size 2.")
+        raise lena.core.LenaValueError("interval must be a container of size 2.")
     a_min = interval[0]
     a_max = interval[1]
     if a_min > a_max:
-        raise LenaValueError("interval must be increasing, "
-                             + "({}, {}) provided.".format(a_min, a_max))
+        raise lena.core.LenaValueError(
+            "interval must be increasing, "
+            "({}, {}) provided.".format(a_min, a_max)
+        )
     return max(min(a_max, a), a_min)
 
 
@@ -103,4 +105,4 @@ def isclose(a, b, rel_tol=1e-09, abs_tol=0.0):
                 return False
         return True
     else:
-        raise LenaTypeError("isclose doesn't support {} and {}".format(a, b))
+        raise lena.core.LenaTypeError("isclose doesn't support {} and {}".format(a, b))

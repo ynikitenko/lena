@@ -103,11 +103,11 @@ class LaTeXToPDF(object):
             for out_val in pop_returned_processes(self.processes):
                 yield out_val
             if isinstance(val, tuple) and len(val) == 2:
-                data, context = (lena.flow.get_data(val),
-                                 lena.flow.get_context(val))
+                data, context = lena.flow.get_data_context(val)
                 if not is_tex_file(context):
                     yield val
                     continue
+                # no deepcopy, because it's a Run element
                 context.update({"output": {"filetype": "pdf"}})
                 texfile_name = data
                 data = texfile_name.replace(".tex", ".pdf")

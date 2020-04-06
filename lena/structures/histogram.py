@@ -207,9 +207,8 @@ class Histogram(lena.core.FillCompute):
         Values outside the histogram edges are ignored.
         """
         # self.fill_called = True
-        dt = lena.flow.get_data(value)
-        self._cur_context = lena.flow.get_context(value)
-        indices = hf.get_bin_on_value(dt, self.edges)
+        data, self._cur_context = lena.flow.get_data_context(value)
+        indices = hf.get_bin_on_value(data, self.edges)
         subarr = self.bins
         for ind in indices[:-1]:
             # underflow

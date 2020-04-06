@@ -72,7 +72,7 @@ class PDFToPNG(object):
             return filetype == "pdf"
 
         for val in flow:
-            data, context = lena.flow.get_data(val), lena.flow.get_context(val)
+            data, context = lena.flow.get_data_context(val)
             if is_pdf(context):
                 lena.context.update_recursively(context, "output.filetype.png")
                 pdf_name = data

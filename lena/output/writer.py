@@ -94,7 +94,7 @@ class Writer(object):
         If context.output.filename is present, but empty,
         :exc:`~lena.core.LenaRuntimeError` is raised.
         """
-        def should_be_written(val):
+        def should_be_written(data, context):
             if ("output" not in context
                 or not isinstance(context["output"], dict)
                 or not context["output"].get("writer", True)
@@ -108,8 +108,8 @@ class Writer(object):
                     return False
             return True
         for val in flow:
-            data, context = lena.flow.get_data(val), lena.flow.get_context(val)
-            if not should_be_written(val):
+            data, context = lena.flow.get_data_context(val)
+            if not should_be_written(data, context):
                 yield val
                 continue
 

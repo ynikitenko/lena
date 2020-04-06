@@ -37,7 +37,7 @@ True
 
 from math import sin, cos, acos, pi, atan2, sqrt
 
-from lena.core.exceptions import LenaTypeError
+import lena.core
 import lena.math
 
 # pylint: disable=invalid-name,too-many-public-methods

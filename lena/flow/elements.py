@@ -1,4 +1,6 @@
 """Elements which work with the flow."""
+import copy
+
 import lena.core
 from . import functions
 
@@ -33,7 +35,7 @@ class Count(object):
     def compute(self):
         """Yield *(count, context)* and reset self."""
         self._cur_context.update({self._name: self._count})
-        yield (self._count, self._cur_context)
+        yield (self._count, copy.deepcopy(self._cur_context))
         # reset
         self._count = 0
         self._cur_context = {}
@@ -46,7 +48,7 @@ class Count(object):
         Element must have a ``fill(value)`` method.
         """
         self._count += 1
-        data, context = lena.flow.get_data(value), lena.flow.get_context(value)
+        data, context = lena.flow.get_data_context(value)
         context.update({self._name: self._count})
         element.fill((data, context))
 
@@ -74,7 +76,7 @@ class Count(object):
             count += 1
             prev_val = val
         val = prev_val
-        data, context = lena.flow.get_data(val), lena.flow.get_context(val)
+        data, context = lena.flow.get_data_context(val)
         context.update({self._name: count})
         yield (data, context)
 

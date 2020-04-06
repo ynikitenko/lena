@@ -81,8 +81,7 @@ class Graph(object):
         For example, *value* can contain the principal number
         and the precision.
         """
-        point = lena.flow.get_data(value)
-        self._cur_context = lena.flow.get_context(value)
+        point, self._cur_context = lena.flow.get_data_context(value)
         # coords, val = point
         self._points.append(point)
 

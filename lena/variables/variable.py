@@ -128,9 +128,7 @@ class Variable(object):
 
         Return *(data, context)*.
         """
-        data, context = lena.flow.get_data(value), lena.flow.get_context(value)
-        # deepcopy, because otherwise several applications of Variable
-        # to data with context are not idempotent
+        data, context = lena.flow.get_data_context(value)
         context = copy.deepcopy(context)
         var_context = context.get("variable")
         if var_context:

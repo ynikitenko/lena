@@ -152,8 +152,7 @@ class TransformBins(object):
 
     def run(self, flow):
         for value in flow:
-            data, context = (lena.flow.get_data(value),
-                             lena.flow.get_context(value))
+            data, context = lena.flow.get_data_context(value)
             if not isinstance(data, lena.structures.Histogram):
                 yield value
                 continue
@@ -169,8 +168,7 @@ class TransformBins(object):
             ## But in this case data can't be used twice!!
             # context = copy.deepcopy(context)
             for histc, bin_edges in _iter_bins_with_edges(data.bins, data.edges):
-                hist, ana_context = (lena.flow.get_data(histc),
-                                     lena.flow.get_context(histc))
+                hist, ana_context = lena.flow.get_data_context(histc)
                 split_var = lena.context.get_recursively(
                     context, "split_into_bins.variable", None
                 )
@@ -260,8 +258,7 @@ class ReduceBinContent(object):
         and (optionally) for all bins in "all_bins".
         """
         for value in flow:
-            hist, context = (lena.flow.get_data(value),
-                             lena.flow.get_context(value))
+            hist, context = lena.flow.get_data_context(value)
             # data part must be a histogram
             if not isinstance(hist, lena.structures.Histogram):
                 yield value
@@ -380,7 +377,7 @@ class SplitIntoBins(lena.core.FillCompute):
 
         Values outside of *edges* range are ignored.
         """
-        data, context = lena.flow.get_data(val), lena.flow.get_context(val)
+        data, context = lena.flow.get_data_context(val)
         bin_index = lena.structures.get_bin_on_value(self._arg_func(data),
                                                      self.edges)
         subarr = self.bins

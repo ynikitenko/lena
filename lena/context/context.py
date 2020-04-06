@@ -61,6 +61,5 @@ class Context(dict):
         If the *value* doesn't contain a context,
         it is created as an empty :class:`Context`.
         """
-        data, context = (lena.flow.get_data(value),
-                         lena.flow.get_context(value))
+        data, context = lena.flow.get_data_context(value)
         return (data, Context(context))

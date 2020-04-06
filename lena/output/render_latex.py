@@ -73,7 +73,7 @@ def _is_csv(value):
 
 def _select_template(default):
     def select_template(val):
-        data, context = lena.flow.get_data(val), lena.flow.get_context(val)
+        data, context = lena.flow.get_data_context(val)
         out_template = lena.context.get_recursively(context, "output.template", None)
         if out_template:
             return out_template
@@ -141,6 +141,9 @@ class RenderLaTeX(object):
         of the tuple (no write to filesystem occurs).
         context.output.filetype updates to "tex".
 
+        Deprecated:
+        ---------_-
+
         If context contains a list *output.plot.repeat*,
         rendering will be iterated and yielded for each of its items.
         Each repeat item must be a dictionary, which will update
@@ -154,8 +157,7 @@ class RenderLaTeX(object):
         Not selected values pass unchanged.
         """
         for val in flow:
-            data, context = (lena.flow.get_data(val),
-                             lena.flow.get_context(val))
+            data, context = lena.flow.get_data_context(val)
             if self._select_data(val):
                 template = self._environment.get_template(self._select_template(val))
 
