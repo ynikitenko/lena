@@ -50,10 +50,11 @@ def main(copy_buf=True):
 
 
 if __name__ == "__main__":
-    # copy_buf = False
-    copy_buf = True
-    # with that total time is 105.642 s, deepcopy time (still largest) is 20.791
+    copy_buf = False
+    # copy_buf = True
+    # with copy_buf=False total time is 105.642 s, deepcopy time (still largest) is 20.791
     # by default, total time is 128.379, deepcopy time is 31.038
+    # (measured before get_data_context optimizations)
     if copy_buf:
         perf_filename = "perf_usual_split.txt"
     else:
