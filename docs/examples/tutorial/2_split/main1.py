@@ -5,7 +5,7 @@ import os
 from lena.core import Sequence, Split, Source
 from lena.flow import Print
 from lena.math import mesh
-from lena.output import HistToCSV, Writer, LaTeXToPDF, PDFToPNG
+from lena.output import ToCSV, Writer, LaTeXToPDF, PDFToPNG
 from lena.output import RenderLaTeX
 from lena.structures import Histogram
 
@@ -20,20 +20,20 @@ def main():
             (
                 lambda vec: vec[0],
                 Histogram(mesh((-10, 10), 10)),
-                HistToCSV(),
+                ToCSV(),
                 Print(),
                 Writer("output", "x"),
             ),
             (
                 lambda vec: vec[1],
                 Histogram(mesh((-10, 10), 10)),
-                HistToCSV(),
+                ToCSV(),
                 Writer("output", "y"),
             ),
             # (
             #     lambda vec: vec[2],
             #     Histogram(mesh((-10, 10), 10)),
-            #     HistToCSV(),
+            #     ToCSV(),
             #     Writer("output", ("z", "csv")),
             # ),
         ]),

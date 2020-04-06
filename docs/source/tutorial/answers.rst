@@ -94,7 +94,7 @@ A simple output function could be the following:
     def output(output_dir="output"):
         writer = lena.output.Writer(output_dir)
         s = lena.core.Sequence(
-            lena.output.HistToCSV(),
+            lena.output.ToCSV(),
             writer,
             lena.context.Context(),
             lena.output.RenderLaTeX(), # initialize properly here

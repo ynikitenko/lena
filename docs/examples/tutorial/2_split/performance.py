@@ -7,7 +7,7 @@ import pstats
 from lena.core import Sequence, Split, Source
 from lena.structures import Histogram
 from lena.math import mesh
-from lena.output import HistToCSV, Writer, LaTeXToPDF, PDFToPNG
+from lena.output import ToCSV, Writer, LaTeXToPDF, PDFToPNG
 from lena.output import MakeFilename, RenderLaTeX
 from lena.variables import Variable
 
@@ -37,7 +37,7 @@ def main(copy_buf=True):
             copy_buf=copy_buf,
         ),
         MakeFilename("{variable.name}"),
-        HistToCSV(),
+        ToCSV(),
         # writer,
         # RenderLaTeX("histogram_1d.tex", "templates"),
         # writer,

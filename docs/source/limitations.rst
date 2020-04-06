@@ -82,7 +82,7 @@ Development
 -----------
 
 No logging system is present.
-For example, :class:`HistToCSV` prints a warning to ``stdout``
+For example, :class:`ToCSV` prints a warning to ``stdout``
 when it can't convert a 3-dimensional histogram.
 This will be implemented not earlier
 than at least after one other example is found.
