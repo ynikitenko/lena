@@ -8,17 +8,17 @@ import sys
 
 from copy import deepcopy
 
-from lena.output import RenderLaTeX, Template, Environment
+from lena.output.render_latex import RenderLaTeX, _Template, _Environment
 from lena.context import get_recursively, update_recursively
 
 
 def test_template():
     # Check that old template syntax (like {{ var }}) doesn't work. 
-    t1 = Template('Hello {{ name }}!')
+    t1 = _Template('Hello {{ name }}!')
     assert t1.render(name='John Doe') == u'Hello {{ name }}!'
     assert t1.environment.variable_start_string == r'\VAR{'
     # New \VAR{ syntax works.
-    t2 = Template(r'Hello \VAR{ name }!')
+    t2 = _Template(r'Hello \VAR{ name }!')
     assert t2.render(name='John Doe') == u'Hello John Doe!'
     assert t2.render(name='John Doe') == u'Hello John Doe!'
     True
@@ -31,13 +31,13 @@ def test_template():
     #     next(stream)
     # t2.render({"name1": 'John Doe'}) == 'Hello \VAR{ name }!'
     assert t2.render({"name1": 'John Doe'}) == u'Hello !'
-    t3 = Template(r'Hello \VAR{ name }!', undefined=jinja2.DebugUndefined)
+    t3 = _Template(r'Hello \VAR{ name }!', undefined=jinja2.DebugUndefined)
     assert t3.render({"name1": 'John Doe'}) == u'Hello {{ name }}!'
     assert t3.render({"name1": 'John Doe'}) != r'Hello \VAR{ name }!'
 
 
 def test_environment():
-    env = Environment()
+    env = _Environment()
     # Old template syntax (like {{ var }}) doesn't work. 
     t1 = env.from_string('Hello {{ name }}!')
     assert t1.render(name='John Doe') == u'Hello {{ name }}!'
@@ -81,23 +81,6 @@ def test_render_latex():
     # print(rendered)
     assert repr(data + "\n") == repr(rendered)
     assert new_context == {'output': {'fileext': 'tex', 'filetype': 'tex', "filepath": "output.csv"}}
-
-    ## repeat works ##
-    context["output"].update({"plot": {"repeat": [{}, {"scale": "log"}]}})
-    rendered_l = list(renderer.run([("output.csv", context)]))
-    assert len(rendered_l) == 2
-    # for res in rendered_l:
-    #     print(res[1])
-    context_1 = rendered_l[0][1]
-    assert "scale" not in context_1
-    assert context_1 == {
-        'output': {'fileext': 'tex', 'filetype': 'tex', "filepath": "output.csv",
-                   'plot': {'repeat': [{}, {'scale': 'log'}]}}
-        }
-    context_2 = rendered_l[1][1]
-    assert get_recursively(context_2, "output.plot.scale") == "log"
-    update_recursively(context_1, {"output": {"plot": {"scale": "log"}}})
-    assert context_1 == context_2
 
     # not selected data passes unchanged
     assert list(renderer.run([("output.csv", {})])) == [("output.csv", {})]

@@ -24,12 +24,9 @@ _ljinja_env = {
 }
 
 
-class Template(jinja2.Template):
+class _Template(jinja2.Template):
+    # this class is not used. Environment is used.
     """Adapt jijna2 template to LaTeX.
-
-    Warning
-    -------
-        This class may be deleted, changed or refactored.
 
     Working with not completely rendered environments may be a problem. 
     For example, undefined variable's attributes are not processed correctly,
@@ -43,22 +40,17 @@ class Template(jinja2.Template):
         kws.update(_ljinja_env)
         # how to efficiently merge two dicts: https://stackoverflow.com/a/26853961/952234
         # print kws
-        sucls = super(Template, cls)
+        sucls = super(_Template, cls)
         return sucls.__new__(sucls, *args, **kws)
 
 
-class Environment(jinja2.Environment):
-    """Jinja environment.
-    
-    Warning
-    -------
-        This class may be deleted, changed or refactored.
-    """
+class _Environment(jinja2.Environment):
+    """Jinja environment."""
 
     def __init__(self, *args, **jkws):
         kws = jkws.copy()
         kws.update(_ljinja_env)
-        super(Environment, self).__init__(*args, **kws)
+        super(_Environment, self).__init__(*args, **kws)
         # Python 3
         # super().__init__(*args, **kws)
 
@@ -74,9 +66,10 @@ def _is_csv(value):
 def _select_template(default):
     def select_template(val):
         data, context = lena.flow.get_data_context(val)
-        out_template = lena.context.get_recursively(context, "output.template", None)
-        if out_template:
-            return out_template
+        # this is not tested, documented and used
+        # out_template = lena.context.get_recursively(context, "output.template", None)
+        # if out_template:
+        #     return out_template
         if not default:
             raise lena.core.LenaRuntimeError(
                 "context contains no template and empty default provided, "
@@ -127,32 +120,19 @@ class RenderLaTeX(object):
                 "{} provided".format(select_template)
             )
         self._loader = jinja2.FileSystemLoader(template_path)
-        self._environment = Environment(loader=self._loader)
+        self._environment = _Environment(loader=self._loader)
         # print("templates:", self._environment.list_templates())
 
     def run(self, flow):
-        """Render (data, context) values from *flow* to LaTeX.
+        """Render values from *flow* to LaTeX.
 
         If no *select_data* was initialized,
-        values where context.output.filetype is "csv"
+        values with *context.output.filetype* equal to "csv"
         are selected by default.
 
         Rendered LaTeX text is yielded in the data part
         of the tuple (no write to filesystem occurs).
-        context.output.filetype updates to "tex".
-
-        Deprecated:
-        ---------_-
-
-        If context contains a list *output.plot.repeat*,
-        rendering will be iterated and yielded for each of its items.
-        Each repeat item must be a dictionary, which will update
-        a deep copy of *output.plot* (each update won't affect other ones).
-        If you want the original context to be preserved,
-        add an empty dictionary to *repeat*.
-        For example, if you want to make two renderings of a plot
-        with normal and logarithmic scales,
-        add *output.plot.repeat* equal to [{}, {"scale": "log"}].
+        *context.output.filetype* updates to "tex".
 
         Not selected values pass unchanged.
         """
@@ -167,22 +147,7 @@ class RenderLaTeX(object):
                 lena.context.update_recursively(
                     context, {"output": {"fileext": "tex"}}
                 )
-                repeat = lena.context.get_recursively(
-                        context, "output.plot.repeat", default=None
-                )
-                if repeat is None:
-                    data = template.render(context)
-                    yield (data, context)
-                else:
-                    for rep in repeat:
-                        upd_context = copy.deepcopy(context)
-                        lena.context.update_recursively(
-                            upd_context, {"output": {"plot": rep}}
-                        )
-                        data = template.render(upd_context)
-                        yield (data, upd_context)
-                    # for upd_context in lena.context.iterate_update(
-                    #     context, {"output": {"plot": repeat}}
-                    # ):
+                data = template.render(context)
+                yield (data, context)
             else:
                 yield val
