@@ -1,4 +1,4 @@
-"""Generate 10 3-dimensional vectors normally distributed."""
+"""Generate 3-dimensional vectors normally distributed."""
 from __future__ import print_function
 
 import random
@@ -53,24 +53,34 @@ if __name__ == "__main__":
     seed = 0
     means = (0, 0, 2)
     sigmas = (5, 5, 5)
-    xyzs = normal3_shifted(10, seed, means, sigmas)
+    if len(sys.argv) > 1 and sys.argv[1] == "--large":
+        large = True
+        size = 10**6
+        normal_filename = "normal_3d_large.csv"
+    else:
+        large = False
+        size = 10
+        normal_filename = "normal_3d.csv"
+    xyzs = normal3_shifted(size, seed, means, sigmas)
     # xyzs = normal3_shifted(1000)
     write_to_file(xyzs,
-                  os.path.join(DATADIR, "normal_3d.csv"),
+                  os.path.join(DATADIR, normal_filename),
                   formatter3)
+    if large:
+        sys.exit(0)
 
     xs = [v[0] for v in xyzs]
     write_to_file(xs,
                   os.path.join(DATADIR, "x.csv"),
                   formatter1)
 
-    xyzs_mc = normal3_shifted(10, seed=1, means=means, sigmas=(5, 5, 4))
+    xyzs_mc = normal3_shifted(size, seed=1, means=means, sigmas=(5, 5, 4))
     write_to_file(xyzs_mc,
                   os.path.join(DATADIR, "normal_3d_mc.csv"),
                   formatter3)
 
-    xyzs_1 = normal3_shifted(10, seed=2, means=means, sigmas=sigmas)
-    xyzs_2 = normal3_shifted(10, seed=3, means=(0,0,3), sigmas=(6,6,6))
+    xyzs_1 = normal3_shifted(size, seed=2, means=means, sigmas=sigmas)
+    xyzs_2 = normal3_shifted(size, seed=3, means=(0,0,3), sigmas=(6,6,6))
     xyzs_double_event = list(zip(xyzs_1, xyzs_2))
     double_ev_filename = os.path.join(DATADIR, "double_ev.csv")
     with open(double_ev_filename, "w") as fil:
