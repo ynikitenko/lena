@@ -1,10 +1,12 @@
 from __future__ import print_function
 
+import copy
 import pytest
 
 import lena.core
 import lena.context
 from lena.core import LenaTypeError
+from lena.flow import get_data
 from lena.variables.variable import Combine, Compose, Variable
 
 
@@ -170,10 +172,10 @@ def test_variable():
     sq_m = Variable("sq", getter = lambda x: x*x, type="function")
     data = [1, 2, 3]
     data = list(map(lambda v: (v, {str(v): v}), data))
-    from lena.flow import get_data
-    assert list(map(get_data, map(sq_m, data))) == [1, 4, 9]
+    results = map(sq_m, copy.deepcopy(data))
+    assert list(map(get_data, results)) == [1, 4, 9]
     assert sq_m.var_context == {'function': 'sq', 'name': 'sq', 'type': 'function'}
-    assert sq_m(data[0]) == (
+    assert sq_m(copy.deepcopy(data[0])) == (
         1, {
             '1': 1, 
             'variable': {
@@ -188,13 +190,13 @@ def test_variable():
     mm = Variable("mm", unit="mm", getter=lambda x: x*10, type="length")
     square = Variable("square", type="area", getter=lambda x: x*x, unit="mm^2")
     sq_mm = Compose(mm, square)
-    res1 = list(lena.core.Sequence(mm, square).run(data))[0]
-    res2 = sq_mm(data[0])
+    res1 = list(lena.core.Sequence(mm, square).run(copy.deepcopy(data)))[0]
+    res2 = sq_mm(copy.deepcopy(copy.deepcopy(data[0])))
     res1[1]["variable"]["name"] = 'mm_square'
     res1[1]["variable"]["latex_name"] = 'square_{mm}'
     assert res1 == res2
-    assert list(map(get_data, map(sq_mm, data))) == [100, 400, 900]
-    assert sq_mm(data[0]) == (
+    assert list(map(get_data, map(sq_mm, copy.deepcopy(data)))) == [100, 400, 900]
+    assert sq_mm(copy.deepcopy(data[0])) == (
         100, {
             '1': 1, 
             'variable': {
@@ -213,10 +215,10 @@ def test_variable():
 
     # test Combine
     sq_m_mm = Combine(sq_m, sq_mm, name="sq_m_mm")
-    assert list(map(get_data, map(sq_m_mm, data))) == [
+    assert list(map(get_data, map(sq_m_mm, copy.deepcopy(data)))) == [
         (1, 100), (4, 400), (9, 900)
     ]
-    assert sq_m_mm(data[0]) == (
+    assert sq_m_mm(copy.deepcopy(data[0])) == (
         (1, 100), {
             '1': 1, 
             'variable': {

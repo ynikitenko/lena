@@ -129,11 +129,15 @@ class Variable(object):
         Return *(data, context)*.
         """
         data, context = lena.flow.get_data_context(value)
-        context = copy.deepcopy(context)
+        # Run (and Call) elements don't make deep copy.
+        # context = copy.deepcopy(context)
         var_context = context.get("variable")
         if var_context:
             # todo: check that several compose context work
+            # deep copy, otherwise it will be updated during update_recursively
             context["variable"]["compose"] = copy.deepcopy(var_context)
+        # update recursively, because we need to preserve "type"
+        # and other not overwritten data
         lena.context.update_recursively(
             context, {"variable": copy.deepcopy(self.var_context)}
         )
