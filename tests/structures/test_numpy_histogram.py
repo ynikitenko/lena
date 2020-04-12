@@ -6,25 +6,42 @@ from lena.core import LenaValueError
 from lena.math import isclose
 
 np = pytest.importorskip('numpy')
+from lena.structures import Histogram
 from lena.structures.numpy_histogram import NumpyHistogram
 
 
 def test_numpy_histogram():
     nhist = NumpyHistogram(bins=list(range(0, 5)), density=True)
+    filled_hist = Histogram([0, 1, 2, 3, 4], bins=[0.25, 0.25, 0.25 ,0.25])
+    filled_context = {'histogram': {'ranges': [(0, 4)], 'dim': 1, 'nbins': [4]}}
+
+    empty_hist, empty_cont = next(nhist.request())
+    assert empty_cont == filled_context
+
     data = list(range(0, 4))
     for val in data:
         nhist.fill(val)
     lhist, context = next(nhist.request())
-    # request is idempotent
-    assert lhist, context == next(nhist.request())
+    # assert lhist.bins == filled_hist.bins
+    assert all(v1 == v2 for v1, v2 in zip(lhist.bins, filled_hist.bins))
+    assert all(v1 == v2 for v1, v2 in zip(lhist.edges, filled_hist.edges))
+    assert context == filled_context
 
-    # compute and request give same results
-    computed = next(nhist.compute())
-    assert all(isclose(v1, v2) for v1, v2 in zip(lhist.bins, computed[0].bins))
-    assert context == computed[1]
-    print(lhist, context, computed)
+    # histogram is reset after request
+    next_hist, next_cont = next(nhist.request())
+    assert next_hist, next_cont == (empty_hist, empty_cont)
 
     true_bins = np.array([0.25, 0.25, 0.25, 0.25])
     for ind, bin in enumerate(true_bins):
         assert lhist.bins[ind] == bin
     assert lhist.scale() == 1
+
+    nhist1 = NumpyHistogram(bins=list(range(0, 5)), density=True, reset=False)
+    for val in data:
+        nhist1.fill(val)
+    lhist1, context1 = next(nhist1.request())
+    assert all(v1 == v2 for v1, v2 in zip(lhist1.bins, filled_hist.bins))
+    assert all(v1 == v2 for v1, v2 in zip(lhist1.edges, filled_hist.edges))
+    assert context1 == filled_context
+    # request is idempotent if no reset was called
+    assert lhist1, context1 == next(nhist1.request())

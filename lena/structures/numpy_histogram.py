@@ -34,14 +34,16 @@ class NumpyHistogram(object):
         r"""Use *\*args* and *\*\*kwargs* for *numpy.histogram* initialization.
 
         Default *bins* keyword argument is *auto*.
+
+        A keyword argument *reset* specifies the exact behaviour of *request*.
         """
+        self._reset = kwargs.pop("reset", True)
         self._args = args
         self._kwargs = kwargs
         if "bins" not in kwargs:
             self._kwargs.update({"bins": "auto"})
         # numpy.array can't be extended on the fly
-        self._data = []
-        self._cur_context = {}
+        self.reset()
 
     def fill(self, val):
         """Add data to the internal storage."""
@@ -49,26 +51,26 @@ class NumpyHistogram(object):
         self._data.append(data)
         self._cur_context = context
 
-    def compute(self):
+    def request(self):
         """Compute the final histogram.
 
         Return :ref:`Histogram <Histogram>` with context.
 
-        All data for this histogram is reset.
+        If *reset* was set during the initialization,
+        *reset* method is called.
         """
         bins, edges = numpy.histogram(self._data, *self._args, **self._kwargs)
+        hist = lena.structures.Histogram(edges, bins)
+        # deep copy is made here
+        context = hf.make_hist_context(hist, self._cur_context)
+        if self._reset:
+            self.reset()
+        yield (hist, context)
+
+    def reset(self):
+        """Reset data and context.
+
+        Remove all data for this histogram and set current context to {}.
+        """
         self._data = []
-        # self._cur_context.update({"type": "histogram"})
-        hist = lena.structures.Histogram(edges, bins)
-        context = hf.make_hist_context(hist, self._cur_context)
-        yield (hist, context)
-
-    def request(self):
-        """Calculate histogram.
-
-        Return :ref:`Histogram <Histogram>` with context.
-        """
-        bins, edges = numpy.histogram(self._data, *self._args, **self._kwargs)
-        hist = lena.structures.Histogram(edges, bins)
-        context = hf.make_hist_context(hist, self._cur_context)
-        yield (hist, context)
+        self._cur_context = {}
