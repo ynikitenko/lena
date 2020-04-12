@@ -177,6 +177,8 @@ Ex. 3
 .. code-block:: python
 
    FillRequest(fill_compute_el, request="compute")
+   # or 
+   FillRequest(fill_compute_el, reset=False)
 
 Ex. 4
 ^^^^^
