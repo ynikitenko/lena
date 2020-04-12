@@ -117,6 +117,7 @@ class Split(object):
         self._n_seq_types = len(different_seq_types)
         if self._n_seq_types == 1:
             seq_type = different_seq_types.pop()
+            # todo: probably remove run to avoid duplication?
             if seq_type == "fill_compute":
                 self.fill = self._fill
                 self.compute = self._compute
@@ -156,11 +157,12 @@ class Split(object):
                 yield result
 
     def _fill(self, val):
-        for seq in self._sequences:
+        for seq in self._sequences[:-1]:
             if self._copy_buf:
                 seq.fill(copy.deepcopy(val))
             else:
                 seq.fill(val)
+        self._sequences[-1].fill(val)
 
     def _compute(self):
         for seq in self._sequences:
@@ -188,13 +190,10 @@ class Split(object):
         it doesn't accept the incoming *flow*,
         but produces its own complete flow
         and becomes inactive (is not called any more).
-        It is always called even if the *flow* was empty.
 
-        A *FillRequestSeq* is filled with the buffer.
+        A *FillRequestSeq* is filled with the buffer contents.
         After the buffer is finished,
         it yields all values from *request()*.
-        If the *flow* was empty,
-        each *FillRequestSeq* is *requested* nevertheless.
 
         A *FillComputeSeq* is filled with values from each buffer,
         but yields values from *compute* only after the whole *flow*
@@ -205,6 +204,9 @@ class Split(object):
         for each buffer (and also if the *flow* was empty).
         If the whole flow must be analysed at once,
         don't use such a sequence in *Split*.
+
+        If the *flow* was empty, each *call*, *compute*,
+        *request* or *run* is called nevertheless.
 
         If *copy_buf* is True,
         then the buffer for each sequence except the last one is a deep copy
