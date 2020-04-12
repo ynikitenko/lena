@@ -217,13 +217,19 @@ class FillRequest(object):
 
         *FillRequest* can be initialized from a *FillCompute* element.
         If a callable *request* method was not found,
-        *el* must have callable *compute* and *reset* methods.
-        *request* in this case is *compute* followed by *reset*.
+        *el* must have a callable *compute* method.
+        *request* in this case is *compute*.
 
         By default, *FillRequest* implements *run* method
         that splits the flow into subslices of *bufsize* elements.
         If *el* has a callable *run* method,
         it is used instead of the default one.
+
+        If a keyword argument *reset* is ``True`` (default),
+        *el* must have a method *reset, and in this case
+        :meth:`reset` is called after each :meth:`request`
+        (including those during :meth:`run`).
+        If *reset* is ``False``, :meth:`reset` is never called.
 
         **Attributes**
 
@@ -233,6 +239,7 @@ class FillRequest(object):
         otherwise :exc:`~lena.core.LenaValueError` is raised.
         If callable *fill* and *request* methods were not found,
         or *FillRequest* could not be derived from *FillCompute*,
+        or if *reset* is ``True``, but *el* has no method *reset*,
         :exc:`~lena.core.LenaTypeError` is raised.
         """
         fill = getattr(el, fill, None)
@@ -242,7 +249,7 @@ class FillRequest(object):
             raise exceptions.LenaTypeError(
                 "fill method {} must exist and be callable".format(fill)
             )
-        if not callable(el_reset):
+        if reset and not callable(el_reset):
             raise exceptions.LenaTypeError(
                 "reset must exist and be callable"
             )
