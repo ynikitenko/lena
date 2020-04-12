@@ -56,13 +56,13 @@ class Variable(object):
     def __init__(self, name, getter, **kwargs):
         """*name* is variable's name.
 
-        *getter* is the python function (not a :class:`Variable`),
-        which performs the actual transformation of data.
+        *getter* is the python function (not a :class:`Variable`)
+        that performs the actual transformation of data.
         It must accept data and return data without context.
 
         Other variable's attributes can be passed as keyword arguments.
-        Examples: *latex_name*, *unit* (like *cm* or *keV*),
-        *range*, *dim*, etc.
+        Examples include *latex_name*, *unit* (like *cm* or *keV*),
+        *range*, etc.
 
         *type* is the type of the variable.
         It depends on your application, examples are
@@ -71,25 +71,29 @@ class Variable(object):
         its value is added to variable's
         context as a key with variable's name
         (see example for this module).
-        Thus variable type's data is preserved during composition.
+        Thus variable type's data is preserved during composition
+        of different types.
 
         **Attributes**
 
-        *getter* is the function,
-        which does the actual data transformation.
+        *getter* is the function
+        that does the actual data transformation.
 
-        *var_context* is the dictionary of attributes of variable,
-        which is added to the context during __call__
-        and used during variable transformations (see :ref:`functions`).
+        *var_context* is the dictionary of attributes of the variable,
+        which is added to *context.variable* during :meth:`__call__`.
+
+        ..
+            and used during variable transformations (see :ref:`functions`).
 
         All public attributes of a variable
         can be accessed using dot notation
-        (for example, var.var_context["latex_name"]
-        can be simply var.latex_name).
-        :exc:`AttributeError` is raised if the attribute is missing.
+        (for example, *var.var_context["latex_name"]*
+        can be simply *var.latex_name*).
+        :exc:`~lena.core.AttributeError` is raised
+        if the attribute is missing.
 
-        If *getter* is a variable, or if it is None or not callable,
-        :exc:`LenaTypeError` is raised.
+        If *getter* is a :class:`Variable` or is not callable,
+        :exc:`~lena.core.LenaTypeError` is raised.
         """
         self.name = name
         if isinstance(getter, Variable):
@@ -108,12 +112,6 @@ class Variable(object):
         }
         if "type" in kwargs:
             self.var_context.update({kwargs["type"]: self.name})
-        # if "compose" in kwargs:
-        #     if not isinstance(kwargs["compose"], dict):
-        #         raise lena.core.LenaTypeError(
-        #             "compose must be a dictionary, "
-        #             "{} provided".format(kwargs["compose"])
-        #         )
         self.var_context.update(**kwargs)
 
     def __call__(self, value):
@@ -256,12 +254,13 @@ class Compose(Variable):
         it is used to create the corresponding variable attribute.
         In this case, all variables must have this attribute,
         and the callable is applied to the list of these attributes.
-        If any attribute is missing, :exc:`LenaAttributeError` is raised.
+        If any attribute is missing,
+        :exc:`~lena.core.LenaAttributeError` is raised.
         This can be used to create composed attributes
         other than *latex_name*.
 
         If there are no variables or if *kwargs* contain *getter*,
-        :exc:`LenaTypeError` is raised.
+        :exc:`~lena.core.LenaTypeError` is raised.
         """
         if not all(isinstance(arg, Variable) for arg in args):
             raise lena.core.LenaTypeError(

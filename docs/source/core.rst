@@ -19,8 +19,10 @@ lena.core
 
     Call
     FillCompute
+    FillInto
     FillRequest
     Run
+    SourceEl
 
 **Exceptions:**
 

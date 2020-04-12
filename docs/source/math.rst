@@ -19,6 +19,7 @@ math package
 .. currentmodule:: lena.math.elements
 .. autosummary::
     Mean
+    Sum
 
 **3-dimensional vector:**
 

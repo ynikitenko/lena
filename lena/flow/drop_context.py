@@ -15,6 +15,13 @@ class DropContext():
     and this may lead to errors in the analysis.
     It is recommended to provide *context* when possible.
     """
+    # probably, this is in important element, since dealing with context
+    # and deepcopy takes relatively much time.
+    # Lena elements should probably have methods like fill_data,
+    # run_data (?), compute_data, request_data,
+    # and make_context(self, other_context).
+    # This may be added in future versions.
+    # todo: add methods from the inner sequences, add tests.
     def __init__(self, *args):
         """*\*args* will form a :class:`Sequence`.
         """

@@ -83,7 +83,7 @@ class Sum(object):
         """Fill *self* with *value*.
 
         The *value* can be a *(data, context)* pair.
-        The last *context* value (if missing, it is considered empty)
+        The last *context* value (considered empty if missing)
         sets the current context.
         """
         data, context = lena.flow.get_data_context(value)
@@ -102,9 +102,9 @@ class Sum(object):
             yield (self._sum, copy.deepcopy(self._cur_context))
 
     def reset(self):
-        """Reset sum, count and context.
+        """Reset sum and context.
 
-        Sum is reset to *start* value, count to zero and context to {}.
+        Sum is reset to *start* value and context to {}.
         """
         self._sum = copy.deepcopy(self._start)
         self._cur_context = {}

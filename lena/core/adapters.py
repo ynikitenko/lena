@@ -307,8 +307,9 @@ class FillRequest(object):
         This repeats until the *flow* is exhausted.
 
         If *fill* was not called even once (*flow* is empty),
-        the results are undefined
+        the results for a general *FillRequest* are undefined
         (for example, it can run *request* or raise an exception).
+        This adapter runs *request* in this case.
         If the last slice is empty, *request* is not run for that.
         Note that the last slice may contain less than *bufsize* values.
         If that is important, implement your own method.
@@ -355,7 +356,7 @@ class Run(object):
 
         If *run* keyword argument is missing,
         then *el* is searched for a method *run*.
-        If that is not found, a type cast is tried.
+        If that is not found, a type cast is attempted.
 
         A *Run* element can be initialized from a *Call*
         or a *FillCompute* element.
