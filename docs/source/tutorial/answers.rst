@@ -117,28 +117,130 @@ It is probably impossible in Python
 to stop a function and resume it at the given point.
 Inform the author if you know how to do that.
 
-..
-    Part 2
-    ------
-    Ex. 1
-    ^^^^^
-    .. code-block:: python
+Part 2
+------
+Ex. 1
+^^^^^
+This is the *Sum* implementation from *lena.math*:
 
-        import lena.flow
+.. code-block:: python
 
+    class Sum(object):
+        """Calculate sum of input values."""
 
-        class Sum():
-            def __init__(self):
-                self._sum = 0
-                self._cur_context = {}
+        def __init__(self, start=0):
+            """*start* is the initial value of sum."""
+            # start is similar to Python's builtin *sum* start.
+            self._start = start
+            self.reset()
 
-            def fill(self, val):
-                val, context = (lena.flow.get_data(val),
-                                lena.flow.get_context(val))
-                self._sum += val
-                self._cur_context = context
+        def fill(self, value):
+            """Fill *self* with *value*.
 
-            def compute(self):
-                yield (self._sum, self._cur_context)
-                self._sum = 0
-                self._cur_context = {}
+            The *value* can be a *(data, context)* pair.
+            The last *context* value (considered empty if missing)
+            sets the current context.
+            """
+            data, context = lena.flow.get_data_context(value)
+            self._sum += data
+            self._cur_context = context
+
+        def compute(self):
+            """Calculate the sum and yield.
+
+            If the current context is not empty, yield *(sum, context)*.
+            Otherwise yield only *sum*.
+            """
+            if not self._cur_context:
+                yield self._sum
+            else:
+                yield (self._sum, copy.deepcopy(self._cur_context))
+
+        def reset(self):
+            """Reset sum and context.
+
+            Sum is reset to the *start* value and context to {}.
+            """
+            self._sum = copy.deepcopy(self._start)
+            self._cur_context = {}
+
+Ex. 2
+^^^^^
+Delete the first *MakeFilename* and change the second one to
+
+.. code-block:: python
+
+   MakeFilename("{variable.particle}/{variable.name}")
+
+Ex. 3
+^^^^^
+.. code-block:: python
+
+   FillRequest(fill_compute_el, request="compute")
+
+Ex. 4
+^^^^^
+We believe that the essence of data is captured in
+the function with which it was obtained.
+Histogram is just its presentation.
+It may be tempting to name a histogram just for convenience,
+but a general *MakeFilename* would be more powerful.
+
+Functional programming suggests that larger functions should be 
+decomposed into smaller ones, while object-oriented design
+praises code cohesion.
+The decisions above were made by choosing between these principles.
+There are cases when a histogram is data itself.
+In such situations, however,
+the final result is often not a histogram but a function of that,
+like a mean or a mode (which again suggests a different name).
+
+Ex. 5
+^^^^^
+In part 1 of the tutorial there was introduced an element *End*,
+which stops the flow at its location. 
+However, if there are *Histograms* in the following flow,
+they will be yielded even if nothing was filled into them.
+Empty histogram is a legitimate histogram state.
+It may be also filled, but the result may fall out of the histogram's range.
+It is possible to write a special element if needed to check
+whether the flow was empty.
+
+In the next chapter we will present a specific analysis
+during which a histogram may not be filled, but it must be produced.
+A *FillCompute* element is more general than a histogram
+(which we use here just for a concrete example).
+
+Note also that if a histogram was not filled,
+preceding variables weren't called.
+The histogram will have no context,
+probably won't have a name and won't be plotted correctly.
+Take an empty flow into account when creating
+your own *FillCompute* elements.
+
+Ex. 6
+^^^^^
+It depends on the student's priorities.
+If he wants to finish the diploma never to return to programming,
+or if he has a lot of work to do apart from writing code,
+the fastest option might be the best.
+General algorithms have a more complicated interface.
+However, if one decides to rely upon a "friendly" library,
+there is a risk that the programmer will have to rewrite
+all code when more functionality becomes needed.
+
+Architectural choices rise for middle-sized or large projects.
+If the student's personal code becomes large and more time is spent
+on supporting and extending that, it may be a good time to define
+the architecture.
+Here the author estimates "large" programs to start from
+one thousand lines.
+
+Another distinction is that when using a library one learns
+how to use a library. When using a good framework, one learns
+how to write good code. Many algorithms in programming are simple,
+but to choose a good design may be much more difficult,
+and to learn how to create good programs yourself may take years
+of studying and experience.
+When you feel difficulties with making programming decisions,
+it's time to invest into design skills.

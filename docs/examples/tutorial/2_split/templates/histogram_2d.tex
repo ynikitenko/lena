@@ -17,12 +17,13 @@
         mesh/cols=\VAR{xcols},
         mesh/rows=\VAR{ycols},
         colorbar horizontal,
-        xlabel = {$\VAR{ varx.latex_name }$ \BLOCK{ if varx.unit }[$\mathrm{\VAR{ varx.unit }}$]\BLOCK{ endif }},
-        ylabel = {$\VAR{ vary.latex_name }$ \BLOCK{ if vary.unit }[$\mathrm{\VAR{ vary.unit }}$]\BLOCK{ endif }},
+        xlabel = {$\VAR{ varx.latex_name }$
+            \BLOCK{ if varx.unit }[$\mathrm{\VAR{ varx.unit }}$]\BLOCK{ endif }},
+        ylabel = {$\VAR{ vary.latex_name }$
+            \BLOCK{ if vary.unit }[$\mathrm{\VAR{ vary.unit }}$]\BLOCK{ endif }},
     ]
     \addplot3 [
         surf,
-        domain=-1500:1500,
         mesh/ordering=y varies,
     ] table [col sep=comma, header=false] {\VAR{ output.filepath }};
     \end{axis}

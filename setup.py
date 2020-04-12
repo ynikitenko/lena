@@ -15,8 +15,8 @@ setuptools.setup(
     packages=["lena"],
     # packages=setuptools.find_packages(),
     classifiers=[
-        # "Development Status :: 4 - Beta",
-        "Development Status :: 3 - Alpha",
+        "Development Status :: 4 - Beta",
+        # "Development Status :: 3 - Alpha",
         "Environment :: Console", 
         "Intended Audience :: Developers",
         "Intended Audience :: Science/Research",

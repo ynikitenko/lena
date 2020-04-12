@@ -3,6 +3,7 @@ from __future__ import print_function
 import os
 
 import lena.context
+import lena.flow
 from lena.core import Sequence, Split, Source
 from lena.structures import Histogram
 from lena.math import mesh
@@ -39,10 +40,8 @@ coordinates_1d = [
 
 
 def select_template(val):
-    data, context = val
-    if lena.context.get_recursively(context, "variable.dim", None) == 2:
-        return "histogram_2d.tex"
-    elif lena.context.get_recursively(context, "histogram.dim", None) == 2:
+    data, context = lena.flow.get_data_context(val)
+    if lena.context.get_recursively(context, "histogram.dim", None) == 2:
         return "histogram_2d.tex"
     else:
         return "histogram_1d.tex"
