@@ -105,8 +105,11 @@ class FillCompute(object):
         """Method names can be customized through *fill* and *compute*
         keyword arguments during the initialization.
 
-        If callable methods *fill* and *compute* were not found,
-        :exc:`~lena.core.LenaTypeError` is raised.
+        *FillCompute* can be explicitly cast from *FillRequest*.
+        In this case *compute* is *request*.
+
+        If callable methods *fill* and *compute* or *request*
+        were not found, :exc:`~lena.core.LenaTypeError` is raised.
         """
         fill_method = getattr(el, fill, None)
         compute_method = getattr(el, compute, None)
@@ -120,9 +123,14 @@ class FillCompute(object):
         if callable(compute_method):
             self.compute = compute_method
         else:
-            raise exceptions.LenaTypeError(
-                "compute method {} must exist and be callable".format(compute)
-            )
+            # derive from FillRequest
+            request = getattr(el, "request", None)
+            if not callable(request):
+                raise exceptions.LenaTypeError(
+                    "compute method {} or request must exist and be callable"\
+                    .format(compute)
+                )
+            self.compute = request
         self._el = el
 
     def fill(self, value): # pylint: disable=no-self-use,unused-argument
