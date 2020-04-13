@@ -1,7 +1,7 @@
 import setuptools
 
-with open("README.rst", "r") as fh:
-    long_description = fh.read()
+with open("README.rst", "r") as readme:
+    long_description = readme.read()
 
 setuptools.setup(
     name="lena",
@@ -10,10 +10,15 @@ setuptools.setup(
     author_email="metst13@gmail.com",
     description="Lena is an architectural framework for data analysis",
     long_description=long_description,
-    long_description_content_type="text/rst",
+    long_description_content_type="text/x-rst",
     url="https://github.com/ynikitenko/lena",
-    packages=["lena"],
-    # packages=setuptools.find_packages(),
+    project_urls = {
+        'Documentation': "https://lena.readthedocs.io",
+        'Source': 'https://github.com/ynikitenko/lena',
+        'Tracker': 'https://github.com/ynikitenko/lena/issues',
+    },
+    keywords="data analysis framework",
+    packages=setuptools.find_packages(exclude=['tests', 'tests.*']),
     classifiers=[
         "Development Status :: 4 - Beta",
         # "Development Status :: 3 - Alpha",
