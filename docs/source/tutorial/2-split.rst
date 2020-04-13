@@ -1,7 +1,7 @@
 Split
 =====
 
-In this part of the tutorial we learn how to make several analyses
+In this part of the tutorial we'll learn how to make several analyses
 reading input data only once and without storing that in memory.
 
 .. contents:: Contents
@@ -488,7 +488,7 @@ To deal with this, we have to be prepared not to consume all flow
 before that is yielded. We create an element with a *fill* method,
 and call the second method *request*.
 A *FillRequest* element is similar to *FillCompute*,
-but *request* can (and should) be called multiple times.
+but *request* can be called multiple times.
 As with *FillComputeSeq*,
 we can add *Call* elements (lambdas) before a *FillRequest* element
 and *Call* or *Run* elements after that
@@ -499,45 +499,20 @@ During initialization a *Sequence* checks for each its argument
 whether it has a *run* method.
 If it is missing,
 it tries to convert the element to a *Run* element using the adapter.
-*Run* can be initialized from a *Call* or *FillCompute* element. 
 
+*Run* can be initialized from a *Call* or a *FillCompute* element. 
 A callable is run as a transformation function,
 which accepts single values from the flow
-and returns their transformations for each value.
+and returns their transformations for each value:
+
+.. code-block:: python
+
+    for val in flow:
+        yield self._el(val)
+
 A *FillCompute* element is run the following way:
 first, *fill(value)* is called for the whole flow.
 After the flow is exhausted, *compute()* is called.
-*FillRequest* adapter provides its own *run* method.
-During the initialization, this element sets its
-buffer size from the keyword argument *bufsize* (by default 1).
-During *run*, *fill* is called for each value
-in a subslice of *flow* of *self.bufsize* size,
-then the results are yielded from *self.request()*.
-This repeats until the flow is exhausted.
-
-*FillRequest* can be initialized from a *FillCompute* element.
-*request* in this case is *compute*.
-A keyword initialization argument *reset* (by default ``True``)
-sets whether the method *reset()* of *FillRequest* must be called.
-For that to be possible, the initialization element must have a *reset* method,
-which clears its state. If *reset* is ``True``, *reset()*
-is called after each *request* (including those during *run*).
-
-*FillCompute* is a powerful but simple element.
-The method *compute* is called only once in Lena.
-One can start with that, and if the need to call it several times arises,
-a *reset* method can be added,
-and the element can be explicitly cast to *FillRequest*.
-*FillRequest* is called many times.
-This can have two uses:
-to clean the state of the object each time
-or to yield the accumulating value several times.
-Having separated *compute* and *reset* into two different methods,
-we can flexibly choose between clearing or preserving the state
-after each yield (exercise :ref:`3 <ex_fr>`).
-Note that if a large amount of memory can be consumed
-(if the element doesn't reduce data),
-it must be always *FillRequest*.
 
 There are algorithms and structures which are inherently
 not memory safe.
@@ -545,7 +520,7 @@ For example, *lena.structures.Graph* stores all filled data
 as its points, and it is a *FillRequest* element.
 Since *FillRequest* can't be used directly in a *Sequence*,
 or if we want to yield only the final result once,
-we cast that with *FillCompute(Graph(), compute="request")*.
+we cast that with *FillCompute(Graph())*.
 We can do that when we are sure that our data won't overflow memory,
 and that cast will be explicit in our code.
 
@@ -597,7 +572,8 @@ If the whole flow must be analysed at once,
 don't use such a sequence in *Split*.
 
 If the *flow* was empty,
-each *call*, *compute*, *request* or *run* is called nevertheless.
+each *__call__* (from *Source*), *compute*, *request* or *run*
+is called nevertheless.
 
 *Source* within *Split* can be used to add new data to *flow*.
 For example, we can create *Split([source, ()])*,
@@ -736,8 +712,6 @@ The former yields the results when its *compute* method is called.
 It is supposed that *FillCompute* is run only once
 and that it is memory safe (that it reduces data).
 If an element can consume much memory, it must be a *FillRequest* element.
-Its method *request* can be called several times (possibly clearing its state). 
-Thus, a *FillRequest* element can also be used for repeating calculations.
 
 If we add *Call* elements before and *Run* and *Call* elements after
 our *FillCompute* or *FillRequest* elements,
@@ -776,15 +750,6 @@ Lena allows optimizations if they are needed.
 #. In the analysis example :ref:`main4.py <main4_py>`
    there are two *MakeFilename* elements.
    Is it possible to use only one of them? How?
-
-
-#. 
-   .. _ex_fr:
-
-   *FillRequest* can be initialized from a *FillCompute* element,
-   if it has a method *reset*.
-   In this case *request* will be *compute* followed by *reset*.
-   How to make *request* to be *compute* without *reset*?
 
 #. We developed the example :ref:`main2.py <main2_py>`
    and joined *lambda* and *filename* into a *Variable*.

@@ -28,7 +28,7 @@ The three ideas behind Lena
 
 1. Sequences and elements
 ^^^^^^^^^^^^^^^^^^^^^^^^^
-The basic idea of *Lena* it to join our computations into sequences.
+The basic idea of *Lena* is to join our computations into sequences.
 Sequences consist of elements.
 
 The simplest *Lena* program may be the following.
@@ -451,7 +451,7 @@ If the file is missing, then *Cache* creates that, runs the previous elements,
 and stores values from the flow into the file.
 On subsequent runs it loads the flow from file, and no previous elements are run.
 *Cache* uses *pickle*,
-which allows serialization and de-serialization of most Python objects
+which allows serialization and deserialization of most Python objects
 (except function’s code).
 If you have some lengthy calculation and want to save the results
 (for example, to improve plots, which follow in the sequence),

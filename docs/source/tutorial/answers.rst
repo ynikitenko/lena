@@ -174,14 +174,6 @@ Delete the first *MakeFilename* and change the second one to
 
 Ex. 3
 ^^^^^
-.. code-block:: python
-
-   FillRequest(fill_compute_el, request="compute")
-   # or 
-   FillRequest(fill_compute_el, reset=False)
-
-Ex. 4
-^^^^^
 We believe that the essence of data is captured in
 the function with which it was obtained.
 Histogram is just its presentation.
@@ -197,7 +189,7 @@ In such situations, however,
 the final result is often not a histogram but a function of that,
 like a mean or a mode (which again suggests a different name).
 
-Ex. 5
+Ex. 4
 ^^^^^
 In part 1 of the tutorial there was introduced an element *End*,
 which stops the flow at its location. 
@@ -220,7 +212,7 @@ probably won't have a name and won't be plotted correctly.
 Take an empty flow into account when creating
 your own *FillCompute* elements.
 
-Ex. 6
+Ex. 5
 ^^^^^
 It depends on the student's priorities.
 If he wants to finish the diploma never to return to programming,

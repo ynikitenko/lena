@@ -8,10 +8,12 @@
 *.pcm
 *.d
 *.so
+*.bin
 
 *.pdf
 *.png
 *.csv
+*.bak
 
 # LaTeX 
 *tmp0*
@@ -32,4 +34,5 @@ docs/source/modules.rst
 
 .tox
 dist/
+build/
 *.egg-info
