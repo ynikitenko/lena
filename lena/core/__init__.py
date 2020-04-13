@@ -1,5 +1,4 @@
 """Lena combines calculations using *sequences*.
-
 *Sequences* consist of *elements*.
 Basic Lena sequences and element types are defined in this module.
 """

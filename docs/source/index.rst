@@ -48,28 +48,36 @@ Lena originated from experimental neutrino physics and is named after a great Si
 
 Installation
 ------------
+
+From pip
+^^^^^^^^
+Lena core modules depend only on Python standard libraries.
+Other python extensions can be installed from pip:
+
+::
+
+    pip install lena
+    # if you plan to render LaTeX templates
+    pip install jinja2
+
 ..
-    From pip
-    ^^^^^^^^
-    Lena core modules depend only on Python standard libraries.
-    Other python dependencies are installed automatically from pip::
-
-        pip install lena
-
-        # without jinja2
-        pip install --no-deps lena
-        # or, for Python 3
-        pip3 install lena
+    # without jinja2
+    # unfortunately, now jinja2 seems to be not
+    # in the default requirements.
+    pip install --no-deps lena
+    # or, for Python 3
+    pip3 install lena
 
 From github
 ^^^^^^^^^^^
 ::
 
     git clone https://github.com/ynikitenko/lena
+    # most of requirements are for development only
     pip install -r lena/requirements.txt
 
 Replace *<path-to-lena>* with the actual path to the directory *lena*
-and write
+and add
 
 .. code-block:: console
 
