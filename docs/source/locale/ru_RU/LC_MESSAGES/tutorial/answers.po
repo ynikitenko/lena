@@ -1,0 +1,198 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2020, Yaroslav Nikitenko
+# This file is distributed under the same license as the Lena package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2020.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Lena 0.1\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-04-14 22:34+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.8.0\n"
+
+#: ../../source/tutorial/answers.rst:2
+msgid "Answers to exercises"
+msgstr ""
+
+#: ../../source/tutorial/answers.rst:4
+msgid "Part 1"
+msgstr ""
+
+#: ../../source/tutorial/answers.rst:6 ../../source/tutorial/answers.rst:140
+msgid "Ex. 1"
+msgstr ""
+
+#: ../../source/tutorial/answers.rst:7
+msgid ""
+"*End.run* in this case is not a generator. To make it a generator, add a "
+"*yield* statement somewhere. Also note that since Python 3.7 all "
+"*StopIteration* are considered to be errors according to PEP 479. Use a "
+"simple *return* instead. This is the implementation in *lena.flow*:"
+msgstr ""
+
+#: ../../source/tutorial/answers.rst:30 ../../source/tutorial/answers.rst:185
+msgid "Ex. 2"
+msgstr ""
+
+#: ../../source/tutorial/answers.rst:43 ../../source/tutorial/answers.rst:193
+msgid "Ex. 3"
+msgstr ""
+
+#: ../../source/tutorial/answers.rst:44
+msgid ""
+"An implementation of *Count* is given below. An important consideration "
+"is that there may be several *Counts* in the sequence, so give them "
+"different names to distinguish."
+msgstr ""
+
+#: ../../source/tutorial/answers.rst:89 ../../source/tutorial/answers.rst:210
+msgid "Ex. 4"
+msgstr ""
+
+#: ../../source/tutorial/answers.rst:90
+msgid "A simple output function could be the following:"
+msgstr ""
+
+#: ../../source/tutorial/answers.rst:107
+msgid ""
+"Then place *output()* in a sequence, and new initialized elements will be"
+" put there."
+msgstr ""
+
+#: ../../source/tutorial/answers.rst:110
+msgid ""
+"This approach is terse, but less flexible and explicit. In practice "
+"verbosity of several output elements was never a problem for the author."
+msgstr ""
+
+#: ../../source/tutorial/answers.rst:115 ../../source/tutorial/answers.rst:233
+msgid "Ex. 5"
+msgstr ""
+
+#: ../../source/tutorial/answers.rst:116
+msgid ""
+"The author is unaware of a simple for a user way to stop a function and "
+"resume it at the given point. Inform the author if you know better "
+"answers to any of these exercises."
+msgstr ""
+
+#: ../../source/tutorial/answers.rst:120
+msgid ""
+"MechanicZelenyy from habr gives this `explanation "
+"<https://habr.com/ru/post/490518/#comment_21342580>`_ (translated from "
+"Russian):"
+msgstr ""
+
+#: ../../source/tutorial/answers.rst:124
+msgid ""
+"There are two types of models: push and pull. If you have a sequence, "
+"then in the case of a *push* model the calculations are initiated by the "
+"first member of the sequence, which pushes data further. In this case "
+"fork could be done easily, just at a certain moment it pushes data not "
+"into one sequence, but into two."
+msgstr ""
+
+#: ../../source/tutorial/answers.rst:130
+msgid ""
+"In the case of a *pull* model the calculations are initiated by the last "
+"member of the sequence. Consequently, if we want to branch the sequence, "
+"we need to think what to do: to start only when all consumers asked, to "
+"use a buffer, or to start with one consumer and to push the rest of the "
+"data conforming to the *push* model."
+msgstr ""
+
+#: ../../source/tutorial/answers.rst:138
+msgid "Part 2"
+msgstr ""
+
+#: ../../source/tutorial/answers.rst:141
+msgid "This is the *Sum* implementation from *lena.math*:"
+msgstr ""
+
+#: ../../source/tutorial/answers.rst:186
+msgid "Delete the first *MakeFilename* and change the second one to"
+msgstr ""
+
+#: ../../source/tutorial/answers.rst:194
+msgid ""
+"We believe that the essence of data is captured in the function with "
+"which it was obtained. Histogram is just its presentation. It may be "
+"tempting to name a histogram just for convenience, but a general "
+"*MakeFilename* would be more powerful."
+msgstr ""
+
+#: ../../source/tutorial/answers.rst:200
+msgid ""
+"Functional programming suggests that larger functions should be "
+"decomposed into smaller ones, while object-oriented design praises code "
+"cohesion. The decisions above were made by choosing between these "
+"principles. There are cases when a histogram is data itself. In such "
+"situations, however, the final result is often not a histogram but a "
+"function of that, like a mean or a mode (which again suggests a different"
+" name)."
+msgstr ""
+
+#: ../../source/tutorial/answers.rst:211
+msgid ""
+"In part 1 of the tutorial there was introduced an element *End*, which "
+"stops the flow at its location. However, if there are *Histograms* in the"
+" following flow, they will be yielded even if nothing was filled into "
+"them. Empty histogram is a legitimate histogram state. It may be also "
+"filled, but the result may fall out of the histogram's range. It is "
+"possible to write a special element if needed to check whether the flow "
+"was empty."
+msgstr ""
+
+#: ../../source/tutorial/answers.rst:220
+msgid ""
+"In the next chapter we will present a specific analysis during which a "
+"histogram may not be filled, but it must be produced. A *FillCompute* "
+"element is more general than a histogram (which we use here just for a "
+"concrete example)."
+msgstr ""
+
+#: ../../source/tutorial/answers.rst:225
+msgid ""
+"Note also that if a histogram was not filled, preceding variables weren't"
+" called. The histogram will have no context, probably won't have a name "
+"and won't be plotted correctly. Take an empty flow into account when "
+"creating your own *FillCompute* elements."
+msgstr ""
+
+#: ../../source/tutorial/answers.rst:234
+msgid ""
+"It depends on the student's priorities. If he wants to finish the diploma"
+" never to return to programming, or if he has a lot of work to do apart "
+"from writing code, the fastest option might be the best. General "
+"algorithms have a more complicated interface. However, if one decides to "
+"rely upon a \"friendly\" library, there is a risk that the programmer "
+"will have to rewrite all code when more functionality becomes needed."
+msgstr ""
+
+#: ../../source/tutorial/answers.rst:243
+msgid ""
+"Architectural choices rise for middle-sized or large projects. If the "
+"student's personal code becomes large and more time is spent on "
+"supporting and extending that, it may be a good time to define the "
+"architecture. Here the author estimates \"large\" programs to start from "
+"one thousand lines."
+msgstr ""
+
+#: ../../source/tutorial/answers.rst:250
+msgid ""
+"Another distinction is that when using a library one learns how to use a "
+"library. When using a good framework, one learns how to write good code. "
+"Many algorithms in programming are simple, but to choose a good design "
+"may be much more difficult, and to learn how to create good programs "
+"yourself may take years of studying and experience. When you feel "
+"difficulties with making programming decisions, it's time to invest into "
+"design skills."
+msgstr ""
+

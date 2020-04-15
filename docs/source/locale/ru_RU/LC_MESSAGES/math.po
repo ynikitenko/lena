@@ -1,0 +1,471 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2020, Yaroslav Nikitenko
+# This file is distributed under the same license as the Lena package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2020.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Lena 0.1\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-04-14 22:34+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.8.0\n"
+
+#: ../../source/math.rst:2
+msgid "math package"
+msgstr ""
+
+#: ../../source/math.rst:3
+msgid "**Functions of multidimensional arguments:**"
+msgstr ""
+
+#: ../../source/math.rst:9:<autosummary>:1
+msgid ":obj:`mesh <lena.math.meshes.mesh>`\\ \\(ranges\\, nbins\\)"
+msgstr ""
+
+#: ../../source/math.rst:9:<autosummary>:1 lena.math.meshes.mesh:1 of
+msgid "Generate equally spaced mesh of *nbins* cells in the given range."
+msgstr ""
+
+#: ../../source/math.rst:9:<autosummary>:1
+msgid ":obj:`md_map <lena.math.meshes.md_map>`\\ \\(f\\, array\\)"
+msgstr ""
+
+#: ../../source/math.rst:9:<autosummary>:1 lena.math.meshes.md_map:1 of
+msgid "Multidimensional map."
+msgstr ""
+
+#: ../../source/math.rst:10
+msgid "**Functions of scalar and multidimensional arguments:**"
+msgstr ""
+
+#: ../../source/math.rst:16:<autosummary>:1
+msgid ":obj:`clip <lena.math.utils.clip>`\\ \\(a\\, interval\\)"
+msgstr ""
+
+#: ../../source/math.rst:16:<autosummary>:1 lena.math.utils.clip:1 of
+msgid "Clip (limit) the value."
+msgstr ""
+
+#: ../../source/math.rst:16:<autosummary>:1
+msgid ""
+":obj:`isclose <lena.math.utils.isclose>`\\ \\(a\\, b\\[\\, rel\\_tol\\, "
+"abs\\_tol\\]\\)"
+msgstr ""
+
+#: ../../source/math.rst:16:<autosummary>:1 lena.math.utils.isclose:1 of
+msgid ""
+"Return ``True`` if *a* and *b* are approximately equal, and ``False`` "
+"otherwise."
+msgstr ""
+
+#: ../../source/math.rst:17
+msgid "**Elements:**"
+msgstr ""
+
+#: ../../source/math.rst:23:<autosummary>:1
+msgid ""
+":obj:`Mean <lena.math.elements.Mean>`\\ \\(\\[start\\, "
+"pass\\_on\\_empty\\]\\)"
+msgstr ""
+
+#: ../../source/math.rst:23:<autosummary>:1 lena.math.elements.Mean:1 of
+msgid "Calculate mean (average) of input values."
+msgstr ""
+
+#: ../../source/math.rst:23:<autosummary>:1
+msgid ":obj:`Sum <lena.math.elements.Sum>`\\ \\(\\[start\\]\\)"
+msgstr ""
+
+#: ../../source/math.rst:23:<autosummary>:1 lena.math.elements.Sum:1 of
+msgid "Calculate sum of input values."
+msgstr ""
+
+#: ../../source/math.rst:24
+msgid "**3-dimensional vector:**"
+msgstr ""
+
+#: ../../source/math.rst:29:<autosummary>:1
+msgid ":obj:`vector3 <lena.math.vector3.vector3>`\\ \\(v\\)"
+msgstr ""
+
+#: ../../source/math.rst:29:<autosummary>:1 lena.math.vector3.vector3:1 of
+msgid "3-dimensional vector with Cartesian and spherical coordinates."
+msgstr ""
+
+#: ../../source/math.rst:31
+msgid "Functions of multidimensional arguments"
+msgstr ""
+
+#: lena.math.meshes.mesh of
+msgid "Parameters"
+msgstr ""
+
+#: lena.math.meshes.mesh:3 of
+msgid ""
+"a pair of (min, max) values for 1-dimensional range, or a list of ranges "
+"in corresponding dimensions."
+msgstr ""
+
+#: lena.math.meshes.mesh:5 of
+msgid ""
+"number of bins for 1-dimensional range, or a list of number of bins in "
+"corresponding dimensions."
+msgstr ""
+
+#: lena.math.meshes.mesh:14 of
+msgid ""
+"Note that because of rounding errors two meshes should not be naively "
+"compared, they will probably appear different. One should use "
+":ref:`isclose <isclose_label>` for comparison."
+msgstr ""
+
+#: lena.math.meshes.md_map:3 of
+msgid ""
+"Return function *f* mapped to contents of a multidimensional *array*. *f*"
+" is a function of one argument."
+msgstr ""
+
+#: lena.math.meshes.md_map:7 of
+msgid ""
+"*Array* must be a list of (possibly nested) lists. Its contents remain "
+"unchanged. Returned array has same dimensions as the initial one. If "
+"*array* is not a list, :exc:`~lena.core.LenaTypeError` is raised."
+msgstr ""
+
+#: ../../source/math.rst:38
+msgid "Functions of scalar and multidimensional arguments"
+msgstr ""
+
+#: lena.math.utils.clip:3 of
+msgid ""
+"Given an interval *(a_min, a_max)*, values of *a* outside the interval "
+"are clipped to the interval edges. For example, if an interval of *[0, "
+"1]* is specified, values smaller than 0 become 0, and values larger than "
+"1 become 1."
+msgstr ""
+
+#: lena.math.utils.clip:16 of
+msgid ""
+"If *a_min* > *a_max* or if *interval* has length more than 2, "
+":exc:`~lena.core.LenaValueError` is raised. If *interval* is not a "
+"container, :exc:`~lena.core.LenaTypeError` is raised."
+msgstr ""
+
+#: lena.math.utils.isclose:4 of
+msgid ""
+"*rel_tol* is the relative tolerance. It is multiplied by the greater of "
+"the magnitudes of the two arguments; as the values get larger, so does "
+"the allowed difference between them while still considering them close."
+msgstr ""
+
+#: lena.math.utils.isclose:11 of
+msgid ""
+"*abs_tol* is the absolute tolerance. If the difference is less than "
+"either of those tolerances, the values are considered equal."
+msgstr ""
+
+#: lena.math.utils.isclose:15 of
+msgid ""
+"*a* and *b* must be either numbers or lists/tuples of same dimensions "
+"(may be nested), or have a method *isclose*. Otherwise "
+":exc:`~lena.core.LenaTypeError` is raised. For containers, *isclose* is "
+"called elementwise. If every corresponding element is close, the "
+"containers are close. Dimensions are not checked to be equal."
+msgstr ""
+
+#: lena.math.utils.isclose:23 of
+msgid ""
+"First, *a* and *b* are checked if any of them has *isclose* method. If "
+"*a* and *b* both have *isclose* method, then they must both return "
+"``True`` to be close. Otherwise, if only one of *a* or *b* has *isclose* "
+"method, it is called."
+msgstr ""
+
+#: lena.math.utils.isclose:29 of
+msgid "Special values of ``NaN``, ``inf``, and ``-inf`` are not supported."
+msgstr ""
+
+#: lena.math.utils.isclose:36 of
+msgid ""
+"This function for scalar numbers appeared in ``math`` module in *Python "
+"3.5*."
+msgstr ""
+
+#: ../../source/math.rst:47
+msgid "Elements"
+msgstr ""
+
+#: lena.math.elements:1 of
+msgid "Elements for mathematical calculations."
+msgstr ""
+
+#: lena.math.elements.Mean:3 lena.math.elements.Sum:3 of
+msgid "*start* is the initial value of sum."
+msgstr ""
+
+#: lena.math.elements.Mean:5 of
+msgid ""
+"If *pass_on_empty* is True, then if nothing was filled, don't yield "
+"anything. By default it raises an error (see :meth:`compute`)."
+msgstr ""
+
+#: lena.math.elements.Mean.compute:1 of
+msgid "Calculate mean and yield."
+msgstr ""
+
+#: lena.math.elements.Mean.compute:3 of
+msgid ""
+"If the current context is not empty, yield *(mean, context)*. Otherwise "
+"yield only *mean*."
+msgstr ""
+
+#: lena.math.elements.Mean.compute:6 of
+msgid ""
+"If no values were filled (count is zero), mean can't be calculated and "
+":exc:`~lena.core.LenaZeroDivisionError` is raised. This can be changed to"
+" yielding nothing if *pass_on_empty* was initialized to True."
+msgstr ""
+
+#: lena.math.elements.Mean.fill:1 lena.math.elements.Sum.fill:1 of
+msgid "Fill *self* with *value*."
+msgstr ""
+
+#: lena.math.elements.Mean.fill:3 of
+msgid ""
+"The *value* can be a *(data, context)* pair. The last *context* value (if"
+" missing, it is considered empty) is saved for output."
+msgstr ""
+
+#: lena.math.elements.Mean.reset:1 of
+msgid "Reset sum, count and context."
+msgstr ""
+
+#: lena.math.elements.Mean.reset:3 of
+msgid "Sum is reset to *start* value, count to zero and context to {}."
+msgstr ""
+
+#: lena.math.elements.Sum.compute:1 of
+msgid "Calculate the sum and yield."
+msgstr ""
+
+#: lena.math.elements.Sum.compute:3 of
+msgid ""
+"If the current context is not empty, yield *(sum, context)*. Otherwise "
+"yield only *sum*."
+msgstr ""
+
+#: lena.math.elements.Sum.fill:3 of
+msgid ""
+"The *value* can be a *(data, context)* pair. The last *context* value "
+"(considered empty if missing) sets the current context."
+msgstr ""
+
+#: lena.math.elements.Sum.reset:1 of
+msgid "Reset sum and context."
+msgstr ""
+
+#: lena.math.elements.Sum.reset:3 of
+msgid "Sum is reset to *start* value and context to {}."
+msgstr ""
+
+#: ../../source/math.rst:51
+msgid "3-dimensional vector"
+msgstr ""
+
+#: lena.math.vector3:1 of
+msgid ""
+"*vector3* is a 3-dimensional vector with float coordinates. It supports "
+"spherical coordinates and basic vector operations."
+msgstr ""
+
+#: lena.math.vector3:4 of
+msgid ""
+"Initialization, vector addition and scalar multiplication create new "
+"vectors:"
+msgstr ""
+
+#: lena.math.vector3:18 of
+msgid ""
+"Vector attributes can be set and read. Vectors can be tested for exact or"
+" approximate equality with `==` and :meth:`isclose <vector3.isclose>` "
+"method."
+msgstr ""
+
+#: lena.math.vector3.vector3:3 of
+msgid "Create vector3 from Cartesian coordinates."
+msgstr ""
+
+#: lena.math.vector3.vector3:5 of
+msgid ""
+"*v* should be a container of size 3 (will be transformed to a list of "
+"floats)."
+msgstr ""
+
+#: lena.math.vector3.vector3:8 of
+msgid "**Attributes**"
+msgstr ""
+
+#: lena.math.vector3.vector3:10 of
+msgid ""
+"*vector3* has usual vector attributes: *x*, *y*, *z* and spherical "
+"coordinates *r*, *phi*, *theta*."
+msgstr ""
+
+#: lena.math.vector3.vector3:13 of
+msgid "They are connected through this formula:"
+msgstr ""
+
+#: lena.math.vector3.vector3:15 of
+msgid ""
+"\\begin{gather*} \\begin{aligned}     x & = r * \\cos(\\phi) * "
+"\\sin(\\theta),\\\\     y & = r * \\sin(\\phi) * \\sin(\\theta),\\\\     "
+"z & = r * \\cos(\\theta),\\\\ \\end{aligned} \\end{gather*}"
+msgstr ""
+
+#: lena.math.vector3.vector3:26 of
+msgid ":math:`\\phi \\in [0, 2 \\pi], \\theta \\in [0, \\pi]`."
+msgstr ""
+
+#: lena.math.vector3.vector3:28 of
+msgid ":math:`\\phi` and :math:`\\phi + 2 \\pi` are equal."
+msgstr ""
+
+#: lena.math.vector3.vector3:30 of
+msgid ""
+"Cartesian coordinates can be obtained and set through indices starting "
+"from 0 (v.x = v[0]). In this respect, *vector3* behaves as a container of"
+" length 3."
+msgstr ""
+
+#: lena.math.vector3.vector3:34 of
+msgid ""
+"Only Cartesian coordinates are stored internally (spherical coordinates "
+"are recomputed each time)."
+msgstr ""
+
+#: lena.math.vector3.vector3:37 of
+msgid ""
+"Attributes can be got and set using subscript or a function set*, get*. "
+"For example:"
+msgstr ""
+
+#: lena.math.vector3.vector3:48 of
+msgid ""
+":math:`r^2` and :math:`\\cos\\theta` can be obtained with methods "
+"*getr2()* and *getcostheta()*."
+msgstr ""
+
+#: lena.math.vector3.vector3:51 of
+msgid "**Comparisons**"
+msgstr ""
+
+#: lena.math.vector3.vector3:53 of
+msgid ""
+"For elementwise comparison of two vectors one can use '==' and '!=' "
+"operators. Because of rounding errors, this can often show two same "
+"vectors as different. In general, it is recommended to use approximate "
+"comparison with :meth:`isclose <vector3.isclose>` method."
+msgstr ""
+
+#: lena.math.vector3.vector3:60 of
+msgid ""
+"Comparisons like '>', '<=' are all prohibited: if one tries to use these "
+"operators, :exc:`~lena.core.LenaTypeError` is raised."
+msgstr ""
+
+#: lena.math.vector3.vector3:64 of
+msgid "**Truth testing**"
+msgstr ""
+
+#: lena.math.vector3.vector3:66 of
+msgid "*vector3* is non-zero if its magnitude (*r*) is not 0."
+msgstr ""
+
+#: lena.math.vector3.vector3:68 of
+msgid "**Vector operations**"
+msgstr ""
+
+#: lena.math.vector3.vector3:70 of
+msgid ""
+"3-dimensional vectors can be added and subtracted, multiplied or divided "
+"by a scalar. Multiplication by a scalar can be written from any side of "
+"the vector (c*v or v*c). A vector can also be negated (*-v*)."
+msgstr ""
+
+#: lena.math.vector3.vector3:76 of
+msgid "For other vector operations see methods below."
+msgstr ""
+
+#: lena.math.vector3.vector3.fromspherical:1 of
+msgid "Construct vector3 from spherical coordinates."
+msgstr ""
+
+#: lena.math.vector3.vector3.fromspherical:3 of
+msgid ""
+"*r* is magnitude, *phi* is azimuth angle from 0 to :math:`2 * \\pi`, "
+"*theta* is polar angle from 0 (z = 1) to :math:`\\pi` (z = -1)."
+msgstr ""
+
+#: lena.math.vector3.vector3.angle:1 of
+msgid "The angle between self and *B*, in radians."
+msgstr ""
+
+#: lena.math.vector3.vector3.cosine:1 of
+msgid "Cosine of the angle between self and *B*."
+msgstr ""
+
+#: lena.math.vector3.vector3.cross:1 of
+msgid "The cross product between self and *B*, :math:`A\\times B`."
+msgstr ""
+
+#: lena.math.vector3.vector3.dot:1 of
+msgid "The scalar product between self and *B*, :math:`A \\cdot B`."
+msgstr ""
+
+#: lena.math.vector3.vector3.isclose:1 of
+msgid "Test whether two vectors are approximately equal."
+msgstr ""
+
+#: lena.math.vector3.vector3.isclose:3 of
+msgid ""
+"Parameter semantics is the same as for the general :func:`isclose "
+"<lena.math.utils.isclose>`."
+msgstr ""
+
+#: lena.math.vector3.vector3.norm:1 of
+msgid ":math:`A/|A|`, a unit vector in the direction of self."
+msgstr ""
+
+#: lena.math.vector3.vector3.proj:1 of
+msgid "The vector projection of self along B."
+msgstr ""
+
+#: lena.math.vector3.vector3.proj:3 of
+msgid "A.proj(B) = :math:`(A \\cdot norm(B)) norm(B)`."
+msgstr ""
+
+#: lena.math.vector3.vector3.rotate:1 of
+msgid "Rotate self around *B* through angle *theta*."
+msgstr ""
+
+#: lena.math.vector3.vector3.rotate:3 of
+msgid ""
+"From the position where *B* points towards us, the rotation is "
+"counterclockwise (the right hand rule)."
+msgstr ""
+
+#: lena.math.vector3.vector3.scalar_proj:1 of
+msgid "The scalar projection of self along B."
+msgstr ""
+
+#: lena.math.vector3.vector3.scalar_proj:3 of
+msgid "A.scalar_proj(B) = :math:`A \\cdot norm(B)`."
+msgstr ""
+

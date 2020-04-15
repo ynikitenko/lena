@@ -113,9 +113,26 @@ was never a problem for the author.
 
 Ex. 5
 ^^^^^
-It is probably impossible in Python
+The author is unaware of a simple for a user way
 to stop a function and resume it at the given point.
-Inform the author if you know how to do that.
+Inform the author if you know better answers to any of these exercises.
+
+Mikhail Zelenyi gives this
+`explanation <https://habr.com/ru/post/490518/#comment_21342580>`_
+(translated from Russian):
+
+There are two types of models: push and pull.
+If you have a sequence, then in the case of a *push* model
+the calculations are initiated by the first member of the sequence,
+which pushes data further. In this case fork could be done easily,
+just at a certain moment it pushes data not into one sequence, but into two.
+
+In the case of a *pull* model
+the calculations are initiated by the last member of the sequence.
+Consequently, if we want to branch the sequence, we need to think
+what to do: to start only when all consumers asked,
+to use a buffer, or to start with one consumer
+and to push the rest of the data conforming to the *push* model.
 
 Part 2
 ------

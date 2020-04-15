@@ -608,7 +608,7 @@ The answers to the excercises are given in the end of the tutorial.
 
 .. [#f1] This possibility may be added in the future.
 .. [#f2] Jinja documentation: https://jinja.palletsprojects.com/
-.. [#f3] To use Jinja to render LaTeX was proposed `here <http://eosrei.net/articles/2015/11/latex-templates-python-and-jinja2-generate-pdfs>`_ and `here <https://web.archive.org/web/20121024021221/http://e6h.de/post/11/>`_, template syntax was taken from the original article.
+.. [#f3] To use Jinja to render LaTeX was proposed `here <http://eosrei.net/articles/2015/11/latex-templates-python-and-jinja2-generate-pdfs>`__ and `here <https://web.archive.org/web/20121024021221/http://e6h.de/post/11/>`__, template syntax was taken from the original article.
 
 ..
     todo:

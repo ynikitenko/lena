@@ -1,0 +1,865 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2020, Yaroslav Nikitenko
+# This file is distributed under the same license as the Lena package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2020.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Lena 0.1\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-04-14 22:34+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.8.0\n"
+
+#: ../../source/flow.rst:2
+msgid "Flow"
+msgstr ""
+
+#: ../../source/flow.rst:4
+msgid "**Elements:**"
+msgstr ""
+
+#: ../../source/flow.rst:13:<autosummary>:1
+msgid ""
+":obj:`Cache <lena.flow.Cache>`\\ \\(filename\\[\\, method\\, "
+"protocol\\]\\)"
+msgstr ""
+
+#: ../../source/flow.rst:13:<autosummary>:1 lena.flow.Cache:1 of
+msgid "Cache flow passing through."
+msgstr ""
+
+#: ../../source/flow.rst:13:<autosummary>:1
+msgid ":obj:`DropContext <lena.flow.DropContext>`\\ \\(\\*args\\)"
+msgstr ""
+
+#: ../../source/flow.rst:13:<autosummary>:1
+msgid ""
+"Sequence, which transform *(data, context)* flow so that only *data* "
+"remains in the inner sequence."
+msgstr ""
+
+#: ../../source/flow.rst:13:<autosummary>:1
+msgid ":obj:`End <lena.flow.End>`\\"
+msgstr ""
+
+#: ../../source/flow.rst:13:<autosummary>:1 lena.flow.End:1 of
+msgid "Stop sequence here."
+msgstr ""
+
+#: ../../source/flow.rst:13:<autosummary>:1
+msgid ""
+":obj:`Print <lena.flow.Print>`\\ \\(\\[before\\, sep\\, end\\, "
+"transform\\]\\)"
+msgstr ""
+
+#: ../../source/flow.rst:13:<autosummary>:1 lena.flow.Print:1 of
+msgid "Print values passing through."
+msgstr ""
+
+#: ../../source/flow.rst:17
+msgid "**Functions:**"
+msgstr ""
+
+#: ../../source/flow.rst:26:<autosummary>:1
+msgid ":obj:`get_context <lena.flow.functions.get_context>`\\ \\(value\\)"
+msgstr ""
+
+#: ../../source/flow.rst:26:<autosummary>:1 lena.flow.functions.get_context:1
+#: of
+msgid "Get context from a possible *(data, context)* pair."
+msgstr ""
+
+#: ../../source/flow.rst:26:<autosummary>:1
+msgid ":obj:`get_data <lena.flow.functions.get_data>`\\ \\(value\\)"
+msgstr ""
+
+#: ../../source/flow.rst:26:<autosummary>:1 lena.flow.functions.get_data:1 of
+msgid "Get data from *value* (a possible *(data, context)* pair)."
+msgstr ""
+
+#: ../../source/flow.rst:26:<autosummary>:1
+msgid ""
+":obj:`get_data_context <lena.flow.functions.get_data_context>`\\ "
+"\\(value\\)"
+msgstr ""
+
+#: ../../source/flow.rst:26:<autosummary>:1
+#: lena.flow.functions.get_data_context:1 of
+msgid "Get (data, context) from *value* (a possible *(data, context)* pair)."
+msgstr ""
+
+#: ../../source/flow.rst:26:<autosummary>:1
+msgid ""
+":obj:`seq_map <lena.flow.functions.seq_map>`\\ \\(seq\\, container\\[\\, "
+"one\\_result\\]\\)"
+msgstr ""
+
+#: ../../source/flow.rst:26:<autosummary>:1 lena.flow.functions.seq_map:1 of
+msgid "Map Lena Sequence *seq* to the *container*."
+msgstr ""
+
+#: ../../source/flow.rst:27
+msgid "**Group plots:**"
+msgstr ""
+
+#: ../../source/flow.rst:36:<autosummary>:1
+msgid ":obj:`GroupBy <lena.flow.GroupBy>`\\ \\(group\\_by\\)"
+msgstr ""
+
+#: ../../source/flow.rst:36:<autosummary>:1 lena.flow.GroupBy:1 of
+msgid "Group data."
+msgstr ""
+
+#: ../../source/flow.rst:36:<autosummary>:1
+msgid ""
+":obj:`GroupPlots <lena.flow.GroupPlots>`\\ \\(group\\_by\\, select\\[\\, "
+"transform\\, ...\\]\\)"
+msgstr ""
+
+#: ../../source/flow.rst:36:<autosummary>:1 lena.flow.GroupPlots:1 of
+msgid "Group several plots."
+msgstr ""
+
+#: ../../source/flow.rst:36:<autosummary>:1
+msgid ""
+":obj:`GroupScale <lena.flow.GroupScale>`\\ \\(scale\\_to\\[\\, "
+"allow\\_zero\\_scale\\, ...\\]\\)"
+msgstr ""
+
+#: ../../source/flow.rst:36:<autosummary>:1 lena.flow.GroupScale:1 of
+msgid "Scale a group of data."
+msgstr ""
+
+#: ../../source/flow.rst:36:<autosummary>:1
+msgid ":obj:`Selector <lena.flow.Selector>`\\ \\(selector\\)"
+msgstr ""
+
+#: ../../source/flow.rst:36:<autosummary>:1 lena.flow.Selector:1 of
+msgid "Determine whether an item should be selected."
+msgstr ""
+
+#: ../../source/flow.rst:37
+msgid "**Iterators:**"
+msgstr ""
+
+#: ../../source/flow.rst:45:<autosummary>:1
+msgid ":obj:`Chain <lena.flow.iterators.Chain>`\\ \\(\\*iterables\\)"
+msgstr ""
+
+#: ../../source/flow.rst:45:<autosummary>:1 lena.flow.iterators.Chain:1 of
+msgid "Chain generators."
+msgstr ""
+
+#: ../../source/flow.rst:45:<autosummary>:1
+msgid ""
+":obj:`CountFrom <lena.flow.iterators.CountFrom>`\\ \\(\\[start\\, "
+"step\\]\\)"
+msgstr ""
+
+#: ../../source/flow.rst:45:<autosummary>:1 lena.flow.iterators.CountFrom:1 of
+msgid "Generate numbers from *start* to infinity, with *step* between values."
+msgstr ""
+
+#: ../../source/flow.rst:45:<autosummary>:1
+msgid ":obj:`ISlice <lena.flow.iterators.ISlice>`\\ \\(\\*args\\)"
+msgstr ""
+
+#: ../../source/flow.rst:45:<autosummary>:1 lena.flow.iterators.ISlice:1 of
+msgid "Slice iterable from *start* to *stop* with *step*."
+msgstr ""
+
+#: ../../source/flow.rst:46
+msgid "**Split into bins:**"
+msgstr ""
+
+#: ../../source/flow.rst:52:<autosummary>:1
+msgid ""
+":obj:`SplitIntoBins <lena.flow.split_into_bins.SplitIntoBins>`\\ "
+"\\(seq\\, arg\\_func\\, edges\\[\\, transform\\]\\)"
+msgstr ""
+
+#: ../../source/flow.rst:52:<autosummary>:1
+#: lena.flow.split_into_bins.SplitIntoBins:1 of
+msgid "Split analysis into bins."
+msgstr ""
+
+#: ../../source/flow.rst:54
+msgid "Elements"
+msgstr ""
+
+#: ../../source/flow.rst:55
+msgid ""
+"Elements form Lena sequences. This group contains miscellaneous elements,"
+" which didn't fit other categories."
+msgstr ""
+
+#: lena.flow.Cache:3 of
+msgid ""
+"On the first run, dump all flow to file (and yield the flow unaltered). "
+"On subsequent runs, load all flow from that file in the original order."
+msgstr ""
+
+#: lena.flow.Cache:8 of
+msgid "Example::"
+msgstr ""
+
+#: lena.flow.Cache:19 of
+msgid ""
+"If *stats.pkl* exists, :class:`Cache` will read data flow from that file "
+"and no other processing will be done. If the *stats.pkl* cache doesn't "
+"exist, but the cache for histograms exist, it will be used and no "
+"previous processing (from *ReadFiles* to *MakeHistograms*) will occur. If"
+" both caches are not filled yet, processing will run as usually."
+msgstr ""
+
+#: lena.flow.Cache:28 of
+msgid ""
+"Only pickleable objects can be cached (otherwise a *pickle.PickleError* "
+"is raised)."
+msgstr ""
+
+#: lena.flow.Cache:33 of
+msgid ""
+"The pickle module is not secure against erroneous or maliciously "
+"constructed data. Never unpickle data from an untrusted source."
+msgstr ""
+
+#: lena.flow.Cache:37 of
+msgid ""
+"*filename* is the name of file where to store the cache. You can give it "
+"*.pkl* extension."
+msgstr ""
+
+#: lena.flow.Cache:40 of
+msgid ""
+"*method* can be *pickle* or *cPickle* (faster pickle). For Python3 they "
+"are same."
+msgstr ""
+
+#: lena.flow.Cache:43 of
+msgid ""
+"*protocol* is pickle protocol. Version 2 is the highest supported by "
+"Python 2. Version 0 is \"human-readable\" (as noted in the "
+"documentation). 3 is recommended if compatibility between Python 3 "
+"versions is needed. 4 was added in Python 3.4. It adds support for very "
+"large objects, pickling more kinds of objects, and some data format "
+"optimizations."
+msgstr ""
+
+#: lena.flow.Cache.alter_sequence:1 of
+msgid ""
+"If the Sequence *seq* contains a :class:`Cache`, which has an up-to-date "
+"cache, a :class:`~lena.core.Source` is built based on the flattened *seq*"
+" and returned. Otherwise the *seq* is returned unchanged."
+msgstr ""
+
+#: lena.flow.Cache.cache_exists:1 of
+msgid "Return ``True`` if file with cache exists and is readable."
+msgstr ""
+
+#: lena.flow.Cache.drop_cache:1 of
+msgid "Remove file with cache if that exists, pass otherwise."
+msgstr ""
+
+#: lena.flow.Cache.drop_cache:3 of
+msgid ""
+"If cache exists and is readable, but could not be deleted, "
+":exc:`~lena.core.LenaEnvironmentError` is raised."
+msgstr ""
+
+#: lena.flow.Cache.run:1 of
+msgid "Load cache or fill it."
+msgstr ""
+
+#: lena.flow.Cache.run:3 of
+msgid ""
+"If we can read *filename*, load flow from there. Otherwise use the "
+"incoming *flow* and fill the cache. All loaded or passing items are "
+"yielded."
+msgstr ""
+
+#: lena.flow.DropContext:1 of
+msgid ""
+"Sequence, which transform *(data, context)* flow so that only *data* "
+"remains in the inner sequence. Context is restored outside *DropContext*."
+msgstr ""
+
+#: lena.flow.DropContext:5 of
+msgid ""
+"*DropContext* works for most simple cases as a *Sequence*, but may not "
+"work in more advanced circumstances. For example, since *DropContext* is "
+"not transparent, :class:`Split` can't judge whether it has a "
+"*FillCompute* element inside, and this may lead to errors in the "
+"analysis. It is recommended to provide *context* when possible."
+msgstr ""
+
+#: lena.flow.DropContext:13 of
+msgid "*\\*args* will form a :class:`Sequence`."
+msgstr ""
+
+#: lena.flow.DropContext.run:1 of
+msgid ""
+"Run the sequence without context, and generate output flow restoring the "
+"context before *DropContext*."
+msgstr ""
+
+#: lena.flow.DropContext.run:5 of
+msgid "If the sequence adds a context, the returned context is updated with that."
+msgstr ""
+
+#: lena.flow.End.run:1 of
+msgid ""
+"Exhaust all preceding flow and stop iteration (yield nothing to the "
+"following flow)."
+msgstr ""
+
+#: lena.flow.Print:3 of
+msgid ""
+"*before* is a string appended before the first element in the item (which"
+" may be a container)."
+msgstr ""
+
+#: lena.flow.Print:6 of
+msgid "*sep* separates elements, *end* is appended after the last element."
+msgstr ""
+
+#: lena.flow.Print:8 of
+msgid ""
+"*transform* is a function which transforms passing items (for example, it"
+" can select its specific fields)."
+msgstr ""
+
+#: ../../source/flow.rst:75
+msgid "Functions"
+msgstr ""
+
+#: lena.flow.functions:1 of
+msgid "Functions to deal with data and context, and :func:`seq_map`."
+msgstr ""
+
+#: lena.flow.functions:3 of
+msgid ""
+"A value is considered a (data, context) pair, if it is a tuple of length "
+"2, and the second element is a dictionary or its subclass."
+msgstr ""
+
+#: lena.flow.functions.get_context:3 of
+msgid "If context is not found, return an empty dictionary."
+msgstr ""
+
+#: lena.flow.functions.get_data:3 of
+msgid "If context is not found, return *value*."
+msgstr ""
+
+#: lena.flow.functions.get_data_context:3 of
+msgid "If context is not found, (value, {}) is returned."
+msgstr ""
+
+#: lena.flow.functions.get_data_context:5 of
+msgid ""
+"Since :func:`get_data` and :func:`get_context` both check whether context"
+" is present, this function may be slightly more efficient and compact "
+"than the other two."
+msgstr ""
+
+#: lena.flow.functions.seq_map:3 of
+msgid ""
+"For each value from the *container*, calculate ``seq.run([value])``. This"
+" can be a list or a single value. If *one_result* is True, the result "
+"must be a single value. In this case, if results contain less than or "
+"more than one element, :exc:`~lena.core.LenaValueError` is raised."
+msgstr ""
+
+#: lena.flow.functions.seq_map:9 of
+msgid ""
+"The list of results (lists or single values) is returned. The results are"
+" in the same order as read from the *container*."
+msgstr ""
+
+#: ../../source/flow.rst:82
+msgid "Group plots"
+msgstr ""
+
+#: lena.flow.group_plots:1 of
+msgid "Group several plots into one."
+msgstr ""
+
+#: lena.flow.group_plots:3 of
+msgid ""
+"Since data can be produced in different places, several classes are "
+"needed to support this. First, the plots of interest must be selected "
+"(for example, one-dimensional histograms). This is done by "
+":class:`Selector`. Selected plots must be grouped. For example, we may "
+"want to plot data *x* versus Monte-Carlo *x*, but not data *x* vs data "
+"*y*. Data is grouped by :class:`GroupBy`. To preserve the group, we can't"
+" yield it to the following elements, but have to transform the plots "
+"inside :class:`GroupPlots`. We can also scale (normalize) all plots to "
+"one using :class:`GroupScale`."
+msgstr ""
+
+#: lena.flow.GroupBy:3 of
+msgid ""
+"Data is added during :meth:`update`. Groups are available as "
+":attr:`groups` attribute."
+msgstr ""
+
+#: lena.flow.GroupBy:6 of
+msgid ""
+"Groups is a mapping of *keys* (return values of *group_by*) and lists of "
+"items with the same key."
+msgstr ""
+
+#: lena.flow.GroupBy:9 of
+msgid "Combine data with same attributes."
+msgstr ""
+
+#: lena.flow.GroupBy:11 of
+msgid ""
+"*group_by* is a function, which returns distinct hashable results for "
+"items from different groups."
+msgstr ""
+
+#: lena.flow.GroupBy:14 of
+msgid ""
+"It can be a dot-separated string, which corresponds to context. "
+"Otherwise, :exc:`~lena.core.LenaTypeError` is raised."
+msgstr ""
+
+#: lena.flow.GroupBy.clear:1 of
+msgid "Remove all groups."
+msgstr ""
+
+#: lena.flow.GroupBy.update:1 of
+msgid "Find a group for *val* and add it there."
+msgstr ""
+
+#: lena.flow.GroupBy.update:3 of
+msgid ""
+"A group key is calculated by *group_by*. If no such key exists, a new "
+"group is created."
+msgstr ""
+
+#: lena.flow.GroupPlots:3 of
+msgid ""
+"Plots to be grouped are chosen by *select*, which acts as a boolean "
+"function. If *select* is not a :class:`Selector`, it is converted to that"
+" class. See :class:`Selector` for more options."
+msgstr ""
+
+#: lena.flow.GroupPlots:9 of
+msgid ""
+"Plots are grouped by *group_by*, which returns different keys for "
+"different groups. If it is not an instance of :class:`GroupBy`, it is "
+"converted to that class. See :class:`GroupBy` for more options."
+msgstr ""
+
+#: lena.flow.GroupPlots:15 of
+msgid ""
+"*scale_to* is a number or a string. A number means the scale, to which "
+"plots must be normalized. A string is a name of the plot to which other "
+"plots must be normalized. If *scale_to* is not an instance of "
+":class:`GroupScale`, it is converted to that class. If a plot could not "
+"be rescaled, :exc:`~lena.core.LenaValueError` is raised. For more "
+"options, use :class:`GroupScale`."
+msgstr ""
+
+#: lena.flow.GroupPlots:25 of
+msgid ""
+"*transform* is a sequence, which processes individual plots before "
+"yielding. For example, ``transform=(HistToCSV(), writer)``. *transform* "
+"is called after *scale_to*."
+msgstr ""
+
+#: lena.flow.GroupPlots:30 of
+msgid ""
+"*yield_selected* defines whether selected items should be yielded during "
+"*run* like other items. Use it if you want to have both single and "
+"combined plots. By default, selected plots are not yielded."
+msgstr ""
+
+#: lena.flow.GroupPlots.run:1 of
+msgid "Run the flow and yield final groups."
+msgstr ""
+
+#: lena.flow.GroupPlots.run:3 of
+msgid ""
+"Each item of the flow is checked with the selector. If it is selected, it"
+" is added to groups. Otherwised it is yielded."
+msgstr ""
+
+#: lena.flow.GroupPlots.run:7 of
+msgid ""
+"After the flow is finished, groups are yielded. Groups are lists of "
+"items, which have same keys from *group_by*. Each group's context "
+"(including empty) is inserted into a list in *context.group*. The "
+"resulting context is updated with the intersection of groups' contexts. "
+"For uniformity, if *yield_selected* is True, single values are also "
+"updated: data is put into a list of one element, and context is updated "
+"with *group* key. Its value is copy (not deep copy) of context's values, "
+"so future updates to subdictionaries which existed during this run will "
+"be effective in *context.group*."
+msgstr ""
+
+#: lena.flow.GroupPlots.run:22 of
+msgid ""
+"If *scale_to* was set, plots are normalized to the given value or plot. "
+"If that plot was not selected (is missing in the captured group) or its "
+"norm could not be calculated, :exc:`~lena.core.LenaValueError` is raised."
+msgstr ""
+
+#: lena.flow.GroupScale:3 of
+msgid ""
+"*scale_to* defines the method of scaling. If a number is given, group "
+"items are scaled to that. Otherwise it is converted to a "
+":class:`~lena.flow.Selector`, which must return a unique item from the "
+"group. Group items will be scaled to the scale of that item."
+msgstr ""
+
+#: lena.flow.GroupScale:9 of
+msgid ""
+"By default, attempts to rescale a structure with unknown or zero scale "
+"raise an error. If *allow_zero_scale* and *allow_unknown_scale* are set "
+"to ``True``, the corresponding errors are ignored and the structure "
+"remains unscaled."
+msgstr ""
+
+#: lena.flow.GroupScale.scale:1 of
+msgid "Scale *group* and return a rescaled group as a list."
+msgstr ""
+
+#: lena.flow.GroupScale.scale:3 of
+msgid ""
+"The *group* can contain *(structure, context)* pairs. The original group "
+"is unchanged as long as structures' *scale* method returns a new "
+"structure (default for Lena histograms and graphs)."
+msgstr ""
+
+#: lena.flow.GroupScale.scale:9 of
+msgid ""
+"If any item could not be rescaled and options were not set to ignore "
+"that, :exc:`~lena.core.LenaValueError` is raised."
+msgstr ""
+
+#: lena.flow.Selector:3 of
+msgid ""
+"Generally, *selected* means the result is convertible to ``True``, but "
+"other values can be used as well."
+msgstr ""
+
+#: lena.flow.Selector:6 of
+msgid "The usage of *selector* depends on its type."
+msgstr ""
+
+#: lena.flow.Selector:8 of
+msgid ""
+"If *selector* is a class, :meth:`__call__` checks that data part of the "
+"value is subclassed from that."
+msgstr ""
+
+#: lena.flow.Selector:12 of
+msgid "A callable is used as is."
+msgstr ""
+
+#: lena.flow.Selector:14 of
+msgid ""
+"A string means that value's context must conform to that (as in "
+":func:`lena.context.check_context_str`)."
+msgstr ""
+
+#: lena.flow.Selector:17 of
+msgid ""
+"*selector* can be a container. In this case its items are converted to "
+"selectors. If *selector* is a *list*, the result is *or* applied to "
+"results of each item. If it is a *tuple*, boolean *and* is applied to the"
+" results."
+msgstr ""
+
+#: lena.flow.Selector:23 of
+msgid ""
+"If incorrect arguments are provided, :exc:`~lena.core.LenaTypeError` is "
+"raised."
+msgstr ""
+
+#: lena.flow.Selector.__call__:1 of
+msgid "Check whether *value* is selected."
+msgstr ""
+
+#: lena.flow.Selector.__call__:3 of
+msgid ""
+"If an exception occurs, the result is False. It is safe to use non-"
+"existing attributes, etc."
+msgstr ""
+
+#: ../../source/flow.rst:94
+msgid "Iterators"
+msgstr ""
+
+#: lena.flow.iterators:1 of
+msgid "Adapters to iterators from ``itertools``."
+msgstr ""
+
+#: lena.flow.iterators.Chain:3 of
+msgid ":class:`Chain` can be used as a ``Source`` to generate data."
+msgstr ""
+
+#: lena.flow.iterators.Chain:5 of
+msgid "Example:"
+msgstr ""
+
+#: lena.flow.iterators.Chain:11 of
+msgid ""
+"*iterables* will be chained during ``__call__()``, that is after the "
+"first one is exhausted, the second is called, etc."
+msgstr ""
+
+#: lena.flow.iterators.Chain.__call__:1 of
+msgid "Generate values from chained iterables."
+msgstr ""
+
+#: lena.flow.iterators.CountFrom:3 of
+msgid "Similar to :func:`itertools.count`."
+msgstr ""
+
+#: lena.flow.iterators.CountFrom.__call__:1 of
+msgid "Yield values from *start* to infinity with *step*."
+msgstr ""
+
+#: lena.flow.iterators.ISlice:3 of
+msgid "Initialization:"
+msgstr ""
+
+#: lena.flow.iterators.ISlice:5 of
+msgid ":class:`ISlice` (*stop*)"
+msgstr ""
+
+#: lena.flow.iterators.ISlice:7 of
+msgid ":class:`ISlice` (*start, stop* [*, step*])"
+msgstr ""
+
+#: lena.flow.iterators.ISlice:9 of
+msgid "Similar to :func:`itertools.islice` or :func:`range`."
+msgstr ""
+
+#: lena.flow.iterators.ISlice.fill_into:1 of
+msgid "Fill *element* with *value*."
+msgstr ""
+
+#: lena.flow.iterators.ISlice.fill_into:3 of
+msgid "Element must have a ``fill(value)`` method."
+msgstr ""
+
+#: lena.flow.iterators.ISlice.run:1 of
+msgid "Yield values from *start* to *stop* with *step*."
+msgstr ""
+
+#: ../../source/flow.rst:100
+msgid "Split into bins"
+msgstr ""
+
+#: lena.flow.split_into_bins:1 of
+msgid "Split analysis on groups set by bins."
+msgstr ""
+
+#: lena.flow.split_into_bins.ReduceBinContent:1 of
+msgid "Transform bin content of histograms."
+msgstr ""
+
+#: lena.flow.split_into_bins.ReduceBinContent:3 of
+msgid ""
+"This class is used when histogram bins contain complex structures. For "
+"example, in order to plot a histogram with a 3-dimensional vector in each"
+" bin, we shall create 3 histograms corresponding to vector's components."
+msgstr ""
+
+#: lena.flow.split_into_bins.ReduceBinContent:8 of
+msgid ""
+"*Select* determines which types should be transformed. The types must be "
+"given in a ``list`` (not a tuple) or as a general :class:`Selector`. "
+"Example: ``select=[lena.math.vector3, list]``."
+msgstr ""
+
+#: lena.flow.split_into_bins.ReduceBinContent:13 of
+msgid ""
+"*transform* is a *Sequence* or element applied to bin contents. If "
+"*transform* is not a :class:`~lena.core.Sequence` or an element with "
+"*run* method, it is converted to a :class:`~lena.core.Sequence`. Example:"
+" ``transform=Split([X(), Y(), Z()])`` (provided that you have X, Y, Z "
+"variables)."
+msgstr ""
+
+#: lena.flow.split_into_bins.ReduceBinContent:20 of
+msgid ""
+":class:`ReduceBinContent` creates histograms, which may be plotted, that "
+"is bins contain only data without context. By default, context of all "
+"bins except one is not used. If *drop_bins_context* is ``False``, a "
+"histogram of bin context is added to context."
+msgstr ""
+
+#: lena.flow.split_into_bins.ReduceBinContent:27 of
+msgid "In case of wrong arguments, :exc:`~lena.core.LenaTypeError` is raised."
+msgstr ""
+
+#: lena.flow.split_into_bins.ReduceBinContent.run:1 of
+msgid "Transform histograms from *flow*."
+msgstr ""
+
+#: lena.flow.split_into_bins.ReduceBinContent.run:3 of
+msgid "Not selected values pass unchanged."
+msgstr ""
+
+#: lena.flow.split_into_bins.ReduceBinContent.run:5 of
+msgid ""
+"Context is updated with *variable*, *histogram* and *bin_content*. "
+"*variable\" and *histogram* copy context from *split_into_bins* (if "
+"present there). *bin_content* includes context for example bin in "
+"\"example_bin\" and (optionally) for all bins in \"all_bins\"."
+msgstr ""
+
+#: lena.flow.split_into_bins.SplitIntoBins:3 of
+msgid ""
+"*seq* is a :class:`~lena.core.FillComputeSeq` sequence, which corresponds"
+" to the analysis being compared for different bins. It can be a tuple "
+"containing a *FillCompute* element. Deep copy of *seq* will be used to "
+"produce each bin's content."
+msgstr ""
+
+#: lena.flow.split_into_bins.SplitIntoBins:9 of
+msgid ""
+"*arg_func* is a function which takes data and returns argument value used"
+" to compute the bin index. A :class:`~lena.variables.variable.Variable` "
+"must be provided. Example of a two-dimensional function: ``arg_func = "
+"lena.variables.Variable(\"xy\", lambda event: (event.x, event.y))``."
+msgstr ""
+
+#: lena.flow.split_into_bins.SplitIntoBins:16 of
+msgid ""
+"*edges* is a sequence of arrays containing monotonically increasing bin "
+"edges along each dimension. Example: ``edges = lena.math.mesh((0, 1), "
+"10)``."
+msgstr ""
+
+#: lena.flow.split_into_bins.SplitIntoBins:20 of
+msgid ""
+"*transform* is a :class:`~lena.core.Sequence`, which is applied to "
+"results. The final histogram may contain vectors, histograms and any "
+"other data the analysis produced. To be able to plot them, *transform* "
+"can extract vector components or do other work to simplify structures. By"
+" default, *transform* is :class:`TransformBins`. Pass an empty tuple to "
+"disable it."
+msgstr ""
+
+#: lena.flow.split_into_bins.SplitIntoBins:29 of
+msgid "**Attributes**: bins, edges."
+msgstr ""
+
+#: lena.flow.split_into_bins.SplitIntoBins:31 of
+msgid ""
+"If *edges* are not increasing, "
+":exc:`~lena.core.exceptions.LenaValueError` is raised. In case of other "
+"argument initialization problems, "
+":exc:`~lena.core.exceptions.LenaTypeError` is raised."
+msgstr ""
+
+#: lena.flow.split_into_bins.SplitIntoBins.compute:1 of
+msgid "Yield a *(Histogram, context)* for *compute()* for each bin."
+msgstr ""
+
+#: lena.flow.split_into_bins.SplitIntoBins.compute:3 of
+msgid ""
+":class:`~lena.structures.Histogram` is created from :attr:`edges` and "
+"bins taken from compute() for :attr:`bins`. Context is preserved in "
+"histogram bins."
+msgstr ""
+
+#: lena.flow.split_into_bins.SplitIntoBins.compute:8 of
+msgid ""
+":class:`SplitIntoBins` context is added to *context.split_into_bins* as "
+"*histogram* (corresponding to *edges*) and *variable* (corresponding to "
+"*arg_func*) subcontexts."
+msgstr ""
+
+#: lena.flow.split_into_bins.SplitIntoBins.compute:13 of
+msgid ""
+"In Python 3 the minimum number of *compute()* among all bins is used. In "
+"Python 2, if some bin is exhausted before the others, its content will be"
+" filled with None."
+msgstr ""
+
+#: lena.flow.split_into_bins.SplitIntoBins.fill:1 of
+msgid "Fill the cell corresponding to *arg_func(val)* with *val*."
+msgstr ""
+
+#: lena.flow.split_into_bins.SplitIntoBins.fill:3 of
+msgid "Values outside of *edges* range are ignored."
+msgstr ""
+
+#: lena.flow.split_into_bins.TransformBins:1 of
+msgid "Transform bins into a flattened sequence."
+msgstr ""
+
+#: lena.flow.split_into_bins.TransformBins:3 of
+msgid ""
+"*create_edges_str* is a callable, which creates a string from bin's edges"
+" and coordinate names and adds that to context. It is passed parameters "
+"*(edges, var_context)*, where *var_context* is Variable context "
+"containing variable names (it can be a single "
+":class:`~lena.variable.Variable` or :class:`~lena.variable.Combine`)."
+msgstr ""
+
+#: lena.flow.split_into_bins.TransformBins:13 of
+msgid "By default, it is :func:`cell_to_string`."
+msgstr ""
+
+#: lena.flow.split_into_bins.TransformBins:15 of
+msgid ""
+"If *create_edges_str* is not callable, :exc:`~lena.core.LenaTypeError` is"
+" raised."
+msgstr ""
+
+#: lena.flow.split_into_bins.cell_to_string:1 of
+msgid "Transform cell edges into a string."
+msgstr ""
+
+#: lena.flow.split_into_bins.cell_to_string:3 of
+msgid ""
+"*cell_edges* is a tuple of pairs *(lower bound, upper bound)* for each "
+"coordinate."
+msgstr ""
+
+#: lena.flow.split_into_bins.cell_to_string:6 of
+msgid "*coord_names* is a list of coordinates names."
+msgstr ""
+
+#: lena.flow.split_into_bins.cell_to_string:8 of
+msgid ""
+"*coord_fmt* is a string, which defines how to format individual "
+"coordinates."
+msgstr ""
+
+#: lena.flow.split_into_bins.cell_to_string:11 of
+msgid "*coord_join* is a string, which joins coordinate pairs."
+msgstr ""
+
+#: lena.flow.split_into_bins.cell_to_string:13 of
+msgid "If *reverse* is True, coordinates are joined in reverse order."
+msgstr ""
+
+#: lena.flow.split_into_bins.get_example_bin:1 of
+msgid "Return bin with zero index on each axis of the histogram bins."
+msgstr ""
+
+#: lena.flow.split_into_bins.get_example_bin:3 of
+msgid "For example, if the histogram is two-dimensional, return hist[0][0]."
+msgstr ""
+
+#: lena.flow.split_into_bins.get_example_bin:5 of
+msgid "*struct* can be a :class:`~lena.structures.Histogram` or an array of bins."
+msgstr ""
+

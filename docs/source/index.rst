@@ -3,11 +3,34 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
+.. |br| raw:: html
+
+   <br />
+
+..
+    todo:
+    - install programs on Linux (pdflatex and other packages)
+    - Lena is intended to... - we can write about its mission
+      (create good and beautiful software).
+    - from philosophical point of view.
+      Ready to analyse several issues at once.
+      Data analysis is comparison of different entities (expected and observed).
+    - create When should I use Lena? Make Overwiew small.
+    - write about minimal requirements and recommended programs.
+    - move performance to the end, add a note about Python.
+    - Add Thanks subsection
+    - add release notes somewhere in the future.
+
 ========
 Overview
 ========
 
-Lena is an architectural framework for data analysis. It is written in Python and works with Python versions 2, 3 and PyPy.
+Lena is an architectural framework for data analysis.
+It is written in a popular programming language Python
+and works with Python versions 2, 3 and PyPy (2 and 3).
+
+..
+    todo: rewrite. ... features ... include...
 
 These are Lena features from programming point of view:
 
@@ -49,10 +72,14 @@ Lena originated from experimental neutrino physics and is named after a great Si
 Installation
 ------------
 
-From pip
-^^^^^^^^
+From PyPI
+^^^^^^^^^
+
+..
+    no python extensions!
+
 Lena core modules depend only on Python standard libraries.
-Other python extensions can be installed from pip:
+Other Python extensions can be installed using pip:
 
 ::
 
@@ -76,15 +103,13 @@ From github
     # most of requirements are for development only
     pip install -r lena/requirements.txt
 
-Replace *<path-to-lena>* with the actual path to the directory *lena*
-and add
+Add to your profile (e.g. ``.profile`` or ``.bashrc`` on Linux)
 
 .. code-block:: console
 
     export PYTHONPATH=$PYTHONPATH:<path-to-lena>
 
-to your profile 
-(e.g. ``.profile`` or ``.bashrc`` on Linux).
+and replace *<path-to-lena>* with the actual path to the directory *lena*.
 
 .. .bashrc is for non-interactive shells, which are used with 'ssh command'.
 
@@ -99,13 +124,12 @@ To fully use all available tools, you may need the following programs:
 
 .. * *# ssh-agent* to use Lena on remote servers.
 
-They are not necessary if you don't need to make plots or want to provide your own tools for that.
+They are not necessary if you don't need to make plots
+or if you want to use your own tools for that.
 
 Documentation
 -------------
 To get started, read the :doc:`tutorial`.
-
-.. Other tutorials are: ...
 
 Complete documentation on Lena classes and specific topics can be found in the :doc:`reference`.
 
@@ -167,12 +191,8 @@ License
 Lena is free software licensed under Apache software license (version 2).
 You can use it freely for your data analysis, read its source code and modify it.
 
-.. It is tested and actively used, but we take no responsibility 
-
-It is intended to help people in their data analysis, 
+It is intended to help people in data analysis, 
 but we don't take responsibility if something goes wrong.
-
-.. English. It is intended?
 
 ..
     .. _contacts:
@@ -184,11 +204,10 @@ but we don't take responsibility if something goes wrong.
 Alternatives
 ------------
 `Ruffus <http://www.ruffus.org.uk/index.html>`_ 
-is a Computation Pipeline library for python used in science and bioinformatics. 
+is a Computation Pipeline library for Python used in science and bioinformatics. 
 It connects program components by writing and reading files.
 
 ..
-    Lena is simple, beautiful, transparent (but understandable).
     These are not alternatives, I see few of them in Python, or they do different things.
     `Computational Data Analysis Workflow Systems <https://github.com/common-workflow-language/common-workflow-language/wiki/Existing-Workflow-systems>`_
     `A curated list of awesome pipeline toolkits <https://github.com/pditommaso/awesome-pipeline>`_

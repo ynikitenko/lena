@@ -1,0 +1,824 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2020, Yaroslav Nikitenko
+# This file is distributed under the same license as the Lena package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2020.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Lena 0.1\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-04-14 22:34+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.8.0\n"
+
+#: ../../source/core.rst:2
+msgid "lena.core"
+msgstr ""
+
+#: ../../source/core.rst:4
+msgid "**Sequences:**"
+msgstr ""
+
+#: ../../source/core.rst:14:<autosummary>:1
+msgid ":obj:`Sequence <lena.core.Sequence>`\\ \\(\\*args\\)"
+msgstr ""
+
+#: ../../source/core.rst:14:<autosummary>:1 lena.core.Sequence:1 of
+msgid ""
+"Sequence of elements, such that next takes input from the previous during"
+" *run*."
+msgstr ""
+
+#: ../../source/core.rst:14:<autosummary>:1
+msgid ":obj:`Source <lena.core.Source>`\\ \\(\\*args\\)"
+msgstr ""
+
+#: ../../source/core.rst:14:<autosummary>:1 lena.core.Source:1 of
+msgid "Sequence with no input flow."
+msgstr ""
+
+#: ../../source/core.rst:14:<autosummary>:1
+msgid ":obj:`FillComputeSeq <lena.core.FillComputeSeq>`\\ \\(\\*args\\)"
+msgstr ""
+
+#: ../../source/core.rst:14:<autosummary>:1 lena.core.FillComputeSeq:1 of
+msgid "Sequence with one :class:`FillCompute` element."
+msgstr ""
+
+#: ../../source/core.rst:14:<autosummary>:1
+msgid ""
+":obj:`FillRequestSeq <lena.core.FillRequestSeq>`\\ \\(\\*args\\, "
+"\\*\\*kwargs\\)"
+msgstr ""
+
+#: ../../source/core.rst:14:<autosummary>:1 lena.core.FillRequestSeq:1 of
+msgid "Sequence with one :class:`FillRequest` element."
+msgstr ""
+
+#: ../../source/core.rst:14:<autosummary>:1
+msgid ":obj:`Split <lena.core.Split>`\\ \\(seqs\\[\\, bufsize\\, copy\\_buf\\]\\)"
+msgstr ""
+
+#: ../../source/core.rst:14:<autosummary>:1 lena.core.Split:1 of
+msgid "Split data flow and run analysis in parallel."
+msgstr ""
+
+#: ../../source/core.rst:15
+msgid "**Adapters:**"
+msgstr ""
+
+#: ../../source/core.rst:26:<autosummary>:1
+msgid ":obj:`Call <lena.core.adapters.Call>`\\ \\(el\\[\\, call\\]\\)"
+msgstr ""
+
+#: ../../source/core.rst:26:<autosummary>:1 lena.core.adapters.Call:1 of
+msgid "Adapter to provide *__call__(value)* method."
+msgstr ""
+
+#: ../../source/core.rst:26:<autosummary>:1
+msgid ""
+":obj:`FillCompute <lena.core.adapters.FillCompute>`\\ \\(el\\[\\, fill\\,"
+" compute\\]\\)"
+msgstr ""
+
+#: ../../source/core.rst:26:<autosummary>:1 lena.core.adapters.FillCompute:1 of
+msgid "Adapter for a *FillCompute* element."
+msgstr ""
+
+#: ../../source/core.rst:26:<autosummary>:1
+msgid ""
+":obj:`FillInto <lena.core.adapters.FillInto>`\\ \\(el\\[\\, "
+"fill\\_into\\, explicit\\]\\)"
+msgstr ""
+
+#: ../../source/core.rst:26:<autosummary>:1 lena.core.adapters.FillInto:1 of
+msgid "Adapter for a FillInto element."
+msgstr ""
+
+#: ../../source/core.rst:26:<autosummary>:1
+msgid ""
+":obj:`FillRequest <lena.core.adapters.FillRequest>`\\ \\(el\\[\\, fill\\,"
+" request\\, reset\\, bufsize\\]\\)"
+msgstr ""
+
+#: ../../source/core.rst:26:<autosummary>:1 lena.core.adapters.FillRequest:1 of
+msgid "Adapter for a *FillRequest* element."
+msgstr ""
+
+#: ../../source/core.rst:26:<autosummary>:1
+msgid ":obj:`Run <lena.core.adapters.Run>`\\ \\(el\\[\\, run\\]\\)"
+msgstr ""
+
+#: ../../source/core.rst:26:<autosummary>:1 lena.core.adapters.Run:1 of
+msgid "Adapter for a *Run* element."
+msgstr ""
+
+#: ../../source/core.rst:26:<autosummary>:1
+msgid ":obj:`SourceEl <lena.core.adapters.SourceEl>`\\ \\(el\\[\\, call\\]\\)"
+msgstr ""
+
+#: ../../source/core.rst:26:<autosummary>:1
+msgid "Adapter to provide *__call__()* method."
+msgstr ""
+
+#: ../../source/core.rst:27
+msgid "**Exceptions:**"
+msgstr ""
+
+#: ../../source/core.rst:41:<autosummary>:1
+msgid ":obj:`LenaAttributeError <lena.core.exceptions.LenaAttributeError>`\\"
+msgstr ""
+
+#: ../../source/core.rst:41:<autosummary>:1
+msgid ":obj:`LenaEnvironmentError <lena.core.exceptions.LenaEnvironmentError>`\\"
+msgstr ""
+
+#: ../../source/core.rst:41:<autosummary>:1
+#: lena.core.exceptions.LenaEnvironmentError:1 of
+msgid ""
+"The base class for exceptions that can occur outside the Python system, "
+"like IOError or OSError."
+msgstr ""
+
+#: ../../source/core.rst:41:<autosummary>:1
+msgid ":obj:`LenaException <lena.core.exceptions.LenaException>`\\"
+msgstr ""
+
+#: ../../source/core.rst:41:<autosummary>:1
+#: lena.core.exceptions.LenaException:1 of
+msgid "Base class for all Lena exceptions."
+msgstr ""
+
+#: ../../source/core.rst:41:<autosummary>:1
+msgid ":obj:`LenaIndexError <lena.core.exceptions.LenaIndexError>`\\"
+msgstr ""
+
+#: ../../source/core.rst:41:<autosummary>:1
+msgid ":obj:`LenaKeyError <lena.core.exceptions.LenaKeyError>`\\"
+msgstr ""
+
+#: ../../source/core.rst:41:<autosummary>:1
+msgid ":obj:`LenaRuntimeError <lena.core.exceptions.LenaRuntimeError>`\\"
+msgstr ""
+
+#: ../../source/core.rst:41:<autosummary>:1
+#: lena.core.exceptions.LenaRuntimeError:1 of
+msgid "Raised when an error does not belong to other categories."
+msgstr ""
+
+#: ../../source/core.rst:41:<autosummary>:1
+msgid ":obj:`LenaStopFill <lena.core.exceptions.LenaStopFill>`\\"
+msgstr ""
+
+#: ../../source/core.rst:41:<autosummary>:1 lena.core.exceptions.LenaStopFill:1
+#: of
+msgid "Signal that no more fill is accepted."
+msgstr ""
+
+#: ../../source/core.rst:41:<autosummary>:1
+msgid ":obj:`LenaTypeError <lena.core.exceptions.LenaTypeError>`\\"
+msgstr ""
+
+#: ../../source/core.rst:41:<autosummary>:1
+msgid ":obj:`LenaValueError <lena.core.exceptions.LenaValueError>`\\"
+msgstr ""
+
+#: ../../source/core.rst:43
+msgid "Sequences"
+msgstr ""
+
+#: lena.core:1 of
+msgid ""
+"Lena combines calculations using *sequences*. *Sequences* consist of "
+"*elements*. Basic Lena sequences and element types are defined in this "
+"module."
+msgstr ""
+
+#: lena.core.Sequence:4 of
+msgid ""
+":meth:`Sequence.run` must accept input flow. For sequence with no input "
+"data use :class:`Source`."
+msgstr ""
+
+#: lena.core.Sequence:7 of
+msgid "*args* are objects which implement a method *run(flow)* or callables."
+msgstr ""
+
+#: lena.core.Sequence:10 of
+msgid ""
+"*args* can be a single tuple of such elements. In this case one doesn't "
+"need to check argument type when initializing a Sequence in a general "
+"function."
+msgstr ""
+
+#: lena.core.Sequence:14 of
+msgid ""
+"For more information about the *run* method and callables, see "
+":class:`Run`."
+msgstr ""
+
+#: lena.core.Sequence.run:1 of
+msgid "Generator, which transforms the incoming flow."
+msgstr ""
+
+#: lena.core.Sequence.run:3 of
+msgid ""
+"If this :class:`Sequence` is empty, the flow passes untransformed, with a"
+" small change. This function converts input flow to an iterator, so that "
+"it always contains both *iter* and *next* methods. This is done for the "
+"flow entering the first sequence element and exiting from the sequence."
+msgstr ""
+
+#: lena.core.Source:3 of
+msgid ""
+"First argument is the initial element with no input flow. Following "
+"arguments (if present) form a sequence of elements, each accepting "
+"computational flow from the previous element."
+msgstr ""
+
+#: lena.core.Source:15 of
+msgid ""
+"For a *sequence* which transforms the incoming flow, use "
+":class:`Sequence`."
+msgstr ""
+
+#: lena.core.Source.__call__:1 of
+msgid "Generate flow."
+msgstr ""
+
+#: lena.core.FillComputeSeq:3 of
+msgid ""
+"Input flow is preprocessed with the *Sequence* before the *FillCompute* "
+"element, then it fills the *FillCompute* element."
+msgstr ""
+
+#: lena.core.FillComputeSeq:7 of
+msgid ""
+"When the results are *computed*, they are postprocessed with the "
+"*Sequence* after that element."
+msgstr ""
+
+#: lena.core.FillComputeSeq:11 of
+msgid "*args* form a sequence with a *FillCompute* element."
+msgstr ""
+
+#: lena.core.FillComputeSeq:13 of
+msgid ""
+"If *args* contain several *FillCompute* elements, only the first one is "
+"chosen (the subsequent ones are used as simple *Run* elements). To change"
+" that, explicitly cast the first element to :class:`~lena.core.FillInto`."
+msgstr ""
+
+#: lena.core.FillComputeSeq:19 of
+msgid ""
+"If *FillCompute* element was not found, or if the sequences before and "
+"after that could not be correctly initialized, "
+":exc:`~lena.core.LenaTypeError` is raised."
+msgstr ""
+
+#: lena.core.FillComputeSeq.compute:1 of
+msgid "Compute the results and yield."
+msgstr ""
+
+#: lena.core.FillComputeSeq.compute:3 of
+msgid ""
+"If the sequence after *FillCompute* is not empty, it postprocesses the "
+"results yielded from *FillCompute* element."
+msgstr ""
+
+#: lena.core.FillComputeSeq.fill:1 lena.core.FillRequestSeq.fill:1
+#: lena.core.adapters.FillCompute.fill:1 lena.core.adapters.FillRequest.fill:1
+#: of
+msgid "Fill *self* with *value*."
+msgstr ""
+
+#: lena.core.FillComputeSeq.fill:3 of
+msgid ""
+"If the sequence before FillCompute is not empty, it preprocesses the "
+"*value* before filling *FillCompute*."
+msgstr ""
+
+#: lena.core.FillRequestSeq:3 of
+msgid ""
+"Input flow is preprocessed with the *Sequence* before the *FillRequest* "
+"element, then it fills the *FillRequest* element."
+msgstr ""
+
+#: lena.core.FillRequestSeq:7 of
+msgid ""
+"When the results are yielded from the *FillRequest*, they are "
+"postprocessed with the *Sequence* after that element."
+msgstr ""
+
+#: lena.core.FillRequestSeq:11 of
+msgid "*args* form a sequence with a *FillRequest* element."
+msgstr ""
+
+#: lena.core.FillRequestSeq:13 of
+msgid ""
+"If *args* contains several *FillRequest* elements, only the first one is "
+"chosen (the subsequent ones are used as simple *Run* elements). To change"
+" that, explicitly cast the first element to :class:`~lena.core.FillInto`."
+msgstr ""
+
+#: lena.core.FillRequestSeq:19 of
+msgid ""
+"*kwargs* can contain *bufsize*, which is used during *run*. See "
+":class:`FillRequest` for more information on *run*. By default *bufsize* "
+"is *1*. Other *kwargs* raise :exc:`~lena.core.LenaTypeError`."
+msgstr ""
+
+#: lena.core.FillRequestSeq:24 of
+msgid ""
+"If *FillRequest* element was not found, or if the sequences before or "
+"after that could not be correctly initialized, "
+":exc:`~lena.core.LenaTypeError` is raised."
+msgstr ""
+
+#: lena.core.FillRequestSeq.fill:3 of
+msgid ""
+"If the sequence before *FillRequest* is not empty, it preprocesses the "
+"*value* before filling *FillRequest*."
+msgstr ""
+
+#: lena.core.FillRequestSeq.request:1 of
+msgid "Request the results and yield."
+msgstr ""
+
+#: lena.core.FillRequestSeq.request:3 of
+msgid ""
+"If the sequence after *FillRequest* is not empty, it postprocesses the "
+"results yielded from the *FillRequest* element."
+msgstr ""
+
+#: lena.core.FillRequestSeq.reset:1 of
+msgid "Reset the *FillRequest* element."
+msgstr ""
+
+#: lena.core.Split:3 of
+msgid ""
+"*seqs* must be a list of Sequence, Source, FillComputeSeq or "
+"FillRequestSeq sequences (any other container will raise "
+":exc:`~lena.core.LenaTypeError`). If *seqs* is empty, *Split* acts as an "
+"empty *Sequence* and yields all values it receives."
+msgstr ""
+
+#: lena.core.Split:9 of
+msgid ""
+"*bufsize* is the size of the buffer for the input flow. If *bufsize* is "
+"``None``, whole input flow is materialized in the buffer. *bufsize* must "
+"be a natural number or ``None``, otherwise "
+":exc:`~lena.core.LenaValueError` is raised."
+msgstr ""
+
+#: lena.core.Split:15 of
+msgid ""
+"*copy_buf* sets whether the buffer should be copied during *run*. This is"
+" important if different sequences can change input data and interfere "
+"with each other."
+msgstr ""
+
+#: lena.core.Split:29 of
+msgid "Common type:"
+msgstr ""
+
+#: lena.core.Split:20 of
+msgid ""
+"If each sequence from *seqs* has a common type, *Split* creates methods "
+"corresponding to this type. For example, if each sequence is "
+"*FillCompute*, *Split* creates methods *fill* and *compute* and can be "
+"used as a *FillCompute* sequence. *fill* fills all its subsequences (with"
+" copies if *copy_buf* is True), and *compute* yields values from all "
+"sequences in turn (as would also do *request* or *Source.__call__*)."
+msgstr ""
+
+#: lena.core.Split.run:1 of
+msgid "Iterate input *flow* and yield results."
+msgstr ""
+
+#: lena.core.Split.run:3 of
+msgid ""
+"The *flow* is divided into subslices of *bufsize*. Each subslice is "
+"processed by sequences in the order of their initializer list."
+msgstr ""
+
+#: lena.core.Split.run:7 of
+msgid ""
+"If a sequence is a *Source*, it doesn't accept the incoming *flow*, but "
+"produces its own complete flow and becomes inactive (is not called any "
+"more)."
+msgstr ""
+
+#: lena.core.Split.run:12 of
+msgid ""
+"A *FillRequestSeq* is filled with the buffer contents. After the buffer "
+"is finished, it yields all values from *request()*."
+msgstr ""
+
+#: lena.core.Split.run:16 of
+msgid ""
+"A *FillComputeSeq* is filled with values from each buffer, but yields "
+"values from *compute* only after the whole *flow* is finished."
+msgstr ""
+
+#: lena.core.Split.run:20 of
+msgid ""
+"A *Sequence* is called with *run(buffer)* instead of the whole flow. The "
+"results are yielded for each buffer (and also if the *flow* was empty). "
+"If the whole flow must be analysed at once, don't use such a sequence in "
+"*Split*."
+msgstr ""
+
+#: lena.core.Split.run:26 of
+msgid ""
+"If the *flow* was empty, each *call*, *compute*, *request* or *run* is "
+"called nevertheless."
+msgstr ""
+
+#: lena.core.Split.run:29 of
+msgid ""
+"If *copy_buf* is True, then the buffer for each sequence except the last "
+"one is a deep copy of the current buffer."
+msgstr ""
+
+#: ../../source/core.rst:79
+msgid "Adapters"
+msgstr ""
+
+#: lena.core.adapters:1 of
+msgid "Adapters allow to use existing objects as Lena core elements."
+msgstr ""
+
+#: lena.core.adapters:3 of
+msgid "Adapters can be used for several purposes:"
+msgstr ""
+
+#: lena.core.adapters:5 of
+msgid "provide an unusual name for a method (*Run(my_obj, run=\"my_run\")*)."
+msgstr ""
+
+#: lena.core.adapters:6 of
+msgid "hide unused methods to prevent ambiguity."
+msgstr ""
+
+#: lena.core.adapters:7 of
+msgid ""
+"automatically convert objects of one type to another in sequences "
+"(*FillCompute* to *Run*)."
+msgstr ""
+
+#: lena.core.adapters:8 of
+msgid ""
+"explicitly cast object of one type to another (*FillRequest* to "
+"*FillCompute*)."
+msgstr ""
+
+#: lena.core.adapters:10 of
+msgid "Example:"
+msgstr ""
+
+#: lena.core.adapters.Call:3 of
+msgid ""
+"Name of the actually called method can be customized during the "
+"initialization."
+msgstr ""
+
+#: lena.core.adapters.Call:6 of
+msgid ""
+"The method *__call__(value)* is a simple (preferably pure) function, "
+"which accepts a *value* and returns its transformation."
+msgstr ""
+
+#: lena.core.adapters.Call:9 of
+msgid "Element *el* must contain a callable method *call* or be callable itself."
+msgstr ""
+
+#: lena.core.adapters.Call:12 of
+msgid ""
+"If *call* method name is not provided, it is checked whether *el* is "
+"callable itself."
+msgstr ""
+
+#: lena.core.adapters.Call:15 of
+msgid ""
+"If :class:`Call` failed to instantiate with *el* and *call*, "
+":exc:`~lena.core.LenaTypeError` is raised."
+msgstr ""
+
+#: lena.core.adapters.Call.__call__:1 of
+msgid "Transform the *value* and return."
+msgstr ""
+
+#: lena.core.adapters.FillCompute:3 of
+msgid "A *FillCompute* element has methods *fill(value)* and *compute()*."
+msgstr ""
+
+#: lena.core.adapters.FillCompute:5 of
+msgid ""
+"Method names can be customized through *fill* and *compute* keyword "
+"arguments during the initialization."
+msgstr ""
+
+#: lena.core.adapters.FillCompute:8 of
+msgid ""
+"*FillCompute* can be explicitly cast from *FillRequest*. In this case "
+"*compute* is *request*."
+msgstr ""
+
+#: lena.core.adapters.FillCompute:11 of
+msgid ""
+"If callable methods *fill* and *compute* or *request* were not found, "
+":exc:`~lena.core.LenaTypeError` is raised."
+msgstr ""
+
+#: lena.core.adapters.FillCompute.compute:1
+#: lena.core.adapters.FillRequest.request:1 of
+msgid "Yield computed values."
+msgstr ""
+
+#: lena.core.adapters.FillInto:3 of
+msgid ""
+"Element *el* must implement *fill_into* method, be callable or be a Run "
+"element."
+msgstr ""
+
+#: lena.core.adapters.FillInto:6 of
+msgid ""
+"If no *fill_into* argument is provided, then *fill_into* method is "
+"searched, then *__call__*, then *run*. If none of them is found and "
+"callable, :exc:`~lena.core.LenaTypeError` is raised."
+msgstr ""
+
+#: lena.core.adapters.FillInto:12 of
+msgid ""
+"Note that callable elements and elements with *fill_into* method have "
+"different interface. If the *el* is callable, it is assumed to be a "
+"simple function, which accepts a single value and transforms that, and "
+"the result is filled into the element by this adapter. *fill_into* "
+"method, on the contrary, takes two arguments (element and value) and "
+"fills the element itself. This allows to use lambdas directly in "
+"*FillInto*."
+msgstr ""
+
+#: lena.core.adapters.FillInto:21 of
+msgid ""
+"A *Run* element is converted to *FillInto* this way: for each value the "
+"*el* runs a flow consisting of this one value and fills the results into "
+"the output element. This can be done only if *explicit* is True."
+msgstr ""
+
+#: lena.core.adapters.FillInto.fill_into:1 of
+msgid "Fill *value* into an *element*."
+msgstr ""
+
+#: lena.core.adapters.FillInto.fill_into:3 of
+msgid "*Value* is transformed by the initialization element before filling *el*."
+msgstr ""
+
+#: lena.core.adapters.FillInto.fill_into:6 of
+msgid "*Element* must provide a *fill* method."
+msgstr ""
+
+#: lena.core.adapters.FillRequest:3 of
+msgid "A *FillRequest* element has methods *fill(value)* and *request()*."
+msgstr ""
+
+#: lena.core.adapters.FillRequest:5 of
+msgid "Names for *fill* and *request* can be customized during initialization."
+msgstr ""
+
+#: lena.core.adapters.FillRequest:8 of
+msgid ""
+"*FillRequest* can be initialized from a *FillCompute* element. If a "
+"callable *request* method was not found, *el* must have a callable "
+"*compute* method. *request* in this case is *compute*."
+msgstr ""
+
+#: lena.core.adapters.FillRequest:13 of
+msgid ""
+"By default, *FillRequest* implements *run* method that splits the flow "
+"into subslices of *bufsize* elements. If *el* has a callable *run* "
+"method, it is used instead of the default one."
+msgstr ""
+
+#: lena.core.adapters.FillRequest:18 of
+msgid ""
+"If a keyword argument *reset* is ``True`` (default), *el* must have a "
+"method *reset, and in this case :meth:`reset` is called after each "
+":meth:`request` (including those during :meth:`run`). If *reset* is "
+"``False``, :meth:`reset` is never called."
+msgstr ""
+
+#: lena.core.adapters.FillRequest:24 of
+msgid "**Attributes**"
+msgstr ""
+
+#: lena.core.adapters.FillRequest:26 of
+msgid ":attr:`bufsize` is the maximum size of subslices during *run*."
+msgstr ""
+
+#: lena.core.adapters.FillRequest:28 of
+msgid ""
+"*bufsize* must be a natural number, otherwise "
+":exc:`~lena.core.LenaValueError` is raised. If callable *fill* and "
+"*request* methods were not found, or *FillRequest* could not be derived "
+"from *FillCompute*, or if *reset* is ``True``, but *el* has no method "
+"*reset*, :exc:`~lena.core.LenaTypeError` is raised."
+msgstr ""
+
+#: lena.core.adapters.FillRequest.request:3 of
+msgid "May be called at any time, the flow may still contain zero or more items."
+msgstr ""
+
+#: lena.core.adapters.FillRequest.reset:1 of
+msgid "Reset the element *el*."
+msgstr ""
+
+#: lena.core.adapters.FillRequest.run:1 of
+msgid "Implement *run* method."
+msgstr ""
+
+#: lena.core.adapters.FillRequest.run:3 of
+msgid ""
+"First, *fill* is called for each value in a subslice of *flow* of "
+"*self.bufsize* size. After that, results are yielded from "
+"*self.request()*. This repeats until the *flow* is exhausted."
+msgstr ""
+
+#: lena.core.adapters.FillRequest.run:8 of
+msgid ""
+"If *fill* was not called even once (*flow* is empty), the results for a "
+"general *FillRequest* are undefined (for example, it can run *request* or"
+" raise an exception). This adapter runs *request* in this case. If the "
+"last slice is empty, *request* is not run for that. Note that the last "
+"slice may contain less than *bufsize* values. If that is important, "
+"implement your own method."
+msgstr ""
+
+#: lena.core.adapters.FillRequest.run:16 of
+msgid ""
+"A slice is a non-materialized list, which means that it will not take "
+"place of *bufsize* in memory."
+msgstr ""
+
+#: lena.core.adapters.Run:3 of
+msgid "Name of the method *run* can be customized during initialization."
+msgstr ""
+
+#: lena.core.adapters.Run:5 of
+msgid ""
+"If *run* argument is supplied, *el* must be None or it must have a "
+"callable method with name given by *run*."
+msgstr ""
+
+#: lena.core.adapters.Run:8 of
+msgid ""
+"If *run* keyword argument is missing, then *el* is searched for a method "
+"*run*. If that is not found, a type cast is attempted."
+msgstr ""
+
+#: lena.core.adapters.Run:12 of
+msgid ""
+"A *Run* element can be initialized from a *Call* or a *FillCompute* "
+"element."
+msgstr ""
+
+#: lena.core.adapters.Run:15 of
+msgid ""
+"A callable element is run as a transformation function, which accepts "
+"single values from the flow and *returns* their transformations for each "
+"value."
+msgstr ""
+
+#: lena.core.adapters.Run:19 of
+msgid ""
+"A *FillCompute* element is run the following way: first, *el.fill(value)*"
+" is called for the whole flow. After the flow is exhausted, "
+"*el.compute()* is called."
+msgstr ""
+
+#: lena.core.adapters.Run:23 of
+msgid ""
+"It is possible to initialize :class:`Run` using a generator function "
+"without an element. To do that, set the element to ``None``: *Run(None, "
+"run=<my_function>)*."
+msgstr ""
+
+#: lena.core.adapters.Run:28 of
+msgid "If the initialization failed, :exc:`~lena.core.LenaTypeError` is raised."
+msgstr ""
+
+#: lena.core.adapters.Run:31 of
+msgid ""
+":class:`Run` is used implicitly during the initialization of "
+":class:`~lena.core.Sequence`."
+msgstr ""
+
+#: lena.core.adapters.Run.run:1 of
+msgid "Yield transformed elements from the incoming *flow*."
+msgstr ""
+
+#: lena.core.adapters.SourceEl:1 of
+msgid ""
+"Adapter to provide *__call__()* method. Name of the actually called "
+"method can be customized during the initialization."
+msgstr ""
+
+#: lena.core.adapters.SourceEl:5 of
+msgid ""
+"The :meth:`__call__()` method is a generator, which yields values. It "
+"doesn't accept any input flow."
+msgstr ""
+
+#: lena.core.adapters.SourceEl:8 of
+msgid ""
+"Element *el* must contain a callable method *__call__* or be callable "
+"itself."
+msgstr ""
+
+#: lena.core.adapters.SourceEl:11 of
+msgid ""
+"If *call* function or method name is not provided, it is checked whether "
+"*el* is callable itself."
+msgstr ""
+
+#: lena.core.adapters.SourceEl:14 of
+msgid ""
+"If :class:`SourceEl` failed to instantiate with *el* and *call*, "
+":exc:`~lena.core.LenaTypeError` is raised."
+msgstr ""
+
+#: lena.core.adapters.SourceEl.__call__:1 of
+msgid "Yield generated values."
+msgstr ""
+
+#: ../../source/core.rst:101
+msgid "Exceptions"
+msgstr ""
+
+#: lena.core.exceptions:1 of
+msgid ""
+"All Lena exceptions are subclasses of :exc:`LenaException` and "
+"corresponding Python exceptions (if they exist)."
+msgstr ""
+
+#: lena.core.exceptions.LenaAttributeError:1 of
+msgid ""
+"Bases: :class:`lena.core.exceptions.LenaException`, "
+":class:`AttributeError`"
+msgstr ""
+
+#: lena.core.exceptions.LenaEnvironmentError:1 of
+msgid "Bases: :class:`lena.core.exceptions.LenaException`, :class:`OSError`"
+msgstr ""
+
+#: lena.core.exceptions.LenaException:1 of
+msgid "Bases: :class:`Exception`"
+msgstr ""
+
+#: lena.core.exceptions.LenaIndexError:1 of
+msgid "Bases: :class:`lena.core.exceptions.LenaException`, :class:`IndexError`"
+msgstr ""
+
+#: lena.core.exceptions.LenaKeyError:1 of
+msgid "Bases: :class:`lena.core.exceptions.LenaException`, :class:`KeyError`"
+msgstr ""
+
+#: lena.core.exceptions.LenaNotImplementedError:1 of
+msgid ""
+"Bases: :class:`lena.core.exceptions.LenaException`, "
+":class:`NotImplementedError`"
+msgstr ""
+
+#: lena.core.exceptions.LenaRuntimeError:1 of
+msgid "Bases: :class:`lena.core.exceptions.LenaException`, :class:`RuntimeError`"
+msgstr ""
+
+#: lena.core.exceptions.LenaStopFill:1 of
+msgid "Bases: :class:`lena.core.exceptions.LenaException`"
+msgstr ""
+
+#: lena.core.exceptions.LenaStopFill:3 of
+msgid "Analogous to StopIteration, but control flow is reversed."
+msgstr ""
+
+#: lena.core.exceptions.LenaTypeError:1 of
+msgid "Bases: :class:`lena.core.exceptions.LenaException`, :class:`TypeError`"
+msgstr ""
+
+#: lena.core.exceptions.LenaValueError:1 of
+msgid "Bases: :class:`lena.core.exceptions.LenaException`, :class:`ValueError`"
+msgstr ""
+
+#: lena.core.exceptions.LenaZeroDivisionError:1 of
+msgid ""
+"Bases: :class:`lena.core.exceptions.LenaException`, "
+":class:`ZeroDivisionError`"
+msgstr ""
+

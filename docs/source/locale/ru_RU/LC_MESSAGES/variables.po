@@ -1,0 +1,268 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2020, Yaroslav Nikitenko
+# This file is distributed under the same license as the Lena package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2020.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Lena 0.1\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-04-14 22:34+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.8.0\n"
+
+#: ../../source/variables.rst:2 ../../source/variables.rst:21
+msgid "Variables"
+msgstr ""
+
+#: ../../source/variables.rst:3
+msgid "**Variables:**"
+msgstr ""
+
+#: ../../source/variables.rst:11:<autosummary>:1
+msgid ""
+":obj:`Combine <lena.variables.variable.Combine>`\\ \\(\\*args\\, "
+"\\*\\*kwargs\\)"
+msgstr ""
+
+#: ../../source/variables.rst:11:<autosummary>:1
+#: lena.variables.variable.Combine:1 of
+msgid "Combine variables into a tuple."
+msgstr ""
+
+#: ../../source/variables.rst:11:<autosummary>:1
+msgid ""
+":obj:`Compose <lena.variables.variable.Compose>`\\ \\(\\*args\\, "
+"\\*\\*kwargs\\)"
+msgstr ""
+
+#: ../../source/variables.rst:11:<autosummary>:1
+#: lena.variables.variable.Compose:1 of
+msgid "Composition of variables."
+msgstr ""
+
+#: ../../source/variables.rst:11:<autosummary>:1
+msgid ""
+":obj:`Variable <lena.variables.variable.Variable>`\\ \\(name\\, getter\\,"
+" \\*\\*kwargs\\)"
+msgstr ""
+
+#: ../../source/variables.rst:11:<autosummary>:1
+#: lena.variables.variable.Variable:1 of
+msgid "Function of data with context."
+msgstr ""
+
+#: lena.variables.variable:1 of
+msgid "Variables are functions to transform data and add context."
+msgstr ""
+
+#: lena.variables.variable:3 of
+msgid ""
+"A variable can represent a particle type, a coordinate, etc. They "
+"transform raw input data into Lena data with context. Variables have name"
+" and may have other attributes like LaTeX name, dimension or unit."
+msgstr ""
+
+#: lena.variables.variable:8 of
+msgid ""
+"Variables can be composed using :class:`Compose`, which corresponds to "
+"function composition."
+msgstr ""
+
+#: lena.variables.variable:11 of
+msgid ""
+"Variables can be combined into multidimensional variables using "
+":class:`Combine`."
+msgstr ""
+
+#: lena.variables.variable:14 of
+msgid "Examples:"
+msgstr ""
+
+#: lena.variables.variable:41 of
+msgid ""
+":class:`Combine` and :class:`Compose` are subclasses of a "
+":class:`Variable`."
+msgstr ""
+
+#: lena.variables.variable.Combine:3 of
+msgid ""
+":class:`Combine`\\ *(var1, var2, ...)(value)* is *((var1.getter(value), "
+"var2.getter(value), ...), context)*."
+msgstr ""
+
+#: lena.variables.variable.Combine:6 of
+msgid "*args* are the variables to be combined."
+msgstr ""
+
+#: lena.variables.variable.Combine:8 of
+msgid ""
+"Keyword arguments are passed to :class:`Variable`'s __init__. For "
+"example, *name* is the name of the combined variable. If not provided, it"
+" is its variables' names joined with '_'."
+msgstr ""
+
+#: lena.variables.variable.Combine:12 of
+msgid ""
+"*context.variable* is updated with *combine*, which is a tuple of each "
+"variable's context."
+msgstr ""
+
+#: lena.variables.variable.Combine:15 of
+msgid "**Attributes**:"
+msgstr ""
+
+#: lena.variables.variable.Combine:17 of
+msgid "*dim* is the number of variables."
+msgstr ""
+
+#: lena.variables.variable.Combine:19 of
+msgid ""
+"All *args* must be *Variables* and there must be at least one of them, "
+"otherwise :class:`LenaTypeError` is raised."
+msgstr ""
+
+#: lena.variables.variable.Combine.__getitem__:1 of
+msgid "Get variable at the given *index*."
+msgstr ""
+
+#: lena.variables.variable.Compose:3 of
+msgid "*args* are the variables to be composed."
+msgstr ""
+
+#: lena.variables.variable.Compose:5 of
+msgid "Keyword arguments:"
+msgstr ""
+
+#: lena.variables.variable.Compose:7 of
+msgid ""
+"*name* is the name of the composed variable. If that is missing, it is "
+"composed from variables names joined with underscore."
+msgstr ""
+
+#: lena.variables.variable.Compose:11 of
+msgid ""
+"*latex_name* is LaTeX name of the composed variable. If that is missing "
+"and if there are only two variables, it is composed from variables' names"
+" (or their LaTeX names if present) as a subscript in the reverse order "
+"*(latex2_{latex1})*."
+msgstr ""
+
+#: lena.variables.variable.Compose:17 of
+msgid ""
+"*context.variable.compose* contains contexts of the composed variables "
+"(the first composed variable is most nested)."
+msgstr ""
+
+#: lena.variables.variable.Compose:21 of
+msgid ""
+"If any keyword argument is a callable, it is used to create the "
+"corresponding variable attribute. In this case, all variables must have "
+"this attribute, and the callable is applied to the list of these "
+"attributes. If any attribute is missing, "
+":exc:`~lena.core.LenaAttributeError` is raised. This can be used to "
+"create composed attributes other than *latex_name*."
+msgstr ""
+
+#: lena.variables.variable.Compose:30 of
+msgid ""
+"If there are no variables or if *kwargs* contain *getter*, "
+":exc:`~lena.core.LenaTypeError` is raised."
+msgstr ""
+
+#: lena.variables.variable.Variable:3 of
+msgid "*name* is variable's name."
+msgstr ""
+
+#: lena.variables.variable.Variable:5 of
+msgid ""
+"*getter* is the python function (not a :class:`Variable`) that performs "
+"the actual transformation of data. It must accept data and return data "
+"without context."
+msgstr ""
+
+#: lena.variables.variable.Variable:9 of
+msgid ""
+"Other variable's attributes can be passed as keyword arguments. Examples "
+"include *latex_name*, *unit* (like *cm* or *keV*), *range*, etc."
+msgstr ""
+
+#: lena.variables.variable.Variable:13 of
+msgid ""
+"*type* is the type of the variable. It depends on your application, "
+"examples are 'coordinate' or 'particle_type'. It has a special meaning: "
+"if present, its value is added to variable's context as a key with "
+"variable's name (see example for this module). Thus variable type's data "
+"is preserved during composition of different types."
+msgstr ""
+
+#: lena.variables.variable.Variable:23 of
+msgid "**Attributes**"
+msgstr ""
+
+#: lena.variables.variable.Variable:25 of
+msgid "*getter* is the function that does the actual data transformation."
+msgstr ""
+
+#: lena.variables.variable.Variable:28 of
+msgid ""
+"*var_context* is the dictionary of attributes of the variable, which is "
+"added to *context.variable* during :meth:`__call__`."
+msgstr ""
+
+#: lena.variables.variable.Variable:34 of
+msgid ""
+"All public attributes of a variable can be accessed using dot notation "
+"(for example, *var.var_context[\"latex_name\"]* can be simply "
+"*var.latex_name*). :exc:`~lena.core.AttributeError` is raised if the "
+"attribute is missing."
+msgstr ""
+
+#: lena.variables.variable.Variable:41 of
+msgid ""
+"If *getter* is a :class:`Variable` or is not callable, "
+":exc:`~lena.core.LenaTypeError` is raised."
+msgstr ""
+
+#: lena.variables.variable.Variable.__call__:1 of
+msgid "Transform a *value*."
+msgstr ""
+
+#: lena.variables.variable.Variable.__call__:3 of
+msgid ""
+"Data part of the value is transformed by the *getter*. *Context.variable*"
+" is updated with the context of this variable (or created if missing)."
+msgstr ""
+
+#: lena.variables.variable.Variable.__call__:7 of
+msgid ""
+"If context already contained *variable*, it is preserved as "
+"*context.variable.compose* subcontext."
+msgstr ""
+
+#: lena.variables.variable.Variable.__call__:10 of
+msgid "Return *(data, context)*."
+msgstr ""
+
+#: lena.variables.variable.Variable.get:1 of
+msgid "Return the attribute *key* if present, else default."
+msgstr ""
+
+#: lena.variables.variable.Variable.get:3 of
+msgid ""
+"*Key* can be a dot-separated string, a list or a dictionary (see "
+":func:`lena.context.get_recursively`)."
+msgstr ""
+
+#: lena.variables.variable.Variable.get:6 of
+msgid ""
+"If default is not given, it defaults to ``None``, so that this method "
+"never raises a *KeyError*."
+msgstr ""
+

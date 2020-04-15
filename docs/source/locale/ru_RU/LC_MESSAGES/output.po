@@ -1,0 +1,488 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2020, Yaroslav Nikitenko
+# This file is distributed under the same license as the Lena package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2020.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Lena 0.1\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-04-14 22:34+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.8.0\n"
+
+#: ../../source/output.rst:2 ../../source/output.rst:32
+msgid "Output"
+msgstr ""
+
+#: ../../source/output.rst:3
+msgid "**Output:**"
+msgstr ""
+
+#: ../../source/output.rst:12:<autosummary>:1
+msgid ":obj:`HistToCSV <lena.output.HistToCSV>`\\ \\(\\*\\*kwargs\\)"
+msgstr ""
+
+#: ../../source/output.rst:12:<autosummary>:1
+msgid "Deprecated."
+msgstr ""
+
+#: ../../source/output.rst:12:<autosummary>:1
+msgid ":obj:`PDFToPNG <lena.output.PDFToPNG>`\\ \\(\\[format\\, timeoutsec\\]\\)"
+msgstr ""
+
+#: ../../source/output.rst:12:<autosummary>:1 lena.output.PDFToPNG:1 of
+msgid "Convert PDF to image format (by default PNG)."
+msgstr ""
+
+#: ../../source/output.rst:12:<autosummary>:1
+msgid ""
+":obj:`ToCSV <lena.output.ToCSV>`\\ \\(\\[separator\\, header\\, "
+"duplicate\\_last\\_bin\\]\\)"
+msgstr ""
+
+#: ../../source/output.rst:12:<autosummary>:1 lena.output.ToCSV:1 of
+msgid "Convert data to CSV text."
+msgstr ""
+
+#: ../../source/output.rst:12:<autosummary>:1
+msgid ""
+":obj:`Writer <lena.output.Writer>`\\ \\(\\[output\\_directory\\, "
+"output\\_filename\\]\\)"
+msgstr ""
+
+#: ../../source/output.rst:12:<autosummary>:1 lena.output.Writer:1 of
+msgid "Write text data to filesystem."
+msgstr ""
+
+#: ../../source/output.rst:15
+msgid "**LaTeX utilities:**"
+msgstr ""
+
+#: ../../source/output.rst:22:<autosummary>:1
+msgid ""
+":obj:`LaTeXToPDF <lena.output.LaTeXToPDF>`\\ \\(\\[verbose\\, "
+"create\\_command\\]\\)"
+msgstr ""
+
+#: ../../source/output.rst:22:<autosummary>:1 lena.output.LaTeXToPDF:1 of
+msgid "Run pdflatex binary for LaTeX files."
+msgstr ""
+
+#: ../../source/output.rst:22:<autosummary>:1
+msgid ""
+":obj:`RenderLaTeX <lena.output.RenderLaTeX>`\\ \\(\\[select\\_template\\,"
+" ...\\]\\)"
+msgstr ""
+
+#: ../../source/output.rst:22:<autosummary>:1 lena.output.RenderLaTeX:1 of
+msgid "Create LaTeX from templates and data."
+msgstr ""
+
+#: ../../source/output.rst:23
+msgid "**Make filename:**"
+msgstr ""
+
+#: ../../source/output.rst:30:<autosummary>:1
+msgid ""
+":obj:`format_context <lena.output.make_filename.format_context>`\\ "
+"\\(format\\_str\\, \\*args\\, \\*\\*kwargs\\)"
+msgstr ""
+
+#: ../../source/output.rst:30:<autosummary>:1
+#: lena.output.make_filename.format_context:1 of
+msgid "Create a function, which formats a given string using a context."
+msgstr ""
+
+#: ../../source/output.rst:30:<autosummary>:1
+msgid ""
+":obj:`MakeFilename <lena.output.make_filename.MakeFilename>`\\ "
+"\\(\\*args\\, \\*\\*kwargs\\)"
+msgstr ""
+
+#: ../../source/output.rst:30:<autosummary>:1
+#: lena.output.make_filename.MakeFilename:1 of
+msgid "Make file names for data from the flow."
+msgstr ""
+
+#: lena.output.PDFToPNG:3 of
+msgid "Initialize output *format*."
+msgstr ""
+
+#: lena.output.PDFToPNG:5 of
+msgid ""
+"*timeoutsec* is time (in seconds) for subprocess timeout (used only in "
+"Python 3). If the timeout expires, the child process will be killed and "
+"waited for. The TimeoutExpired exception will be re-raised after the "
+"child process has terminated."
+msgstr ""
+
+#: lena.output.PDFToPNG:11 of
+msgid ""
+"This class uses ``pdftoppm`` binary internally. Pdftoppm can be given "
+"other output formats as an option (see ``man pdftoppm``), for example "
+"*jpeg* or *tiff*."
+msgstr ""
+
+#: lena.output.PDFToPNG.run:1 of
+msgid "Convert PDF files to *format*."
+msgstr ""
+
+#: lena.output.PDFToPNG.run:3 of
+msgid ""
+"PDF files are recognized via *context.output.filetype*. Their paths are "
+"assumed to be data part of the value (may contain trailing \".pdf\")."
+msgstr ""
+
+#: lena.output.PDFToPNG.run:7 of
+msgid ""
+"Data yielded is the resulting file name. Context is updated with filetype"
+" = *format*."
+msgstr ""
+
+#: lena.output.PDFToPNG.run:10 of
+msgid "Other values are passed unchanged."
+msgstr ""
+
+#: lena.output.Writer:3 of
+msgid ""
+"*output_directory* is the base output directory. It can be further "
+"appended by the incoming data. Non-existing directories are created."
+msgstr ""
+
+#: lena.output.Writer:7 of
+msgid ""
+"*output_filename* is the name for unnamed data. Use it to write only one "
+"file."
+msgstr ""
+
+#: lena.output.Writer:10 of
+msgid ""
+"If no arguments are given, the default is to write to \"output.txt\" in "
+"the current directory (rewritten for every new value) (unless different "
+"extensions are provided through the context). It is recommended to create"
+" filename explicitly using :class:`~lena.output.MakeFilename`. The "
+"default writer's output file can be useful in case of errors, when "
+"explicit file name didn't work."
+msgstr ""
+
+#: lena.output.Writer.run:1 of
+msgid "Write incoming data to file system."
+msgstr ""
+
+#: lena.output.Writer.run:3 of
+msgid ""
+"Only strings (and unicode in Python 2) are written. To be written, data "
+"must have \"output\" dictionary in context and "
+"*context[\"output\"][\"writer\"]* not set to ``False``. Other values pass"
+" unchanged."
+msgstr ""
+
+#: lena.output.Writer.run:8 of
+msgid ""
+"Full name of the file to be written (*filepath*) has the form "
+"self.output_directory/dirname/filename.fileext, where dirname, filename "
+"and file extension are searched in *context[\"output\"]*. If *filename* "
+"is missing, Writer's default filename is used. If *fileext* is missing, "
+"then *filetype* is used; if it is also absent, the default file extension"
+" is \"txt\". It is recommended to provide only *fileext* in context, "
+"unless it differs with *filetype*."
+msgstr ""
+
+#: lena.output.Writer.run:18 of
+msgid ""
+"File name with full path is yielded as data. Context.output is updated "
+"with *fileext* and *filename* (in case they were not present), and "
+"*filepath*, where *filename* is its base part (without output directory "
+"and extension) and *filepath* is the complete path."
+msgstr ""
+
+#: lena.output.Writer.run:25 of
+msgid ""
+"If context.output.filename is present, but empty, "
+":exc:`~lena.core.LenaRuntimeError` is raised."
+msgstr ""
+
+#: lena.output.ToCSV:7 of
+msgid "These objects are converted:"
+msgstr ""
+
+#: lena.output.ToCSV:4 of
+msgid ""
+":class:`~lena.structures.Histogram` (implemented only for 1- and "
+"2-dimensional histograms)."
+msgstr ""
+
+#: lena.output.ToCSV:6 of
+msgid ""
+"any object (including :class:`~lena.structures.Graph`) with *to_csv* "
+"method."
+msgstr ""
+
+#: lena.output.HistToCSV:3 lena.output.ToCSV:9 of
+msgid "*separator* delimits values in the output text,"
+msgstr ""
+
+#: lena.output.HistToCSV:5 lena.output.ToCSV:11 of
+msgid "*header* is a string which becomes the first line of the output,"
+msgstr ""
+
+#: lena.output.HistToCSV:7 lena.output.ToCSV:13 of
+msgid ""
+"If *duplicate_last_bin* is ``True``, contents of the last bin will be "
+"written in the end twice. This may be useful for graphical "
+"representation: if last bin is from 9 to 10, then the plot may end on 9, "
+"while this parameter allows to write bin content at 10, creating the last"
+" horizontal step."
+msgstr ""
+
+#: lena.output.ToCSV.run:1 of
+msgid "Convert values from *flow* to CSV text."
+msgstr ""
+
+#: lena.output.ToCSV.run:3 of
+msgid ""
+"*Context.output* is updated with {\"filetype\": \"csv\"}. All not "
+"converted data is yielded unchanged."
+msgstr ""
+
+#: lena.output.ToCSV.run:6 of
+msgid ""
+"If *data* has *to_csv* method, it must accept keyword arguments "
+"*separator* and *header* and return text."
+msgstr ""
+
+#: lena.output.ToCSV.run:10 of
+msgid "If *context.output.to_csv* is False, the value is skipped."
+msgstr ""
+
+#: lena.output.ToCSV.run:13 of
+msgid ""
+"Data is yielded as a whole CSV block. To generate CSV line by line, use "
+":func:`hist1d_to_csv` and :func:`hist2d_to_csv`."
+msgstr ""
+
+#: lena.output.hist1d_to_csv:1 of
+msgid "Yield CSV-formatted strings for a one-dimensional histogram."
+msgstr ""
+
+#: lena.output.hist2d_to_csv:1 of
+msgid "Yield CSV-formatted strings for a two-dimensional histogram."
+msgstr ""
+
+#: lena.output.HistToCSV:1 of
+msgid "Deprecated. Use :class:`ToCSV` instead."
+msgstr ""
+
+#: ../../source/output.rst:39
+msgid "LaTeX"
+msgstr ""
+
+#: lena.output.LaTeXToPDF:3 of
+msgid ""
+"It runs in parallel (separate process is spawned for each job) and non-"
+"interactively."
+msgstr ""
+
+#: lena.output.LaTeXToPDF:6 of
+msgid "Initialize object."
+msgstr ""
+
+#: lena.output.LaTeXToPDF:8 of
+msgid ""
+"verbose = 0 means no output messages. 1 prints pdflatex error messages. "
+"More than 1 prints pdflatex stdout."
+msgstr ""
+
+#: lena.output.LaTeXToPDF:12 of
+msgid ""
+"If you need to run pdflatex (or other executable) with different "
+"parameters, provide its command."
+msgstr ""
+
+#: lena.output.LaTeXToPDF:15 of
+msgid ""
+"*create_command* is a function which accepts texfile_name, outfilename, "
+"output_directory, context (in this order) and returns a list made of the "
+"command and its arguments."
+msgstr ""
+
+#: lena.output.LaTeXToPDF:24 of
+msgid "Default command is:"
+msgstr ""
+
+#: lena.output.LaTeXToPDF:24 of
+msgid "[\"pdflatex\", \"-halt-on-error\", \"-interaction\", \"batchmode\","
+msgstr ""
+
+#: lena.output.LaTeXToPDF:22 of
+msgid "\"-output-directory\", output_directory, texfile_name]"
+msgstr ""
+
+#: lena.output.LaTeXToPDF.run:1 of
+msgid "Convert all incoming LaTeX files to pdf."
+msgstr ""
+
+#: lena.output.RenderLaTeX:3 of
+msgid ""
+"*select_template* is a string or a callable. If a string, it is the name "
+"of the template to be used (unless *context.output.template* overwrites "
+"that). If *select_template* is a callable, it must accept a value from "
+"the flow and return template name. If *select_template* is an empty "
+"string (default) and no template could be found in the context, "
+":exc:`~lena.core.LenaRuntimeError` is raised."
+msgstr ""
+
+#: lena.output.RenderLaTeX:12 of
+msgid ""
+"*template_path* is the path for templates (used in "
+"jinja2.FileSystemLoader). By default, it is the current directory."
+msgstr ""
+
+#: lena.output.RenderLaTeX:16 of
+msgid ""
+"*select_data* is a callable to choose data to be rendered. It should "
+"accept a value from flow and return boolean. If it is not provided, by "
+"default CSV files are selected."
+msgstr ""
+
+#: lena.output.RenderLaTeX.run:1 of
+msgid "Render values from *flow* to LaTeX."
+msgstr ""
+
+#: lena.output.RenderLaTeX.run:3 of
+msgid ""
+"If no *select_data* was initialized, values with "
+"*context.output.filetype* equal to \"csv\" are selected by default."
+msgstr ""
+
+#: lena.output.RenderLaTeX.run:7 of
+msgid ""
+"Rendered LaTeX text is yielded in the data part of the tuple (no write to"
+" filesystem occurs). *context.output.filetype* updates to \"tex\"."
+msgstr ""
+
+#: lena.output.RenderLaTeX.run:11 of
+msgid "Not selected values pass unchanged."
+msgstr ""
+
+#: ../../source/output.rst:45
+msgid "Make filename"
+msgstr ""
+
+#: lena.output.make_filename.MakeFilename:3 of
+msgid ""
+":class:`MakeFilename` can be initialized using a single string, a "
+"Sequence or from keyword arguments."
+msgstr ""
+
+#: lena.output.make_filename.MakeFilename:6 of
+msgid ""
+"A single string is a file name without extension (but it can contain a "
+"relative path)."
+msgstr ""
+
+#: lena.output.make_filename.MakeFilename:9 of
+msgid "Otherwise, all positional arguments will make a Sequence."
+msgstr ""
+
+#: lena.output.make_filename.MakeFilename:11 of
+msgid ""
+"By default, values with *context.output* already containing *filename* "
+"are skipped. This can be changed using a keyword argument *overwrite*."
+msgstr ""
+
+#: lena.output.make_filename.MakeFilename:15 of
+msgid ""
+"Other allowed keywords are *make_filename*, *make_dirname*, "
+"*make_fileext*. Their values must be a tuple, which will initialize a "
+"context formatter, or a callable (as returned by format_context). The "
+"first item of the tuple is format string, the rest are positional and "
+"keyword arguments taken from context during *run* (see "
+":func:`format_context`)."
+msgstr ""
+
+#: lena.output.make_filename.MakeFilename.run:1 of
+msgid "Add output parameters to context from the *flow*."
+msgstr ""
+
+#: lena.output.make_filename.MakeFilename.run:3 of
+msgid ""
+"If :class:`MakeFilename` works as a Sequence, it transforms all *flow*. "
+"In general it should only add values for filename, fileext or dirname in "
+"context.output. It is recommended that if context already contains the "
+"field, that is not changed. Place more specific formatters first in the "
+"sequence."
+msgstr ""
+
+#: lena.output.make_filename.MakeFilename.run:11 of
+msgid ""
+"If :class:`MakeFilename` was initialized with keyword arguments, then "
+"only those values are transformed, which have no corresponding fields "
+"(*filename*, *fileext* and *dirname*) in *context.output* and for which "
+"the current context from *flow* could be formatted (contains all "
+"necessary keys for the format string)."
+msgstr ""
+
+#: lena.output.make_filename.MakeFilename.run:18 of
+msgid ""
+"Note that Sequence takes values with data, while keyword methods take and"
+" update only context."
+msgstr ""
+
+#: lena.output.make_filename.format_context:3 of
+msgid ""
+"*format_str* is an ordinary Python format string. *args* are positional "
+"and *kwargs* are keyword arguments."
+msgstr ""
+
+#: lena.output.make_filename.format_context:6 of
+msgid ""
+"When calling *format_context*, arguments are bound and a new function is "
+"returned. When called with a context, its keys are extracted and "
+"formatted in *format_str*."
+msgstr ""
+
+#: lena.output.make_filename.format_context:10 of
+msgid ""
+"Positional arguments in the *format_str* correspond to *args*, which must"
+" be keys in the context. Keys used as positional arguments may be nested "
+"(e.g. format_context(\"{}\", \"x.y\"))."
+msgstr ""
+
+#: lena.output.make_filename.format_context:15 of
+msgid ""
+"Keyword arguments *kwargs* connect arguments between *format_str* and "
+"context. Example:"
+msgstr ""
+
+#: lena.output.make_filename.format_context:23 of
+msgid "All keywords in the *format_str* must have corresponding *kwargs*."
+msgstr ""
+
+#: lena.output.make_filename.format_context:25 of
+msgid "Keyword and positional arguments can be mixed. Example:"
+msgstr ""
+
+#: lena.output.make_filename.format_context:32 of
+msgid ""
+"If no *args* or *kwargs* are given, *kwargs* are extracted from "
+"*format_str*. It must contain all non-empty replacement fields, and only "
+"simplest formatting without attribute lookup. Example:"
+msgstr ""
+
+#: lena.output.make_filename.format_context:41 of
+msgid ""
+"If *format_str* is not a string, :exc:`LenaTypeError` is raised. All "
+"other errors are raised only during formatting. If context doesn't "
+"contain the needed key, :exc:`LenaKeyError` is raised. Note that string "
+"formatting can also raise a :exc:`KeyError` or an :exc:`IndexError`, so "
+"it is recommended to test your formatters before using them."
+msgstr ""
+

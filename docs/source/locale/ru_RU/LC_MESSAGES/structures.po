@@ -1,0 +1,671 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2020, Yaroslav Nikitenko
+# This file is distributed under the same license as the Lena package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2020.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Lena 0.1\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-04-14 22:34+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.8.0\n"
+
+#: ../../source/structures.rst:2
+msgid "Structures"
+msgstr ""
+
+#: ../../source/structures.rst:3
+msgid "**Histograms:**"
+msgstr ""
+
+#: ../../source/structures.rst:10:<autosummary>:1
+msgid ""
+":obj:`Histogram <lena.structures.Histogram>`\\ \\(edges\\[\\, bins\\, "
+"make\\_bins\\, ...\\]\\)"
+msgstr ""
+
+#: ../../source/structures.rst:10:<autosummary>:1 lena.structures.Histogram:1
+#: of
+msgid "Multidimensional histogram."
+msgstr ""
+
+#: ../../source/structures.rst:10:<autosummary>:1
+msgid ""
+":obj:`NumpyHistogram <lena.structures.NumpyHistogram>`\\ \\(\\*args\\, "
+"\\*\\*kwargs\\)"
+msgstr ""
+
+#: ../../source/structures.rst:10:<autosummary>:1
+#: lena.structures.NumpyHistogram:1 of
+msgid "Create a Histogram using a 1-dimensional *numpy.histogram*."
+msgstr ""
+
+#: ../../source/structures.rst:11
+msgid "**Graph:**"
+msgstr ""
+
+#: ../../source/structures.rst:17:<autosummary>:1
+msgid ""
+":obj:`Graph <lena.structures.graph.Graph>`\\ \\(\\[points\\, scale\\, "
+"sort\\]\\)"
+msgstr ""
+
+#: ../../source/structures.rst:17:<autosummary>:1 lena.structures.graph.Graph:1
+#: of
+msgid "Function at given points."
+msgstr ""
+
+#: ../../source/structures.rst:18
+msgid "**Histogram functions:**"
+msgstr ""
+
+#: ../../source/structures.rst:32:<autosummary>:1
+msgid ""
+":obj:`check_edges_increasing "
+"<lena.structures.hist_functions.check_edges_increasing>`\\ \\(edges\\)"
+msgstr ""
+
+#: ../../source/structures.rst:32:<autosummary>:1
+#: lena.structures.hist_functions.check_edges_increasing:1 of
+msgid "Assure that multidimensional *edges* are increasing."
+msgstr ""
+
+#: ../../source/structures.rst:32:<autosummary>:1
+msgid ""
+":obj:`get_bin_on_value_1d "
+"<lena.structures.hist_functions.get_bin_on_value_1d>`\\ \\(val\\, arr\\)"
+msgstr ""
+
+#: ../../source/structures.rst:32:<autosummary>:1
+#: lena.structures.hist_functions.get_bin_on_value_1d:1 of
+msgid "Return index for value in one-dimensional array."
+msgstr ""
+
+#: ../../source/structures.rst:32:<autosummary>:1
+msgid ""
+":obj:`get_bin_on_value "
+"<lena.structures.hist_functions.get_bin_on_value>`\\ \\(arg\\, edges\\)"
+msgstr ""
+
+#: ../../source/structures.rst:32:<autosummary>:1
+#: lena.structures.hist_functions.get_bin_on_value:1 of
+msgid "Get the bin index for *arg* in a multidimensional array *edges*."
+msgstr ""
+
+#: ../../source/structures.rst:32:<autosummary>:1
+msgid ""
+":obj:`get_bin_on_index "
+"<lena.structures.hist_functions.get_bin_on_index>`\\ \\(index\\, bins\\)"
+msgstr ""
+
+#: ../../source/structures.rst:32:<autosummary>:1
+#: lena.structures.hist_functions.get_bin_on_index:1 of
+msgid "Return bin corresponding to multidimensional *index*."
+msgstr ""
+
+#: ../../source/structures.rst:32:<autosummary>:1
+msgid ":obj:`iter_bins <lena.structures.hist_functions.iter_bins>`\\ \\(bins\\)"
+msgstr ""
+
+#: ../../source/structures.rst:32:<autosummary>:1
+msgid "Iterate on *bins*."
+msgstr ""
+
+#: ../../source/structures.rst:32:<autosummary>:1
+msgid ""
+":obj:`init_bins <lena.structures.hist_functions.init_bins>`\\ "
+"\\(edges\\[\\, value\\, deepcopy\\]\\)"
+msgstr ""
+
+#: ../../source/structures.rst:32:<autosummary>:1
+#: lena.structures.hist_functions.init_bins:1 of
+msgid "Initialize cells of the form *edges* with the given *value*."
+msgstr ""
+
+#: ../../source/structures.rst:32:<autosummary>:1
+msgid ""
+":obj:`integral <lena.structures.hist_functions.integral>`\\ \\(bins\\, "
+"edges\\)"
+msgstr ""
+
+#: ../../source/structures.rst:32:<autosummary>:1
+#: lena.structures.hist_functions.integral:1 of
+msgid "Compute integral (scale for a histogram)."
+msgstr ""
+
+#: ../../source/structures.rst:32:<autosummary>:1
+msgid ""
+":obj:`make_hist_context "
+"<lena.structures.hist_functions.make_hist_context>`\\ \\(hist\\, "
+"context\\)"
+msgstr ""
+
+#: ../../source/structures.rst:32:<autosummary>:1
+#: lena.structures.hist_functions.make_hist_context:1 of
+msgid "Update *context* with the context of a :class:`Histogram` *hist*."
+msgstr ""
+
+#: ../../source/structures.rst:32:<autosummary>:1
+msgid ""
+":obj:`unify_1_md <lena.structures.hist_functions.unify_1_md>`\\ "
+"\\(bins\\, edges\\)"
+msgstr ""
+
+#: ../../source/structures.rst:32:<autosummary>:1
+#: lena.structures.hist_functions.unify_1_md:1 of
+msgid "Unify 1- and multidimensional bins and edges."
+msgstr ""
+
+#: ../../source/structures.rst:34
+msgid "Histograms"
+msgstr ""
+
+#: lena.structures.Histogram:3 of
+msgid ""
+"Arbitrary dimension, variable bin size and a weight function during "
+":meth:`fill` are supported. Lower bin edge is included, upper edge is "
+"excluded. Underflow and overflow values are skipped. Bin content type is "
+"defined during the initialization."
+msgstr ""
+
+#: lena.structures.Histogram:9
+#: lena.structures.hist_functions.get_bin_on_value:20
+#: lena.structures.hist_functions.init_bins:9 of
+msgid "Examples:"
+msgstr ""
+
+#: lena.structures.Histogram:29 of
+msgid ""
+"*edges* is a sequence of one-dimensional arrays, each containing strictly"
+" increasing bin edges. If *edges*' subarrays are not increasing or any of"
+" them has length less than 2, :exc:`~lena.core.LenaValueError` is raised."
+msgstr ""
+
+#: lena.structures.Histogram:35 of
+msgid ""
+"Histogram bins by default are initialized with *initial_value*. It can be"
+" any object, which supports addition of a *weight* during *fill* (but "
+"that is not necessary if you don't plan to fill the histogram). If the "
+"*initial_value* is compound and requires special copying, create initial "
+"bins yourself (see :func:`~lena.structures.init_bins`)."
+msgstr ""
+
+#: lena.structures.Histogram:42 of
+msgid ""
+"*Histogram* may be created from existing *bins* and *edges*. In this case"
+" a simple check of the shape of *bins* is done. If that is incorrect, "
+":exc:`~lena.core.LenaValueError` is raised."
+msgstr ""
+
+#: lena.structures.Histogram:46 of
+msgid ""
+"*make_bins* is a function without arguments, which creates new bins (it "
+"will be called during :meth:`__init__` and :meth:`reset`). "
+"*initial_value* in this case is ignored, but bin check is being done. If "
+"both *bins* and *make_bins* are provided, :exc:`~lena.core.LenaTypeError`"
+" is raised."
+msgstr ""
+
+#: lena.structures.Histogram:52 of
+msgid "**Attributes**"
+msgstr ""
+
+#: lena.structures.Histogram:54 of
+msgid ""
+":attr:`Histogram.edges` is a list of edges on each dimension. Edges mark "
+"the borders of the bin. Edges along each dimension is a one-dimensional "
+"list, and the multidimensional bin is the result of all intersections of "
+"one-dimensional edges. For example, 3-dimensional histogram has edges of "
+"the form *[x_edges, y_edges, z_edges]*, and the 0th bin has the borders "
+"*((x[0], x[1]), (y[0], y[1]), (z[0], z[1]))*."
+msgstr ""
+
+#: lena.structures.Histogram:64 of
+msgid ""
+"Index in the edges is a tuple, where a given position corresponds to a "
+"dimension, and the content at that position to the bin along that "
+"dimension. For example, index *(0, 1, 3)* corresponds to the bin with "
+"lower edges *(x[0], y[1], z[3])*."
+msgstr ""
+
+#: lena.structures.Histogram:70 of
+msgid ""
+":attr:`Histogram.bins` is a list of nested lists. Same index as for edges"
+" can be used to get bin content: bin at *(0, 1, 3)* can be obtained as "
+"*bins[0][1][3]*. Most nested arrays correspond to highest (further from "
+"x) coordinates. For example, for a 3-dimensional histogram bins equal to "
+"*[[[1, 1], [0, 0]], [[0, 0], [0, 0]]]* mean that the only filled bins are"
+" those where x and y indices are 0, and z index is 0 and 1."
+msgstr ""
+
+#: lena.structures.Histogram:80 of
+msgid ""
+":attr:`dim` is the dimension of a histogram (length of its *edges* for a "
+"multidimensional histogram)."
+msgstr ""
+
+#: lena.structures.Histogram:83 of
+msgid "Programmer's note"
+msgstr ""
+
+#: lena.structures.Histogram:85 of
+msgid ""
+"one- and multidimensional histograms have different *bins* and *edges* "
+"format. To be unified, 1-dimensional edges should be nested in a list "
+"(like *[[1, 2, 3]]*). Instead, they are simply the x-edges list, because "
+"it is more intuitive and one-dimensional histograms are used more often. "
+"To unify the interface for bins and edges in your code, use "
+":func:`unify_1_md` function."
+msgstr ""
+
+#: lena.structures.Histogram.compute:1 of
+msgid "Yield this histogram with context."
+msgstr ""
+
+#: lena.structures.Histogram.fill:1 of
+msgid "Fill histogram with *value* with the given *weight*."
+msgstr ""
+
+#: lena.structures.Histogram.fill:3 of
+msgid ""
+"*Value* can be a *(data, context)* pair. Values outside the histogram "
+"edges are ignored."
+msgstr ""
+
+#: lena.structures.Histogram.reset:1 of
+msgid "Reset the histogram."
+msgstr ""
+
+#: lena.structures.Histogram.reset:3 of
+msgid ""
+"Current context is reset to an empty dict. Bins are reinitialized with "
+"the *initial_value* or with *make_bins* (depending on the "
+"initialization)."
+msgstr ""
+
+#: lena.structures.Histogram.reset:7 of
+msgid ""
+"If bins were set explicitly during the initialization, "
+":exc:`~lena.core.LenaRuntimeError` is raised."
+msgstr ""
+
+#: lena.structures.Histogram.scale:1 of
+msgid "Compute or set scale (integral of the histogram)."
+msgstr ""
+
+#: lena.structures.Histogram.scale:3 of
+msgid ""
+"If *other* is None, return scale of this histogram. If its scale was not "
+"computed before, it is computed and stored for subsequent use (unless "
+"explicitly asked to *recompute*)."
+msgstr ""
+
+#: lena.structures.Histogram.scale:8 of
+msgid ""
+"If a float *other* is provided, rescale to *other*. A new histogram with "
+"the scale equal to *other* is returned, the original histogram remains "
+"unchanged."
+msgstr ""
+
+#: lena.structures.Histogram.scale:12 of
+msgid ""
+"Histograms with scale equal to zero can't be rescaled. "
+":exc:`~lena.core.LenaValueError` is raised if one tries to do that."
+msgstr ""
+
+#: lena.structures.NumpyHistogram:3 of
+msgid ""
+"The result of *compute* is a Lena *Histogram*, but it is calculated using"
+" *numpy* histogram, and all its initialization arguments are passed to "
+"*numpy*."
+msgstr ""
+
+#: lena.structures.NumpyHistogram:7 of
+msgid "Examples"
+msgstr ""
+
+#: lena.structures.NumpyHistogram:9 of
+msgid "With *NumpyHistogram()* bins are automatically derived from data."
+msgstr ""
+
+#: lena.structures.NumpyHistogram:12 of
+msgid ""
+"With *NumpyHistogram(bins=list(range(0, 5)), density=True)* bins are set "
+"explicitly."
+msgstr ""
+
+#: lena.structures.NumpyHistogram:17 of
+msgid ""
+"as *numpy* histogram is computed from an existing array, all values are "
+"stored in the internal data structure during *fill*, which may take much "
+"memory."
+msgstr ""
+
+#: lena.structures.NumpyHistogram:21 of
+msgid "Use *\\*args* and *\\*\\*kwargs* for *numpy.histogram* initialization."
+msgstr ""
+
+#: lena.structures.NumpyHistogram:23 of
+msgid "Default *bins* keyword argument is *auto*."
+msgstr ""
+
+#: lena.structures.NumpyHistogram:25 of
+msgid "A keyword argument *reset* specifies the exact behaviour of *request*."
+msgstr ""
+
+#: lena.structures.NumpyHistogram.fill:1 of
+msgid "Add data to the internal storage."
+msgstr ""
+
+#: lena.structures.NumpyHistogram.request:1 of
+msgid "Compute the final histogram."
+msgstr ""
+
+#: lena.structures.NumpyHistogram.request:3 of
+msgid "Return :ref:`Histogram <Histogram>` with context."
+msgstr ""
+
+#: lena.structures.NumpyHistogram.request:5 of
+msgid "If *reset* was set during the initialization, *reset* method is called."
+msgstr ""
+
+#: lena.structures.NumpyHistogram.reset:1 of
+msgid "Reset data and context."
+msgstr ""
+
+#: lena.structures.NumpyHistogram.reset:3 of
+msgid "Remove all data for this histogram and set current context to {}."
+msgstr ""
+
+#: ../../source/structures.rst:47
+msgid "Graph"
+msgstr ""
+
+#: lena.structures.graph.Graph:3 of
+msgid ""
+"Graph can be set during the initialization and during :meth:`fill`. It "
+"can be rescaled (producing a new graph)."
+msgstr ""
+
+#: lena.structures.graph.Graph:6 of
+msgid ""
+"One can get graph points as :attr:`Graph.points` attribute. They will be "
+"sorted each time before return if *sort* was set to True. An attempt to "
+"change points (use :attr:`Graph.points` on the left of '=') will raise "
+"Python's :exc:`AttributeError`."
+msgstr ""
+
+#: lena.structures.graph.Graph:15 of
+msgid ""
+"*Graph* does not reduce data. All filled values will be stored in it. To "
+"reduce data, use histograms."
+msgstr ""
+
+#: lena.structures.graph.Graph:19 of
+msgid "*points* is an array of *(coordinate, value)* tuples."
+msgstr ""
+
+#: lena.structures.graph.Graph:21 of
+msgid ""
+"*context* will be added to graph context. If it contains \"scale\", "
+":meth:`scale` method will be available. Otherwise, if \"scale\" is "
+"contained in the context during :meth:`fill`, it will be used. In this "
+"case it is assumed that this scale is same for all values (only the last "
+"filled context is checked). Context from flow takes precedence over the "
+"initialized one."
+msgstr ""
+
+#: lena.structures.graph.Graph:29 of
+msgid ""
+"Graph coordinates are sorted by default. This is usually needed to plot "
+"graphs of functions. If you need to keep the order of insertion, set "
+"*sort* to False."
+msgstr ""
+
+#: lena.structures.graph.Graph:33 of
+msgid ""
+"By default, sorting is done using standard Python lists and functions. "
+"You can disable *sort* and provide your own sorting container for "
+"*points*. Some implementations are compared `here "
+"<http://www.grantjenks.com/docs/sortedcontainers/performance.html>`_. "
+"Note that a rescaled graph uses a default list."
+msgstr ""
+
+#: lena.structures.graph.Graph.fill:1 of
+msgid "Fill the graph with *value*."
+msgstr ""
+
+#: lena.structures.graph.Graph.fill:3 of
+msgid ""
+"*Value* can be a *(data, context)* tuple. *Data* part must be a "
+"*(coordinates, value)* pair, where both coordinates and value are also "
+"tuples. For example, *value* can contain the principal number and the "
+"precision."
+msgstr ""
+
+#: lena.structures.graph.Graph.points:1 of
+msgid "Get graph points (read only)."
+msgstr ""
+
+#: lena.structures.graph.Graph.request:1 of
+msgid "Yield graph with context."
+msgstr ""
+
+#: lena.structures.graph.Graph.request:3 of
+msgid ""
+"If *sort* was initialized True, graph points will be sorted. If flow "
+"contained *scale* it the context, it is set now."
+msgstr ""
+
+#: lena.structures.graph.Graph.reset:1 of
+msgid "Reset points to an empty list and current context to an empty dict."
+msgstr ""
+
+#: lena.structures.graph.Graph.scale:1 of
+msgid "Get or set the scale."
+msgstr ""
+
+#: lena.structures.graph.Graph.scale:3 of
+msgid ""
+"Graph's scale comes from an external source. For example, if the graph "
+"was computed from a function, this may be its integral passed via context"
+" during :meth:`fill`. Once the scale is set, it is stored in the graph. "
+"If one attempts to use scale which was not set, "
+":exc:`~lena.core.LenaAttributeError` is raised."
+msgstr ""
+
+#: lena.structures.graph.Graph.scale:10 of
+msgid "If *other* is None, return the scale."
+msgstr ""
+
+#: lena.structures.graph.Graph.scale:12 of
+msgid ""
+"If a ``float`` *other* is provided, rescale to *other*. A new graph with "
+"the scale equal to *other* is returned, the original one remains "
+"unchanged. Note that in this case its *points* will be a simple list and "
+"new graph *sort* parameter will be True."
+msgstr ""
+
+#: lena.structures.graph.Graph.scale:18 of
+msgid ""
+"Graphs with scale equal to zero can't be rescaled. Attempts to do that "
+"raise :exc:`~lena.core.LenaValueError`."
+msgstr ""
+
+#: lena.structures.graph.Graph.to_csv:1 of
+msgid "Convert graph's points to CSV."
+msgstr ""
+
+#: lena.structures.graph.Graph.to_csv:3 of
+msgid "*separator* delimits values, default is a comma."
+msgstr ""
+
+#: lena.structures.graph.Graph.to_csv:5 of
+msgid ""
+"*header*, if not ``None``, is the first string of the output (new line is"
+" added automatically)."
+msgstr ""
+
+#: lena.structures.graph.Graph.to_csv:8 of
+msgid ""
+"Since a graph can be multidimensional, for each point first its "
+"coordinate is converted to string (separated by *separator*), than each "
+"part of its value."
+msgstr ""
+
+#: lena.structures.graph.Graph.to_csv:12 of
+msgid ""
+"To convert :class:`Graph` to CSV inside a Lena sequence, use "
+":class:`~lena.output.ToCSV`."
+msgstr ""
+
+#: ../../source/structures.rst:54
+msgid "Histogram functions"
+msgstr ""
+
+#: lena.structures.hist_functions:1 of
+msgid "Functions for histograms."
+msgstr ""
+
+#: lena.structures.hist_functions:3 of
+msgid ""
+"These functions are used for low-level work with histograms and their "
+"contents. They are not needed for normal usage."
+msgstr ""
+
+#: lena.structures.hist_functions.check_edges_increasing:3 of
+msgid ""
+"If length of *edges* or its subarray is less than 2 or if some subarray "
+"of *edges* contains not strictly increasing values, :exc:`LenaValueError`"
+" is raised."
+msgstr ""
+
+#: lena.structures.hist_functions.get_bin_on_index:3 of
+msgid ""
+"*index* can be a number or a list/tuple. If *index* length is less than "
+"dimension of *bins*, a subarray of *bins* is returned."
+msgstr ""
+
+#: lena.structures.hist_functions.get_bin_on_index:7 of
+msgid "In case of an index error, :exc:`LenaIndexError` is raised."
+msgstr ""
+
+#: lena.structures.hist_functions.get_bin_on_index:9
+#: lena.structures.hist_functions.get_bin_on_value_1d:11 of
+msgid "Example:"
+msgstr ""
+
+#: lena.structures.hist_functions.get_bin_on_value:3 of
+msgid ""
+"*arg* is a 1-dimensional array of numbers (or a number for 1-dimensional "
+"*edges*), and corresponds to a point in N-dimensional space."
+msgstr ""
+
+#: lena.structures.hist_functions.get_bin_on_value:7 of
+msgid ""
+"*edges* is an array of N-1 dimensional arrays (lists or tuples) of "
+"numbers. Each 1-dimensional subarray consists of increasing numbers."
+msgstr ""
+
+#: lena.structures.hist_functions.get_bin_on_value:10 of
+msgid ""
+"*arg* and *edges* must have the same length (otherwise "
+":exc:`LenaValueError` is raised). *arg* and *edges* must be iterable and "
+"support *len()*."
+msgstr ""
+
+#: lena.structures.hist_functions.get_bin_on_value:14 of
+msgid "Return list of indices in *edges* corresponding to *arg*."
+msgstr ""
+
+#: lena.structures.hist_functions.get_bin_on_value:16 of
+msgid ""
+"If any coordinate is out of its corresponding edge range, its index will "
+"be ``-1`` for underflow or ``len(edge)-1`` for overflow."
+msgstr ""
+
+#: lena.structures.hist_functions.get_bin_on_value_1d:3 of
+msgid ""
+"*arr* must contain strictly increasing values (not necessarily "
+"equidistant), it is not checked."
+msgstr ""
+
+#: lena.structures.hist_functions.get_bin_on_value_1d:7 of
+msgid ""
+"\"Linear binary search\" is used, that is our array search by default "
+"assumes the array to be split on equidistant steps."
+msgstr ""
+
+#: lena.structures.hist_functions.hist_to_graph:1 of
+msgid ""
+"Convert a :class:`~lena.structures.Histogram` *hist* to a "
+":class:`~lena.structures.Graph`."
+msgstr ""
+
+#: lena.structures.hist_functions.hist_to_graph:4 of
+msgid "*context* becomes graph's context. For example, it can contain a scale."
+msgstr ""
+
+#: lena.structures.hist_functions.hist_to_graph:7 of
+msgid ""
+"*make_graph_value* is a function to set graph point's value. By default "
+"it is bin content. This option could be used to create graph error bars. "
+"*make_graph_value* must accept bin content and bin context as positional "
+"arguments."
+msgstr ""
+
+#: lena.structures.hist_functions.hist_to_graph:13 of
+msgid ""
+"*bin_coord* signifies which will be the coordinate of a graph's point "
+"created from histogram's bin. Can be \"left\" (default), \"right\" and "
+"\"middle\"."
+msgstr ""
+
+#: lena.structures.hist_functions.hist_to_graph:17 of
+msgid "Return the resulting graph."
+msgstr ""
+
+#: lena.structures.hist_functions.init_bins:3 of
+msgid "Return bins filled with copies of *value*."
+msgstr ""
+
+#: lena.structures.hist_functions.init_bins:5 of
+msgid ""
+"*Value* must be copyable, usual numbers will suit. If the value is "
+"mutable, use *deepcopy =* ``True`` (or the content of cells will be "
+"identical)."
+msgstr ""
+
+#: lena.structures.hist_functions.integral:3 of
+msgid ""
+"*bins* contain values, and *edges* form the mesh for the integration. "
+"Their format is defined in :class:`Histogram` description."
+msgstr ""
+
+#: lena.structures.hist_functions.iter_bins:1 of
+msgid "Iterate on *bins*. Yield *(index, bin content)*."
+msgstr ""
+
+#: lena.structures.hist_functions.iter_bins:3 of
+msgid ""
+"Edges with higher index are iterated first (that is z, then y, then x for"
+" a 3-dimensional histogram)."
+msgstr ""
+
+#: lena.structures.hist_functions.make_hist_context:4 of
+msgid "Deep copy of updated context is returned."
+msgstr ""
+
+#: lena.structures.hist_functions.unify_1_md:3 of
+msgid ""
+"Return a tuple of *(bins, edges)*. Bins and multidimensional *edges* "
+"return unchanged, while one-dimensional *edges* are inserted into a list."
+msgstr ""
+

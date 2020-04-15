@@ -1,0 +1,157 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2020, Yaroslav Nikitenko
+# This file is distributed under the same license as the Lena package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2020.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Lena 0.1\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-04-14 22:34+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.8.0\n"
+
+#: ../../source/limitations.rst:6
+msgid "Limitations"
+msgstr ""
+
+#: ../../source/limitations.rst:9
+msgid "Performance"
+msgstr ""
+
+#: ../../source/limitations.rst:10
+msgid "not for number crunching"
+msgstr ""
+
+#: ../../source/limitations.rst:12
+msgid "Python is high level"
+msgstr ""
+
+#: ../../source/limitations.rst:14
+msgid ""
+"But: most time is spent on reading data and making plots No serious "
+"performance measurements (and hence optimizations) were made yet."
+msgstr ""
+
+#: ../../source/limitations.rst:18
+msgid "Development status"
+msgstr ""
+
+#: ../../source/limitations.rst:19
+msgid "small user base, may have bugs"
+msgstr ""
+
+#: ../../source/limitations.rst:22
+msgid "but tested and used by the author This limitation on the second place"
+msgstr ""
+
+#: ../../source/limitations.rst:27
+msgid "General"
+msgstr ""
+
+#: ../../source/limitations.rst:28
+msgid ""
+"No global settings exist, everything is defined during the "
+"initialization. No configuration options can be passed via the command "
+"line."
+msgstr ""
+
+#: ../../source/limitations.rst:31
+msgid ""
+"In fact, the first feature may be more useful for large projects than for"
+" simple scripts. The second one seems more important. This features are "
+"waiting to be implemented."
+msgstr ""
+
+#: ../../source/limitations.rst:36
+msgid "Flow"
+msgstr ""
+
+#: ../../source/limitations.rst:39
+msgid "Missing Filter and Zip"
+msgstr ""
+
+#: ../../source/limitations.rst:40
+msgid ""
+"Functional programming may seem weird without a filter, but in fact the "
+"author didn't need to use that, and when he needed, a better solution was"
+" found. Moreover, Lena's design suggests that one should expect any "
+"unknown values from the flow (if that's not during histogram fill), and "
+"pass that unchanged. One can very simply implement a filter using a "
+":class:`Selector`."
+msgstr ""
+
+#: ../../source/limitations.rst:48
+msgid ""
+"Zip may also not fit well with Lena's design, because it would impose "
+"limitations on the order of flow elements (if that is important). It may "
+"also be duplication of some :class:`Split`'s logic."
+msgstr ""
+
+#: ../../source/limitations.rst:52
+msgid ""
+"These classes may be implemented, if good non-trivial example uses for "
+"them is given."
+msgstr ""
+
+#: ../../source/limitations.rst:56
+msgid "Split into bins"
+msgstr ""
+
+#: ../../source/limitations.rst:58
+msgid ""
+"If the analysis produced not equal number of data during *compute()*, in "
+"Python 3 the minimum number will be used, while in Python 2 some bins "
+"will be filled with None."
+msgstr ""
+
+#: ../../source/limitations.rst:62
+msgid "Waiting to provide general settings for that."
+msgstr ""
+
+#: ../../source/limitations.rst:65
+msgid "Output"
+msgstr ""
+
+#: ../../source/limitations.rst:67
+msgid ""
+"Only one engine can be used to create pdf (``pdflatex``) and convert pdf "
+"to png (``pdftoppm``). No html (or other) plots are used."
+msgstr ""
+
+#: ../../source/limitations.rst:71
+msgid "Waiting to be implemented by people who use alternative tools."
+msgstr ""
+
+#: ../../source/limitations.rst:74
+msgid "LaTeXToPDF"
+msgstr ""
+
+#: ../../source/limitations.rst:76
+msgid ""
+"It has an option to support multiprocess execution, but can't limit the "
+"number of these processes."
+msgstr ""
+
+#: ../../source/limitations.rst:79
+msgid "Waiting to be implemented."
+msgstr ""
+
+#: ../../source/limitations.rst:82
+msgid "Development"
+msgstr ""
+
+#: ../../source/limitations.rst:84
+msgid ""
+"No logging system is present. For example, :class:`ToCSV` prints a "
+"warning to ``stdout`` when it can't convert a 3-dimensional histogram. "
+"This will be implemented not earlier than at least after one other "
+"example is found."
+msgstr ""
+

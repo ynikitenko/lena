@@ -28,9 +28,11 @@ docs/examples/tutorial/*/output
 
 # Sphinx
 docs/build
+docs/_build
 docs/source/lena.*.rst
 docs/source/lena.rst
 docs/source/modules.rst
+*.mo
 
 .tox
 dist/
