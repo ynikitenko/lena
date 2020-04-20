@@ -16,6 +16,7 @@ Context
     get_recursively
     intersection
     str_to_dict
+    str_to_list
     update_nested
     update_recursively
 
@@ -47,5 +48,6 @@ Functions
 .. autofunction:: get_recursively
 .. autofunction:: intersection
 .. autofunction:: str_to_dict
+.. autofunction:: str_to_list
 .. autofunction:: update_nested
 .. autofunction:: update_recursively

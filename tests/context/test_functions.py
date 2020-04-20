@@ -151,6 +151,12 @@ def test_str_to_dict():
     assert lena.context.str_to_dict(d) == d
 
 
+def test_str_to_list():
+    # empty string produces an empty list
+    assert lena.context.str_to_list("") == []
+    assert lena.context.str_to_list(".a..") == ["", "a", "", ""]
+
+
 def test_update_nested():
     d1 = {"a": 1, "b": {"c": 3}}
     d2 = {"b": {"d": 4}}

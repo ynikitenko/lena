@@ -303,6 +303,27 @@ def str_to_dict(s):
     return d
 
 
+def str_to_list(s):
+    """Like :func:`str_to_dict`, but return a flat list.
+
+    If the string *s* is empty, an empty list is returned.
+    This is different from *str.split*: the latter would
+    return a list with one empty string.
+    Contrarily to *str_to_dict*, this function allows
+    arbitrary number of dots in *s* (or none).
+    """
+    if s == "":
+        return []
+    # s can't be a list. This function is not used as a general
+    # interface (as str_to_dict could be).
+
+    # s may contain empty substrings, like in "a..b"
+    # this is not encouraged, of course, but may suit:
+    # if there are two errors in some user's context logic,
+    # they may compensate and not destroy all.
+    return s.split(".")
+
+
 def update_nested(d, other):
     """Update dictionary *d* with items from *other* dictionary.
 
