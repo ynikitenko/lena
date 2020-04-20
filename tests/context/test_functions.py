@@ -143,6 +143,7 @@ def test_make_context():
 def test_str_to_dict():
     with pytest.raises(lena.core.LenaValueError):
         lena.context.str_to_dict("s")
+    assert lena.context.str_to_dict("") == {}
 
 
 def test_update_nested():

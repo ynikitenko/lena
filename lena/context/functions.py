@@ -269,8 +269,9 @@ def str_to_dict(s):
     """Create a dictionary from a dot-separated string *s*.
 
     Dots represent nested dictionaries.
-    *s* must have at least two dot-separated parts (*a.b*),
-    otherwise :exc:`~lena.core.LenaValueError` is raised.
+    *s*, if not empty, must have at least two dot-separated parts
+    (*a.b*), otherwise :exc:`~lena.core.LenaValueError` is raised.
+    If *s* is empty, an empty dictionary is returned.
 
     Example:
 
@@ -278,6 +279,8 @@ def str_to_dict(s):
     {'a': {'b': 'c d'}}
     """
     # todo: add a parameter to recover ints from ints?
+    if s == "":
+        return {}
     parts = s.split(".")
     d = {}
     def nest_list(d, l):
