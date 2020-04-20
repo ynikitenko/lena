@@ -141,9 +141,14 @@ def test_make_context():
 
 
 def test_str_to_dict():
+    # empty string produces an empty dict
+    assert lena.context.str_to_dict("") == {}
+    # otherwise s must have at least two dot-separated parts
     with pytest.raises(lena.core.LenaValueError):
         lena.context.str_to_dict("s")
-    assert lena.context.str_to_dict("") == {}
+    # dictionary is returned unchanged
+    d = {"d": "d"}
+    assert lena.context.str_to_dict(d) == d
 
 
 def test_update_nested():

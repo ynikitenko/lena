@@ -66,6 +66,16 @@ def get_recursively(d, keys, default=_sentinel):
     if "default" is given,
     otherwise :exc:`~lena.core.LenaKeyError` is raised.
 
+    If *keys* is empty, *d* is returned.
+
+    Examples:
+
+    >>> context = {"output": {"latex": {"name": "x"}}}
+    >>> get_recursively(context, ["output", "latex", "name"], default="y")
+    'x'
+    >>> get_recursively(context, "output.latex.name")
+    'x'
+
     .. note::
         Python's dict.get in case of a missing value
         returns ``None`` and never raises an error.
@@ -76,16 +86,6 @@ def get_recursively(d, keys, default=_sentinel):
     :exc:`~lena.core.LenaTypeError` is raised.
     If *keys* is a dictionary with more than one key at some level,
     :exc:`~lena.core.LenaValueError` is raised.
-
-    If *keys* is empty, *d* is returned.
-
-    Examples:
-
-    >>> context = {"output": {"latex": {"name": "x"}}}
-    >>> get_recursively(context, ["output", "latex", "name"], default="y")
-    'x'
-    >>> get_recursively(context, "output.latex.name")
-    'x'
     """
     has_default = default is not _sentinel
     if not isinstance(d, dict):
@@ -271,7 +271,9 @@ def str_to_dict(s):
     Dots represent nested dictionaries.
     *s*, if not empty, must have at least two dot-separated parts
     (*a.b*), otherwise :exc:`~lena.core.LenaValueError` is raised.
+
     If *s* is empty, an empty dictionary is returned.
+    *s* can be a dictionary. In this case it is returned as it is.
 
     Example:
 
@@ -281,6 +283,8 @@ def str_to_dict(s):
     # todo: add a parameter to recover ints from ints?
     if s == "":
         return {}
+    elif isinstance(s, dict):
+        return s
     parts = s.split(".")
     d = {}
     def nest_list(d, l):
