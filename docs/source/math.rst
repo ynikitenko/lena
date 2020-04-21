@@ -4,8 +4,10 @@ math package
 
 .. currentmodule:: lena.math.meshes
 .. autosummary::
+    flatten
     mesh
     md_map
+    refine_mesh
 
 **Functions of scalar and multidimensional arguments:**
 
@@ -31,8 +33,10 @@ Functions of multidimensional arguments
 ---------------------------------------
 
 .. module:: lena.math.meshes
+.. autofunction:: flatten
 .. autofunction:: mesh
 .. autofunction:: md_map
+.. autofunction:: refine_mesh
 
 Functions of scalar and multidimensional arguments
 --------------------------------------------------

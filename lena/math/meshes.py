@@ -7,7 +7,7 @@ from itertools import count, islice
 def flatten(array):
     """Flatten an *array* of arbitrary dimension.
 
-    Array must be list or a tuple (can be nested).
+    *array* must be list or a tuple (can be nested).
     Depth-first flattening is used.
 
     Return an iterator over the flattened array.
@@ -140,12 +140,15 @@ def mesh(ranges, nbins):
 
 
 def refine_mesh(arr, refinement):
-    """Refine (subdivide) a mesh *arr*.
+    """Refine (subdivide) one-dimensional mesh *arr*.
 
-    *refinement* is the number of subdivisions, it must be not less than 1.
+    *refinement* is the number of subdivisions.
+    It must be not less than 1.
 
-    *arr* must be one-dimensional now.
+    Note that to create a new mesh may be faster.
+    Use this function only for convenience.
     """
+    # *arr* must be one-dimensional.
     new_mesh = [arr[0]]
     for low, up in zip(arr, arr[1:]):
         new_mesh.extend(mesh((low, up), refinement)[1:])
