@@ -19,7 +19,7 @@ from lena.structures.graph import Graph
 
 
 def test_graph():
-    # test that sort is performed
+    # sorts well
     coords = range(0, 10)
     values = map(math.sin, coords)
     points = list(zip(coords, values))
@@ -47,7 +47,7 @@ def test_graph():
     assert (repr(unsorted_graph) == 
             "Graph(points=[(2, 3), (0, 1), (1, 2)], scale=None, sort=False)")
 
-    # fill works same as initialization
+    # fill with points works same as initialization
     new_unsorted_graph = Graph(sort=False)
     for pt in points:
         new_unsorted_graph.fill(pt)
@@ -75,6 +75,7 @@ def test_graph():
     resc = rescaled.scale(1)
     assert resc.points[-1] == ((2, 3), 5.0)
 
+    # can't rescale 0 or unknown scale
     r0 = resc.scale(0)
     with pytest.raises(lena.core.LenaValueError):
         r0.scale(1)
@@ -82,10 +83,67 @@ def test_graph():
     with pytest.raises(lena.core.LenaAttributeError):
         r1.scale()
 
+    # can't set points
     with pytest.raises(AttributeError):
-        # can't set points
         r1.points = 1
 
+    # cur_context works
+    context = {"data": "d1"}
+    gr1 = Graph([(0, 1)], cur_context=copy.deepcopy(context))
+    gr2 = Graph()
+    gr2.fill(((0, 1), copy.deepcopy(context)))
+    res1 = list(gr1.request())
+    res2 = list(gr2.request())
+    assert res1 == res2
 
-if __name__ == "__main__":
-    test_graph()
+    # cur_context must be a context, if set
+    with pytest.raises(lena.core.LenaTypeError):
+        Graph([(0, 1)], cur_context=0)
+
+    # reset works
+    gr1.reset()
+    assert gr1 == Graph()
+
+
+def test_graph_equal():
+    # test equality
+    gr1 = Graph([(0, 1)])
+
+    # non-Graphs are not equal to graphs
+    # this line is not checked when using !=
+    assert not gr1 == 1
+
+    ## equality with scale works ##
+    # set and unset scales are not equal
+    gr2 = Graph([(0, 1)], scale=1)
+    assert not gr1 == gr2
+
+    # sometimes they are really equal
+    gr3 = Graph(scale=1)
+    gr3.fill((0, 1))
+    assert gr2 == gr3
+
+    # different points compare different
+    gr3.fill((0, 1))
+    assert not gr2 == gr3
+
+
+def test_graph_to_csv():
+    # to_csv works
+    gr2 = Graph([(0, 1)])
+    csv2 = gr2.to_csv()
+    assert csv2 == "0,1"
+
+    # fill with a point with another dimension is prohibited
+    # should be moved to another method though...
+    gr2.fill((((0, 1, 2), (3, 4)), {}))
+    with pytest.raises(lena.core.LenaValueError):
+        gr2.to_csv()
+
+    # multidimensional to_csv works
+    gr2 = Graph([(((0, 1, 2), (3, 4)))])
+    assert gr2.to_csv() == "0,1,2,3,4"
+
+    # header works
+    header = "x,y,z,f,g"
+    assert gr2.to_csv(header=header) == header + '\n' + "0,1,2,3,4"
