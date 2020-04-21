@@ -309,7 +309,7 @@ def str_to_list(s):
     If the string *s* is empty, an empty list is returned.
     This is different from *str.split*: the latter would
     return a list with one empty string.
-    Contrarily to *str_to_dict*, this function allows
+    Contrarily to :func:`str_to_dict`, this function allows
     arbitrary number of dots in *s* (or none).
     """
     if s == "":
@@ -321,6 +321,9 @@ def str_to_list(s):
     # this is not encouraged, of course, but may suit:
     # if there are two errors in some user's context logic,
     # they may compensate and not destroy all.
+    # Another variant would be to treat empty strings
+    # as whole context. The variant with '' seems more understandable
+    # to the user.
     return s.split(".")
 
 
@@ -400,6 +403,8 @@ def update_recursively(d, other):
             d[key] = val
         else:
             if key in d:
+                if not isinstance(d[key], dict):
+                    d[key] = {}
                 update_recursively(d[key], other[key])
             else:
                 d[key] = val

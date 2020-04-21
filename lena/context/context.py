@@ -1,15 +1,4 @@
-"""Make better output for context. Example:
-
->>> from lena.context import Context
->>> c = Context({"1": 1, "2": {"3": 4}})
->>> print(c) # doctest: +NORMALIZE_WHITESPACE
-{
-    "1": 1,
-    "2": {
-        "3": 4
-    }
-}
-"""
+""":class:`Context` provides a better representation for context."""
 from __future__ import print_function
 
 import json
@@ -19,10 +8,23 @@ import lena.flow
 
 
 class Context(dict):
-    """Dictionary with easy-to-read formatting."""
+    """Dictionary with easy-to-read formatting.
 
-    def __init__(self, d={}, formatter=None):
-        """Initialize from a dictionary *d*.
+    :class:`Context` provides a better representation for context. Example:
+
+    >>> from lena.context import Context
+    >>> c = Context({"1": 1, "2": {"3": 4}})
+    >>> print(c) # doctest: +NORMALIZE_WHITESPACE
+    {
+        "1": 1,
+        "2": {
+            "3": 4
+        }
+    }
+    """
+
+    def __init__(self, d=None, formatter=None):
+        """Initialize from a dictionary *d* (empty by default).
 
         Representation is defined by the *formatter*.
         That must be a callable,
@@ -32,12 +34,15 @@ class Context(dict):
         Tip
         ---
             JSON and Python representations are different.
-            In particular, JSON *True* is written lowercase *true*.
+            In particular, JSON *True* is written as lowercase *true*.
             To convert JSON back to Python, use ``json.loads(string)``.
 
         If *formatter* is given but is not callable,
-        :exc:`~lena.core.LenaTypeError` is raised.
+        :exc:`.LenaTypeError` is raised.
         """
+        # todo: maybe add intersphinx reference to json
+        if d is None:
+            d = {}
         super(Context, self).__init__(d)
         if formatter is not None:
             if not callable(formatter):
@@ -60,6 +65,10 @@ class Context(dict):
         convert its context part to :class:`Context`.
         If the *value* doesn't contain a context,
         it is created as an empty :class:`Context`.
+
+        When a :class:`Context` is used as a sequence element,
+        its initialization argument *d*
+        has no effect on the produced values.
         """
         data, context = lena.flow.get_data_context(value)
         return (data, Context(context))

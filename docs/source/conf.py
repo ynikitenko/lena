@@ -49,6 +49,7 @@ release = u'0.1'
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.autosummary',
+    # 'sphinx.ext.intersphinx',
     # 'sphinx_automodapi.automodapi',
     'sphinx.ext.coverage',
     # 'sphinx-prompt', # doesn't show command output.

@@ -183,10 +183,12 @@ def test_update_recursively():
     d1 = {"a": 1, "b": {"c": 3}}
     d2 = {"b": {"d": 4}}
     update_recursively(d1, d2)
-    assert d1 == {'a': 1, 'b': {'c': 3, 'd': 4}}
+    assert d1 == {"a": 1, "b": {"c": 3, "d": 4}}
     update_recursively(d1, {"b": 2})
-    assert d1 == {'a': 1, 'b': 2}
+    assert d1 == {"a": 1, "b": 2}
     update_recursively(d1, {"e": {"f": 2}})
-    assert d1 == {'a': 1, 'b': 2, 'e': {'f': 2}}
+    assert d1 == {"a": 1, "b": 2, "e": {"f": 2}}
     with pytest.raises(lena.core.LenaTypeError):
         update_recursively(1, {})
+    update_recursively(d1, {"a": {"b": "c"}})
+    assert d1 == {"a": {"b": "c"}, "b": 2, "e": {"f": 2}}

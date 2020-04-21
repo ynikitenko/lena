@@ -1,11 +1,12 @@
 Context
 =======
-**Context:**
+**Elements:**
 
-.. currentmodule:: lena.context.context
+.. currentmodule:: lena.context
 .. autosummary::
 
     Context
+    UpdateContext
 
 **Functions:**
 
@@ -31,11 +32,16 @@ Context
     update_nested
     update_recursively
 
-Context
--------
-.. automodule:: lena.context.context
-    :special-members: __call__, __getitem__
+Elements
+--------
+.. currentmodule:: lena.context
+.. autoclass:: Context
+    :special-members: __call__
     :show-inheritance:
+
+.. autoclass:: UpdateContext
+    :special-members: __call__
+
 
 .. _context_functions:
 
