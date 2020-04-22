@@ -3,12 +3,11 @@
 # This file is distributed under the same license as the Lena package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2020.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: Lena 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-14 22:34+0300\n"
+"POT-Creation-Date: 2020-04-22 12:19+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,19 +16,20 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.8.0\n"
 
-#: ../../source/tutorial/answers.rst:2
+#: ../../source/tutorial/answers.rst:2 683e10ff26c347379c808edc24343160
 msgid "Answers to exercises"
 msgstr ""
 
-#: ../../source/tutorial/answers.rst:4
+#: ../../source/tutorial/answers.rst:4 3259be2c29a24ab0a63e8249ee7d3bf3
 msgid "Part 1"
 msgstr ""
 
 #: ../../source/tutorial/answers.rst:6 ../../source/tutorial/answers.rst:140
+#: 0569693370f14f528a468bca8e3368cb 4388f406c6db42ad97880cb16790a6ae
 msgid "Ex. 1"
 msgstr ""
 
-#: ../../source/tutorial/answers.rst:7
+#: ../../source/tutorial/answers.rst:7 2de0f317c69b407fb7e3e2e9d9fefe72
 msgid ""
 "*End.run* in this case is not a generator. To make it a generator, add a "
 "*yield* statement somewhere. Also note that since Python 3.7 all "
@@ -38,14 +38,16 @@ msgid ""
 msgstr ""
 
 #: ../../source/tutorial/answers.rst:30 ../../source/tutorial/answers.rst:185
+#: 22c034a4dca84d44acbca75b4b995c6a 8de454edfac64a36ae15a6c9e449a39f
 msgid "Ex. 2"
 msgstr ""
 
 #: ../../source/tutorial/answers.rst:43 ../../source/tutorial/answers.rst:193
+#: 017ddfdd10b14d6bae4cf747f006ff9f e1995a1fe69d4f1fb96d82b1cb65d6ff
 msgid "Ex. 3"
 msgstr ""
 
-#: ../../source/tutorial/answers.rst:44
+#: ../../source/tutorial/answers.rst:44 bde08b659aa24f37ac8209fb63689621
 msgid ""
 "An implementation of *Count* is given below. An important consideration "
 "is that there may be several *Counts* in the sequence, so give them "
@@ -53,74 +55,88 @@ msgid ""
 msgstr ""
 
 #: ../../source/tutorial/answers.rst:89 ../../source/tutorial/answers.rst:210
+#: 13e078c315bb4d53aa4bc36c4d2a1aa7 1b67e285608a48b7987234250c863dbb
 msgid "Ex. 4"
 msgstr ""
 
-#: ../../source/tutorial/answers.rst:90
+#: ../../source/tutorial/answers.rst:90 c6f39c4fe56949f4aaf09cb80b80cd32
 msgid "A simple output function could be the following:"
 msgstr ""
 
-#: ../../source/tutorial/answers.rst:107
+#: ../../source/tutorial/answers.rst:107 29aa178cbe2946c4a5b7cd5311cfed99
 msgid ""
 "Then place *output()* in a sequence, and new initialized elements will be"
 " put there."
 msgstr ""
 
-#: ../../source/tutorial/answers.rst:110
+#: ../../source/tutorial/answers.rst:110 b15dcb31e1c948e587ca00823f26f1a5
 msgid ""
 "This approach is terse, but less flexible and explicit. In practice "
 "verbosity of several output elements was never a problem for the author."
 msgstr ""
 
 #: ../../source/tutorial/answers.rst:115 ../../source/tutorial/answers.rst:233
+#: 103a0359b05f43248e89547724021a6c 410c08904ee6455092f3317c7002eb15
 msgid "Ex. 5"
 msgstr ""
 
-#: ../../source/tutorial/answers.rst:116
+#: ../../source/tutorial/answers.rst:116 546925e2eab542039338223dc6b1cf42
 msgid ""
 "The author is unaware of a simple for a user way to stop a function and "
 "resume it at the given point. Inform the author if you know better "
 "answers to any of these exercises."
 msgstr ""
 
-#: ../../source/tutorial/answers.rst:120
+#: ../../source/tutorial/answers.rst:120 d8dfdea5c95646f6a004521faa0a0826
 msgid ""
-"MechanicZelenyy from habr gives this `explanation "
+"Mikhail Zelenyi gives this `explanation "
 "<https://habr.com/ru/post/490518/#comment_21342580>`_ (translated from "
 "Russian):"
 msgstr ""
+"Михаил Зелёный даёт такое `объяснение "
+"<https://habr.com/ru/post/490518/#comment_21342580>`_:"
 
-#: ../../source/tutorial/answers.rst:124
+#: ../../source/tutorial/answers.rst:124 33745856d8de4bb69690eabad5bb5e0d
+#, fuzzy
 msgid ""
 "There are two types of models: push and pull. If you have a sequence, "
 "then in the case of a *push* model the calculations are initiated by the "
-"first member of the sequence, which pushes data further. In this case "
-"fork could be done easily, just at a certain moment it pushes data not "
-"into one sequence, but into two."
+"first member of the sequence, which pushes data further. In this case a "
+"fork can be done easily, just at a certain moment it pushes data not into"
+" one sequence, but into two."
 msgstr ""
+"Есть два типа моделей: push и pull.  Если у вас есть цепочка, то в случае"
+" *push* модели вычисления инициирует первый член цепочки и он пихает "
+"данные дальше. В данном случае ветвление (форк) делается легко, он просто"
+" в определённый момент пихает данные не в одну цепочку, а в две."
 
-#: ../../source/tutorial/answers.rst:130
+#: ../../source/tutorial/answers.rst:130 83074c9b7b6845cc9b4cf36ff1d8c8d9
 msgid ""
 "In the case of a *pull* model the calculations are initiated by the last "
 "member of the sequence. Consequently, if we want to branch the sequence, "
 "we need to think what to do: to start only when all consumers asked, to "
-"use a buffer, or to start with one consumer and to push the rest of the "
-"data conforming to the *push* model."
+"use a buffer, or to start with one consumer and to push data into the "
+"others conforming to the *push* model."
 msgstr ""
+"В случае pull модели вычисления инициирует последний член цепочки. "
+"Соответственно, если мы хотим разветвить цепочку, то уже надо думать, что"
+" делать: или запускать только когда запросили все потребители, или делать"
+" буферизацию, или стартовать с одного потребителя, а в остальные "
+"пропихивать данные по push модели."
 
-#: ../../source/tutorial/answers.rst:138
+#: ../../source/tutorial/answers.rst:138 6bd0ec8ff9fa452db1ea26d2b2013c27
 msgid "Part 2"
 msgstr ""
 
-#: ../../source/tutorial/answers.rst:141
+#: ../../source/tutorial/answers.rst:141 00b73a5ffc3048868bf448ce0b2f6689
 msgid "This is the *Sum* implementation from *lena.math*:"
 msgstr ""
 
-#: ../../source/tutorial/answers.rst:186
+#: ../../source/tutorial/answers.rst:186 41bca8f1f5af450f94984e9f3450d0d9
 msgid "Delete the first *MakeFilename* and change the second one to"
 msgstr ""
 
-#: ../../source/tutorial/answers.rst:194
+#: ../../source/tutorial/answers.rst:194 85e2de13a82f4c4892c73a5abc3ffdd4
 msgid ""
 "We believe that the essence of data is captured in the function with "
 "which it was obtained. Histogram is just its presentation. It may be "
@@ -128,7 +144,7 @@ msgid ""
 "*MakeFilename* would be more powerful."
 msgstr ""
 
-#: ../../source/tutorial/answers.rst:200
+#: ../../source/tutorial/answers.rst:200 aa9d2342e2cd4b42ba925b828151ce90
 msgid ""
 "Functional programming suggests that larger functions should be "
 "decomposed into smaller ones, while object-oriented design praises code "
@@ -139,7 +155,7 @@ msgid ""
 " name)."
 msgstr ""
 
-#: ../../source/tutorial/answers.rst:211
+#: ../../source/tutorial/answers.rst:211 2d712486afd1434fa6fdcdcbc1741aca
 msgid ""
 "In part 1 of the tutorial there was introduced an element *End*, which "
 "stops the flow at its location. However, if there are *Histograms* in the"
@@ -150,7 +166,7 @@ msgid ""
 "was empty."
 msgstr ""
 
-#: ../../source/tutorial/answers.rst:220
+#: ../../source/tutorial/answers.rst:220 57af737efcf2434bb28e08fc8c1df6d4
 msgid ""
 "In the next chapter we will present a specific analysis during which a "
 "histogram may not be filled, but it must be produced. A *FillCompute* "
@@ -158,7 +174,7 @@ msgid ""
 "concrete example)."
 msgstr ""
 
-#: ../../source/tutorial/answers.rst:225
+#: ../../source/tutorial/answers.rst:225 139e4a7b69354abebc02bd4d9668316e
 msgid ""
 "Note also that if a histogram was not filled, preceding variables weren't"
 " called. The histogram will have no context, probably won't have a name "
@@ -166,7 +182,7 @@ msgid ""
 "creating your own *FillCompute* elements."
 msgstr ""
 
-#: ../../source/tutorial/answers.rst:234
+#: ../../source/tutorial/answers.rst:234 bd61f87a1c8d492dbf246abdd397b688
 msgid ""
 "It depends on the student's priorities. If he wants to finish the diploma"
 " never to return to programming, or if he has a lot of work to do apart "
@@ -176,7 +192,7 @@ msgid ""
 "will have to rewrite all code when more functionality becomes needed."
 msgstr ""
 
-#: ../../source/tutorial/answers.rst:243
+#: ../../source/tutorial/answers.rst:243 60e4fb81acd5492d92f2a80c6adc46a8
 msgid ""
 "Architectural choices rise for middle-sized or large projects. If the "
 "student's personal code becomes large and more time is spent on "
@@ -185,7 +201,7 @@ msgid ""
 "one thousand lines."
 msgstr ""
 
-#: ../../source/tutorial/answers.rst:250
+#: ../../source/tutorial/answers.rst:250 7455dc0be37c449ca8493e787985f633
 msgid ""
 "Another distinction is that when using a library one learns how to use a "
 "library. When using a good framework, one learns how to write good code. "
@@ -195,4 +211,11 @@ msgid ""
 "difficulties with making programming decisions, it's time to invest into "
 "design skills."
 msgstr ""
+
+#~ msgid ""
+#~ "MechanicZelenyy from habr gives this "
+#~ "`explanation "
+#~ "<https://habr.com/ru/post/490518/#comment_21342580>`_ "
+#~ "(translated from Russian):"
+#~ msgstr ""
 

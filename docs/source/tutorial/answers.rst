@@ -124,7 +124,7 @@ Mikhail Zelenyi gives this
 There are two types of models: push and pull.
 If you have a sequence, then in the case of a *push* model
 the calculations are initiated by the first member of the sequence,
-which pushes data further. In this case fork could be done easily,
+which pushes data further. In this case a fork can be done easily,
 just at a certain moment it pushes data not into one sequence, but into two.
 
 In the case of a *pull* model
@@ -132,7 +132,7 @@ the calculations are initiated by the last member of the sequence.
 Consequently, if we want to branch the sequence, we need to think
 what to do: to start only when all consumers asked,
 to use a buffer, or to start with one consumer
-and to push the rest of the data conforming to the *push* model.
+and to push data into the others conforming to the *push* model.
 
 Part 2
 ------

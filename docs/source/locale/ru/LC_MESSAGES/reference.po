@@ -49,6 +49,8 @@ msgstr ""
 msgid "Reference"
 msgstr ""
 
+# "Руководство"
+
 #: ../../source/reference.rst:14
 msgid "Indices and tables"
 msgstr ""

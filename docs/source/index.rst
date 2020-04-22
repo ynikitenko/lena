@@ -9,17 +9,14 @@
 
 ..
     todo:
-    - install programs on Linux (pdflatex and other packages)
     - Lena is intended to... - we can write about its mission
       (create good and beautiful software).
-    - from philosophical point of view.
+    -- - in the very end of the tutorial. from philosophical point of view.
       Ready to analyse several issues at once.
       Data analysis is comparison of different entities (expected and observed).
-    - create When should I use Lena? Make Overwiew small.
-    - write about minimal requirements and recommended programs.
-    - move performance to the end, add a note about Python.
     - Add Thanks subsection
     - add release notes somewhere in the future.
+    - create When should I use Lena? Make Overwiew small.
 
 ========
 Overview
@@ -29,18 +26,19 @@ Lena is an architectural framework for data analysis.
 It is written in a popular programming language Python
 and works with Python versions 2, 3 and PyPy (2 and 3).
 
-..
-    todo: rewrite. ... features ... include...
+Lena features from programming point of view include:
 
-These are Lena features from programming point of view:
+- simple and powerful programming language.
 
 - modularity, weak coupling. Algorithms can be easily added, replaced or reused.
 
-- performance. Lazy evaluation is good for memory and speed. Several analyses can be done reading data once. PyPy with just-in-time compiler can be used if needed.
-
 - code reuse. Logic is separated from presentation. One template can be used for several plots.
 
-- rapid development. One can run only those elements which already work. During development only a small subset of data can be analysed. Results of heavy calculations can be easily saved.
+- rapid development. One can run only those elements which already work.
+  During development only a small subset of data can be analysed (to check the code).
+  Results of heavy calculations can be easily saved.
+
+- performance. Lazy evaluation is good for memory and speed. Several analyses can be done reading data once. PyPy with just-in-time compiler can be used if needed.
 
 - easy to understand, structured and beautiful code.
 
@@ -48,13 +46,16 @@ From data analysis perspective:
 
 - comparison of analyses with arbitrary changes (including different input data or algorithms).
 
-- algorithm reuse for a subset of data (for example, to see how an algorithm works at different coordinates in the detector).
+- algorithm reuse for a subset of data
+  (for example, to see how an algorithm works at different positions in the detector).
 
-- analysis consistency. When we run several algorithms for same data or reuse an algorithm, we are sure that we use same data and algorithm.
+- analysis consistency.
+  When we run several algorithms for same data or reuse an algorithm,
+  we are confident that we use same data and algorithm.
 
 - algorithms can be combined into a more complex analysis.
 
-Lena originated from experimental neutrino physics and is named after a great Siberian river.
+Lena was created in experimental neutrino physics and is named after a great Siberian river.
 
 .. .. rst-class:: hidden
 
@@ -69,63 +70,133 @@ Lena originated from experimental neutrino physics and is named after a great Si
 ..
    Q & A <questions_and_answers>
 
+    When to use Lena
+    ----------------
+
+    Your choice may start with the programming language.
+    Here are the advantages of Python
+    (adapted from this `post <https://medium.com/crowdbotics/when-to-use-django-and-when-not-to-9f62f55f693b>`_, where you can find the sources of information):
+
+    - Python is one of the most popular and growing languages in the world.
+    - Python is really easy to learn. It is usually first language of choice for developers.
+    - Don't let the previous statement misguide you in believing that it's only for beginners. Python is used in cutting edge tech as well. Many giants including Google use Python in their tech stack extensively.
+    - It plays nice with other languages.
+    - Developing with Python does not mean that you have to stick with everything that's built with Python only. You may use libraries built with many other languages, including C/C++/Java.
+    - Python is portable, and easy to read.
+    - Python can even run on JVM. Check out Jython.
+    - Python is extensively used and supported in cutting-edge tech like Big Data, Machine Learning, etc.
+    - Access to huge PyPI library.
+
+    "Program development using Python is 5–10 times faster than using C/C++,
+    and 3–5 times faster than using Java", -
+    `estimates <https://www.python.org/doc/essays/omg-darpa-mcc-position/>`_ the author of Python. 
+
+
+    .. A general programming language is a tool that allows to express
+
+    A general programming language can be used to express
+    a vast range of commands and ideas.
+    An architectural framework limits what can be done within that.
+
+    OTOH definite structure allows very complex algorithms
+
+
+    Actually easier than cmake
+
+    A software library provides data and algorithms that you can use in your programs.
+    An architectural framework 
+
+
 Installation
 ------------
 
-From PyPI
-^^^^^^^^^
+Minimal
+^^^^^^^
 
-..
-    no python extensions!
+Install the latest official version from PyPI:
 
-Lena core modules depend only on Python standard libraries.
-Other Python extensions can be installed using pip:
-
-::
+.. code-block:: console
 
     pip install lena
-    # if you plan to render LaTeX templates
-    pip install jinja2
+
+Lena core modules have no dependencies except Python standard libraries.
+
+Recommended
+^^^^^^^^^^^
+
+.. code-block:: console
+
+    pip install lena jinja2
+
+*jinja2* is used to create templates for plots.
+Also install the following programs:
+
+* *pdflatex* to produce pdf files from LaTeX,
+* *pgfplots* and *TikZ* to produce LaTeX plots,
+* *pdftoppm* to convert pdf files to png.
+
+.. * *# ssh-agent* to use Lena on remote servers.
+
+These programs can be found in your OS packages.
+For example, in Fedora Core 29 install them with
+
+.. code-block:: console
+
+    dnf install texlive-latex texlive-pgfplots poppler-utils
+
+..
+    pdflatex from texlive-latex
+    pgfplots from texlive-pgfplots
+    pdftoppm from poppler-utils
+
+*pdflatex* and *pgfplots* are contained in the standard
+`TeX Live <https://www.ctan.org/pkg/texlive>`_ distribution.
+
+Full
+^^^^
+This installation is needed only if you want to extend and develop Lena.
+Download the full repository (with history) from GitHub
+and install all development dependencies:
 
 ..
     # without jinja2
     # unfortunately, now jinja2 seems to be not
     # in the default requirements.
     pip install --no-deps lena
-    # or, for Python 3
-    pip3 install lena
 
-From github
-^^^^^^^^^^^
-::
+.. code-block:: console
 
     git clone https://github.com/ynikitenko/lena
-    # most of requirements are for development only
     pip install -r lena/requirements.txt
 
+Install command line programs from the previous subsection and adjust PYTHONPATH
+as shown in the next subsection.
+
+GitHub or PyPI
+^^^^^^^^^^^^^^
+
+PyPI contains the last official release, which was tested for more Python versions.
+GitHub contains the most recent development code for experienced users.
+Usually it is well tested too,
+but there is a chance that a newly introduced interface can be changed.
+
+For most users *pip* install should be easier.
+If for some reasons you can't do that, you can get an archive
+of an official release
+from GitHub `releases <https://github.com/ynikitenko/lena/releases>`_.
+
+*pip* installs the framework to a system directory, while to install with *git*
+you need to adjust the PYTHONPATH.
+
 Add to your profile (e.g. ``.profile`` or ``.bashrc`` on Linux)
+
+.. .bashrc is for non-interactive shells, which are used with 'ssh command'.
 
 .. code-block:: console
 
     export PYTHONPATH=$PYTHONPATH:<path-to-lena>
 
-and replace *<path-to-lena>* with the actual path to the directory *lena*.
-
-.. .bashrc is for non-interactive shells, which are used with 'ssh command'.
-
-Additional programs
-^^^^^^^^^^^^^^^^^^^
-
-To fully use all available tools, you may need the following programs:
-
-* *pdflatex* to produce pdf files from LaTeX.
-* *pgfplots* and *TikZ* to produce LaTeX plots.
-* *pdftoppm* to convert pdf files to png.
-
-.. * *# ssh-agent* to use Lena on remote servers.
-
-They are not necessary if you don't need to make plots
-or if you want to use your own tools for that.
+and replace *<path-to-lena>* with the actual path to the cloned repository.
 
 Documentation
 -------------
@@ -188,7 +259,10 @@ Complete documentation on Lena classes and specific topics can be found in the :
 
 License
 -------
-Lena is free software licensed under Apache software license (version 2).
+
+Lena is free software released under
+`Apache <https://github.com/ynikitenko/lena/blob/master/LICENSE>`_
+software license (version 2).
 You can use it freely for your data analysis, read its source code and modify it.
 
 It is intended to help people in data analysis, 

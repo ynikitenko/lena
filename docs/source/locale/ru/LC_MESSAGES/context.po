@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Lena 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-14 22:34+0300\n"
+"POT-Creation-Date: 2020-04-22 12:19+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,140 +17,218 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.8.0\n"
 
-#: ../../source/context.rst:2 ../../source/context.rst:34
+#: ../../source/context.rst:2 f5ae74cf5f15493ba907ac1b20c5e3c8
 msgid "Context"
 msgstr ""
 
-#: ../../source/context.rst:3
-msgid "**Context:**"
+#: ../../source/context.rst:3 2b46d11d09db469cb8c7a10ffb9524f4
+msgid "**Elements:**"
 msgstr ""
 
-#: ../../source/context.rst:9:<autosummary>:1
-msgid ":obj:`Context <lena.context.context.Context>`\\ \\(\\[d\\, formatter\\]\\)"
+#: ../../source/context.rst:10:<autosummary>:1 2bb7c25a673a4db88fe4b9ef533b60a2
+msgid ":obj:`Context <lena.context.Context>`\\ \\(\\[d\\, formatter\\]\\)"
 msgstr ""
 
-#: ../../source/context.rst:9:<autosummary>:1 lena.context.context.Context:1 of
+#: ../../source/context.rst:10:<autosummary>:1 1d803513dd2d4fefbc611134b03f2fd9
+#: 321d01a873f74040add82bd7fe889bb4 lena.context.Context:1 of
 msgid "Dictionary with easy-to-read formatting."
 msgstr ""
 
-#: ../../source/context.rst:10
+#: ../../source/context.rst:10:<autosummary>:1 c0b0670868f84b18bd883d3db495baea
+msgid ""
+":obj:`UpdateContext <lena.context.UpdateContext>`\\ \\(subcontext\\, "
+"update\\[\\, recursively\\]\\)"
+msgstr ""
+
+#: ../../source/context.rst:10:<autosummary>:1 0740c9a3d62f4a4c8d7fcfa41e6e823a
+#: a926fb1dd8554fa9a1034e0c99c15287 lena.context.UpdateContext:1 of
+msgid "Update context of passing values."
+msgstr ""
+
+#: ../../source/context.rst:11 f82f261d7b4847fd95ec3dbb078c41b4
 msgid "**Functions:**"
 msgstr ""
 
-#: ../../source/context.rst:21:<autosummary>:1
+#: ../../source/context.rst:23:<autosummary>:1 102c45e1e0284c3ab7f33fe59dddf33e
 msgid ":obj:`difference <lena.context.functions.difference>`\\ \\(d1\\, d2\\)"
 msgstr ""
 
-#: ../../source/context.rst:21:<autosummary>:1
+#: ../../source/context.rst:23:<autosummary>:1 4a7887f68c274fb096e1c130b9498cc4
 #: lena.context.functions.difference:1 of
 msgid "Return a dictionary with items from *d1* not contained in *d2*."
 msgstr ""
 
-#: ../../source/context.rst:21:<autosummary>:1
+#: ../../source/context.rst:23:<autosummary>:1 c0b0670868f84b18bd883d3db495baea
 msgid ""
 ":obj:`get_recursively <lena.context.functions.get_recursively>`\\ \\(d\\,"
 " keys\\[\\, default\\]\\)"
 msgstr ""
 
-#: ../../source/context.rst:21:<autosummary>:1
+#: ../../source/context.rst:23:<autosummary>:1 b37900ca5a5542b19b10fde46499b629
 #: lena.context.functions.get_recursively:1 of
 msgid "Get value from a dictionary *d* recursively."
 msgstr ""
 
-#: ../../source/context.rst:21:<autosummary>:1
+#: ../../source/context.rst:23:<autosummary>:1 07043271059c43409ba9fc0a7e002cda
 msgid ""
 ":obj:`intersection <lena.context.functions.intersection>`\\ "
 "\\(\\*dicts\\, \\*\\*kwargs\\)"
 msgstr ""
 
-#: ../../source/context.rst:21:<autosummary>:1
-#: lena.context.functions.intersection:1 of
+#: ../../source/context.rst:23:<autosummary>:1 04ca1620c7cc4ffab1013c74a1b0a41b
+#: 35243848a2db493191e000fabc1f907d lena.context.functions.intersection:1 of
 msgid ""
 "Return a dictionary, such that each of its items are contained in all "
 "*dicts* (recursively)."
 msgstr ""
 
-#: ../../source/context.rst:21:<autosummary>:1
+#: ../../source/context.rst:23:<autosummary>:1 af012cdf10504e8784953edfddbd694f
 msgid ":obj:`str_to_dict <lena.context.functions.str_to_dict>`\\ \\(s\\)"
 msgstr ""
 
-#: ../../source/context.rst:21:<autosummary>:1
+#: ../../source/context.rst:23:<autosummary>:1 37fff5bc444f4d18ae22e7c2ed61182a
 #: lena.context.functions.str_to_dict:1 of
 msgid "Create a dictionary from a dot-separated string *s*."
 msgstr ""
 
-#: ../../source/context.rst:21:<autosummary>:1
+#: ../../source/context.rst:23:<autosummary>:1 af012cdf10504e8784953edfddbd694f
+msgid ":obj:`str_to_list <lena.context.functions.str_to_list>`\\ \\(s\\)"
+msgstr ""
+
+#: ../../source/context.rst:23:<autosummary>:1 4aa01809fd8c49bca4bd010a5838fd89
+#: 523dd77c01084953a1d1345bce314dfc lena.context.functions.str_to_list:1 of
+msgid "Like :func:`str_to_dict`, but return a flat list."
+msgstr ""
+
+#: ../../source/context.rst:23:<autosummary>:1 a9656d0dfb3a4170881ac9f57e92d2c2
 msgid ""
 ":obj:`update_nested <lena.context.functions.update_nested>`\\ \\(d\\, "
 "other\\)"
 msgstr ""
 
-#: ../../source/context.rst:21:<autosummary>:1
+#: ../../source/context.rst:23:<autosummary>:1 cbc40d392ecc4f29860e608689e56e9c
 #: lena.context.functions.update_nested:1
 #: lena.context.functions.update_recursively:1 of
 msgid "Update dictionary *d* with items from *other* dictionary."
 msgstr ""
 
-#: ../../source/context.rst:21:<autosummary>:1
+#: ../../source/context.rst:23:<autosummary>:1 9547e83e173d4891a3100fe81e9bd164
 msgid ""
 ":obj:`update_recursively <lena.context.functions.update_recursively>`\\ "
 "\\(d\\, other\\)"
 msgstr ""
 
-#: lena.context.context:1 of
-msgid "Make better output for context. Example:"
+#: ../../source/context.rst:36 d7c14c0a979f4ce7a1aad7d9f646752c
+msgid "Elements"
 msgstr ""
 
-#: lena.context.context.Context:1 of
+#: 3a4f4ba51dca4b8f942fc1ae60264aaf lena.context.Context:1 of
 msgid "Bases: :class:`dict`"
 msgstr ""
 
-#: lena.context.context.Context:3 of
-msgid "Initialize from a dictionary *d*."
+#: b5ae70ae5ee24c4c86431c1ddf846af3 lena.context.Context:3 of
+msgid ":class:`Context` provides a better representation for context. Example:"
 msgstr ""
 
-#: lena.context.context.Context:5 of
+#: b37900ca5a5542b19b10fde46499b629 lena.context.Context:15 of
+msgid "Initialize from a dictionary *d* (empty by default)."
+msgstr ""
+
+#: 07df86b2346d40c5a0462262a5f04895 lena.context.Context:17 of
 msgid ""
 "Representation is defined by the *formatter*. That must be a callable, "
 "which should accept a dictionary and return a string. The default is "
 "``json.dumps``."
 msgstr ""
 
-#: lena.context.context.Context:12 of
+#: f1054f31d7d74594a1329c7515b316d9 lena.context.Context:24 of
 msgid ""
 "JSON and Python representations are different. In particular, JSON *True*"
-" is written lowercase *true*. To convert JSON back to Python, use "
+" is written as lowercase *true*. To convert JSON back to Python, use "
 "``json.loads(string)``."
 msgstr ""
 
-#: lena.context.context.Context:16 of
+#: 5bed68a300c74342b84d2918c3790840 lena.context.Context:28 of
 msgid ""
-"If *formatter* is given but is not callable, "
-":exc:`~lena.core.LenaTypeError` is raised."
+"If *formatter* is given but is not callable, :exc:`.LenaTypeError` is "
+"raised."
 msgstr ""
 
-#: lena.context.context.Context.__call__:1 of
+#: ebcbea64e4824bc59ba1717af96486fb lena.context.Context.__call__:1 of
 msgid "Convert *value*'s context to :class:`Context` on the fly."
 msgstr ""
 
-#: lena.context.context.Context.__call__:3 of
+#: 144b62a176f24a7e975f311898bc15c3 lena.context.Context.__call__:3 of
 msgid ""
 "If the *value* is a *(data, context)* pair, convert its context part to "
 ":class:`Context`. If the *value* doesn't contain a context, it is created"
 " as an empty :class:`Context`."
 msgstr ""
 
-#: ../../source/context.rst:42
+#: ed5e7493c0584ecd90624d1634dbe5cf lena.context.Context.__call__:8 of
+msgid ""
+"When a :class:`Context` is used as a sequence element, its initialization"
+" argument *d* has no effect on the produced values."
+msgstr ""
+
+#: 6967cd3a630944e9b3a70f4deb641272 lena.context.UpdateContext:3 of
+msgid ""
+"*subcontext* is a string representing the part of context to be updated "
+"(for example, *output.plot*). If *subcontext* is an empty string, all "
+"context will be overwritten."
+msgstr ""
+
+#: 06eab6b704004a829b205f7c9ac436c5 lena.context.UpdateContext:8 of
+msgid "*update* is a dictionary that will become the value of *subcontext*."
+msgstr ""
+
+#: fe59799d9802462b8e3ea60dd79889d6 lena.context.UpdateContext:11 of
+msgid ""
+"If *recursively* is ``True`` (default), not overwritten existing values "
+"of *subcontext* are preserved. Otherwise, all existing values of "
+"*subcontext* (at its lowest level) are removed. See also "
+":func:`.update_recursively`."
+msgstr ""
+
+#: b94d2ced245647baa93f77b82efb5078 lena.context.UpdateContext:17
+#: lena.context.functions.intersection:14 lena.context.functions.str_to_dict:10
+#: of
+msgid "Example:"
+msgstr ""
+
+#: 7e40272b1ec14de681e159d6fef141a4 lena.context.UpdateContext:23 of
+msgid ""
+"The context in the class name means any general context (not only "
+":class:`.Context`)."
+msgstr ""
+
+#: 31ea055362684803bce3ac2ed651322f lena.context.UpdateContext:26 of
+msgid ""
+"In case of wrong types of *subcontext* or *update* :exc:`.LenaTypeError` "
+"is raised."
+msgstr ""
+
+#: cbc40d392ecc4f29860e608689e56e9c lena.context.UpdateContext.__call__:1 of
+msgid "Update context of the *value*."
+msgstr ""
+
+#: 144b62a176f24a7e975f311898bc15c3 lena.context.UpdateContext.__call__:3 of
+msgid ""
+"If *value*'s context doesn't contain *subcontext*, it is created. If the "
+"*value* contains no context, it is also created."
+msgstr ""
+
+#: ../../source/context.rst:49 9d195860047942578d898521261188dc
 msgid "Functions"
 msgstr ""
 
-#: lena.context.functions.difference:3 of
+#: 0812d9cba0804192973e1db0f4765cd8 lena.context.functions.difference:3 of
 msgid ""
 "If a key is present both in *d1* and *d2* but has different values, it is"
 " included into the difference."
 msgstr ""
 
-#: lena.context.functions.get_recursively:3 of
+#: 680344f71c6246d7951800f8dbe0cdde lena.context.functions.get_recursively:3 of
 msgid ""
 "*keys* can be a list of simple keys (strings), a dot-separated string or "
 "a dictionary with at most one key at each level. A string is split by "
@@ -160,14 +238,26 @@ msgid ""
 ":exc:`~lena.core.LenaKeyError` is raised."
 msgstr ""
 
-#: lena.context.functions.get_recursively:14 of
+#: a971cd10b0604465a12e1f3d09446556 lena.context.functions.get_recursively:13
+#: of
+msgid "If *keys* is empty, *d* is returned."
+msgstr ""
+
+#: e97099f15056495faa8ba323a396120b lena.context.functions.get_recursively:15
+#: of
+msgid "Examples:"
+msgstr ""
+
+#: 4eaa666659a1408aaa3fb17fc6e556dd lena.context.functions.get_recursively:24
+#: of
 msgid ""
 "Python's dict.get in case of a missing value returns ``None`` and never "
 "raises an error. We implement it differently, because it allows more "
 "flexibility."
 msgstr ""
 
-#: lena.context.functions.get_recursively:19 of
+#: 62694e6cc4f2413da36f6a4c087787f1 lena.context.functions.get_recursively:29
+#: of
 msgid ""
 "If *d* is not a dictionary or if *keys* have unknown types, "
 ":exc:`~lena.core.LenaTypeError` is raised. If *keys* is a dictionary with"
@@ -175,21 +265,13 @@ msgid ""
 "raised."
 msgstr ""
 
-#: lena.context.functions.get_recursively:24 of
-msgid "If *keys* is empty, *d* is returned."
-msgstr ""
-
-#: lena.context.functions.get_recursively:26 of
-msgid "Examples:"
-msgstr ""
-
-#: lena.context.functions.intersection:4 of
+#: 2f167c77b7b74dde86f8ba3eaf739e53 lena.context.functions.intersection:4 of
 msgid ""
 "*dicts* are several dictionaries. If *dicts* is empty, an empty "
 "dictionary is returned."
 msgstr ""
 
-#: lena.context.functions.intersection:7 of
+#: 9fd43dd7091a497c8d0ae8ab286f3f72 lena.context.functions.intersection:7 of
 msgid ""
 "A keyword argument *level* sets maximum number of recursions. For "
 "example, if *level* is 0, all *dicts* must be equal (otherwise an empty "
@@ -198,32 +280,41 @@ msgid ""
 "set *level* to -1 (default)."
 msgstr ""
 
-#: lena.context.functions.intersection:14 lena.context.functions.str_to_dict:7
-#: of
-msgid "Example:"
-msgstr ""
-
-#: lena.context.functions.intersection:29 of
+#: 03823dfd77814793913340b93a15f28c lena.context.functions.intersection:29 of
 msgid ""
 "This function always returns a dictionary or its subtype (copied from "
 "dicts[0]). All values are deeply copied. No dictionary or subdictionary "
 "is changed."
 msgstr ""
 
-#: lena.context.functions.intersection:34 of
+#: 31ea055362684803bce3ac2ed651322f lena.context.functions.intersection:34 of
 msgid ""
 "If any of *dicts* is not a dictionary or if some *kwargs* are unknown, "
 ":exc:`~lena.core.LenaTypeError` is raised."
 msgstr ""
 
-#: lena.context.functions.str_to_dict:3 of
+#: c5af553b39f944cd8cda6dc65047997f lena.context.functions.str_to_dict:3 of
 msgid ""
-"Dots represent nested dictionaries. *s* must have at least two dot-"
-"separated parts (*a.b*), otherwise :exc:`~lena.core.LenaValueError` is "
-"raised."
+"Dots represent nested dictionaries. *s*, if not empty, must have at least"
+" two dot-separated parts (*a.b*), otherwise "
+":exc:`~lena.core.LenaValueError` is raised."
 msgstr ""
 
-#: lena.context.functions.update_nested:3 of
+#: 8f2240cb6e2b43b8aef306888bd02cd9 lena.context.functions.str_to_dict:7 of
+msgid ""
+"If *s* is empty, an empty dictionary is returned. *s* can be a "
+"dictionary. In this case it is returned as it is."
+msgstr ""
+
+#: fd4274f427ba4bcbaabdad8aa557097e lena.context.functions.str_to_list:3 of
+msgid ""
+"If the string *s* is empty, an empty list is returned. This is different "
+"from *str.split*: the latter would return a list with one empty string. "
+"Contrarily to :func:`str_to_dict`, this function allows arbitrary number "
+"of dots in *s* (or none)."
+msgstr ""
+
+#: f539d225b79043ed89508a60e6a21ea7 lena.context.functions.update_nested:3 of
 msgid ""
 "*other* must be a dictionary of one element, which is used as a key. If "
 "*d* doesn't contain the key, *d* is updated with *other*. If *d* contains"
@@ -231,31 +322,70 @@ msgid ""
 " the level which doesn't contain the key. *d* is updated."
 msgstr ""
 
-#: lena.context.functions.update_nested:10 of
+#: 1c7c145d5bf34195a4519c4c87ac7d3a lena.context.functions.update_nested:10 of
 msgid ""
 "If *d[key]* is not a dictionary or if there is not one key in *other*, "
 ":exc:`~lena.core.LenaValueError` is raised."
 msgstr ""
 
-#: lena.context.functions.update_recursively:3 of
+#: 7be10b8cb79d4511a78c74f6014c1c02 lena.context.functions.update_recursively:3
+#: of
 msgid ""
 "*other* can be a dot-separated string. In this case :func:`str_to_dict` "
 "is used to convert it to a dictionary."
 msgstr ""
 
-#: lena.context.functions.update_recursively:6 of
+#: 1c02b349a6274b45a2b1a3f83d183c58 lena.context.functions.update_recursively:6
+#: of
 msgid ""
 "Existing values are updated recursively, that is including nested "
 "subdictionaries. For example:"
 msgstr ""
 
+#: e7bd4a175cbe4555976d37e449b8f89a
 #: lena.context.functions.update_recursively:17 of
 msgid "Non-dictionary items from *other* overwrite those in *d*:"
 msgstr ""
 
+#: 771cfed7d4c941c68ae0de8e3961e2be
 #: lena.context.functions.update_recursively:23 of
 msgid ""
 "Both *d* and *other* must be dictionaries, otherwise "
 ":exc:`~lena.core.LenaTypeError` is raised."
 msgstr ""
+
+#~ msgid "**Context:**"
+#~ msgstr ""
+
+#~ msgid ""
+#~ ":obj:`Context <lena.context.context.Context>`\\ \\(\\[d\\,"
+#~ " formatter\\]\\)"
+#~ msgstr ""
+
+#~ msgid "Make better output for context. Example:"
+#~ msgstr ""
+
+#~ msgid "Initialize from a dictionary *d*."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "JSON and Python representations are "
+#~ "different. In particular, JSON *True* is"
+#~ " written lowercase *true*. To convert "
+#~ "JSON back to Python, use "
+#~ "``json.loads(string)``."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "If *formatter* is given but is not"
+#~ " callable, :exc:`~lena.core.LenaTypeError` is "
+#~ "raised."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Dots represent nested dictionaries. *s* "
+#~ "must have at least two dot-"
+#~ "separated parts (*a.b*), otherwise "
+#~ ":exc:`~lena.core.LenaValueError` is raised."
+#~ msgstr ""
 

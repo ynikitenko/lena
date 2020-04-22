@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Lena 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-15 22:21+0300\n"
+"POT-Creation-Date: 2020-04-22 13:16+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,37 +17,41 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.8.0\n"
 
-#: ../../source/index.rst:54
+#: ../../source/index.rst:62
 msgid "Tutorial"
 msgstr "Пособие"
 
-#: ../../source/index.rst:54
+#: ../../source/index.rst:62
 msgid "Reference"
 msgstr "Руководство"
 
-#: ../../source/index.rst:54
+#: ../../source/index.rst:62
 msgid "Contents:"
 msgstr "Содержание:"
 
-#: ../../source/index.rst:22 969e4d8fb2d04b7ab340e2152bf51dea
+#: ../../source/index.rst:23 969e4d8fb2d04b7ab340e2152bf51dea
 msgid "Overview"
 msgstr "Обзор"
 
-#: ../../source/index.rst:24 7c52cf29114741b49a1e58101f313141
+#: ../../source/index.rst:25 7c52cf29114741b49a1e58101f313141
 msgid ""
 "Lena is an architectural framework for data analysis. It is written in a "
 "popular programming language Python and works with Python versions 2, 3 "
 "and PyPy (2 and 3)."
 msgstr ""
 "Lena - архитектурный фреймворк для анализа данных. Она написана на "
-"популярном языке программирования Python (Питон) и работает с версиями Python 2, 3 "
-"и PyPy (2 и 3)."
+"популярном языке программирования Python (Питон) и работает с версиями "
+"Python 2, 3 и PyPy (2 и 3)."
 
-#: ../../source/index.rst:28 e41d2a9030ee44299bc23750c48c8f35
-msgid "These are Lena features from programming point of view:"
-msgstr "Свойства и преимущества Lena с точки зрения программирования:"
+#: ../../source/index.rst:29 e41d2a9030ee44299bc23750c48c8f35
+msgid "Lena features from programming point of view include:"
+msgstr "Свойства и преимущества Lena с точки зрения программирования включают:"
 
-#: ../../source/index.rst:30 64dffa424b804f4793c087a0bcfbe828
+#: ../../source/index.rst:31 e41d2a9030ee44299bc23750c48c8f35
+msgid "simple and powerful programming language."
+msgstr "мощный и простой язык программирования."
+
+#: ../../source/index.rst:33 64dffa424b804f4793c087a0bcfbe828
 msgid ""
 "modularity, weak coupling. Algorithms can be easily added, replaced or "
 "reused."
@@ -55,7 +59,26 @@ msgstr ""
 "модульность, слабое зацепление (*loose coupling*). Алгоритмы могут быть "
 "легко добавлены, заменены или повторно использованы."
 
-#: ../../source/index.rst:32 730d992684f846d59d89585b2de95d9d
+#: ../../source/index.rst:35 8376b18fd0894454bbf8593f2b82987d
+msgid ""
+"code reuse. Logic is separated from presentation. One template can be "
+"used for several plots."
+msgstr ""
+"повторное использование кода. Разделение логики и презентации. Один "
+"шаблон может быть использован для нескольких графиков."
+
+#: ../../source/index.rst:37 d13c27b917d5425090441139d2daa352
+msgid ""
+"rapid development. One can run only those elements which already work. "
+"During development only a small subset of data can be analysed (to check "
+"the code). Results of heavy calculations can be easily saved."
+msgstr ""
+"быстрая разработка. Могут быть запущены только те элементы, которые уже "
+"работают. Во время разработки можно анализировать только малую часть "
+"данных (чтобы проверить работу программы). Результаты сложных вычислений "
+"можно легко сохранить."
+
+#: ../../source/index.rst:41 730d992684f846d59d89585b2de95d9d
 msgid ""
 "performance. Lazy evaluation is good for memory and speed. Several "
 "analyses can be done reading data once. PyPy with just-in-time compiler "
@@ -65,33 +88,15 @@ msgstr ""
 "видов анализа могут быть сделаны за одно чтение данных. Может "
 "использоваться PyPy с компиляцией \"на лету\"."
 
-#: ../../source/index.rst:34 8376b18fd0894454bbf8593f2b82987d
-msgid ""
-"code reuse. Logic is separated from presentation. One template can be "
-"used for several plots."
-msgstr ""
-"повторное использование кода. Разделение логики и презентации. Один "
-"шаблон может быть использован для нескольких графиков."
-
-#: ../../source/index.rst:36 d13c27b917d5425090441139d2daa352
-msgid ""
-"rapid development. One can run only those elements which already work. "
-"During development only a small subset of data can be analysed. Results "
-"of heavy calculations can be easily saved."
-msgstr ""
-"быстрая разработка. Могут быть запущены только те элементы, которые уже "
-"работают. Во время разработки можно анализировать только малую часть "
-"данных. Результаты сложных вычислений легко сохранить."
-
-#: ../../source/index.rst:38 1e4ee403010a4819986538fbdfab3671
+#: ../../source/index.rst:43 1e4ee403010a4819986538fbdfab3671
 msgid "easy to understand, structured and beautiful code."
 msgstr "понятный, структурированный и красивый код."
 
-#: ../../source/index.rst:40 e1a0558a2b3b44a694c5a3228043e880
+#: ../../source/index.rst:45 e1a0558a2b3b44a694c5a3228043e880
 msgid "From data analysis perspective:"
 msgstr "С точки зрения анализа данных:"
 
-#: ../../source/index.rst:42 09bad82a79744c4b9db2633486fa9fe9
+#: ../../source/index.rst:47 09bad82a79744c4b9db2633486fa9fe9
 msgid ""
 "comparison of analyses with arbitrary changes (including different input "
 "data or algorithms)."
@@ -99,106 +104,173 @@ msgstr ""
 "сравнение результатов анализа при произвольных изменениях (в том числе "
 "для разных входных данных или алгоритмов)."
 
-#: ../../source/index.rst:44 25a16629b2954297b104347149aaf439
+#: ../../source/index.rst:49 25a16629b2954297b104347149aaf439
 msgid ""
 "algorithm reuse for a subset of data (for example, to see how an "
-"algorithm works at different coordinates in the detector)."
+"algorithm works at different positions in the detector)."
 msgstr ""
 "переиспользование алгоритма для подмножества данных (например, чтобы "
 "увидеть, как алгоритм работает для разных позиций в детекторе)."
 
-#: ../../source/index.rst:46 8a24a9e021cd4867992a3cc03ac3942d
+#: ../../source/index.rst:52 8a24a9e021cd4867992a3cc03ac3942d
 msgid ""
 "analysis consistency. When we run several algorithms for same data or "
-"reuse an algorithm, we are sure that we use same data and algorithm."
+"reuse an algorithm, we are confident that we use same data and algorithm."
 msgstr ""
 "согласованность анализа. Когда мы запускаем несколько алгоритмов для "
-"одних данных или переиспользуем алгоритм, то мы уверены, что используем "
-"те же данные и тот же алгоритм."
+"одного набора данных или переиспользуем алгоритм, то мы уверены, что "
+"используем те же данные и тот же алгоритм."
 
-#: ../../source/index.rst:48 f7137323fdb44f27a23ad7a6a15fa3de
+#: ../../source/index.rst:56 f7137323fdb44f27a23ad7a6a15fa3de
 msgid "algorithms can be combined into a more complex analysis."
 msgstr "алгоритмы могут быть скомбинированы для более сложного анализа."
 
-#: ../../source/index.rst:50 bcd610f85dab421bb49d329d1ae556f5
+#: ../../source/index.rst:58 bcd610f85dab421bb49d329d1ae556f5
 msgid ""
-"Lena originated from experimental neutrino physics and is named after a "
+"Lena was created in experimental neutrino physics and is named after a "
 "great Siberian river."
 msgstr ""
-"Lena создана при анализе данных в экспериментальной физике нейтрино и "
-"названа в честь великой сибирской реки."
+"Lena была создана при анализе данных в экспериментальной физике нейтрино "
+"и названа в честь великой сибирской реки."
 
-#: ../../source/index.rst:66 3c4625e4ed2044758959e57759d21ad9
+#: ../../source/index.rst:111 3c4625e4ed2044758959e57759d21ad9
 msgid "Installation"
 msgstr "Установка"
 
-# ## From PyPI
-#: ../../source/index.rst:69 40de0b52747a4a7690830518f5a91411
-msgid "From PyPI"
-msgstr "Из PyPI"
+#: ../../source/index.rst:114 d9635e918e344d97aa27bba1ad984ef9
+msgid "Minimal"
+msgstr "Минимальная"
 
-#: ../../source/index.rst:71 6b8a2df96e0543d5821b29e7f3cc3fd1
-msgid ""
-"Lena core modules depend only on Python standard libraries. Other Python "
-"extensions can be installed using pip:"
+#: ../../source/index.rst:116 70c5851949fd49dcb574bb14f609ddc5
+msgid "Install the latest official version from PyPI:"
+msgstr "Установите последнюю официальную версию из PyPI:"
+
+#: ../../source/index.rst:122 6b8a2df96e0543d5821b29e7f3cc3fd1
+msgid "Lena core modules have no dependencies except Python standard libraries."
 msgstr ""
-"Базовые модули Lena зависят только от стандартных библиотек Python. "
-"Другие расширения Python могут быть установлены с помощью pip:"
+"Базовые модули Lena не имеют зависимостей помимо стандартных библиотек "
+"Python."
 
-#: ../../source/index.rst:89 9c4897ae1584482ba71a44fd5e31a1d7
-msgid "From github"
-msgstr "С github"
+#: ../../source/index.rst:125 af5efb9308074b17aab58e690baa91c2
+msgid "Recommended"
+msgstr "Рекомендуемая"
 
-#: ../../source/index.rst:96 f77d9613c2b344aab2d33922ae787ed4
+#: ../../source/index.rst:131 82095d0ce0d74f4fa61ac1a56d36db8d
+msgid ""
+"*jinja2* is used to create templates for plots. Also install the "
+"following programs:"
+msgstr ""
+"*jinja2* используется для создания шаблонов графиков. Также установите "
+"следующие программы:"
+
+#: ../../source/index.rst:134 7c8c2315318640b1a8f1c797a185b14e
+msgid "*pdflatex* to produce pdf files from LaTeX,"
+msgstr "*pdflatex* для создания pdf-файлов из LaTeX,"
+
+#: ../../source/index.rst:135 d496503e3a8541b49f4827dd2e21f710
+msgid "*pgfplots* and *TikZ* to produce LaTeX plots,"
+msgstr "*pgfplots* и *TikZ* для создания графиков в LaTeX,"
+
+#: ../../source/index.rst:136 3a724f3b950e4146acb4e0d16ff6bac2
+msgid "*pdftoppm* to convert pdf files to png."
+msgstr "*pdftoppm* для преобразования pdf-файлов в png."
+
+#: ../../source/index.rst:140 d858308318c842d9b53dd94b83d01303
+msgid ""
+"These programs can be found in your OS packages. For example, in Fedora "
+"Core 29 install them with"
+msgstr ""
+"Эти программы можно найти в пакетах вашей операционной системы. Например,"
+" в Fedora Core 29 установите их с помощью"
+
+#: ../../source/index.rst:152 77c6fb6b4f8f472ab53d8b36162a2b4c
+msgid ""
+"*pdflatex* and *pgfplots* are contained in the standard `TeX Live "
+"<https://www.ctan.org/pkg/texlive>`_ distribution."
+msgstr ""
+"*pdflatex* и *pgfplots* содержатся в стандартном дистрибутиве `TeX Live "
+"<https://www.ctan.org/pkg/texlive>`_."
+
+#: ../../source/index.rst:156 6277839d220148f992a44cfc13c95493
+msgid "Full"
+msgstr "Полная"
+
+#: ../../source/index.rst:157 4be123cc1fa84c7cbf8c6904754e8326
+msgid ""
+"This installation is needed only if you want to extend and develop Lena. "
+"Download the full repository (with history) from GitHub and install all "
+"development dependencies:"
+msgstr ""
+"Эта установка требуется только если вы хотите расширять и разрабатывать "
+"Lena. Скачайте полный репозиторий (с историей) с GitHub и установите все "
+"зависимости для разработки:"
+
+#: ../../source/index.rst:172 c3cd7c5864a74d41b81d8b7ef74b40cb
+msgid ""
+"Install command line programs from the previous subsection and adjust "
+"PYTHONPATH as shown in the next subsection."
+msgstr ""
+"Установите программы из предыдущего подраздела и измените PYTHONPATH как "
+"показано в следующем подразделе."
+
+#: ../../source/index.rst:176 35d2b87d649248bb863dae986a583aa5
+msgid "GitHub or PyPI"
+msgstr "GitHub или PyPI"
+
+#: ../../source/index.rst:178 a1518007c4f444099d4ca4585e2ef031
+msgid ""
+"PyPI contains the last official release, which was tested for more Python"
+" versions. GitHub contains the most recent development code for "
+"experienced users. Usually it is well tested too, but there is a chance "
+"that a newly introduced interface can be changed."
+msgstr ""
+"PyPI содержит последний официальный релиз, который был протестирован для "
+"большего числа версий Python. GitHub содержит последний разрабатываемый "
+"код для продвинутых пользователей. Обычно он также хорошо протестирован, "
+"но есть шанс, что впервые введённый интерфейс может быть изменён."
+
+#: ../../source/index.rst:183 7ef93e720914486c934780352543527f
+msgid ""
+"For most users *pip* install should be easier. If for some reasons you "
+"can't do that, you can get an archive of an official release from GitHub "
+"`releases <https://github.com/ynikitenko/lena/releases>`_."
+msgstr ""
+"Для большинства пользователей установка из *pip* должна быть проще. Если "
+"по каким-то причинам вы не можете это сделать, вы можете получить архив "
+"официального релиза из `релизов "
+"<https://github.com/ynikitenko/lena/releases>`_ GitHub."
+
+#: ../../source/index.rst:188 50b38271bf014edc89e66d374d051a39
+msgid ""
+"*pip* installs the framework to a system directory, while to install with"
+" *git* you need to adjust the PYTHONPATH."
+msgstr ""
+"*pip* устанавливает фреймворк в системную директорию, в то время как для "
+"установки с *git* вам нужно поменять PYTHONPATH."
+
+#: ../../source/index.rst:191 f77d9613c2b344aab2d33922ae787ed4
 msgid "Add to your profile (e.g. ``.profile`` or ``.bashrc`` on Linux)"
 msgstr "Добавьте в ваш профиль (например, ``.profile`` или ``.bashrc`` в Linux)"
 
 # ##
-#: ../../source/index.rst:102 44bec88e9b854021a048efdbec6358c3
-msgid "and replace *<path-to-lena>* with the actual path to the directory *lena*."
-msgstr "и замените *<path-to-lena>* на фактический путь к директории *lena*."
-
-#: ../../source/index.rst:107 7dea9640bc68451fa2a1a90c3b607f8a
-msgid "Additional programs"
-msgstr "Дополнительные программы"
-
-#: ../../source/index.rst:109 63f0857bb283498ba3f3ba28e34fa283
-msgid "To fully use all available tools, you may need the following programs:"
-msgstr ""
-"Чтобы полностью использовать все имеющиеся инструменты, вам могут "
-"понадобиться следующие программы:"
-
-#: ../../source/index.rst:111 7c8c2315318640b1a8f1c797a185b14e
-msgid "*pdflatex* to produce pdf files from LaTeX."
-msgstr "*pdflatex* для создания pdf-файлов из LaTeX."
-
-#: ../../source/index.rst:112 d496503e3a8541b49f4827dd2e21f710
-msgid "*pgfplots* and *TikZ* to produce LaTeX plots."
-msgstr "*pgfplots* и *TikZ* для создания графиков в LaTeX."
-
-#: ../../source/index.rst:113 3a724f3b950e4146acb4e0d16ff6bac2
-msgid "*pdftoppm* to convert pdf files to png."
-msgstr "*pdftoppm* для преобразования pdf-файлов в png."
-
-# ##
-#: ../../source/index.rst:117 6146252e44c945f6afadb0b0d545df8c
+#: ../../source/index.rst:199 44bec88e9b854021a048efdbec6358c3
 msgid ""
-"They are not necessary if you don't need to make plots or if you want to "
-"use your own tools for that."
+"and replace *<path-to-lena>* with the actual path to the cloned "
+"repository."
 msgstr ""
-"Они не обязательны, если вам не требуется создавать графики или если вы "
-"хотите использовать для этого собственные инструменты."
+"и замените *<path-to-lena>* на фактический путь к клонированному "
+"репозиторию."
 
-#: ../../source/index.rst:121 b8bc6de9fe2346aaa2e2d38d36ca8ad2
+#: ../../source/index.rst:202 b8bc6de9fe2346aaa2e2d38d36ca8ad2
 msgid "Documentation"
 msgstr "Документация"
 
-#: ../../source/index.rst:122 7557d0995f574beb85e780d7e43e04c8
+#: ../../source/index.rst:203 7557d0995f574beb85e780d7e43e04c8
 msgid "To get started, read the :doc:`tutorial`."
-msgstr "В начале работы прочитайте :doc:`пособие <tutorial>`."
+msgstr "В начале работы прочтите :doc:`пособие <tutorial>`."
 
 # ## отдельные темы?
-#: ../../source/index.rst:124 3d307c8f66e84dc89af146b782399cf5
+#: ../../source/index.rst:205 3d307c8f66e84dc89af146b782399cf5
 msgid ""
 "Complete documentation on Lena classes and specific topics can be found "
 "in the :doc:`reference`."
@@ -208,22 +280,25 @@ msgstr ""
 "русский язык переведена лишь первая часть пособия, "
 "https://habr.com/ru/post/490518/"
 
-#: ../../source/index.rst:180 1bece98223cc4cf1b57606bb512ef6b2
+#: ../../source/index.rst:261 1bece98223cc4cf1b57606bb512ef6b2
 msgid "License"
 msgstr "Лицензия"
 
-#: ../../source/index.rst:181 339545f661b24d6fbee381b9f2ab8581
+#: ../../source/index.rst:263 339545f661b24d6fbee381b9f2ab8581
 msgid ""
-"Lena is free software licensed under Apache software license (version 2)."
-" You can use it freely for your data analysis, read its source code and "
-"modify it."
+"Lena is free software released under `Apache "
+"<https://github.com/ynikitenko/lena/blob/master/LICENSE>`_ software "
+"license (version 2). You can use it freely for your data analysis, read "
+"its source code and modify it."
 msgstr ""
-"Lena - это свободное программное обеспечение под лицензией Apache (версия"
-" 2). Вы можете свободно использовать её для своего анализа данных, читать её"
-" исходный код и изменять его."
+"Lena - это свободное программное обеспечение, опубликованное под "
+"лицензией `Apache "
+"<https://github.com/ynikitenko/lena/blob/master/LICENSE>`_ (версия 2). Вы"
+" можете свободно использовать её для своего анализа данных, читать её "
+"исходный код и изменять его."
 
 # ## в их = intended?
-#: ../../source/index.rst:184 bf6e386bfd204a959ebd4c48ec931e93
+#: ../../source/index.rst:268 bf6e386bfd204a959ebd4c48ec931e93
 msgid ""
 "It is intended to help people in data analysis, but we don't take "
 "responsibility if something goes wrong."
@@ -231,11 +306,11 @@ msgstr ""
 "Она предназначена помочь людям при анализе данных, но мы не несём "
 "ответственности, если что-то пойдёт не так."
 
-#: ../../source/index.rst:195 a538edb3c48c45cfa5559cc8006cf5da
+#: ../../source/index.rst:279 a538edb3c48c45cfa5559cc8006cf5da
 msgid "Alternatives"
 msgstr "Альтернативы"
 
-#: ../../source/index.rst:196 aa91bf4552034c458cca835afaabaa8f
+#: ../../source/index.rst:280 aa91bf4552034c458cca835afaabaa8f
 msgid ""
 "`Ruffus <http://www.ruffus.org.uk/index.html>`_ is a Computation Pipeline"
 " library for Python used in science and bioinformatics. It connects "
@@ -245,4 +320,42 @@ msgstr ""
 " (*computational pipeline*) для Python, используемый в науке и "
 "биоинформатике. Он объединяет компоненты программы через запись и чтение "
 "файлов."
+
+# ## From PyPI
+#~ msgid "From PyPI"
+#~ msgstr "Из PyPI"
+
+#~ msgid ""
+#~ "Lena core modules depend only on "
+#~ "Python standard libraries. Other Python "
+#~ "extensions can be installed using pip:"
+#~ msgstr ""
+#~ "Базовые модули Lena зависят только от"
+#~ " стандартных библиотек Python. Другие "
+#~ "расширения Python могут быть установлены "
+#~ "с помощью pip:"
+
+#~ msgid "From github"
+#~ msgstr "С github"
+
+#~ msgid "Additional programs"
+#~ msgstr "Дополнительные программы"
+
+#~ msgid "To fully use all available tools, you may need the following programs:"
+#~ msgstr ""
+#~ "Чтобы полностью использовать все имеющиеся "
+#~ "инструменты, вам могут понадобиться следующие"
+#~ " программы:"
+
+# ##
+#~ msgid ""
+#~ "They are not necessary if you "
+#~ "don't need to make plots or if "
+#~ "you want to use your own tools "
+#~ "for that."
+#~ msgstr ""
+#~ "Они не обязательны, если вам не "
+#~ "требуется создавать графики или если вы"
+#~ " хотите использовать для этого собственные"
+#~ " инструменты."
 
