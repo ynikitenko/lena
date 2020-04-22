@@ -18,11 +18,11 @@ class Graph(object):
     Graph points can be set during the initialization and
     during :meth:`fill`. It can be rescaled (producing a new :class:`Graph`).
     A point is a tuple of *(coordinate, value)*, where both *coordinate*
-    and *value* can be tuples of numbers. *Coordinate* corresponds
-    to a point in N-dimensional space, while *value* is some function's
-    value at this point (the function can take a value in M-dimensional
-    space). Coordinate and value dimensions
-    must be the same for all points.
+    and *value* can be tuples of numbers.
+    *Coordinate* corresponds to a point in N-dimensional space,
+    while *value* is some function's value at this point
+    (the function can take a value in M-dimensional space).
+    Coordinate and value dimensions must be the same for all points.
 
     One can get graph points as :attr:`Graph.points` attribute.
     They will be sorted each time before return
@@ -32,8 +32,12 @@ class Graph(object):
     will raise Python's :exc:`AttributeError`.
     """
 
-    def __init__(self, points=None, scale=None, sort=True, cur_context=None):
+    def __init__(self, points=None, context=None, scale=None, sort=True):
         """*points* is an array of *(coordinate, value)* tuples.
+
+        *context* is the same as the most recent context
+        during *fill*. Use it to provide a context
+        when initializing a :class:`Graph` from existing points.
 
         *scale* sets the scale of the graph.
         It is used during plotting if rescaling is needed.
@@ -49,10 +53,6 @@ class Graph(object):
         `here <http://www.grantjenks.com/docs/sortedcontainers/performance.html>`_.
         Note that a rescaled graph uses a default list.
 
-        *cur_context* is the same as the most recent context
-        during *fill*. Use it to provide a context
-        when initializing a :class:`Graph` from existing points.
-
         Note that :class:`Graph` does not reduce data.
         All filled values will be stored in it.
         To reduce data, use histograms.
@@ -61,14 +61,14 @@ class Graph(object):
         # todo: add some sanity checks for points
         self._scale = scale
         self._init_context = {"scale": scale}
-        if cur_context is None:
+        if context is None:
             self._cur_context = {}
-        elif not isinstance(cur_context, dict):
+        elif not isinstance(context, dict):
             raise lena.core.LenaTypeError(
-                "cur_context must be a dict, {} provided".format(cur_context)
+                "context must be a dict, {} provided".format(context)
             )
         else:
-            self._cur_context = cur_context
+            self._cur_context = context
         self._sort = sort
 
         # todo: probably, scale from context is not needed.
@@ -182,9 +182,10 @@ class Graph(object):
                 # make a deep copy so that new values
                 # are completely independent from old ones.
                 new_points.append((coord, self._rescale_value(rescale, val)))
-            # todo: not sort=self._sort?
+            # todo: should it inherit context?
+            # Probably yes, but watch out scale.
             new_graph = Graph(points=new_points, scale=other,
-                              sort=True)
+                              sort=self._sort)
             return new_graph
 
     def to_csv(self, separator=",", header=None):

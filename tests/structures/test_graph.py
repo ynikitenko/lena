@@ -87,18 +87,18 @@ def test_graph():
     with pytest.raises(AttributeError):
         r1.points = 1
 
-    # cur_context works
+    # context kwarg works
     context = {"data": "d1"}
-    gr1 = Graph([(0, 1)], cur_context=copy.deepcopy(context))
+    gr1 = Graph([(0, 1)], context=copy.deepcopy(context))
     gr2 = Graph()
     gr2.fill(((0, 1), copy.deepcopy(context)))
     res1 = list(gr1.request())
     res2 = list(gr2.request())
     assert res1 == res2
 
-    # cur_context must be a context, if set
+    # context must be a context, if set
     with pytest.raises(lena.core.LenaTypeError):
-        Graph([(0, 1)], cur_context=0)
+        Graph([(0, 1)], context=0)
 
     # reset works
     gr1.reset()
@@ -137,7 +137,8 @@ def test_graph_to_csv():
     # fill with a point with another dimension is prohibited
     # should be moved to another method though...
     gr2.fill((((0, 1, 2), (3, 4)), {}))
-    with pytest.raises(lena.core.LenaValueError):
+    # in python3 it raises TypeError
+    with pytest.raises((lena.core.LenaValueError, TypeError)):
         gr2.to_csv()
 
     # multidimensional to_csv works
