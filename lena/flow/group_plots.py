@@ -26,7 +26,7 @@ import lena.flow
 class GroupPlots(object):
     """Group several plots."""
 
-    def __init__(self, group_by, select, transform=(), scale_to=None,
+    def __init__(self, group_by, select, transform=(), scale=None,
                  yield_selected=False):
         """Plots to be grouped are chosen by *select*,
         which acts as a boolean function.
@@ -40,11 +40,11 @@ class GroupPlots(object):
         it is converted to that class.
         Use :class:`.GroupBy` for more options.
 
-        *scale_to* is a number or a string.
+        *scale* is a number or a string.
         A number means the scale, to which plots must be normalized.
         A string is a name of the plot to which other plots
         must be normalized.
-        If *scale_to* is not an instance of :class:`.GroupScale`,
+        If *scale* is not an instance of :class:`.GroupScale`,
         it is converted to that class.
         If a plot could not be rescaled,
         :exc:`~lena.core.LenaValueError` is raised.
@@ -53,7 +53,7 @@ class GroupPlots(object):
         *transform* is a sequence, which processes individual plots
         before yielding.
         For example, set ``transform=(ToCSV(), writer)``.
-        *transform* is called after *scale_to*.
+        *transform* is called after *scale*.
 
         *yield_selected* defines whether selected items should be
         yielded during :meth:`run` like other items (by default not).
@@ -69,11 +69,11 @@ class GroupPlots(object):
         else:
             self._group_by = lena.flow.group_by.GroupBy(group_by)
 
-        if (scale_to is None
-            or isinstance(scale_to, lena.flow.group_scale.GroupScale)):
-            self._scale_to = scale_to
+        if (scale is None
+            or isinstance(scale, lena.flow.group_scale.GroupScale)):
+            self._scale = scale
         else:
-            self._scale_to = lena.flow.group_scale.GroupScale(scale_to)
+            self._scale = lena.flow.group_scale.GroupScale(scale)
 
         if isinstance(transform, lena.core.LenaSequence):
             self._transform = transform
@@ -97,7 +97,7 @@ class GroupPlots(object):
         The resulting context is updated with the intersection
         of groups' contexts.
 
-        If *scale_to* was set, plots are normalized
+        If *scale* was set, plots are normalized
         to the given value or plot.
         If that plot was not selected (is missing in the captured group)
         or its norm could not be calculated,
@@ -131,8 +131,8 @@ class GroupPlots(object):
         groups = self._group_by.groups
         for group_name in groups:
             grp = groups[group_name]
-            if self._scale_to is not None:
-                grp = self._scale_to.scale(grp)
+            if self._scale is not None:
+                grp = self._scale.scale(grp)
             # transform group items
             grp = lena.flow.functions.seq_map(self._transform, grp)
             yield update_group_with_context(grp)

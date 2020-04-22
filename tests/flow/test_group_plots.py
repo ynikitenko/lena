@@ -50,7 +50,7 @@ def test_group_plots():
     assert_list_contents_equal(results, results2)
 
     data = [h1, h2]
-    gp_scaled = GroupPlots(type, lambda _: True, scale_to=4)
+    gp_scaled = GroupPlots(type, lambda _: True, scale=4)
     results = list(gp_scaled.run(data))
     assert results == [(
         [
@@ -79,7 +79,7 @@ def test_group_plots():
     ]
 
     # yield_selected works with scale
-    gps = GroupPlots(type, lambda _: True, scale_to=8, yield_selected=True)
+    gps = GroupPlots(type, lambda _: True, scale=8, yield_selected=True)
     results = list(gps.run(data))
     # grouped histograms are rescaled
     assert results[-1] == (
