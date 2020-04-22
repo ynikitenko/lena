@@ -5,7 +5,6 @@ Output
 .. currentmodule:: lena.output
 .. autosummary::
 
-    HistToCSV
     PDFToPNG
     ToCSV
     Writer
@@ -31,8 +30,7 @@ Output
 ------
 
 .. automodule:: lena.output
-    :exclude-members: MakeFilename, LaTeXToPDF, RenderLaTeX,
-        Template, Environment
+    :exclude-members: MakeFilename, LaTeXToPDF, RenderLaTeX
 
 LaTeX
 -----

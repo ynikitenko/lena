@@ -2,7 +2,7 @@ from lena.output.pdf_to_png import PDFToPNG
 from lena.output.latex_to_pdf import LaTeXToPDF
 from lena.output.make_filename import MakeFilename
 from lena.output.writer import Writer
-from lena.output.to_csv import ToCSV, hist1d_to_csv, hist2d_to_csv, HistToCSV
+from lena.output.to_csv import ToCSV, hist1d_to_csv, hist2d_to_csv
 
 imported = []
 try:
@@ -21,5 +21,5 @@ __all__ = [
     'MakeFilename',
     'RenderLaTeX',
     'Writer',
-    'ToCSV', 'hist1d_to_csv', 'hist2d_to_csv', 'HistToCSV'
+    'ToCSV', 'hist1d_to_csv', 'hist2d_to_csv'
 ] + imported

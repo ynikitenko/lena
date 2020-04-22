@@ -51,7 +51,7 @@ class GroupPlots(object):
 
         *transform* is a sequence, which processes individual plots
         before yielding.
-        For example, ``transform=(HistToCSV(), writer)``.
+        For example, ``transform=(ToCSV(), writer)``.
         *transform* is called after *scale_to*.
 
         *yield_selected* defines whether selected items should be
