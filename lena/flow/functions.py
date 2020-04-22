@@ -63,7 +63,7 @@ def seq_map(seq, container, one_result=True):
     This can be a list or a single value.
     If *one_result* is True, the result must be a single value.
     In this case, if results contain less than or more than one element,
-    :exc:`~lena.core.LenaValueError` is raised.
+    :exc:`.LenaValueError` is raised.
 
     The list of results (lists or single values) is returned. 
     The results are in the same order as read from the *container*.

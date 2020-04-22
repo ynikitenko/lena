@@ -24,7 +24,7 @@ class _Fill(object):
 class FillSeq(lena_sequence.LenaSequence):
     """Sequence with :meth:`fill` method.
 
-    Sequence of :class:`~lena.core.FillInto` elements,
+    Sequence of :class:`.FillInto` elements,
     each filling the following ones.
     The last element has *fill* method and is filled itself.
 
@@ -33,14 +33,14 @@ class FillSeq(lena_sequence.LenaSequence):
 
     def __init__(self, *args):
         """*args* except the last one are
-        :class:`~lena.core.FillInto` elements.
+        :class:`.FillInto` elements.
         The last argument must have a *fill* method.
 
         If any argument
-        could not be converted to :class:`~lena.core.FillInto`,
+        could not be converted to :class:`.FillInto`,
         or if the last argument has no *fill* method,
         or if an *args* is empty,
-        :exc:`~lena.core.LenaTypeError` is raised.
+        :exc:`.LenaTypeError` is raised.
         """
         self._seq = []
 

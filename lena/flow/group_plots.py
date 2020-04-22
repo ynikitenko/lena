@@ -47,7 +47,7 @@ class GroupPlots(object):
         If *scale* is not an instance of :class:`.GroupScale`,
         it is converted to that class.
         If a plot could not be rescaled,
-        :exc:`~lena.core.LenaValueError` is raised.
+        :exc:`.LenaValueError` is raised.
         For more options, use :class:`.GroupScale`.
 
         *transform* is a sequence, which processes individual plots
@@ -101,7 +101,7 @@ class GroupPlots(object):
         to the given value or plot.
         If that plot was not selected (is missing in the captured group)
         or its norm could not be calculated,
-        :exc:`~lena.core.LenaValueError` is raised.
+        :exc:`.LenaValueError` is raised.
         """
         def update_group_with_context(grp):
             # get common context

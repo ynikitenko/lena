@@ -89,7 +89,7 @@ class Cache(object):
         """Remove file with cache if that exists, pass otherwise.
 
         If cache exists and is readable, but could not be deleted,
-        :exc:`~lena.core.LenaEnvironmentError` is raised."""
+        :exc:`.LenaEnvironmentError` is raised."""
         try:
             os.remove(self._filename)
         except OSError:
@@ -117,7 +117,7 @@ class Cache(object):
     def alter_sequence(seq):
         """If the Sequence *seq* contains a :class:`Cache`,
         which has an up-to-date cache,
-        a :class:`~lena.core.Source` is built
+        a :class:`.Source` is built
         based on the flattened *seq* and returned.
         Otherwise the *seq* is returned unchanged.
         """

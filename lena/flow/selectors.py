@@ -65,7 +65,7 @@ class Selector(object):
         If it is a *tuple*, boolean *and* is applied to the results.
 
         If incorrect arguments are provided,
-        :exc:`~lena.core.LenaTypeError` is raised.
+        :exc:`.LenaTypeError` is raised.
         """
         # Callable classes are treated as classes, not callables
         if inspect.isclass(selector):

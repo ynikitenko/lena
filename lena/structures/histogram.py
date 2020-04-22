@@ -51,24 +51,24 @@ class Histogram(lena.core.FillCompute):
         each containing strictly increasing bin edges.
         If *edges*' subarrays are not increasing
         or any of them has length less than 2,
-        :exc:`~lena.core.LenaValueError` is raised.
+        :exc:`.LenaValueError` is raised.
 
         Histogram bins by default are initialized with *initial_value*.
         It can be any object,
         which supports addition of a *weight* during *fill*
         (but that is not necessary if you don't plan to fill the histogram).
         If the *initial_value* is compound and requires special copying,
-        create initial bins yourself (see :func:`~lena.structures.init_bins`).
+        create initial bins yourself (see :func:`.init_bins`).
 
         *Histogram* may be created from existing *bins* and *edges*.
         In this case a simple check of the shape of *bins* is done.
-        If that is incorrect, :exc:`~lena.core.LenaValueError` is raised.
+        If that is incorrect, :exc:`.LenaValueError` is raised.
 
         *make_bins* is a function without arguments, which creates new bins
         (it will be called during :meth:`__init__` and :meth:`reset`).
         *initial_value* in this case is ignored, but bin check is being done.
         If both *bins* and *make_bins* are provided,
-        :exc:`~lena.core.LenaTypeError` is raised.
+        :exc:`.LenaTypeError` is raised.
 
         **Attributes**
 
@@ -177,7 +177,7 @@ class Histogram(lena.core.FillCompute):
         is returned, the original histogram remains unchanged.
 
         Histograms with scale equal to zero can't be rescaled.
-        :exc:`~lena.core.LenaValueError` is raised if one tries to do that.
+        :exc:`.LenaValueError` is raised if one tries to do that.
         """
         if other is None:
             # return scale
@@ -247,7 +247,7 @@ class Histogram(lena.core.FillCompute):
         or with *make_bins* (depending on the initialization).
 
         If bins were set explicitly during the initialization,
-        :exc:`~lena.core.LenaRuntimeError` is raised.
+        :exc:`.LenaRuntimeError` is raised.
         """
         self._cur_context = {}
         if self._make_bins is not None:

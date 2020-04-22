@@ -83,7 +83,7 @@ class Call(object):
         it is checked whether *el* is callable itself.
 
         If :class:`Call` failed to instantiate with *el* and *call*,
-        :exc:`~lena.core.LenaTypeError` is raised.
+        :exc:`.LenaTypeError` is raised.
         """
         _init_callable(self, el, call)
 
@@ -109,7 +109,7 @@ class FillCompute(object):
         In this case *compute* is *request*.
 
         If callable methods *fill* and *compute* or *request*
-        were not found, :exc:`~lena.core.LenaTypeError` is raised.
+        were not found, :exc:`.LenaTypeError` is raised.
         """
         fill_method = getattr(el, fill, None)
         compute_method = getattr(el, compute, None)
@@ -153,7 +153,7 @@ class FillInto(object):
         then *fill_into* method is searched, then *__call__*,
         then *run*.
         If none of them is found and callable,
-        :exc:`~lena.core.LenaTypeError` is raised.
+        :exc:`.LenaTypeError` is raised.
 
         Note that callable elements and elements with *fill_into* method
         have different interface.
@@ -244,11 +244,11 @@ class FillRequest(object):
         :attr:`bufsize` is the maximum size of subslices during *run*.
 
         *bufsize* must be a natural number,
-        otherwise :exc:`~lena.core.LenaValueError` is raised.
+        otherwise :exc:`.LenaValueError` is raised.
         If callable *fill* and *request* methods were not found,
         or *FillRequest* could not be derived from *FillCompute*,
         or if *reset* is ``True``, but *el* has no method *reset*,
-        :exc:`~lena.core.LenaTypeError` is raised.
+        :exc:`.LenaTypeError` is raised.
         """
         fill = getattr(el, fill, None)
         request = getattr(el, request, None)
@@ -390,10 +390,10 @@ class Run(object):
         *Run(None, run=<my_function>)*.
 
         If the initialization failed,
-        :exc:`~lena.core.LenaTypeError` is raised.
+        :exc:`.LenaTypeError` is raised.
 
         :class:`Run` is used implicitly during the initialization
-        of :class:`~lena.core.Sequence`.
+        of :class:`.Sequence`.
         """
         if run is _SENTINEL:
             # no explicit method name given
@@ -466,7 +466,7 @@ class SourceEl(object):
         it is checked whether *el* is callable itself.
 
         If :class:`SourceEl` failed to instantiate with *el* and *call*,
-        :exc:`~lena.core.LenaTypeError` is raised.
+        :exc:`.LenaTypeError` is raised.
         """
         _init_callable(self, el, call)
 

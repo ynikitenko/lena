@@ -27,17 +27,17 @@ class FillRequestSeq(lena_sequence.LenaSequence):
         only the first one is chosen
         (the subsequent ones are used as simple *Run* elements).
         To change that, explicitly cast the first element
-        to :class:`~lena.core.FillInto`.
+        to :class:`.FillInto`.
 
         *kwargs* can contain *bufsize*, which is used during *run*.
         See :class:`FillRequest` for more information on *run*.
         By default *bufsize* is *1*. Other *kwargs* raise 
-        :exc:`~lena.core.LenaTypeError`.
+        :exc:`.LenaTypeError`.
 
         If *FillRequest* element was not found,
         or if the sequences before or after that
         could not be correctly initialized,
-        :exc:`~lena.core.LenaTypeError` is raised.
+        :exc:`.LenaTypeError` is raised.
         """
         # *args* can consist of one tuple, which in that case is expanded.
         if "bufsize" in kwargs:

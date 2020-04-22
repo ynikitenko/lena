@@ -90,7 +90,7 @@ class RenderLaTeX(object):
         a value from the flow and return template name.
         If *select_template* is an empty string (default)
         and no template could be found in the context,
-        :exc:`~lena.core.LenaRuntimeError` is raised.
+        :exc:`.LenaRuntimeError` is raised.
 
         *template_path* is the path for templates
         (used in jinja2.FileSystemLoader).

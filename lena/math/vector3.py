@@ -105,7 +105,7 @@ class vector3(object):
 
         Comparisons like '>', '<=' are all prohibited:
         if one tries to use these operators,
-        :exc:`~lena.core.LenaTypeError` is raised.
+        :exc:`.LenaTypeError` is raised.
 
         **Truth testing**
 

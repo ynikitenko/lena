@@ -66,7 +66,7 @@ class Split(object):
     def __init__(self, seqs, bufsize=1000, copy_buf=True):
         """*seqs* must be a list of Sequence, Source, FillComputeSeq
         or FillRequestSeq sequences
-        (any other container will raise :exc:`~lena.core.LenaTypeError`).
+        (any other container will raise :exc:`.LenaTypeError`).
         If *seqs* is empty, *Split* acts as an empty *Sequence* and
         yields all values it receives.
 
@@ -74,7 +74,7 @@ class Split(object):
         If *bufsize* is ``None``,
         whole input flow is materialized in the buffer.
         *bufsize* must be a natural number or ``None``,
-        otherwise :exc:`~lena.core.LenaValueError` is raised.
+        otherwise :exc:`.LenaValueError` is raised.
 
         *copy_buf* sets whether the buffer should be copied during *run*.
         This is important if different sequences can change input data
@@ -144,8 +144,8 @@ class Split(object):
         After its flow is empty, next sequence is called, etc.
 
         This method is available only if each self sequence is a
-        :class:`~lena.core.Source`,
-        otherwise :exc:`~lena.core.LenaAttributeError` is raised during the execution.
+        :class:`.Source`,
+        otherwise :exc:`.LenaAttributeError` is raised during the execution.
         """
         if self._n_seq_types != 1 or not ct.is_source(self._sequences[0]):
             raise exceptions.LenaAttributeError(

@@ -13,7 +13,7 @@ class GroupScale(object):
     def __init__(self, scale_to, allow_zero_scale=False, allow_unknown_scale=False):
         """*scale_to* defines the method of scaling.
         If a number is given, group items are scaled to that.
-        Otherwise it is converted to a :class:`~lena.flow.Selector`,
+        Otherwise it is converted to a :class:`.Selector`,
         which must return a unique item from the group.
         Group items will be scaled to the scale of that item.
 
@@ -42,7 +42,7 @@ class GroupScale(object):
 
         If any item could not be rescaled and
         options were not set to ignore that,
-        :exc:`~lena.core.LenaValueError` is raised.
+        :exc:`.LenaValueError` is raised.
         """
         # get scale to be used
         if isinstance(self._scale_to, numbers.Number):

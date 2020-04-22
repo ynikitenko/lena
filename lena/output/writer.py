@@ -24,7 +24,7 @@ class Writer(object):
         (rewritten for every new value)
         (unless different extensions are provided through the context).
         It is recommended to create filename explicitly using
-        :class:`~lena.output.MakeFilename`.
+        :class:`.MakeFilename`.
         The default writer's output file can be useful in case of errors,
         when explicit file name didn't work.
         """
@@ -92,7 +92,7 @@ class Writer(object):
         and *filepath* is the complete path.
 
         If context.output.filename is present, but empty,
-        :exc:`~lena.core.LenaRuntimeError` is raised.
+        :exc:`.LenaRuntimeError` is raised.
         """
         def should_be_written(data, context):
             if ("output" not in context

@@ -42,7 +42,7 @@ def md_map(f, array):
     *Array* must be a list of (possibly nested) lists.
     Its contents remain unchanged.
     Returned array has same dimensions as the initial one.
-    If *array* is not a list, :exc:`~lena.core.LenaTypeError`
+    If *array* is not a list, :exc:`.LenaTypeError`
     is raised.
 
     >>> from lena.math import md_map

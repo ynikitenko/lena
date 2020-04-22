@@ -88,7 +88,7 @@ class TransformIf(object):
     and different flows should be transformed
     to common data types (like Histograms) before merging.
     In some cases, however, there emerge values of very different types
-    (like in :class:`~lena.flow.SplitIntoBins`),
+    (like in :class:`.SplitIntoBins`),
     and this class may be useful.
     Todo: probably it should be structure-transparent
     (that is work for histogram content directly)
@@ -99,10 +99,10 @@ class TransformIf(object):
     """
 
     def __init__(self, select, seq):
-        """*select* is converted to :class:`~lena.flow.Selector`.
+        """*select* is converted to :class:`.Selector`.
         See its specifications for available options.
 
-        *seq* is converted to :class:`~lena.core.Sequence`.
+        *seq* is converted to :class:`.Sequence`.
         """
         if isinstance(select, lena.flow.Selector):
             self._select = select

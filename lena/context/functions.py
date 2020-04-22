@@ -14,7 +14,7 @@ def check_context_str(d, s):
     True if *d* contains a subdictionary, which is represented by *s*.
     Dots in *s* signify nesting.
     *s* must have at least two dot-separated parts,
-    otherwise :exc:`~lena.core.LenaValueError` is raised.
+    otherwise :exc:`.LenaValueError` is raised.
 
     See also :func:`str_to_dict`.
     """
@@ -173,7 +173,7 @@ def get_recursively(d, keys, default=_sentinel):
     (it represents nested dictionaries).
     If any of them is not found, *default* is returned
     if "default" is given,
-    otherwise :exc:`~lena.core.LenaKeyError` is raised.
+    otherwise :exc:`.LenaKeyError` is raised.
 
     If *keys* is empty, *d* is returned.
 
@@ -192,9 +192,9 @@ def get_recursively(d, keys, default=_sentinel):
         because it allows more flexibility.
 
     If *d* is not a dictionary or if *keys* have unknown types,
-    :exc:`~lena.core.LenaTypeError` is raised.
+    :exc:`.LenaTypeError` is raised.
     If *keys* is a dictionary with more than one key at some level,
-    :exc:`~lena.core.LenaValueError` is raised.
+    :exc:`.LenaValueError` is raised.
     """
     has_default = default is not _sentinel
     if not isinstance(d, dict):
@@ -290,7 +290,7 @@ def intersection(*dicts, **kwargs):
 
     If any of *dicts* is not a dictionary
     or if some *kwargs* are unknown,
-    :exc:`~lena.core.LenaTypeError` is raised.
+    :exc:`.LenaTypeError` is raised.
     """
     if not all([isinstance(d, dict) for d in dicts]):
         raise lena.core.LenaTypeError(
@@ -379,7 +379,7 @@ def str_to_dict(s):
 
     Dots represent nested dictionaries.
     *s*, if not empty, must have at least two dot-separated parts
-    (*a.b*), otherwise :exc:`~lena.core.LenaValueError` is raised.
+    (*a.b*), otherwise :exc:`.LenaValueError` is raised.
 
     If *s* is empty, an empty dictionary is returned.
     *s* can be a dictionary. In this case it is returned as it is.
@@ -448,7 +448,7 @@ def update_nested(d, other):
 
     If *d[key]* is not a dictionary
     or if there is not one key in *other*,
-    :exc:`~lena.core.LenaValueError` is raised.
+    :exc:`.LenaValueError` is raised.
     """
     if not isinstance(other, dict) or len(other) != 1:
         raise lena.core.LenaValueError(
@@ -499,7 +499,7 @@ def update_recursively(d, other):
     True
 
     Both *d* and *other* must be dictionaries,
-    otherwise :exc:`~lena.core.LenaTypeError` is raised.
+    otherwise :exc:`.LenaTypeError` is raised.
     """
     if isinstance(other, str):
         other = str_to_dict(other)

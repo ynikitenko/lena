@@ -42,7 +42,7 @@ class Mean(object):
 
         If no values were filled (count is zero),
         mean can't be calculated and
-        :exc:`~lena.core.LenaZeroDivisionError` is raised.
+        :exc:`.LenaZeroDivisionError` is raised.
         This can be changed to yielding nothing
         if *pass_on_empty* was initialized to True.
         """

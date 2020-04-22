@@ -109,7 +109,7 @@ def get_example_bin(struct):
 
     For example, if the histogram is two-dimensional, return hist[0][0].
 
-    *struct* can be a :class:`~lena.structures.Histogram`
+    *struct* can be a :class:`.Histogram`
     or an array of bins.
     """
     if isinstance(struct, lena.structures.Histogram):
@@ -132,13 +132,12 @@ class TransformBins(object):
         It is passed parameters *(edges, var_context)*,
         where *var_context* is Variable context containing
         variable names (it can be a single
-        :class:`~lena.variable.Variable`
-        or :class:`~lena.variable.Combine`).
+        :class:`.Variable` or :class:`.Combine`).
         
         By default, it is :func:`cell_to_string`.
 
         If *create_edges_str* is not callable,
-        :exc:`~lena.core.LenaTypeError` is raised.
+        :exc:`.LenaTypeError` is raised.
         """
         if create_edges_str is None:
             # default
@@ -203,17 +202,17 @@ class ReduceBinContent(object):
     def __init__(self, select, transform, drop_bins_context=True):
         """*Select* determines which types should be transformed.
         The types must be given in a ``list`` (not a tuple)
-        or as a general :class:`Selector`.
+        or as a general :class:`.Selector`.
         Example: ``select=[lena.math.vector3, list]``.
 
         *transform* is a *Sequence* or element applied to bin contents.
-        If *transform* is not a :class:`~lena.core.Sequence`
+        If *transform* is not a :class:`.Sequence`
         or an element with *run* method, it is converted to a 
-        :class:`~lena.core.Sequence`.
+        :class:`.Sequence`.
         Example: ``transform=Split([X(), Y(), Z()])``
         (provided that you have X, Y, Z variables).
 
-        :class:`ReduceBinContent` creates histograms,
+        :class:`.ReduceBinContent` creates histograms,
         which may be plotted, that is bins contain only data
         without context.
         By default, context of all bins except one is not used.
@@ -221,7 +220,7 @@ class ReduceBinContent(object):
         bin context is added to context.
 
         In case of wrong arguments,
-        :exc:`~lena.core.LenaTypeError` is raised.
+        :exc:`.LenaTypeError` is raised.
         """
         if not isinstance(select, lena.flow.Selector):
             try:
@@ -304,7 +303,7 @@ class SplitIntoBins(lena.core.FillCompute):
     """Split analysis into bins."""
 
     def __init__(self, seq, arg_func, edges, transform=None):
-        """*seq* is a :class:`~lena.core.FillComputeSeq` sequence,
+        """*seq* is a :class:`.FillComputeSeq` sequence,
         which corresponds to the analysis being compared
         for different bins.
         It can be a tuple containing a *FillCompute* element.
@@ -312,7 +311,7 @@ class SplitIntoBins(lena.core.FillCompute):
 
         *arg_func* is a function which takes data
         and returns argument value used to compute the bin index.
-        A :class:`~lena.variables.variable.Variable` must be provided.
+        A :class:`.Variable` must be provided.
         Example of a two-dimensional function:
         ``arg_func = lena.variables.Variable("xy",
         lambda event: (event.x, event.y))``.
@@ -321,21 +320,21 @@ class SplitIntoBins(lena.core.FillCompute):
         monotonically increasing bin edges along each dimension.
         Example: ``edges = lena.math.mesh((0, 1), 10)``.
 
-        *transform* is a :class:`~lena.core.Sequence`,
+        *transform* is a :class:`.Sequence`,
         which is applied to results.
         The final histogram may contain vectors, histograms and
         any other data the analysis produced. To be able to plot them,
         *transform* can extract vector components or do other work
         to simplify structures.
-        By default, *transform* is :class:`TransformBins`. 
+        By default, *transform* is :class:`.TransformBins`. 
         Pass an empty tuple to disable it.
 
         **Attributes**: bins, edges.
 
         If *edges* are not increasing,
-        :exc:`~lena.core.exceptions.LenaValueError` is raised.
+        :exc:`.exceptions.LenaValueError` is raised.
         In case of other argument initialization problems, 
-        :exc:`~lena.core.exceptions.LenaTypeError` is raised.
+        :exc:`.exceptions.LenaTypeError` is raised.
         """
         if not isinstance(seq, lena.core.FillComputeSeq):
             try:
@@ -397,12 +396,12 @@ class SplitIntoBins(lena.core.FillCompute):
     def compute(self):
         """Yield a *(Histogram, context)* for *compute()* for each bin.
 
-        :class:`~lena.structures.Histogram`
+        :class:`.Histogram`
         is created from :attr:`edges`
         and bins taken from compute() for :attr:`bins`.
         Context is preserved in histogram bins.
 
-        :class:`SplitIntoBins` context is added
+        :class:`.SplitIntoBins` context is added
         to *context.split_into_bins* as *histogram* 
         (corresponding to *edges*) and *variable*
         (corresponding to *arg_func*) subcontexts.

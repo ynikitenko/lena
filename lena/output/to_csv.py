@@ -77,9 +77,9 @@ class ToCSV(object):
     """Convert data to CSV text.
 
     These objects are converted:
-        * :class:`~lena.structures.Histogram`
+        * :class:`.Histogram`
           (implemented only for 1- and 2-dimensional histograms).
-        * any object (including :class:`~lena.structures.Graph`)
+        * any object (including :class:`.Graph`)
           with *to_csv* method.
     """
 

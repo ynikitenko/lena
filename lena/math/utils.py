@@ -21,9 +21,9 @@ def clip(a, interval):
     0.5
 
     If *a_min* > *a_max* or if *interval* has length more than 2,
-    :exc:`~lena.core.LenaValueError` is raised.
+    :exc:`.LenaValueError` is raised.
     If *interval* is not a container,
-    :exc:`~lena.core.LenaTypeError` is raised.
+    :exc:`.LenaTypeError` is raised.
     """
     # Inspired by
     # https://docs.scipy.org/doc/numpy/reference/generated/numpy.clip.html
@@ -68,7 +68,7 @@ def isclose(a, b, rel_tol=1e-09, abs_tol=0.0):
     *a* and *b* must be either numbers
     or lists/tuples of same dimensions (may be nested),
     or have a method *isclose*.
-    Otherwise :exc:`~lena.core.LenaTypeError` is raised.
+    Otherwise :exc:`.LenaTypeError` is raised.
     For containers, *isclose* is called elementwise.
     If every corresponding element is close, the containers are close.
     Dimensions are not checked to be equal.

@@ -89,11 +89,11 @@ class Variable(object):
         can be accessed using dot notation
         (for example, *var.var_context["latex_name"]*
         can be simply *var.latex_name*).
-        :exc:`~lena.core.AttributeError` is raised
+        :exc:`.AttributeError` is raised
         if the attribute is missing.
 
         If *getter* is a :class:`Variable` or is not callable,
-        :exc:`~lena.core.LenaTypeError` is raised.
+        :exc:`.LenaTypeError` is raised.
         """
         self.name = name
         if isinstance(getter, Variable):
@@ -255,12 +255,12 @@ class Compose(Variable):
         In this case, all variables must have this attribute,
         and the callable is applied to the list of these attributes.
         If any attribute is missing,
-        :exc:`~lena.core.LenaAttributeError` is raised.
+        :exc:`.LenaAttributeError` is raised.
         This can be used to create composed attributes
         other than *latex_name*.
 
         If there are no variables or if *kwargs* contain *getter*,
-        :exc:`~lena.core.LenaTypeError` is raised.
+        :exc:`.LenaTypeError` is raised.
         """
         if not all(isinstance(arg, Variable) for arg in args):
             raise lena.core.LenaTypeError(

@@ -210,8 +210,8 @@ def get_bin_on_value(arg, edges):
 
 
 def hist_to_graph(hist, context, make_graph_value=None, bin_coord="left"):
-    """Convert a :class:`~lena.structures.Histogram` *hist*
-    to a :class:`~lena.structures.Graph`.
+    """Convert a :class:`.Histogram` *hist*
+    to a :class:`.Graph`.
 
     *context* becomes graph's context.
     For example, it can contain a scale.

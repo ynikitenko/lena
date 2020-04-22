@@ -21,7 +21,7 @@ class GroupBy(object):
         a subcontext (see :func:`.get_recursively`).
 
         If *group_by* is not a callable or a string,
-        :exc:`~lena.core.LenaTypeError` is raised.
+        :exc:`.LenaTypeError` is raised.
         """
         self.groups = dict()
         if callable(group_by):

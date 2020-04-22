@@ -143,7 +143,7 @@ class Graph(object):
         this may be its integral passed via context during :meth:`fill`.
         Once the scale is set, it is stored in the graph.
         If one attempts to use scale which was not set,
-        :exc:`~lena.core.LenaAttributeError` is raised.
+        :exc:`.LenaAttributeError` is raised.
 
         If *other* is None, return the scale.
 
@@ -154,7 +154,7 @@ class Graph(object):
         and new graph *sort* parameter will be True.
 
         Graphs with scale equal to zero can't be rescaled. 
-        Attempts to do that raise :exc:`~lena.core.LenaValueError`.
+        Attempts to do that raise :exc:`.LenaValueError`.
         """
         if other is None:
             # return scale
@@ -201,7 +201,7 @@ class Graph(object):
         (separated by *separator*), than each part of its value.
 
         To convert :class:`Graph` to CSV inside a Lena sequence,
-        use :class:`~lena.output.ToCSV`.
+        use :class:`lena.output.ToCSV`.
         """
         if self._sort:
             self._update()
