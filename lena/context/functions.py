@@ -50,6 +50,115 @@ def difference(d1, d2):
     return result
 
 
+def format_context(format_str, *args, **kwargs):
+    """Create a function that formats a given string using a context.
+
+    *format_str* is an ordinary Python format string.
+    *args* are positional and *kwargs* are keyword arguments.
+
+    When calling *format_context*, arguments are bound and
+    a new function is returned. When called with a context,
+    its keys are extracted and formatted in *format_str*.
+
+    Positional arguments in the *format_str* correspond to 
+    *args*, which must be keys in the context. 
+    Keys used as positional arguments may be nested
+    using a dot (e.g. format_context("{}", "x.y")).
+
+    Keyword arguments *kwargs* connect
+    arguments between *format_str* and context.
+    Example:
+
+    >>> f = format_context("{y}", y="x.y")
+    >>> f({"x": {"y": 10}})
+    '10'
+
+    All keywords in the *format_str* must have corresponding *kwargs*. 
+
+    Keyword and positional arguments can be mixed. Example:
+
+    >>> f = format_context("{}_{x}_{y}", "x", x="x", y="y")
+    >>> f({"x": 1, "y": 2})
+    '1_1_2'
+    >>>
+
+    If no *args* or *kwargs* are given, *kwargs* are extracted 
+    from *format_str*. It must contain all non-empty replacement fields,
+    and only simplest formatting without attribute lookup.
+    Example:
+
+    >>> f = format_context("{x}")
+    >>> f({"x": 10})
+    '10'
+
+    If *format_str* is not a string, :exc:`LenaTypeError` is raised.
+    All other errors are raised only during formatting.
+    If context doesn't contain the needed key,
+    :exc:`LenaKeyError` is raised.
+    Note that string formatting can also raise
+    a :exc:`KeyError` or an :exc:`IndexError`,
+    so it is recommended to test your formatters before using them.
+    """
+    if not isinstance(format_str, str):
+        raise lena.core.LenaTypeError(
+            "format_str must be a string, {} given".format(format_str)
+        )
+    if not args and not kwargs:
+        new_str = []
+        new_args = []
+        prev_char = ''
+        ind = 0
+        within_field = False
+        while ind < len(format_str):
+            c = format_str[ind]
+            if c != '{' and not within_field:
+                prev_char = c
+                new_str.append(c)
+                ind += 1
+                continue
+            while c == '{' and ind < len(format_str):
+                new_str.append(c)
+                if prev_char == '{':
+                    prev_char = ''
+                    within_field = False
+                else:
+                    prev_char = c
+                    within_field = True
+                ind += 1
+                c = format_str[ind]
+            if within_field:
+                new_arg = []
+                while ind < len(format_str):
+                    if c in '}!:':
+                        prev_char = c
+                        within_field = False
+                        new_args.append(''.join(new_arg))
+                        break
+                    new_arg.append(c)
+                    ind += 1
+                    c = format_str[ind]
+        format_str = ''.join(new_str)
+        args = new_args
+    def _format_context(context):
+        new_args = []
+        for arg in args:
+            new_args.append(lena.context.get_recursively(context, arg))
+        new_kwargs = {}
+        for key in kwargs:
+            new_kwargs[key] = lena.context.get_recursively(context, kwargs[key])
+        try:
+            s = format_str.format(*new_args, **new_kwargs)
+        except KeyError:
+            raise lena.core.LenaKeyError(
+                "keyword arguments of {} not found in kwargs {}".format(
+                    format_str, new_kwargs
+                )
+            )
+        else:
+            return s
+    return _format_context
+
+
 _sentinel = object()
 
 

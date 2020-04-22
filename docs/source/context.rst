@@ -14,6 +14,7 @@ Context
 .. autosummary::
 
     difference
+    format_context
     get_recursively
     intersection
     str_to_dict
@@ -51,6 +52,7 @@ Functions
 .. currentmodule:: lena.context.functions
 
 .. autofunction:: difference
+.. autofunction:: format_context
 .. autofunction:: get_recursively
 .. autofunction:: intersection
 .. autofunction:: str_to_dict

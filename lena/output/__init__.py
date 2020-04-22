@@ -1,6 +1,6 @@
 from lena.output.pdf_to_png import PDFToPNG
 from lena.output.latex_to_pdf import LaTeXToPDF
-from lena.output.make_filename import format_context, MakeFilename
+from lena.output.make_filename import MakeFilename
 from lena.output.writer import Writer
 from lena.output.to_csv import ToCSV, hist1d_to_csv, hist2d_to_csv, HistToCSV
 
@@ -18,7 +18,7 @@ else:
 __all__ = [
     'PDFToPNG',
     'LaTeXToPDF',
-    'format_context', 'MakeFilename',
+    'MakeFilename',
     'RenderLaTeX',
     'Writer',
     'ToCSV', 'hist1d_to_csv', 'hist2d_to_csv', 'HistToCSV'

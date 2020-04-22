@@ -25,14 +25,13 @@ Output
 .. currentmodule:: lena.output.make_filename
 .. autosummary::
 
-    format_context
     MakeFilename
 
 Output
 ------
 
 .. automodule:: lena.output
-    :exclude-members: MakeFilename, format_context, LaTeXToPDF, RenderLaTeX,
+    :exclude-members: MakeFilename, LaTeXToPDF, RenderLaTeX,
         Template, Environment
 
 LaTeX

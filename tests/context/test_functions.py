@@ -6,10 +6,20 @@ import lena
 import lena.core
 import lena.context.functions as lf
 from lena.context import (
-    difference, get_recursively,
+    difference, format_context, get_recursively,
     iterate_update, update_recursively, update_nested,
     intersection,
 )
+
+
+def test_check_context_str():
+    d = {'a': {'b': 'c d'}}
+    # wrong length
+    with pytest.raises(lena.core.LenaValueError):
+        lena.context.check_context_str(d, "a")
+    assert lena.context.check_context_str(d, "a.b.c d")
+    assert lena.context.check_context_str(d, "b.c") is False
+    assert lena.context.check_context_str(d, "a.b")
 
 
 def test_difference():
@@ -21,14 +31,83 @@ def test_difference():
     assert difference(d1, d2) == {'e': 'f'}
 
 
-def test_check_context_str():
-    d = {'a': {'b': 'c d'}}
-    # wrong length
-    with pytest.raises(lena.core.LenaValueError):
-        lena.context.check_context_str(d, "a")
-    assert lena.context.check_context_str(d, "a.b.c d")
-    assert lena.context.check_context_str(d, "b.c") is False
-    assert lena.context.check_context_str(d, "a.b")
+def test_format_context():
+    """Note that formatting errors may be very tricky to understand.
+
+    >>> "{}".format(x=1) # doctest: +IGNORE_EXCEPTION_DETAIL
+    Traceback (most recent call last):
+      File "<stdin>", line 1, in <module>
+    IndexError: tuple index out of range
+    >>> "{}{}".format(1) # doctest: +IGNORE_EXCEPTION_DETAIL
+    Traceback (most recent call last):
+      File "<stdin>", line 1, in <module>
+    IndexError: tuple index out of range
+    >>> "{y}_{x}".format(1, 2)
+    Traceback (most recent call last):
+      File "<stdin>", line 1, in <module>
+    KeyError: 'y'
+    """
+    ## single format_str works
+    f = format_context("{x}")
+    assert f({"x": 10}) == "10"
+    f = format_context("{x.y}")
+    assert f({"x": {"y": 10}}) == "10"
+    # special string doesn't work with keyword arguments
+    f = format_context("{}_{x.y}", "x.y")
+    with pytest.raises(lena.core.LenaKeyError):
+        f({"x": {"y": 10}})
+    ## special formatting works
+    f = format_context("{x!r}")
+    assert f({"x": 10}) == "10"
+    f = format_context("{x:*^4}")
+    assert f({"x": 10}) == "*10*"
+    # fancy braces work
+    f = format_context("{{{x}}}")
+    assert f({"x": 10}) == "{10}"
+
+    ## positional arguments work
+    f = format_context("{}", "x")
+    assert f({"x": 1}) == "1"
+    f = format_context("{}_{}", "x", "y")
+    with pytest.raises(lena.core.LenaKeyError):
+        # "y" not found in context
+        f({"x": 1})
+    assert f({"x": 1, "y": 2}) == "1_2"
+    # redundant arguments don't play a role
+    assert f({"x": 1, "y": 2, "z": 3}) == "1_2"
+    # missing key raises
+    f = format_context("{}", "x")
+    with pytest.raises(lena.core.LenaKeyError):
+        f({"u": 1})
+    f = format_context("{x}", "x")
+    with pytest.raises(lena.core.LenaKeyError):
+        f({"u": 1})
+
+    ## keyword arguments
+    f = format_context("{x}", x="u")
+    assert f({"u": 1}) == "1"
+    # nested keys in keyword arguments
+    f = format_context("{y}", y="x.y")
+    assert f({"x": {"y": 10}}) == "10"
+    assert format_context("{y}_{x}", x="y", y="x")({"x": 1, "y": 2}) == "1_2"
+    with pytest.raises(lena.core.LenaKeyError):
+        # keyword arguments in format string must be keywords in arguments
+        assert format_context("{y}_{x}", "x", "y")({"x": 2, "y": 2}) == "1_2"
+
+    ## mix of keyword and positional arguments
+    f = format_context("{}_{x}_{y}", "x", x="x", y="y")
+    assert f({"x": 1, "y": 2}) == "1_1_2"
+
+    # nested keys in positional arguments
+    f = format_context("{}", "x.y")
+    assert f({"x": {"y": 10}}) == "10"
+    # error
+    # f = format_context("{x.y}", {"x.y": "x.y"})
+    # assert f({"x": {"y": 10}}) == "10"
+
+    # simple string works!
+    f = format_context("a_string")
+    assert f({"x": 1}) == "a_string"
 
 
 def test_get_recursively():
