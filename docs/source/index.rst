@@ -178,16 +178,15 @@ GitHub or PyPI
 PyPI contains the last official release, which was tested for more Python versions.
 GitHub contains the most recent development code for experienced users.
 Usually it is well tested too,
-but there is a chance that a newly introduced interface can be changed.
+but there is a chance that a newly introduced interface will be changed.
 
 For most users *pip* install should be easier.
 If for some reasons you can't do that, you can get an archive
 of an official release
 from GitHub `releases <https://github.com/ynikitenko/lena/releases>`_.
 
-*pip* installs the framework to a system directory, while to install with *git*
-you need to adjust the PYTHONPATH.
-
+*pip* installs the framework into a system directory, while to install with *git*
+you need to adjust the PYTHONPATH.  
 Add to your profile (e.g. ``.profile`` or ``.bashrc`` on Linux)
 
 .. .bashrc is for non-interactive shells, which are used with 'ssh command'.
@@ -202,9 +201,9 @@ Documentation
 -------------
 To get started, read the :doc:`tutorial`.
 
-Complete documentation on Lena classes and specific topics can be found in the :doc:`reference`.
+Complete documentation for Lena modules can be found in the :doc:`reference`.
 
-..
+.. and specific topics
     For general questions, see :doc:`Questions & Answers <questions_and_answers>`.
 
 ..

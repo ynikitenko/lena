@@ -12,11 +12,13 @@ class UpdateContext():
     def __init__(self, subcontext, update, recursively=True):
         """*subcontext* is a string representing the part of context
         to be updated (for example, *output.plot*).
-        If *subcontext* is an empty string,
-        all context will be overwritten.
+        *subcontext* must be non-empty.
 
-        *update* is a dictionary that will become
-        the value of *subcontext*.
+        *update* will become the value of *subcontext*.
+        If it is a string, *update* can contain arguments
+        to be got from context (for example: "{variable.name}").
+        In this case the result is always a string.
+        For formatting details see :func:`.format_context`.
 
         If *recursively* is ``True`` (default), not overwritten
         existing values of *subcontext* are preserved.
@@ -30,27 +32,29 @@ class UpdateContext():
         >>> make_scatter = UpdateContext("output.plot", {"scatter": True})
         >>> # use it in a sequence
 
-        The context in the class name means any general context
+        The "Context" in the class name means any general context
         (not only :class:`.Context`).
 
-        In case of wrong types of *subcontext* or *update*
-        :exc:`.LenaTypeError` is raised.
+        If *subcontext* is not a string, :exc:`.LenaTypeError` is raised.
+        If it is empty, :exc:`.LenaValueError` is raised.
         """
         # subcontext is a string, because it must have at most one value
         # at each nesting level.
-        # todo. update may be made a string in the future.
-        # todo. also, subcontext may be done a format string "{variable.name}",
-        # but this is not implemented (think about it in the future).
+        # todo. subcontext might be also created as a format string
+        # "{variable.name}", (think about it in the future).
         if not isinstance(subcontext, str):
             raise lena.core.LenaTypeError(
                 "subcontext must be a string, {} provided".format(subcontext)
             )
-        if not isinstance(update, dict):
-            raise lena.core.LenaTypeError(
-                "update must be a dict, {} provided".format(update)
+        if not subcontext:
+            raise lena.core.LenaValueError(
+                "subcontext must be non-empty"
             )
         self._subcontext = lena.context.str_to_list(subcontext)
-        self._update = update
+        if isinstance(update, str):
+            self._update = lena.context.format_context(update)
+        else:
+            self._update = update
         self._recursively = bool(recursively)
 
     def __call__(self, value):
@@ -60,18 +64,14 @@ class UpdateContext():
         If the *value* contains no context, it is also created.
         """
         data, context = lena.flow.get_data_context(value)
-        if self._subcontext == []:
-            # overwrite all context. This may be undesirable,
-            # but better than throwing an error
-            # in the middle of calculations.
-            # Context is not so much important.
-            # Overwrite all context, for uniformity with other cases.
-            if self._recursively:
-                lena.context.update_recursively(context, self._update)
-            else:
-                context.clear()
-                context.update(copy.deepcopy(self._update))
-            return (data, context)
+        if callable(self._update):
+            # it is always a string, which is immutable
+            update = self._update(context)
+        else:
+            update = copy.deepcopy(self._update)
+        # now empty context is prohibited.
+        # May be skipped in runtime in the future.
+        assert self._subcontext
         keys = self._subcontext
         subdict = context
         for key in keys[:-1]:
@@ -79,7 +79,7 @@ class UpdateContext():
                 subdict[key] = {}
             subdict = subdict[key]
         if self._recursively:
-            lena.context.update_recursively(subdict, {keys[-1]: self._update})
+            lena.context.update_recursively(subdict, {keys[-1]: update})
         else:
-            subdict[keys[-1]] = self._update
+            subdict[keys[-1]] = update
         return (data, context)

@@ -9,20 +9,33 @@ def test_update_context():
     data = (0, {"data": "yes"})
     orig_data = copy.deepcopy(data)
 
-    # empty subcontext overwrites all context
-    uc1 = UpdateContext("", {}, recursively=False)
-    assert uc1(data) == (0, {})
-    assert data == (0, {})
-    data = orig_data
-    # update all context recursively preserves existing data
-    uc12 = UpdateContext("", {"new_data": "no"})
-    assert uc12(copy.deepcopy(data)) == (0, {"data": "yes", "new_data": "no"})
+    # empty subcontext is difficult. If encountered runtime, it should be probably skipped.
+    ## and don't do 100% tests of developed or new classes...
+    # # empty subcontext overwrites all context
+    # uc1 = UpdateContext("", {}, recursively=False)
+    # assert uc1(data) == (0, {})
+    # assert data == (0, {})
+    # data = orig_data
+    # # update all context recursively preserves existing data
+    # uc12 = UpdateContext("", {"new_data": "no"})
+    # assert uc12(copy.deepcopy(data)) == (0, {"data": "yes", "new_data": "no"})
 
-    # subcontext and update must be a string or a dict
+    # subcontext must be a string or a dict
     with pytest.raises(lena.core.LenaTypeError):
         UpdateContext(0, {})
-    with pytest.raises(lena.core.LenaTypeError):
+    # subcontext must be non-empty
+    with pytest.raises(lena.core.LenaValueError):
         UpdateContext("", 0)
+
+    # update can be not a dict or a string
+    uc13 = UpdateContext("data", 0)
+    assert uc13(copy.deepcopy(data)) == (0, {"data": 0})
+    # simple string
+    uc14 = UpdateContext("data", "data")
+    assert uc14(copy.deepcopy(data)) == (0, {"data": "data"})
+    # formatting string
+    uc15 = UpdateContext("data", "{data}")
+    assert uc15(copy.deepcopy(data)) == (0, {"data": "yes"})
 
     # non-empty subcontext is a proper subcontext
     uc2 = UpdateContext("new_data", {"new_data": "Yes"})
@@ -47,6 +60,19 @@ def test_update_context():
             "data": {
                 "yes": {"Yes": {"new_data": "Yes"}},
                 "_yes": {"Yes": "YES"}
+            }
+        }
+    )
+
+    # string initialization of update works
+    # subdictionaries are converted to string with format_str
+    data = (0, {"data": {"yes": {"Yes": "YES"}}})
+    uc7 = UpdateContext("data.yes.Yes", "{data.yes}", recursively=False)
+    assert uc7(copy.deepcopy(data)) == (
+        0,
+        {
+            "data": {
+                "yes": {"Yes": "{'Yes': 'YES'}"}
             }
         }
     )
