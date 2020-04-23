@@ -72,7 +72,33 @@ def test_update_context():
         0,
         {
             "data": {
-                "yes": {"Yes": "{'Yes': 'YES'}"}
+                "yes": {"Yes": {'Yes': 'YES'}}
             }
         }
     )
+    # value missing in data
+    with pytest.raises(lena.core.LenaKeyError):
+        uc7((0, {}))
+    # default is set
+    uc71 = UpdateContext("data", "{data.yes}", default="", recursively=False)
+    assert uc71((0, {})) == (0, {"data": ""})
+
+    # strings without braces are treated as simple update values
+    uc8 = UpdateContext("data.yes.Yes", "data.yes", recursively=False)
+    assert uc8(copy.deepcopy(data)) == (
+        0,
+        {
+            "data": {
+                "yes": {"Yes": "data.yes"}
+            }
+        }
+    )
+    # braces can be only in the beginning and in the end of the string
+    with pytest.raises(lena.core.LenaValueError):
+        UpdateContext("data", "{data.yes")
+    with pytest.raises(lena.core.LenaValueError):
+        UpdateContext("data", "data.yes}")
+    with pytest.raises(lena.core.LenaValueError):
+        UpdateContext("data", "data.ye}s")
+    with pytest.raises(lena.core.LenaValueError):
+        UpdateContext("data", "{data.ye}s}")

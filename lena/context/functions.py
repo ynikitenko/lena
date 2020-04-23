@@ -1,4 +1,6 @@
 """Functions to work with context (dictionary)."""
+from __future__ import print_function
+
 import copy
 
 import lena.core
@@ -69,6 +71,7 @@ def format_context(format_str, *args, **kwargs):
     arguments between *format_str* and context.
     Example:
 
+    >>> from lena.context import format_context
     >>> f = format_context("{y}", y="x.y")
     >>> f({"x": {"y": 10}})
     '10'
@@ -91,10 +94,10 @@ def format_context(format_str, *args, **kwargs):
     >>> f({"x": 10})
     '10'
 
-    If *format_str* is not a string, :exc:`LenaTypeError` is raised.
+    If *format_str* is not a string, :exc:`.LenaTypeError` is raised.
     All other errors are raised only during formatting.
     If context doesn't contain the needed key,
-    :exc:`LenaKeyError` is raised.
+    :exc:`.LenaKeyError` is raised.
     Note that string formatting can also raise
     a :exc:`KeyError` or an :exc:`IndexError`,
     so it is recommended to test your formatters before using them.

@@ -1,5 +1,6 @@
-math package
-============
+Math
+====
+
 **Functions of multidimensional arguments:**
 
 .. currentmodule:: lena.math.meshes

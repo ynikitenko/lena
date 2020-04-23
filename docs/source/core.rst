@@ -1,5 +1,5 @@
-lena.core
-=========
+Core
+====
 
 **Sequences:**
 
