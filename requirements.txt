@@ -1,6 +1,6 @@
 ### Usage ###
 # LaTeX (and other) templates
-jinja2
+jinja2 >= 2.11.0  # >=2.11.0 needed for UpdateContext (ChainableUndefined)
 # numpy is optional, install if you want.
 # numpy
 #
