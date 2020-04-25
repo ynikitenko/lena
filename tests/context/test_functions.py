@@ -52,10 +52,10 @@ def test_format_context():
     assert f({"x": 10}) == "10"
     f = format_context("{x.y}")
     assert f({"x": {"y": 10}}) == "10"
-    # special string doesn't work with keyword arguments
-    f = format_context("{}_{x.y}", "x.y")
-    with pytest.raises(lena.core.LenaKeyError):
-        f({"x": {"y": 10}})
+    # # special string doesn't work with keyword arguments
+    # f = format_context("{}_{x.y}", "x.y")
+    # with pytest.raises(lena.core.LenaKeyError):
+    #     f({"x": {"y": 10}})
     ## special formatting works
     f = format_context("{x!r}")
     assert f({"x": 10}) == "10"
@@ -65,49 +65,53 @@ def test_format_context():
     f = format_context("{{{x}}}")
     assert f({"x": 10}) == "{10}"
 
-    ## positional arguments work
-    f = format_context("{}", "x")
-    assert f({"x": 1}) == "1"
-    f = format_context("{}_{}", "x", "y")
-    with pytest.raises(lena.core.LenaKeyError):
-        # "y" not found in context
-        f({"x": 1})
-    assert f({"x": 1, "y": 2}) == "1_2"
-    # redundant arguments don't play a role
-    assert f({"x": 1, "y": 2, "z": 3}) == "1_2"
-    # missing key raises
-    f = format_context("{}", "x")
-    with pytest.raises(lena.core.LenaKeyError):
-        f({"u": 1})
-    f = format_context("{x}", "x")
-    with pytest.raises(lena.core.LenaKeyError):
-        f({"u": 1})
+    # ## positional arguments work
+    # f = format_context("{}", "x")
+    # assert f({"x": 1}) == "1"
+    # f = format_context("{}_{}", "x", "y")
+    # with pytest.raises(lena.core.LenaKeyError):
+    #     # "y" not found in context
+    #     f({"x": 1})
+    # assert f({"x": 1, "y": 2}) == "1_2"
+    # # redundant arguments don't play a role
+    # assert f({"x": 1, "y": 2, "z": 3}) == "1_2"
+    # # missing key raises
+    # f = format_context("{}", "x")
+    # with pytest.raises(lena.core.LenaKeyError):
+    #     f({"u": 1})
+    # f = format_context("{x}", "x")
+    # with pytest.raises(lena.core.LenaKeyError):
+    #     f({"u": 1})
 
-    ## keyword arguments
-    f = format_context("{x}", x="u")
-    assert f({"u": 1}) == "1"
-    # nested keys in keyword arguments
-    f = format_context("{y}", y="x.y")
-    assert f({"x": {"y": 10}}) == "10"
-    assert format_context("{y}_{x}", x="y", y="x")({"x": 1, "y": 2}) == "1_2"
-    with pytest.raises(lena.core.LenaKeyError):
-        # keyword arguments in format string must be keywords in arguments
-        assert format_context("{y}_{x}", "x", "y")({"x": 2, "y": 2}) == "1_2"
-
-    ## mix of keyword and positional arguments
-    f = format_context("{}_{x}_{y}", "x", x="x", y="y")
-    assert f({"x": 1, "y": 2}) == "1_1_2"
-
-    # nested keys in positional arguments
-    f = format_context("{}", "x.y")
-    assert f({"x": {"y": 10}}) == "10"
-    # error
-    # f = format_context("{x.y}", {"x.y": "x.y"})
+    # ## keyword arguments
+    # f = format_context("{x}", x="u")
+    # assert f({"u": 1}) == "1"
+    # # nested keys in keyword arguments
+    # f = format_context("{y}", y="x.y")
     # assert f({"x": {"y": 10}}) == "10"
+    # assert format_context("{y}_{x}", x="y", y="x")({"x": 1, "y": 2}) == "1_2"
+    # with pytest.raises(lena.core.LenaKeyError):
+    #     # keyword arguments in format string must be keywords in arguments
+    #     assert format_context("{y}_{x}", "x", "y")({"x": 2, "y": 2}) == "1_2"
+
+    # ## mix of keyword and positional arguments
+    # f = format_context("{}_{x}_{y}", "x", x="x", y="y")
+    # assert f({"x": 1, "y": 2}) == "1_1_2"
+
+    # # nested keys in positional arguments
+    # f = format_context("{}", "x.y")
+    # assert f({"x": {"y": 10}}) == "10"
+    # # error
+    # # f = format_context("{x.y}", {"x.y": "x.y"})
+    # # assert f({"x": {"y": 10}}) == "10"
 
     # simple string works!
     f = format_context("a_string")
     assert f({"x": 1}) == "a_string"
+
+    # not implemented
+    # with pytest.raises(lena.core.LenaValueError):
+    #     format_context("{a_string")
 
 
 def test_get_recursively():
@@ -122,7 +126,9 @@ def test_get_recursively():
         get_recursively(context, True)
 
     # empty keys return context
-    assert get_recursively(context, {}) == context
+    assert get_recursively(context, {}) is context
+    assert get_recursively(context, "") is context
+    assert get_recursively(context, []) is context
     # test str as input
     assert get_recursively(context, "output.latex.name") == "x"
     assert get_recursively(context, "output.latex.name.x", default="default") == "default"

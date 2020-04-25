@@ -52,41 +52,14 @@ def difference(d1, d2):
     return result
 
 
-def format_context(format_str, *args, **kwargs):
+def format_context(format_str):
     """Create a function that formats a given string using a context.
 
+    It is recommended to use jinja2.Template.
+    Use this function only if you don't have jinja2.
+
     *format_str* is an ordinary Python format string.
-    *args* are positional and *kwargs* are keyword arguments.
-
-    When calling *format_context*, arguments are bound and
-    a new function is returned. When called with a context,
-    its keys are extracted and formatted in *format_str*.
-
-    Positional arguments in the *format_str* correspond to 
-    *args*, which must be keys in the context. 
-    Keys used as positional arguments may be nested
-    using a dot (e.g. format_context("{}", "x.y")).
-
-    Keyword arguments *kwargs* connect
-    arguments between *format_str* and context.
-    Example:
-
-    >>> from lena.context import format_context
-    >>> f = format_context("{y}", y="x.y")
-    >>> f({"x": {"y": 10}})
-    '10'
-
-    All keywords in the *format_str* must have corresponding *kwargs*. 
-
-    Keyword and positional arguments can be mixed. Example:
-
-    >>> f = format_context("{}_{x}_{y}", "x", x="x", y="y")
-    >>> f({"x": 1, "y": 2})
-    '1_1_2'
-    >>>
-
-    If no *args* or *kwargs* are given, *kwargs* are extracted 
-    from *format_str*. It must contain all non-empty replacement fields,
+    It must contain all non-empty replacement fields,
     and only simplest formatting without attribute lookup.
     Example:
 
@@ -94,6 +67,17 @@ def format_context(format_str, *args, **kwargs):
     >>> f({"x": 10})
     '10'
 
+    When calling *format_context*, arguments are bound and
+    a new function is returned. When called with a context,
+    its keys are extracted and formatted in *format_str*.
+
+    Keys can be nested using a dot, for example:
+
+    >>> f = format_context("{x.y}")
+    >>> f({"x": {"y": 10}})
+    '10'
+
+    This function does not work with unbalanced braces.
     If *format_str* is not a string, :exc:`.LenaTypeError` is raised.
     All other errors are raised only during formatting.
     If context doesn't contain the needed key,
@@ -106,51 +90,47 @@ def format_context(format_str, *args, **kwargs):
         raise lena.core.LenaTypeError(
             "format_str must be a string, {} given".format(format_str)
         )
-    if not args and not kwargs:
-        new_str = []
-        new_args = []
-        prev_char = ''
-        ind = 0
-        within_field = False
-        while ind < len(format_str):
-            c = format_str[ind]
-            if c != '{' and not within_field:
+    new_str = []
+    new_args = []
+    prev_char = ''
+    ind = 0
+    within_field = False
+    while ind < len(format_str):
+        c = format_str[ind]
+        if c != '{' and not within_field:
+            prev_char = c
+            new_str.append(c)
+            ind += 1
+            continue
+        while c == '{' and ind < len(format_str):
+            new_str.append(c)
+            if prev_char == '{':
+                prev_char = ''
+                within_field = False
+            else:
                 prev_char = c
-                new_str.append(c)
-                ind += 1
-                continue
-            while c == '{' and ind < len(format_str):
-                new_str.append(c)
-                if prev_char == '{':
-                    prev_char = ''
-                    within_field = False
-                else:
+                within_field = True
+            ind += 1
+            c = format_str[ind]
+        if within_field:
+            new_arg = []
+            while ind < len(format_str):
+                if c in '}!:':
                     prev_char = c
-                    within_field = True
+                    within_field = False
+                    new_args.append(''.join(new_arg))
+                    break
+                new_arg.append(c)
                 ind += 1
                 c = format_str[ind]
-            if within_field:
-                new_arg = []
-                while ind < len(format_str):
-                    if c in '}!:':
-                        prev_char = c
-                        within_field = False
-                        new_args.append(''.join(new_arg))
-                        break
-                    new_arg.append(c)
-                    ind += 1
-                    c = format_str[ind]
-        format_str = ''.join(new_str)
-        args = new_args
+    format_str = ''.join(new_str)
+    args = new_args
     def _format_context(context):
         new_args = []
         for arg in args:
             new_args.append(lena.context.get_recursively(context, arg))
-        new_kwargs = {}
-        for key in kwargs:
-            new_kwargs[key] = lena.context.get_recursively(context, kwargs[key])
         try:
-            s = format_str.format(*new_args, **new_kwargs)
+            s = format_str.format(*new_args)
         except KeyError:
             raise lena.core.LenaKeyError(
                 "keyword arguments of {} not found in kwargs {}".format(
@@ -194,8 +174,8 @@ def get_recursively(d, keys, default=_sentinel):
         We implement it differently,
         because it allows more flexibility.
 
-    If *d* is not a dictionary or if *keys* have unknown types,
-    :exc:`.LenaTypeError` is raised.
+    If *d* is not a dictionary or if *keys* is not a string, a dict
+    or a list, :exc:`.LenaTypeError` is raised.
     If *keys* is a dictionary with more than one key at some level,
     :exc:`.LenaValueError` is raised.
     """
@@ -205,7 +185,9 @@ def get_recursively(d, keys, default=_sentinel):
             "need a dictionary, {} provided".format(d)
         )
     if isinstance(keys, str):
-        keys = keys.split('.')
+        # here empty substrings are skipped, but this is undefined.
+        keys = [key for key in keys.split('.') if key]
+    # todo: create dict_to_list and disable dict keys here?
     elif isinstance(keys, dict):
         new_keys = []
         while keys:

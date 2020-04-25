@@ -93,12 +93,12 @@ def test_update_context():
             }
         }
     )
-    # braces can be only in the beginning and in the end of the string
-    with pytest.raises(lena.core.LenaValueError):
-        UpdateContext("data", "{data.yes")
-    with pytest.raises(lena.core.LenaValueError):
-        UpdateContext("data", "data.yes}")
-    with pytest.raises(lena.core.LenaValueError):
-        UpdateContext("data", "data.ye}s")
-    with pytest.raises(lena.core.LenaValueError):
-        UpdateContext("data", "{data.ye}s}")
+    # # braces can be only in the beginning and in the end of the string
+    # with pytest.raises(lena.core.LenaValueError):
+    #     UpdateContext("data", "{data.yes")
+    # with pytest.raises(lena.core.LenaValueError):
+    #     UpdateContext("data", "data.yes}")
+    # with pytest.raises(lena.core.LenaValueError):
+    #     UpdateContext("data", "data.ye}s")
+    # with pytest.raises(lena.core.LenaValueError):
+    #     UpdateContext("data", "{data.ye}s}")

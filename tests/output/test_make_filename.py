@@ -20,7 +20,7 @@ def test_make_filename():
         MakeFilename(Make_Filename=("str"))
     # bad keyword argument
     with pytest.raises(lena.core.LenaTypeError):
-        MakeFilename(make_filename="str")
+        MakeFilename(make_filename={})
     # empty arguments are prohibited
     with pytest.raises(lena.core.LenaTypeError):
         MakeFilename()
@@ -29,7 +29,7 @@ def test_make_filename():
         MakeFilename(make_filename=0)
     # wrong format_str
     with pytest.raises(lena.core.LenaTypeError):
-        MakeFilename(make_filename=(0,))
+        MakeFilename(make_filename=0)
 
     ## sometimes it actually works
     data = [(0, {"output": {"filename": "exists"}}),
@@ -43,12 +43,12 @@ def test_make_filename():
     assert list(map(filename, res))[1] == "out"
     assert list(map(fileext, res)) == [None, "ext"]
     # single make_filename works
-    mk = MakeFilename(make_filename=("out",))
+    mk = MakeFilename(make_filename="out")
     res = list(mk.run(data))
     assert list(map(filename, res)) == ["exists", "out"]
     assert list(map(fileext, res)) == [None, "ext"]
     # make_filename and make_fileext work
-    mk = MakeFilename(make_filename=("out",), make_fileext=("txt",))
+    mk = MakeFilename(make_filename="out", make_fileext="txt")
     res = list(mk.run(data))
     assert list(map(filename, res)) == ["exists", "out"]
     assert list(map(fileext, res)) == ["txt", "ext"]
@@ -58,16 +58,12 @@ def test_make_filename():
     assert list(map(fileext, res)) == ["txt", "txt"]
     # works with real formatting
     val = (0, {"datatype": "MC"})
-    mk = MakeFilename(make_filename=("{}", "datatype"))
+    mk = MakeFilename(make_filename="{datatype}")
     good_res = [(0, {"datatype": "MC", "output": {"filename": "MC"}})]
     assert list(mk.run([val])) == good_res
-    mk = MakeFilename(make_filename=("{datatype}", "datatype"))
+    mk = MakeFilename(make_filename="{datatype}")
     assert list(mk.run([val])) == good_res
     # ignores formatting errors
-    assert list(mk.run([0])) == [0]
-    # format_context works
-    mk = MakeFilename(make_filename=format_context("{datatype}", datatype="datatype"))
-    assert list(mk.run([val])) == good_res
     assert list(mk.run([0])) == [0]
 
     # Sequence works
@@ -75,7 +71,7 @@ def test_make_filename():
     mks = MakeFilename(mk)
     assert list(mks.run([val])) == good_res
     assert list(mks.run([0])) == [0]
-    mks = MakeFilename(mk, MakeFilename(make_filename=("out",)))
+    mks = MakeFilename(mk, MakeFilename(make_filename="out"))
     # context in old data was already changed.
     data = [(0, {"output": {"filename": "exists"}}),
             (1, {"output": {"fileext": "ext"}}),

@@ -25,12 +25,9 @@ class MakeFilename(object):
 
         Other allowed keywords are *make_filename*, *make_dirname*,
         *make_fileext*.
-        Their values must be a tuple,
-        which will initialize a context formatter,
-        or a callable (as returned by format_context).
-        The first item of the tuple is format string,
-        the rest are positional and keyword arguments taken from context
-        during *run* (see :func:`.format_context`).
+        Their value must be a string,
+        which will initialize a context formatter
+        used during :meth:`run` (see :func:`.format_context`).
         """
         overwrite = kwargs.pop("overwrite", None)
         self._overwrite = overwrite
@@ -65,17 +62,13 @@ class MakeFilename(object):
             if kwarg in kwargs:
                 arg = kwargs.pop(kwarg)
                 arg_error = lena.core.LenaTypeError(
-                        "initialization arguments must be a tuple "
-                        "(format_str, *args, **kwargs), "
+                        "initialization argument must be a string, "
                         "{} provided".format(arg)
                     )
-                if callable(arg):
-                    setattr(self, "_" + kwarg, arg)
-                    continue
-                elif not isinstance(arg, tuple):
+                if not isinstance(arg, str):
                     raise arg_error
                 try:
-                    newarg = lena.context.format_context(*arg)
+                    newarg = lena.context.format_context(arg)
                 except TypeError:
                     raise arg_error
                 else:
