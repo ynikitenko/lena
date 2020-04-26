@@ -33,7 +33,7 @@ def main_copybuf(data_file):
                 Histogram(mesh((-10, 10), 10)),
             ),
         ]),
-        MakeFilename("{variable.name}"),
+        MakeFilename("{{variable.name}}"),
         ToCSV(),
         # writer,
         # RenderLaTeX("histogram_1d.tex", "templates"),
@@ -68,7 +68,7 @@ def main_no_copybuf(data_file):
             ],
             copy_buf=False,
         ),
-        MakeFilename("{variable.name}"),
+        MakeFilename("{{variable.name}}"),
         ToCSV(),
     )
     results = s.run([data_file])

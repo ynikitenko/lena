@@ -1,136 +1,110 @@
 from __future__ import print_function
 
-import re
-
 import lena.core
 import lena.context
 import lena.flow
 
 
 class MakeFilename(object):
-    """Make file names for data from the flow."""
+    """Make file name, file extension and directory name."""
 
-    def __init__(self, *args, **kwargs):
-        """:class:`MakeFilename` can be initialized
-        using a single string, a Sequence or from keyword arguments.
-
-        A single string is a file name without extension
+    def __init__(self, filename=None, dirname=None, fileext=None,
+                 overwrite=False):
+        """A single argument can be a string, which will be
+        used as a file name without extension
         (but it can contain a relative path).
+        The string can contain arguments enclosed in double braces.
+        These arguments will be filled from context
+        during :meth:`__call__`. Example:
 
-        Otherwise, all positional arguments will make a Sequence.
+            MakeFilename("{{variable.type}}/{{variable.name}}")
 
         By default, values with *context.output* already containing
-        *filename* are skipped. This can be changed using a keyword
-        argument *overwrite*.
+        *filename* are not updated (returned unchanged).
+        This can be changed using a keyword argument *overwrite*.
+        If context doesn't contain all necessary keys for formatting,
+        it will not be updated.
+        For more options, use :class:`.lena.context.UpdateContext`.
 
-        Other allowed keywords are *make_filename*, *make_dirname*,
-        *make_fileext*.
-        Their value must be a string,
-        which will initialize a context formatter
-        used during :meth:`run` (see :func:`.format_context`).
+        Other allowed keywords are *filename*, *dirname*,
+        *fileext*. Their value must be a string,
+        otherwise :exc:`.LenaTypeError` is raised.
+        At least one of the must be present,
+        or :exc:`.LenaTypeError` will be raised.
+        If a simple check finds unbalanced
+        or single braces instead of double,
+        :exc:`.LenaValueError` is raised.
         """
-        overwrite = kwargs.pop("overwrite", None)
-        self._overwrite = overwrite
+        self._overwrite = bool(overwrite)
 
-        if args and kwargs:
+        args_supplied = (
+            filename is not None or dirname is not None
+            or fileext is not None)
+        if not args_supplied:
+            # for wrong initialization there must be a TypeError,
+            # not a ValueError. As if it was an obligatory argument.
             raise lena.core.LenaTypeError(
-                "MakeFilename must be initialized either from args"
-                "or kwargs, not both"
-            )
-        elif not args and not kwargs:
-            raise lena.core.LenaTypeError(
-                "MakeFilename can't be initialized without "
-                "positional or keyword arguments"
+                "MakeFilename must be initialized with at least "
+                "one of filename, dirname, fileext"
             )
 
-        if len(args) == 1 and isinstance(args[0], str):
-            self._make_filename = lena.context.format_context(args[0])
-            self._sequence = None
-        elif args:
-            self._sequence = lena.core.Sequence(*args)
-        else:
-            self._sequence = None
+        self._filename = None
+        self._dirname = None
+        self._fileext = None
 
-        if args:
-            return
+        # todo: rename to filename etc?
+        arg_error = "{} must be a string, {} provided"
+        if filename is not None:
+            if not isinstance(filename, str):
+                raise lena.core.LenaTypeError(
+                    arg_error.format("filename", filename)
+                )
+            self._filename = lena.context.format_context(filename)
+        if dirname is not None:
+            if not isinstance(dirname, str):
+                raise lena.core.LenaTypeError(
+                    arg_error.format("dirname", dirname)
+                )
+            self._dirname = lena.context.format_context(dirname)
+        if fileext is not None:
+            if not isinstance(fileext, str):
+                raise lena.core.LenaTypeError(
+                    arg_error.format("fileext", fileext)
+                )
+            self._fileext = lena.context.format_context(fileext)
 
-        #### only special kwargs initialized here ####
+    def __call__(self, value):
+        """Add *output* keys to the *value*'s context.
 
-        allowed_kwargs = ["make_filename", "make_dirname", "make_fileext"]
-        # used_kwargs = {}
-        for kwarg in allowed_kwargs:
-            if kwarg in kwargs:
-                arg = kwargs.pop(kwarg)
-                arg_error = lena.core.LenaTypeError(
-                        "initialization argument must be a string, "
-                        "{} provided".format(arg)
-                    )
-                if not isinstance(arg, str):
-                    raise arg_error
+        *filename*, *dirname*, *fileext*, if initialized,
+        set respectively *context.output.{filename,dirname,fileext}*.
+        Only those values are transformed
+        that have no corresponding keys
+        (*filename*, *fileext* or *dirname*) in *context.output*
+        and for which the current context can be formatted
+        (contains all necessary keys for any of the format strings).
+        """
+        context = lena.flow.get_context(value)
+        modified = False
+
+        for key in ["filename", "fileext", "dirname"]:
+            if "output" in context and key in context["output"]:
+                if not self._overwrite:
+                    continue
+            meth = getattr(self, "_" + key, None)
+            if meth is not None:
                 try:
-                    newarg = lena.context.format_context(arg)
-                except TypeError:
-                    raise arg_error
+                    res = meth(context)
+                except lena.core.LenaKeyError:
+                    continue
                 else:
-                    setattr(self, "_" + kwarg, newarg)
+                    update = {"output": {key: res}}
+                    lena.context.update_recursively(context, update)
+                    modified = True
 
-        # make_filename = kwargs.pop("make_filename", None)
-        # make_dirname = kwargs.pop("make_dirname", None)
-        # make_fileext = kwargs.pop("make_fileext", None)
-
-        if kwargs:
-            raise lena.core.LenaTypeError(
-                "unknown keyword arguments {}".format(kwargs)
-            )
-
-    def run(self, flow):
-        """Add output parameters to context from the *flow*.
-
-        If :class:`MakeFilename` works as a Sequence,
-        it transforms all *flow*.
-        In general it should only add values for
-        filename, fileext or dirname in context.output.
-        It is recommended that if context
-        already contains the field, that is not changed.
-        Place more specific formatters first in the sequence.
-
-        If :class:`MakeFilename` was initialized with keyword arguments,
-        then only those values are transformed,
-        which have no corresponding fields
-        (*filename*, *fileext* and *dirname*) in *context.output*
-        and for which the current context from *flow* could be formatted
-        (contains all necessary keys for the format string).
-
-        Note that Sequence takes values with data, while keyword methods
-        take and update only context.
-        """
-        if self._sequence:
-            for val in self._sequence.run(flow):
-                yield val
+        if modified:
+            # or created
+            data = lena.flow.get_data(value)
+            return (data, context)
         else:
-            for val in flow:
-                context = lena.flow.get_context(val)
-                modified = False
-
-                for kw in ["filename", "fileext", "dirname"]:
-                    context_key = lena.context.str_to_dict("output." + kw)
-                    if self._overwrite or not lena.context.get_recursively(
-                        context, context_key, default=""
-                    ):
-                        meth = getattr(self, "_make_" + kw, None)
-                        if meth:
-                            try:
-                                res = meth(context)
-                            except lena.core.LenaKeyError:
-                                continue
-                            else:
-                                context_key["output"] = {kw: res}
-                                lena.context.update_recursively(context,
-                                                                context_key)
-                                modified = True
-
-                if modified:
-                    data = lena.flow.get_data(val)
-                    yield (data, context)
-                else:
-                    yield val
+            return value

@@ -58,12 +58,13 @@ def format_context(format_str):
     It is recommended to use jinja2.Template.
     Use this function only if you don't have jinja2.
 
-    *format_str* is an ordinary Python format string.
+    *format_str* is a Python format string with double braces
+    instead of single ones.
     It must contain all non-empty replacement fields,
     and only simplest formatting without attribute lookup.
     Example:
 
-    >>> f = format_context("{x}")
+    >>> f = format_context("{{x}}")
     >>> f({"x": 10})
     '10'
 
@@ -73,23 +74,36 @@ def format_context(format_str):
 
     Keys can be nested using a dot, for example:
 
-    >>> f = format_context("{x.y}")
-    >>> f({"x": {"y": 10}})
-    '10'
+    >>> f = format_context("{{x.y}}_{{z}}")
+    >>> f({"x": {"y": 10}, "z": 1})
+    '10_1'
 
     This function does not work with unbalanced braces.
+    If a simple check fails, :exc:`.LenaValueError` is raised.
     If *format_str* is not a string, :exc:`.LenaTypeError` is raised.
     All other errors are raised only during formatting.
     If context doesn't contain the needed key,
     :exc:`.LenaKeyError` is raised.
-    Note that string formatting can also raise
-    a :exc:`KeyError` or an :exc:`IndexError`,
+    Note that string formatting can also raise a :exc:`ValueError`,
     so it is recommended to test your formatters before using them.
     """
     if not isinstance(format_str, str):
         raise lena.core.LenaTypeError(
             "format_str must be a string, {} given".format(format_str)
         )
+
+    # prohibit single or unbalanced braces
+    if format_str.count('{') != format_str.count('}'):
+        raise lena.core.LenaValueError("unbalanced braces in '{}'".format(format_str))
+    if '{' in format_str and not '{{' in format_str:
+        raise lena.core.LenaValueError(
+            "double braces must be used for formatting instead of '{}'"
+            .format(format_str)
+        )
+
+    # new format: now double braces instead of single ones.
+    # but the algorithm may be left unchanged.
+    format_str = format_str.replace("{{", "{").replace("}}", "}")
     new_str = []
     new_args = []
     prev_char = ''
@@ -104,12 +118,14 @@ def format_context(format_str):
             continue
         while c == '{' and ind < len(format_str):
             new_str.append(c)
-            if prev_char == '{':
-                prev_char = ''
-                within_field = False
-            else:
-                prev_char = c
-                within_field = True
+            # literal formatting { are not allowed
+            # if prev_char == '{':
+            #     prev_char = ''
+            #     within_field = False
+            # else:
+            prev_char = c
+            within_field = True
+
             ind += 1
             c = format_str[ind]
         if within_field:
@@ -128,17 +144,12 @@ def format_context(format_str):
     def _format_context(context):
         new_args = []
         for arg in args:
+            # LenaKeyError may be raised
             new_args.append(lena.context.get_recursively(context, arg))
-        try:
-            s = format_str.format(*new_args)
-        except KeyError:
-            raise lena.core.LenaKeyError(
-                "keyword arguments of {} not found in kwargs {}".format(
-                    format_str, new_kwargs
-                )
-            )
-        else:
-            return s
+        # other exceptions, like ValueError
+        # (for bad string formatting) may be raised.
+        s = format_str.format(*new_args)
+        return s
     return _format_context
 
 

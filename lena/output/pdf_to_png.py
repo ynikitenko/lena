@@ -44,11 +44,11 @@ class PDFToPNG(object):
         *timeoutsec* is time (in seconds) for subprocess timeout
         (used only in Python 3). If the timeout expires,
         the child process will be killed and waited for.
-        The TimeoutExpired exception will be re-raised
+        The :exc:`TimeoutExpired` exception will be re-raised
         after the child process has terminated. 
 
         This class uses ``pdftoppm`` binary internally.
-        Pdftoppm can be given other output formats as an option
+        ``pdftoppm`` can be given other output formats as an option
         (see ``man pdftoppm``), for example *jpeg* or *tiff*.
         """
         self._format = format
@@ -59,10 +59,10 @@ class PDFToPNG(object):
 
         PDF files are recognized via *context.output.filetype*.
         Their paths are assumed to be data part of the value
-        (may contain trailing ".pdf").
+        (may contain trailing *".pdf"*).
 
         Data yielded is the resulting file name.
-        Context is updated with filetype = *format*.
+        Context is updated with *filetype = format*.
 
         Other values are passed unchanged.
         """

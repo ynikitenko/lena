@@ -187,7 +187,7 @@ Delete the first *MakeFilename* and change the second one to
 
 .. code-block:: python
 
-   MakeFilename("{variable.particle}/{variable.name}")
+   MakeFilename("{{variable.particle}}/{{variable.name}}")
 
 Ex. 3
 ^^^^^

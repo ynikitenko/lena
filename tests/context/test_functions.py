@@ -4,6 +4,7 @@ import pytest
 
 import lena
 import lena.core
+from lena.core import LenaTypeError, LenaValueError
 import lena.context.functions as lf
 from lena.context import (
     difference, format_context, get_recursively,
@@ -47,23 +48,48 @@ def test_format_context():
       File "<stdin>", line 1, in <module>
     KeyError: 'y'
     """
-    ## single format_str works
-    f = format_context("{x}")
+    # format_str must be a string
+    with pytest.raises(LenaTypeError):
+        format_context(0)
+    ## old single braces are prohibited
+    with pytest.raises(LenaValueError):
+        format_context("{x}")
+    # unbalanced braces are prohibited
+    with pytest.raises(LenaValueError):
+        format_context("{{x}}}}")
+
+    # new double braces work
+    f = format_context("{{x}}")
     assert f({"x": 10}) == "10"
-    f = format_context("{x.y}")
+    f = format_context("{{x.y}}")
     assert f({"x": {"y": 10}}) == "10"
     # # special string doesn't work with keyword arguments
     # f = format_context("{}_{x.y}", "x.y")
     # with pytest.raises(lena.core.LenaKeyError):
     #     f({"x": {"y": 10}})
+
     ## special formatting works
-    f = format_context("{x!r}")
+    f = format_context("{{x!r}}")
     assert f({"x": 10}) == "10"
-    f = format_context("{x:*^4}")
+    f = format_context("{{x:*^4}}")
     assert f({"x": 10}) == "*10*"
-    # fancy braces work
-    f = format_context("{{{x}}}")
-    assert f({"x": 10}) == "{10}"
+
+    # missing values raise LenaKeyError
+    with pytest.raises(lena.core.LenaKeyError):
+        f({})
+    f = format_context("{{x} }")
+    with pytest.raises(ValueError):
+        f({"x": 10})
+
+    # several braces work
+    f = format_context("{{x}}_{{y}}")
+    assert f({"x": 1, "y":1}) == "1_1"
+    f = format_context("{{x}}{{y}}")
+    assert f({"x": 1, "y":1}) == "11"
+
+    # simple string works!
+    f = format_context("a_string")
+    assert f({"x": 1}) == "a_string"
 
     # ## positional arguments work
     # f = format_context("{}", "x")
@@ -104,10 +130,6 @@ def test_format_context():
     # # error
     # # f = format_context("{x.y}", {"x.y": "x.y"})
     # # assert f({"x": {"y": 10}}) == "10"
-
-    # simple string works!
-    f = format_context("a_string")
-    assert f({"x": 1}) == "a_string"
 
     # not implemented
     # with pytest.raises(lena.core.LenaValueError):

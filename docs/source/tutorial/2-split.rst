@@ -229,7 +229,7 @@ but let us unite them in one element (and improve the *cohesion* of our code):
                     Histogram(mesh((-10, 10), 10)),
                 ),
             ]),
-            MakeFilename("{variable.name}"),
+            MakeFilename("{{variable.name}}"),
             ToCSV(),
             writer,
             RenderLaTeX("histogram_1d.tex", "templates"),
@@ -265,7 +265,7 @@ and is available as a method *getter*.
 
 *MakeFilename* accepts not only constant, but also format strings,
 which take arguments from context.
-In our example, *MakeFilename("{variable.name}")* creates file name from *context.variable.name*.
+In our example, *MakeFilename("{{variable.name}}")* creates file name from *context.variable.name*.
 
 Note also that since two *Writers* do the same thing, we rewrote them as one object.
 

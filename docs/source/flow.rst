@@ -87,6 +87,7 @@ Group plots
 .. autoclass:: GroupBy
 .. autoclass:: GroupPlots
 .. autoclass:: GroupScale
+
 .. autoclass:: Selector
     :special-members: __call__
 

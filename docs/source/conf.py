@@ -66,7 +66,7 @@ autodoc_default_flags = ['members']
 # unfortunately, this gives a warning when __call__ is missing
 # https://github.com/sphinx-doc/sphinx/issues/6771
 # autodoc_default_options = {
-#     # 'members': True,
+#     'members': True,
 #     'special-members': '__call__',
 #     # 'undoc-members': True,
 #     # 'exclude-members': '__weakref__'

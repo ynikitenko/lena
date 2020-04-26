@@ -59,12 +59,12 @@ def main():
                 particle,
                 Combine(x, y, name="xy"),
                 Histogram(mesh(((-10, 10), (-10, 10)), (10, 10))),
-                MakeFilename("{variable.particle}/{variable.name}"),
+                MakeFilename("{{variable.particle}}/{{variable.name}}"),
              )
              for particle in positron, neutron
             ]
         ),
-        MakeFilename("{variable.particle}/{variable.coordinate}"),
+        MakeFilename("{{variable.particle}}/{{variable.coordinate}}"),
         ToCSV(),
         writer,
         RenderLaTeX(select_template, template_path="templates"),

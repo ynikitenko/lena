@@ -31,7 +31,7 @@ def main():
                 Histogram(mesh((-10, 10), 10)),
             ),
         ]),
-        MakeFilename("{variable.name}"),
+        MakeFilename("{{variable.name}}"),
         ToCSV(),
         writer,
         RenderLaTeX("histogram_1d.tex", "templates"),

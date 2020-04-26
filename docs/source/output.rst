@@ -5,6 +5,7 @@ Output
 .. currentmodule:: lena.output
 .. autosummary::
 
+    MakeFilename
     PDFToPNG
     ToCSV
     Writer
@@ -19,18 +20,18 @@ Output
     LaTeXToPDF
     RenderLaTeX
 
-**Make filename:**
-
-.. currentmodule:: lena.output.make_filename
-.. autosummary::
-
-    MakeFilename
-
 Output
 ------
 
-.. automodule:: lena.output
+.. .. automodule:: lena.output
     :exclude-members: MakeFilename, LaTeXToPDF, RenderLaTeX
+.. autoclass:: MakeFilename
+    :special-members: __call__
+.. autoclass:: PDFToPNG
+.. autoclass:: ToCSV
+.. autofunction:: hist1d_to_csv
+.. autofunction:: hist2d_to_csv
+.. autoclass:: Writer
 
 LaTeX
 -----
@@ -38,7 +39,3 @@ LaTeX
 .. autoclass:: LaTeXToPDF
 .. autoclass:: RenderLaTeX
 
-Make filename
--------------
-
-.. automodule:: lena.output.make_filename
