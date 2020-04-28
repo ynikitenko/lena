@@ -3,6 +3,7 @@ from __future__ import print_function
 
 import os
 import sys
+import warnings
 
 import lena.core
 import lena.flow
@@ -62,6 +63,21 @@ class Writer(object):
             filepath = filename + "." + fileext
         else:
             filepath = filename
+        def normalize_path(pathname, path):
+            if os.path.isabs(path):
+                warnings.warn(
+                    "{} must not be absolute path, {} given"
+                    .format(pathname, path),
+                    RuntimeWarning
+                )
+                if path.startswith(os.sep):
+                    # there can be also os.altsep for some fancy systems
+                    path= path[len(os.sep):]
+                    assert not os.path.isabs(path)
+            return path
+        dirname = normalize_path("dirname", dirname)
+        # filepath is an internal variable created from filename
+        filepath = normalize_path("filename", filepath)
         filepath = os.path.join(self.output_directory, dirname, filepath)
 
         return (dirname, filename, fileext, filepath)
