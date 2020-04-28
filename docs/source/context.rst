@@ -13,6 +13,7 @@ Context
 .. currentmodule:: lena.context.functions
 .. autosummary::
 
+    contains
     difference
     format_context
     get_recursively
@@ -51,6 +52,7 @@ Functions
 .. .. automodule:: lena.context.functions
 .. currentmodule:: lena.context.functions
 
+.. autofunction:: contains
 .. autofunction:: difference
 .. autofunction:: format_context
 .. autofunction:: get_recursively

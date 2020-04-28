@@ -17,8 +17,9 @@ class GroupBy(object):
     def __init__(self, group_by):
         """*group_by* is a function, which returns
         distinct hashable results for items from different groups.
-        It can be a dot-separated string, which corresponds to
-        a subcontext (see :func:`.get_recursively`).
+        It can be a dot-separated string,
+        which corresponds to a subcontext
+        (see :func:`context.get_recursively <.get_recursively>`).
 
         If *group_by* is not a callable or a string,
         :exc:`.LenaTypeError` is raised.

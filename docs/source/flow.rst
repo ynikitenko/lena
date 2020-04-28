@@ -32,6 +32,7 @@ Flow
     GroupBy
     GroupPlots
     GroupScale
+    Not
     Selector
 
 **Iterators:**
@@ -88,6 +89,9 @@ Group plots
 .. autoclass:: GroupPlots
 .. autoclass:: GroupScale
 
+.. autoclass:: Not
+    :show-inheritance:
+    :special-members: __call__
 .. autoclass:: Selector
     :special-members: __call__
 

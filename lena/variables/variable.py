@@ -160,11 +160,11 @@ class Variable(object):
     def get(self, key, default=None):
         """Return the attribute *key* if present, else default.
 
-        *Key* can be a dot-separated string, a list or a dictionary
-        (see :func:`lena.context.get_recursively`).
+        *key* can be a dot-separated string, a list or a dictionary
+        (see :func:`context.get_recursively <.get_recursively>`).
 
         If default is not given, it defaults to ``None``,
-        so that this method never raises a *KeyError*.
+        so that this method never raises a :exc:`KeyError`.
         """
         return lena.context.get_recursively(
             self.var_context, key, default=default

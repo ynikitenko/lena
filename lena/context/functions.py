@@ -10,23 +10,32 @@ import lena.core
 # used in Python documentation for dict.
 
 
-def check_context_str(d, s):
-    """Check that dictionary *d* satisfies a dot-separated string *s*.
+def contains(d, s):
+    """Check that a dictionary *d* contains a subdictionary
+    defined by a string *s*.
 
-    True if *d* contains a subdictionary, which is represented by *s*.
-    Dots in *s* signify nesting.
-    *s* must have at least two dot-separated parts,
-    otherwise :exc:`.LenaValueError` is raised.
+    True if *d* contains a subdictionary that is represented by *s*.
+    Dots in *s* mean nested subdictionaries.
+    A string without dots means a key in *d*.
 
+    Example:
+
+    >>> d = {'fit': {'coordinate': 'x'}}
+    >>> contains(d, "fit")
+    True
+    >>> contains(d, "fit.coordinate.x")
+    True
+    >>> contains(d, "fit.coordinate.y")
+    False
+
+    If the most nested element of *d* to be compared with *s*
+    is not a string, its string representation is used for comparison.
     See also :func:`str_to_dict`.
     """
-    # todo: rename to is_subdictionary?
-    # add examples
+    # todo: s can be a list, or a dict?
     levels = s.split(".")
     if len(levels) < 2:
-        raise lena.core.LenaValueError(
-            "provide at least two dot-separated values."
-        )
+        return s in d
     subdict = d
     for key in levels[:-1]:
         if key not in subdict:
@@ -35,8 +44,16 @@ def check_context_str(d, s):
     last_val = levels[-1]
     if isinstance(subdict, dict):
         return last_val in subdict
-    else: # just a value
-        return subdict == last_val
+    else:
+        # just a value
+        try:
+            # it's better to test for an object to be cast to str
+            # than to disallow "dim.1"
+            subd = str(subdict)
+        except Exception:
+            return False
+        else:
+            return subd == last_val
 
 
 def difference(d1, d2):

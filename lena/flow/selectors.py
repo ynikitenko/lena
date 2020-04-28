@@ -56,7 +56,7 @@ class Selector(object):
         A callable is used as is.
 
         A string means that value's context must conform to that
-        (as in :func:`lena.context.check_context_str`).
+        (as in :func:`context.contains <.contains>`).
 
         *selector* can be a container. In this case its items
         are converted to selectors.
@@ -75,7 +75,7 @@ class Selector(object):
         elif callable(selector):
             self._selector = selector
         elif isinstance(selector, str):
-            self._selector = lambda val: lena.context.check_context_str(
+            self._selector = lambda val: lena.context.contains(
                 lena.flow.get_context(val), selector
             )
         elif isinstance(selector, list):
@@ -122,9 +122,9 @@ class Not(Selector):
         """Negate the result of the initialized *selector*.
 
         This is a complete negation (including the case of an error
-        was encountered in the *selector*).
+        encountered in the *selector*).
         For example, if the *selector* is *variable.name*,
-        and *value*'s context contains no variable,
-        *Not(selector)(value)* will be ``True``.
+        and *value*'s context contains no *"variable"*,
+        *Not("variable.name")(value)* will be ``True``.
         """
         return not self._selector(value)

@@ -13,14 +13,14 @@ from lena.context import (
 )
 
 
-def test_check_context_str():
-    d = {'a': {'b': 'c d'}}
-    # wrong length
-    with pytest.raises(lena.core.LenaValueError):
-        lena.context.check_context_str(d, "a")
-    assert lena.context.check_context_str(d, "a.b.c d")
-    assert lena.context.check_context_str(d, "b.c") is False
-    assert lena.context.check_context_str(d, "a.b")
+def test_contains():
+    d = {'a': {'b': 'c d'}, 'e': 1}
+    assert lena.context.contains(d, "a") is True
+    assert lena.context.contains(d, "a.b.c d") is True
+    assert lena.context.contains(d, "b.c") is False
+    assert lena.context.contains(d, "a.b") is True
+    # not string contents are cast to strings
+    assert lena.context.contains(d, "e.1") is True
 
 
 def test_difference():
