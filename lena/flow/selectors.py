@@ -97,13 +97,34 @@ class Selector(object):
     def __call__(self, value):
         """Check whether *value* is selected.
 
-        If an exception occurs, the result is False.
-        It is safe to use non-existing attributes, etc.
+        If an exception occurs, the result is ``False``.
+        Thus it is safe to use non-existing attributes
+        or arbitrary contexts.
         """
         try:
             sel = self._selector(value)
-        except Exception: # pylint: disable=broad-except
+        except Exception:  # pylint: disable=broad-except
             # it can be really any exception: AttributeError, etc.
             return False
         else:
             return sel
+
+
+class Not(Selector):
+    """Negate a selector."""
+
+    def __init__(self, selector):
+        """*selector* will initialize a :class:`.Selector`."""
+        self._selector = Selector(selector)
+        super(Not, self).__init__(self._selector)
+
+    def __call__(self, value):
+        """Negate the result of the initialized *selector*.
+
+        This is a complete negation (including the case of an error
+        was encountered in the *selector*).
+        For example, if the *selector* is *variable.name*,
+        and *value*'s context contains no variable,
+        *Not(selector)(value)* will be ``True``.
+        """
+        return not self._selector(value)

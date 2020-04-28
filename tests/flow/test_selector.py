@@ -1,7 +1,7 @@
 import pytest
 
 from lena.core import LenaTypeError
-from lena.flow import Selector
+from lena.flow import Selector, Not
 
 
 def test_selector():
@@ -43,3 +43,19 @@ def test_selector():
     data = [(1, {"name": "x"}), (2, {"name": "y"})]
     dsel = Selector("name.x")
     assert [dsel(val) for val in data] == [True, False]
+
+
+def test_not():
+    # simple type
+    ns1 = Not(int)
+    data = [1, "s", []]
+    assert list(map(ns1, data)) == [False, True, True]
+
+    # missing value, raises an exception
+    ns2 = Not("context")
+    assert list(map(ns2, data)) == [True, True, True]
+
+    # pure exception
+    f = lambda x: x/0.
+    ns2 = Not(f)
+    assert list(map(ns2, data)) == [True, True, True]

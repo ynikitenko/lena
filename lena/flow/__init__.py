@@ -7,7 +7,7 @@ from lena.flow.group_plots import GroupPlots
 from lena.flow.group_scale import GroupScale
 from lena.flow.iterators import Chain, CountFrom, ISlice
 from lena.flow.print_ import Print
-from lena.flow.selectors import Selector
+from lena.flow.selectors import Not, Selector
 from lena.flow.split_into_bins import (
     SplitIntoBins, ReduceBinContent, TransformBins,
     get_example_bin,
@@ -21,7 +21,7 @@ __all__ = [
     'Zip',
     'get_context', 'get_data', 'get_data_context',
     'GroupBy', 'GroupScale',
-    'Selector',
+    'Not', 'Selector',
     'seq_map',
     'TransformIf',
     'SplitIntoBins',
