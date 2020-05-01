@@ -17,7 +17,7 @@ import pytest
 import hypothesis.strategies as s
 from hypothesis import given
 
-from lena.core import LenaValueError
+from lena.core import LenaValueError, LenaTypeError
 from lena.structures import Histogram
 from lena.math import refine_mesh, isclose
 from lena.structures.hist_functions import iter_bins, integral
@@ -133,6 +133,9 @@ def test_histogram_3d():
 
 def test_histogram_1d():
     hist = Histogram([0, 1, 2])
+    # context must be a dict
+    with pytest.raises(LenaTypeError):
+        Histogram(hist.edges, hist.bins, context=0)
     # abandoned this idea. No exception is raised.
     # with pytest.raises(StopIteration):
     #     next(hist.compute())

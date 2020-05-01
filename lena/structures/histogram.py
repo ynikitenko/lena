@@ -46,7 +46,7 @@ class Histogram(lena.core.FillCompute):
     # https://docs.scipy.org/doc/numpy/reference/generated/numpy.histogram.html
     # https://root.cern.ch/root/htmldoc/guides/users-guide/Histograms.html#bin-numbering
 
-    def __init__(self, edges, bins=None, make_bins=None, initial_value=0):
+    def __init__(self, edges, bins=None, make_bins=None, initial_value=0, context=None):
         """*edges* is a sequence of one-dimensional arrays,
         each containing strictly increasing bin edges.
         If *edges*' subarrays are not increasing
@@ -64,9 +64,11 @@ class Histogram(lena.core.FillCompute):
         In this case a simple check of the shape of *bins* is done.
         If that is incorrect, :exc:`.LenaValueError` is raised.
 
-        *make_bins* is a function without arguments, which creates new bins
+        *make_bins* is a function without arguments
+        that creates new bins
         (it will be called during :meth:`__init__` and :meth:`reset`).
-        *initial_value* in this case is ignored, but bin check is being done.
+        *initial_value* in this case is ignored,
+        but bin check is being done.
         If both *bins* and *make_bins* are provided,
         :exc:`.LenaTypeError` is raised.
 
@@ -113,6 +115,7 @@ class Histogram(lena.core.FillCompute):
             To unify the interface for bins and edges in your code,
             use :func:`unify_1_md` function.
         """
+        # todo: remove make_bins.
         hf.check_edges_increasing(edges)
         self.edges = edges
         # self.fill_called = False
@@ -148,15 +151,20 @@ class Histogram(lena.core.FillCompute):
             else:
                 if len(bins) != len(edges[0]) - 1:
                     raise wrong_bins_error
-        self._cur_context = {} # context from flow
+        if context is None:
+            self._cur_context = {} # context from flow
+        else:
+            if not isinstance(context, dict):
+                raise lena.core.LenaTypeError(
+                    "context must be a dict, {} provided".format(context)
+                )
+            self._cur_context = context
         if self.dim > 1:
             self.ranges = [(axis[0], axis[-1]) for axis in edges]
             self.nbins = [len(axis) - 1 for axis in edges]
         else:
             self.ranges = [(edges[0], edges[-1])]
             self.nbins = [len(edges)-1]
-        # run method is inherited automatically from FillCompute
-        super(Histogram, self).__init__(self)
         self._hist_context = {
             "histogram": {
                 "dim": self.dim,
