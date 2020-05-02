@@ -135,8 +135,18 @@ class ToCSV(object):
                 continue
 
             if hasattr(data, "to_csv") and callable(data.to_csv):
-                text = data.to_csv(separator=self._separator,
-                                      header=self._header)
+                try:
+                    # some classes (like Graph) can have to_csv
+                    # without duplicate_last_bin keyword.
+                    # If it is present, use it.
+                    text = data.to_csv(
+                        separator=self._separator, header=self._header,
+                        duplicate_last_bin=self._duplicate_last_bin
+                    )
+                except TypeError:
+                    text = data.to_csv(
+                        separator=self._separator, header=self._header
+                    )
                 ## *data.to_csv* may produce context,
                 ## which in this case updates the current context.
                 # no need to allow this. All necessary context

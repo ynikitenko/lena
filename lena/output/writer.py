@@ -63,20 +63,19 @@ class Writer(object):
             filepath = filename + "." + fileext
         else:
             filepath = filename
-        def normalize_path(pathname, path):
+        def normalize_path(path_name, path):
             if os.path.isabs(path):
                 warnings.warn(
                     "{} must not be absolute path, {} given"
-                    .format(pathname, path),
+                    .format(path_name, path),
                     RuntimeWarning
                 )
                 if path.startswith(os.sep):
                     # there can be also os.altsep for some fancy systems
-                    path= path[len(os.sep):]
+                    path = path[len(os.sep):]
                     assert not os.path.isabs(path)
             return path
         dirname = normalize_path("dirname", dirname)
-        # filepath is an internal variable created from filename
         filepath = normalize_path("filename", filepath)
         filepath = os.path.join(self.output_directory, dirname, filepath)
 
