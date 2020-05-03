@@ -97,7 +97,7 @@ A simple output function could be the following:
             lena.output.ToCSV(),
             writer,
             lena.context.Context(),
-            lena.output.RenderLaTeX(), # initialize properly here
+            lena.output.RenderLaTeX(),  # initialize properly here
             writer,
             lena.output.LaTeXToPDF(),
             lena.output.PDFToPNG(),

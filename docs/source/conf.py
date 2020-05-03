@@ -99,7 +99,8 @@ master_doc = 'index'
 language = None
 locale_dirs = ['locale/']
 gettext_compact = False
-gettext_uuid = True
+gettext_uuid = False
+gettext_additional_targets = ["literal-block"]
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.

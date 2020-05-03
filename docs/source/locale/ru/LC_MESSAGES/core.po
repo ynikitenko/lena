@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Lena 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-14 22:34+0300\n"
+"POT-Creation-Date: 2020-05-03 16:54+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,7 +18,7 @@ msgstr ""
 "Generated-By: Babel 2.8.0\n"
 
 #: ../../source/core.rst:2
-msgid "lena.core"
+msgid "Core"
 msgstr ""
 
 #: ../../source/core.rst:4
@@ -272,14 +272,14 @@ msgstr ""
 msgid ""
 "If *args* contain several *FillCompute* elements, only the first one is "
 "chosen (the subsequent ones are used as simple *Run* elements). To change"
-" that, explicitly cast the first element to :class:`~lena.core.FillInto`."
+" that, explicitly cast the first element to :class:`.FillInto`."
 msgstr ""
 
 #: lena.core.FillComputeSeq:19 of
 msgid ""
 "If *FillCompute* element was not found, or if the sequences before and "
-"after that could not be correctly initialized, "
-":exc:`~lena.core.LenaTypeError` is raised."
+"after that could not be correctly initialized, :exc:`.LenaTypeError` is "
+"raised."
 msgstr ""
 
 #: lena.core.FillComputeSeq.compute:1 of
@@ -324,21 +324,21 @@ msgstr ""
 msgid ""
 "If *args* contains several *FillRequest* elements, only the first one is "
 "chosen (the subsequent ones are used as simple *Run* elements). To change"
-" that, explicitly cast the first element to :class:`~lena.core.FillInto`."
+" that, explicitly cast the first element to :class:`.FillInto`."
 msgstr ""
 
 #: lena.core.FillRequestSeq:19 of
 msgid ""
 "*kwargs* can contain *bufsize*, which is used during *run*. See "
 ":class:`FillRequest` for more information on *run*. By default *bufsize* "
-"is *1*. Other *kwargs* raise :exc:`~lena.core.LenaTypeError`."
+"is *1*. Other *kwargs* raise :exc:`.LenaTypeError`."
 msgstr ""
 
 #: lena.core.FillRequestSeq:24 of
 msgid ""
 "If *FillRequest* element was not found, or if the sequences before or "
-"after that could not be correctly initialized, "
-":exc:`~lena.core.LenaTypeError` is raised."
+"after that could not be correctly initialized, :exc:`.LenaTypeError` is "
+"raised."
 msgstr ""
 
 #: lena.core.FillRequestSeq.fill:3 of
@@ -365,16 +365,16 @@ msgstr ""
 msgid ""
 "*seqs* must be a list of Sequence, Source, FillComputeSeq or "
 "FillRequestSeq sequences (any other container will raise "
-":exc:`~lena.core.LenaTypeError`). If *seqs* is empty, *Split* acts as an "
-"empty *Sequence* and yields all values it receives."
+":exc:`.LenaTypeError`). If *seqs* is empty, *Split* acts as an empty "
+"*Sequence* and yields all values it receives."
 msgstr ""
 
 #: lena.core.Split:9 of
 msgid ""
 "*bufsize* is the size of the buffer for the input flow. If *bufsize* is "
 "``None``, whole input flow is materialized in the buffer. *bufsize* must "
-"be a natural number or ``None``, otherwise "
-":exc:`~lena.core.LenaValueError` is raised."
+"be a natural number or ``None``, otherwise :exc:`.LenaValueError` is "
+"raised."
 msgstr ""
 
 #: lena.core.Split:15 of
@@ -508,7 +508,7 @@ msgstr ""
 #: lena.core.adapters.Call:15 of
 msgid ""
 "If :class:`Call` failed to instantiate with *el* and *call*, "
-":exc:`~lena.core.LenaTypeError` is raised."
+":exc:`.LenaTypeError` is raised."
 msgstr ""
 
 #: lena.core.adapters.Call.__call__:1 of
@@ -534,7 +534,7 @@ msgstr ""
 #: lena.core.adapters.FillCompute:11 of
 msgid ""
 "If callable methods *fill* and *compute* or *request* were not found, "
-":exc:`~lena.core.LenaTypeError` is raised."
+":exc:`.LenaTypeError` is raised."
 msgstr ""
 
 #: lena.core.adapters.FillCompute.compute:1
@@ -552,7 +552,7 @@ msgstr ""
 msgid ""
 "If no *fill_into* argument is provided, then *fill_into* method is "
 "searched, then *__call__*, then *run*. If none of them is found and "
-"callable, :exc:`~lena.core.LenaTypeError` is raised."
+"callable, :exc:`.LenaTypeError` is raised."
 msgstr ""
 
 #: lena.core.adapters.FillInto:12 of
@@ -625,11 +625,11 @@ msgstr ""
 
 #: lena.core.adapters.FillRequest:28 of
 msgid ""
-"*bufsize* must be a natural number, otherwise "
-":exc:`~lena.core.LenaValueError` is raised. If callable *fill* and "
-"*request* methods were not found, or *FillRequest* could not be derived "
-"from *FillCompute*, or if *reset* is ``True``, but *el* has no method "
-"*reset*, :exc:`~lena.core.LenaTypeError` is raised."
+"*bufsize* must be a natural number, otherwise :exc:`.LenaValueError` is "
+"raised. If callable *fill* and *request* methods were not found, or "
+"*FillRequest* could not be derived from *FillCompute*, or if *reset* is "
+"``True``, but *el* has no method *reset*, :exc:`.LenaTypeError` is "
+"raised."
 msgstr ""
 
 #: lena.core.adapters.FillRequest.request:3 of
@@ -711,13 +711,13 @@ msgid ""
 msgstr ""
 
 #: lena.core.adapters.Run:28 of
-msgid "If the initialization failed, :exc:`~lena.core.LenaTypeError` is raised."
+msgid "If the initialization failed, :exc:`.LenaTypeError` is raised."
 msgstr ""
 
 #: lena.core.adapters.Run:31 of
 msgid ""
 ":class:`Run` is used implicitly during the initialization of "
-":class:`~lena.core.Sequence`."
+":class:`.Sequence`."
 msgstr ""
 
 #: lena.core.adapters.Run.run:1 of
@@ -751,7 +751,7 @@ msgstr ""
 #: lena.core.adapters.SourceEl:14 of
 msgid ""
 "If :class:`SourceEl` failed to instantiate with *el* and *call*, "
-":exc:`~lena.core.LenaTypeError` is raised."
+":exc:`.LenaTypeError` is raised."
 msgstr ""
 
 #: lena.core.adapters.SourceEl.__call__:1 of
@@ -821,4 +821,117 @@ msgid ""
 "Bases: :class:`lena.core.exceptions.LenaException`, "
 ":class:`ZeroDivisionError`"
 msgstr ""
+
+#~ msgid "lena.core"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "If *args* contain several *FillCompute* "
+#~ "elements, only the first one is "
+#~ "chosen (the subsequent ones are used "
+#~ "as simple *Run* elements). To change "
+#~ "that, explicitly cast the first element"
+#~ " to :class:`~lena.core.FillInto`."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "If *FillCompute* element was not found,"
+#~ " or if the sequences before and "
+#~ "after that could not be correctly "
+#~ "initialized, :exc:`~lena.core.LenaTypeError` is "
+#~ "raised."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "If *args* contains several *FillRequest* "
+#~ "elements, only the first one is "
+#~ "chosen (the subsequent ones are used "
+#~ "as simple *Run* elements). To change "
+#~ "that, explicitly cast the first element"
+#~ " to :class:`~lena.core.FillInto`."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "*kwargs* can contain *bufsize*, which is"
+#~ " used during *run*. See "
+#~ ":class:`FillRequest` for more information on"
+#~ " *run*. By default *bufsize* is *1*."
+#~ " Other *kwargs* raise "
+#~ ":exc:`~lena.core.LenaTypeError`."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "If *FillRequest* element was not found,"
+#~ " or if the sequences before or "
+#~ "after that could not be correctly "
+#~ "initialized, :exc:`~lena.core.LenaTypeError` is "
+#~ "raised."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "*seqs* must be a list of Sequence,"
+#~ " Source, FillComputeSeq or FillRequestSeq "
+#~ "sequences (any other container will "
+#~ "raise :exc:`~lena.core.LenaTypeError`). If *seqs*"
+#~ " is empty, *Split* acts as an "
+#~ "empty *Sequence* and yields all values"
+#~ " it receives."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "*bufsize* is the size of the "
+#~ "buffer for the input flow. If "
+#~ "*bufsize* is ``None``, whole input flow"
+#~ " is materialized in the buffer. "
+#~ "*bufsize* must be a natural number "
+#~ "or ``None``, otherwise "
+#~ ":exc:`~lena.core.LenaValueError` is raised."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "If :class:`Call` failed to instantiate "
+#~ "with *el* and *call*, "
+#~ ":exc:`~lena.core.LenaTypeError` is raised."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "If callable methods *fill* and *compute*"
+#~ " or *request* were not found, "
+#~ ":exc:`~lena.core.LenaTypeError` is raised."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "If no *fill_into* argument is provided,"
+#~ " then *fill_into* method is searched, "
+#~ "then *__call__*, then *run*. If none "
+#~ "of them is found and callable, "
+#~ ":exc:`~lena.core.LenaTypeError` is raised."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "*bufsize* must be a natural number, "
+#~ "otherwise :exc:`~lena.core.LenaValueError` is "
+#~ "raised. If callable *fill* and *request*"
+#~ " methods were not found, or "
+#~ "*FillRequest* could not be derived from"
+#~ " *FillCompute*, or if *reset* is "
+#~ "``True``, but *el* has no method "
+#~ "*reset*, :exc:`~lena.core.LenaTypeError` is raised."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "If the initialization failed, "
+#~ ":exc:`~lena.core.LenaTypeError` is raised."
+#~ msgstr ""
+
+#~ msgid ""
+#~ ":class:`Run` is used implicitly during "
+#~ "the initialization of :class:`~lena.core.Sequence`."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "If :class:`SourceEl` failed to instantiate "
+#~ "with *el* and *call*, "
+#~ ":exc:`~lena.core.LenaTypeError` is raised."
+#~ msgstr ""
 

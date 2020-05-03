@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Lena 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-22 12:19+0300\n"
+"POT-Creation-Date: 2020-05-03 17:35+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,78 +16,244 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.8.0\n"
 
-#: ../../source/tutorial/answers.rst:2 683e10ff26c347379c808edc24343160
+#: ../../source/tutorial/answers.rst:2
 msgid "Answers to exercises"
-msgstr ""
+msgstr "Ответы на упражнения"
 
-#: ../../source/tutorial/answers.rst:4 3259be2c29a24ab0a63e8249ee7d3bf3
+#: ../../source/tutorial/answers.rst:4
 msgid "Part 1"
-msgstr ""
+msgstr "Часть 1"
 
 #: ../../source/tutorial/answers.rst:6 ../../source/tutorial/answers.rst:140
-#: 0569693370f14f528a468bca8e3368cb 4388f406c6db42ad97880cb16790a6ae
 msgid "Ex. 1"
-msgstr ""
+msgstr "Упр. 1"
 
-#: ../../source/tutorial/answers.rst:7 2de0f317c69b407fb7e3e2e9d9fefe72
+#: ../../source/tutorial/answers.rst:7
 msgid ""
 "*End.run* in this case is not a generator. To make it a generator, add a "
 "*yield* statement somewhere. Also note that since Python 3.7 all "
 "*StopIteration* are considered to be errors according to PEP 479. Use a "
 "simple *return* instead. This is the implementation in *lena.flow*:"
 msgstr ""
+"*End.run* в данном случае не генератор. Чтобы сделать его генератором, "
+"добавьте где-нибудь инструкцию *yield*. Также заметьте, что с версии "
+"Python 3.7 все *StopIteration* считаются ошибками, в соответствии с PEP "
+"479. Используйте вместо этого просто *return*. Вот реализация в "
+"*lena.flow*:"
+
+#: ../../source/tutorial/answers.rst:14
+msgid ""
+"class End(object):\n"
+"    \"\"\"Stop sequence here.\"\"\"\n"
+"\n"
+"    def run(self, flow):\n"
+"        \"\"\"Exhaust all preceding flow and stop iteration\n"
+"        (yield nothing to the following flow).\n"
+"        \"\"\"\n"
+"        for val in flow:\n"
+"            pass\n"
+"        return\n"
+"        # otherwise it won't be a generator\n"
+"        yield \"unreachable\""
+msgstr ""
+"class End(object):\n"
+"    \"\"\"Stop sequence here.\"\"\"\n"
+"\n"
+"    def run(self, flow):\n"
+"        \"\"\"Exhaust all preceding flow and stop iteration\n"
+"        (yield nothing to the following flow).\n"
+"        \"\"\"\n"
+"        for val in flow:\n"
+"            pass\n"
+"        return\n"
+"        # иначе это не будет генератор\n"
+"        yield \"unreachable\""
 
 #: ../../source/tutorial/answers.rst:30 ../../source/tutorial/answers.rst:185
-#: 22c034a4dca84d44acbca75b4b995c6a 8de454edfac64a36ae15a6c9e449a39f
 msgid "Ex. 2"
+msgstr "Упр. 2"
+
+#: ../../source/tutorial/answers.rst:31
+msgid ""
+">>> def my_generator():\n"
+"...    print(\"enter my generator\")\n"
+"...    yield True\n"
+"...\n"
+">>> results = my_generator()\n"
+">>> list(results)\n"
+"enter my generator\n"
+"[True]"
 msgstr ""
+">>> def my_generator():\n"
+"...    print(\"входим в мой генератор\")\n"
+"...    yield True\n"
+"...\n"
+">>> results = my_generator()\n"
+">>> list(results)\n"
+"входим в мой генератор\n"
+"[True]"
 
 #: ../../source/tutorial/answers.rst:43 ../../source/tutorial/answers.rst:193
-#: 017ddfdd10b14d6bae4cf747f006ff9f e1995a1fe69d4f1fb96d82b1cb65d6ff
 msgid "Ex. 3"
-msgstr ""
+msgstr "Упр. 3"
 
-#: ../../source/tutorial/answers.rst:44 bde08b659aa24f37ac8209fb63689621
+#: ../../source/tutorial/answers.rst:44
 msgid ""
 "An implementation of *Count* is given below. An important consideration "
 "is that there may be several *Counts* in the sequence, so give them "
 "different names to distinguish."
 msgstr ""
+"Реализация *Count* дана ниже. Важное соображение, что в "
+"последовательности могут быть несколько *Count*, поэтому дайте им разные "
+"имена чтобы отличить."
+
+#: ../../source/tutorial/answers.rst:48
+msgid ""
+"class Count(object):\n"
+"    \"\"\"Count items that pass through.\n"
+"\n"
+"    After the flow is exhausted, add {*name*: count} to the *context*.\n"
+"    \"\"\"\n"
+"\n"
+"    def __init__(self, name=\"counter\"):\n"
+"        \"\"\"*name* is this counter's name.\"\"\"\n"
+"        self._name = name\n"
+"        self._count = 0\n"
+"        self._cur_context = {}\n"
+"\n"
+"    def run(self, flow):\n"
+"        \"\"\"Yield incoming values and increase counter.\n"
+"\n"
+"        When the incoming flow is exhausted,\n"
+"        update last value's context with *(count, context)*.\n"
+"\n"
+"        If the flow was empty, nothing is yielded\n"
+"        (so *count* can't be zero).\n"
+"        \"\"\"\n"
+"        try:\n"
+"            prev_val = next(flow)\n"
+"        except StopIteration:\n"
+"            # otherwise it will be an error since PEP 479\n"
+"            # https://stackoverflow.com/a/51701040/952234\n"
+"            return\n"
+"            # raise StopIteration\n"
+"        count = 1\n"
+"        for val in flow:\n"
+"            yield prev_val\n"
+"            count += 1\n"
+"            prev_val = val\n"
+"        val = prev_val\n"
+"        data, context = lena.flow.get_data(val), "
+"lena.flow.get_context(val)\n"
+"        context.update({self._name: count})\n"
+"        yield (data, context)"
+msgstr ""
+"class Count(object):\n"
+"    \"\"\"Count items that pass through.\n"
+"\n"
+"    After the flow is exhausted, add {*name*: count} to the *context*.\n"
+"    \"\"\"\n"
+"\n"
+"    def __init__(self, name=\"counter\"):\n"
+"        \"\"\"*name* is this counter's name.\"\"\"\n"
+"        self._name = name\n"
+"        self._count = 0\n"
+"        self._cur_context = {}\n"
+"\n"
+"    def run(self, flow):\n"
+"        \"\"\"Yield incoming values and increase counter.\n"
+"\n"
+"        When the incoming flow is exhausted,\n"
+"        update last value's context with *(count, context)*.\n"
+"\n"
+"        If the flow was empty, nothing is yielded\n"
+"        (so *count* can't be zero).\n"
+"        \"\"\"\n"
+"        try:\n"
+"            prev_val = next(flow)\n"
+"        except StopIteration:\n"
+"            # иначе это будет ошибка после PEP 479\n"
+"            # https://stackoverflow.com/a/51701040/952234\n"
+"            return\n"
+"            # raise StopIteration\n"
+"        count = 1\n"
+"        for val in flow:\n"
+"            yield prev_val\n"
+"            count += 1\n"
+"            prev_val = val\n"
+"        val = prev_val\n"
+"        data, context = lena.flow.get_data(val), "
+"lena.flow.get_context(val)\n"
+"        context.update({self._name: count})\n"
+"        yield (data, context)"
 
 #: ../../source/tutorial/answers.rst:89 ../../source/tutorial/answers.rst:210
-#: 13e078c315bb4d53aa4bc36c4d2a1aa7 1b67e285608a48b7987234250c863dbb
 msgid "Ex. 4"
-msgstr ""
+msgstr "Упр. 4"
 
-#: ../../source/tutorial/answers.rst:90 c6f39c4fe56949f4aaf09cb80b80cd32
+#: ../../source/tutorial/answers.rst:90
 msgid "A simple output function could be the following:"
-msgstr ""
+msgstr "Простая функция вывода может быть следующей:"
 
-#: ../../source/tutorial/answers.rst:107 29aa178cbe2946c4a5b7cd5311cfed99
+#: ../../source/tutorial/answers.rst:92
+msgid ""
+"def output(output_dir=\"output\"):\n"
+"    writer = lena.output.Writer(output_dir)\n"
+"    s = lena.core.Sequence(\n"
+"        lena.output.ToCSV(),\n"
+"        writer,\n"
+"        lena.context.Context(),\n"
+"        lena.output.RenderLaTeX(),  # initialize properly here\n"
+"        writer,\n"
+"        lena.output.LaTeXToPDF(),\n"
+"        lena.output.PDFToPNG(),\n"
+"    )\n"
+"    return s"
+msgstr ""
+"def output(output_dir=\"output\"):\n"
+"    writer = lena.output.Writer(output_dir)\n"
+"    s = lena.core.Sequence(\n"
+"        lena.output.ToCSV(),\n"
+"        writer,\n"
+"        lena.context.Context(),\n"
+"        lena.output.RenderLaTeX(),  # инициализируйте здесь корректно\n"
+"        writer,\n"
+"        lena.output.LaTeXToPDF(),\n"
+"        lena.output.PDFToPNG(),\n"
+"    )\n"
+"    return s"
+
+#: ../../source/tutorial/answers.rst:107
 msgid ""
 "Then place *output()* in a sequence, and new initialized elements will be"
 " put there."
 msgstr ""
+"Затем поместите *output()* в последовательность, и новые "
+"инициализированные элементы будут в неё помещены."
 
-#: ../../source/tutorial/answers.rst:110 b15dcb31e1c948e587ca00823f26f1a5
+#: ../../source/tutorial/answers.rst:110
 msgid ""
 "This approach is terse, but less flexible and explicit. In practice "
 "verbosity of several output elements was never a problem for the author."
 msgstr ""
+"Этот подход краток, но он менее гибкий и явный. На практике детализация "
+"из нескольких выходных элементов никогда не была проблемой для автора."
 
 #: ../../source/tutorial/answers.rst:115 ../../source/tutorial/answers.rst:233
-#: 103a0359b05f43248e89547724021a6c 410c08904ee6455092f3317c7002eb15
 msgid "Ex. 5"
-msgstr ""
+msgstr "Упр. 5"
 
-#: ../../source/tutorial/answers.rst:116 546925e2eab542039338223dc6b1cf42
+#: ../../source/tutorial/answers.rst:116
 msgid ""
 "The author is unaware of a simple for a user way to stop a function and "
 "resume it at the given point. Inform the author if you know better "
 "answers to any of these exercises."
 msgstr ""
+"Автору неизвестен простой для пользователя способ остановить функцию и "
+"возобновить её в заданной точке. Сообщите автору, если вы знаете лучшие "
+"ответы на любое из этих упражнений."
 
-#: ../../source/tutorial/answers.rst:120 d8dfdea5c95646f6a004521faa0a0826
+#: ../../source/tutorial/answers.rst:120
 msgid ""
 "Mikhail Zelenyi gives this `explanation "
 "<https://habr.com/ru/post/490518/#comment_21342580>`_ (translated from "
@@ -96,8 +262,7 @@ msgstr ""
 "Михаил Зелёный даёт такое `объяснение "
 "<https://habr.com/ru/post/490518/#comment_21342580>`_:"
 
-#: ../../source/tutorial/answers.rst:124 33745856d8de4bb69690eabad5bb5e0d
-#, fuzzy
+#: ../../source/tutorial/answers.rst:124
 msgid ""
 "There are two types of models: push and pull. If you have a sequence, "
 "then in the case of a *push* model the calculations are initiated by the "
@@ -106,11 +271,11 @@ msgid ""
 " one sequence, but into two."
 msgstr ""
 "Есть два типа моделей: push и pull.  Если у вас есть цепочка, то в случае"
-" *push* модели вычисления инициирует первый член цепочки и он пихает "
+" *push* модели вычисления инициирует первый член цепочки, и он пихает "
 "данные дальше. В данном случае ветвление (форк) делается легко, он просто"
 " в определённый момент пихает данные не в одну цепочку, а в две."
 
-#: ../../source/tutorial/answers.rst:130 83074c9b7b6845cc9b4cf36ff1d8c8d9
+#: ../../source/tutorial/answers.rst:130
 msgid ""
 "In the case of a *pull* model the calculations are initiated by the last "
 "member of the sequence. Consequently, if we want to branch the sequence, "
@@ -124,19 +289,65 @@ msgstr ""
 " буферизацию, или стартовать с одного потребителя, а в остальные "
 "пропихивать данные по push модели."
 
-#: ../../source/tutorial/answers.rst:138 6bd0ec8ff9fa452db1ea26d2b2013c27
+#: ../../source/tutorial/answers.rst:138
 msgid "Part 2"
-msgstr ""
+msgstr "Часть 2"
 
-#: ../../source/tutorial/answers.rst:141 00b73a5ffc3048868bf448ce0b2f6689
+#: ../../source/tutorial/answers.rst:141
 msgid "This is the *Sum* implementation from *lena.math*:"
 msgstr ""
 
-#: ../../source/tutorial/answers.rst:186 41bca8f1f5af450f94984e9f3450d0d9
+#: ../../source/tutorial/answers.rst:143
+msgid ""
+"class Sum(object):\n"
+"    \"\"\"Calculate sum of input values.\"\"\"\n"
+"\n"
+"    def __init__(self, start=0):\n"
+"        \"\"\"*start* is the initial value of sum.\"\"\"\n"
+"        # start is similar to Python's builtin *sum* start.\n"
+"        self._start = start\n"
+"        self.reset()\n"
+"\n"
+"    def fill(self, value):\n"
+"        \"\"\"Fill *self* with *value*.\n"
+"\n"
+"        The *value* can be a *(data, context)* pair.\n"
+"        The last *context* value (considered empty if missing)\n"
+"        sets the current context.\n"
+"        \"\"\"\n"
+"        data, context = lena.flow.get_data_context(value)\n"
+"        self._sum += data\n"
+"        self._cur_context = context\n"
+"\n"
+"    def compute(self):\n"
+"        \"\"\"Calculate the sum and yield.\n"
+"\n"
+"        If the current context is not empty, yield *(sum, context)*.\n"
+"        Otherwise yield only *sum*.\n"
+"        \"\"\"\n"
+"        if not self._cur_context:\n"
+"            yield self._sum\n"
+"        else:\n"
+"            yield (self._sum, copy.deepcopy(self._cur_context))\n"
+"\n"
+"    def reset(self):\n"
+"        \"\"\"Reset sum and context.\n"
+"\n"
+"        Sum is reset to the *start* value and context to {}.\n"
+"        \"\"\"\n"
+"        self._sum = copy.deepcopy(self._start)\n"
+"        self._cur_context = {}"
+msgstr ""
+
+#: ../../source/tutorial/answers.rst:186
 msgid "Delete the first *MakeFilename* and change the second one to"
 msgstr ""
 
-#: ../../source/tutorial/answers.rst:194 85e2de13a82f4c4892c73a5abc3ffdd4
+#: ../../source/tutorial/answers.rst:188
+msgid "MakeFilename(\"{{variable.particle}}/{{variable.name}}\")"
+msgstr ""
+
+#: ../../source/tutorial/answers.rst:194
 msgid ""
 "We believe that the essence of data is captured in the function with "
 "which it was obtained. Histogram is just its presentation. It may be "
@@ -144,7 +355,7 @@ msgid ""
 "*MakeFilename* would be more powerful."
 msgstr ""
 
-#: ../../source/tutorial/answers.rst:200 aa9d2342e2cd4b42ba925b828151ce90
+#: ../../source/tutorial/answers.rst:200
 msgid ""
 "Functional programming suggests that larger functions should be "
 "decomposed into smaller ones, while object-oriented design praises code "
@@ -155,7 +366,7 @@ msgid ""
 " name)."
 msgstr ""
 
-#: ../../source/tutorial/answers.rst:211 2d712486afd1434fa6fdcdcbc1741aca
+#: ../../source/tutorial/answers.rst:211
 msgid ""
 "In part 1 of the tutorial there was introduced an element *End*, which "
 "stops the flow at its location. However, if there are *Histograms* in the"
@@ -166,7 +377,7 @@ msgid ""
 "was empty."
 msgstr ""
 
-#: ../../source/tutorial/answers.rst:220 57af737efcf2434bb28e08fc8c1df6d4
+#: ../../source/tutorial/answers.rst:220
 msgid ""
 "In the next chapter we will present a specific analysis during which a "
 "histogram may not be filled, but it must be produced. A *FillCompute* "
@@ -174,7 +385,7 @@ msgid ""
 "concrete example)."
 msgstr ""
 
-#: ../../source/tutorial/answers.rst:225 139e4a7b69354abebc02bd4d9668316e
+#: ../../source/tutorial/answers.rst:225
 msgid ""
 "Note also that if a histogram was not filled, preceding variables weren't"
 " called. The histogram will have no context, probably won't have a name "
@@ -182,7 +393,7 @@ msgid ""
 "creating your own *FillCompute* elements."
 msgstr ""
 
-#: ../../source/tutorial/answers.rst:234 bd61f87a1c8d492dbf246abdd397b688
+#: ../../source/tutorial/answers.rst:234
 msgid ""
 "It depends on the student's priorities. If he wants to finish the diploma"
 " never to return to programming, or if he has a lot of work to do apart "
@@ -192,7 +403,7 @@ msgid ""
 "will have to rewrite all code when more functionality becomes needed."
 msgstr ""
 
-#: ../../source/tutorial/answers.rst:243 60e4fb81acd5492d92f2a80c6adc46a8
+#: ../../source/tutorial/answers.rst:243
 msgid ""
 "Architectural choices rise for middle-sized or large projects. If the "
 "student's personal code becomes large and more time is spent on "
@@ -201,7 +412,7 @@ msgid ""
 "one thousand lines."
 msgstr ""
 
-#: ../../source/tutorial/answers.rst:250 7455dc0be37c449ca8493e787985f633
+#: ../../source/tutorial/answers.rst:250
 msgid ""
 "Another distinction is that when using a library one learns how to use a "
 "library. When using a good framework, one learns how to write good code. "

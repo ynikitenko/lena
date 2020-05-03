@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Lena 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-14 22:34+0300\n"
+"POT-Creation-Date: 2020-05-03 16:54+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -109,92 +109,100 @@ msgstr ""
 msgid "**Group plots:**"
 msgstr ""
 
-#: ../../source/flow.rst:36:<autosummary>:1
+#: ../../source/flow.rst:37:<autosummary>:1
 msgid ":obj:`GroupBy <lena.flow.GroupBy>`\\ \\(group\\_by\\)"
 msgstr ""
 
-#: ../../source/flow.rst:36:<autosummary>:1 lena.flow.GroupBy:1 of
-msgid "Group data."
+#: ../../source/flow.rst:37:<autosummary>:1 lena.flow.GroupBy:1 of
+msgid "Group values."
 msgstr ""
 
-#: ../../source/flow.rst:36:<autosummary>:1
+#: ../../source/flow.rst:37:<autosummary>:1
 msgid ""
 ":obj:`GroupPlots <lena.flow.GroupPlots>`\\ \\(group\\_by\\, select\\[\\, "
 "transform\\, ...\\]\\)"
 msgstr ""
 
-#: ../../source/flow.rst:36:<autosummary>:1 lena.flow.GroupPlots:1 of
+#: ../../source/flow.rst:37:<autosummary>:1 lena.flow.GroupPlots:1 of
 msgid "Group several plots."
 msgstr ""
 
-#: ../../source/flow.rst:36:<autosummary>:1
+#: ../../source/flow.rst:37:<autosummary>:1
 msgid ""
 ":obj:`GroupScale <lena.flow.GroupScale>`\\ \\(scale\\_to\\[\\, "
 "allow\\_zero\\_scale\\, ...\\]\\)"
 msgstr ""
 
-#: ../../source/flow.rst:36:<autosummary>:1 lena.flow.GroupScale:1 of
+#: ../../source/flow.rst:37:<autosummary>:1 lena.flow.GroupScale:1 of
 msgid "Scale a group of data."
 msgstr ""
 
-#: ../../source/flow.rst:36:<autosummary>:1
+#: ../../source/flow.rst:37:<autosummary>:1
+msgid ":obj:`Not <lena.flow.Not>`\\ \\(selector\\)"
+msgstr ""
+
+#: ../../source/flow.rst:37:<autosummary>:1 lena.flow.Not:1 of
+msgid "Negate a selector."
+msgstr ""
+
+#: ../../source/flow.rst:37:<autosummary>:1
 msgid ":obj:`Selector <lena.flow.Selector>`\\ \\(selector\\)"
 msgstr ""
 
-#: ../../source/flow.rst:36:<autosummary>:1 lena.flow.Selector:1 of
+#: ../../source/flow.rst:37:<autosummary>:1 lena.flow.Selector:1 of
 msgid "Determine whether an item should be selected."
 msgstr ""
 
-#: ../../source/flow.rst:37
+#: ../../source/flow.rst:38
 msgid "**Iterators:**"
 msgstr ""
 
-#: ../../source/flow.rst:45:<autosummary>:1
+#: ../../source/flow.rst:46:<autosummary>:1
 msgid ":obj:`Chain <lena.flow.iterators.Chain>`\\ \\(\\*iterables\\)"
 msgstr ""
 
-#: ../../source/flow.rst:45:<autosummary>:1 lena.flow.iterators.Chain:1 of
+#: ../../source/flow.rst:46:<autosummary>:1 lena.flow.iterators.Chain:1 of
 msgid "Chain generators."
 msgstr ""
 
-#: ../../source/flow.rst:45:<autosummary>:1
+#: ../../source/flow.rst:46:<autosummary>:1
 msgid ""
 ":obj:`CountFrom <lena.flow.iterators.CountFrom>`\\ \\(\\[start\\, "
 "step\\]\\)"
 msgstr ""
 
-#: ../../source/flow.rst:45:<autosummary>:1 lena.flow.iterators.CountFrom:1 of
+#: ../../source/flow.rst:46:<autosummary>:1 lena.flow.iterators.CountFrom:1 of
 msgid "Generate numbers from *start* to infinity, with *step* between values."
 msgstr ""
 
-#: ../../source/flow.rst:45:<autosummary>:1
+#: ../../source/flow.rst:46:<autosummary>:1
 msgid ":obj:`ISlice <lena.flow.iterators.ISlice>`\\ \\(\\*args\\)"
 msgstr ""
 
-#: ../../source/flow.rst:45:<autosummary>:1 lena.flow.iterators.ISlice:1 of
+#: ../../source/flow.rst:46:<autosummary>:1 lena.flow.iterators.ISlice:1 of
 msgid "Slice iterable from *start* to *stop* with *step*."
 msgstr ""
 
-#: ../../source/flow.rst:46
+#: ../../source/flow.rst:47
 msgid "**Split into bins:**"
 msgstr ""
 
-#: ../../source/flow.rst:52:<autosummary>:1
+#: ../../source/flow.rst:53:<autosummary>:1
 msgid ""
 ":obj:`SplitIntoBins <lena.flow.split_into_bins.SplitIntoBins>`\\ "
 "\\(seq\\, arg\\_func\\, edges\\[\\, transform\\]\\)"
 msgstr ""
 
-#: ../../source/flow.rst:52:<autosummary>:1
+#: ../../source/flow.rst:53:<autosummary>:1
 #: lena.flow.split_into_bins.SplitIntoBins:1 of
 msgid "Split analysis into bins."
 msgstr ""
 
-#: ../../source/flow.rst:54
+#: ../../source/flow.rst:55
 msgid "Elements"
 msgstr ""
 
-#: ../../source/flow.rst:55
+#: ../../source/flow.rst:56
 msgid ""
 "Elements form Lena sequences. This group contains miscellaneous elements,"
 " which didn't fit other categories."
@@ -208,6 +216,18 @@ msgstr ""
 
 #: lena.flow.Cache:8 of
 msgid "Example::"
+msgstr ""
+
+#: lena.flow.Cache:10 of
+msgid ""
+"s = Source(\n"
+"         ReadFiles(),\n"
+"         ReadEvents(),\n"
+"         MakeHistograms(),\n"
+"         Cache(\"histograms.pkl\"),\n"
+"         MakeStats(),\n"
+"         Cache(\"stats.pkl\"),\n"
+"      )"
 msgstr ""
 
 #: lena.flow.Cache:19 of
@@ -256,8 +276,8 @@ msgstr ""
 #: lena.flow.Cache.alter_sequence:1 of
 msgid ""
 "If the Sequence *seq* contains a :class:`Cache`, which has an up-to-date "
-"cache, a :class:`~lena.core.Source` is built based on the flattened *seq*"
-" and returned. Otherwise the *seq* is returned unchanged."
+"cache, a :class:`.Source` is built based on the flattened *seq* and "
+"returned. Otherwise the *seq* is returned unchanged."
 msgstr ""
 
 #: lena.flow.Cache.cache_exists:1 of
@@ -271,7 +291,7 @@ msgstr ""
 #: lena.flow.Cache.drop_cache:3 of
 msgid ""
 "If cache exists and is readable, but could not be deleted, "
-":exc:`~lena.core.LenaEnvironmentError` is raised."
+":exc:`.LenaEnvironmentError` is raised."
 msgstr ""
 
 #: lena.flow.Cache.run:1 of
@@ -336,7 +356,7 @@ msgid ""
 " can select its specific fields)."
 msgstr ""
 
-#: ../../source/flow.rst:75
+#: ../../source/flow.rst:76
 msgid "Functions"
 msgstr ""
 
@@ -374,7 +394,7 @@ msgid ""
 "For each value from the *container*, calculate ``seq.run([value])``. This"
 " can be a list or a single value. If *one_result* is True, the result "
 "must be a single value. In this case, if results contain less than or "
-"more than one element, :exc:`~lena.core.LenaValueError` is raised."
+"more than one element, :exc:`.LenaValueError` is raised."
 msgstr ""
 
 #: lena.flow.functions.seq_map:9 of
@@ -383,7 +403,7 @@ msgid ""
 " in the same order as read from the *container*."
 msgstr ""
 
-#: ../../source/flow.rst:82
+#: ../../source/flow.rst:83
 msgid "Group plots"
 msgstr ""
 
@@ -396,40 +416,33 @@ msgid ""
 "Since data can be produced in different places, several classes are "
 "needed to support this. First, the plots of interest must be selected "
 "(for example, one-dimensional histograms). This is done by "
-":class:`Selector`. Selected plots must be grouped. For example, we may "
+":class:`.Selector`. Selected plots must be grouped. For example, we may "
 "want to plot data *x* versus Monte-Carlo *x*, but not data *x* vs data "
-"*y*. Data is grouped by :class:`GroupBy`. To preserve the group, we can't"
-" yield it to the following elements, but have to transform the plots "
-"inside :class:`GroupPlots`. We can also scale (normalize) all plots to "
-"one using :class:`GroupScale`."
+"*y*. Data is grouped by :class:`.GroupBy`. To preserve the group, we "
+"can't yield its members to the following elements, but have to transform "
+"the plots inside :class:`.GroupPlots`. We can also scale (normalize) all "
+"plots to one using :class:`.GroupScale`."
 msgstr ""
 
 #: lena.flow.GroupBy:3 of
 msgid ""
-"Data is added during :meth:`update`. Groups are available as "
-":attr:`groups` attribute."
+"Data is added during :meth:`update`. Groups dictionary is available as "
+":attr:`groups` attribute. :attr:`groups` is a mapping of *keys* (defined "
+"by *group_by*) to lists of items with the same key."
 msgstr ""
 
-#: lena.flow.GroupBy:6 of
-msgid ""
-"Groups is a mapping of *keys* (return values of *group_by*) and lists of "
-"items with the same key."
-msgstr ""
-
-#: lena.flow.GroupBy:9 of
-msgid "Combine data with same attributes."
-msgstr ""
-
-#: lena.flow.GroupBy:11 of
+#: lena.flow.GroupBy:8 of
 msgid ""
 "*group_by* is a function, which returns distinct hashable results for "
-"items from different groups."
+"items from different groups. It can be a dot-separated string, which "
+"corresponds to a subcontext (see :func:`context.get_recursively "
+"<.get_recursively>`)."
 msgstr ""
 
 #: lena.flow.GroupBy:14 of
 msgid ""
-"It can be a dot-separated string, which corresponds to context. "
-"Otherwise, :exc:`~lena.core.LenaTypeError` is raised."
+"If *group_by* is not a callable or a string, :exc:`.LenaTypeError` is "
+"raised."
 msgstr ""
 
 #: lena.flow.GroupBy.clear:1 of
@@ -449,77 +462,73 @@ msgstr ""
 #: lena.flow.GroupPlots:3 of
 msgid ""
 "Plots to be grouped are chosen by *select*, which acts as a boolean "
-"function. If *select* is not a :class:`Selector`, it is converted to that"
-" class. See :class:`Selector` for more options."
+"function. If *select* is not a :class:`.Selector`, it is converted to "
+"that class. Use :class:`.Selector` for more options."
 msgstr ""
 
 #: lena.flow.GroupPlots:9 of
 msgid ""
 "Plots are grouped by *group_by*, which returns different keys for "
-"different groups. If it is not an instance of :class:`GroupBy`, it is "
-"converted to that class. See :class:`GroupBy` for more options."
+"different groups. If it is not an instance of :class:`.GroupBy`, it is "
+"converted to that class. Use :class:`.GroupBy` for more options."
 msgstr ""
 
 #: lena.flow.GroupPlots:15 of
 msgid ""
-"*scale_to* is a number or a string. A number means the scale, to which "
-"plots must be normalized. A string is a name of the plot to which other "
-"plots must be normalized. If *scale_to* is not an instance of "
-":class:`GroupScale`, it is converted to that class. If a plot could not "
-"be rescaled, :exc:`~lena.core.LenaValueError` is raised. For more "
-"options, use :class:`GroupScale`."
+"*scale* is a number or a string. A number means the scale, to which plots"
+" must be normalized. A string is a name of the plot to which other plots "
+"must be normalized. If *scale* is not an instance of "
+":class:`.GroupScale`, it is converted to that class. If a plot could not "
+"be rescaled, :exc:`.LenaValueError` is raised. For more options, use "
+":class:`.GroupScale`."
 msgstr ""
 
 #: lena.flow.GroupPlots:25 of
 msgid ""
 "*transform* is a sequence, which processes individual plots before "
-"yielding. For example, ``transform=(HistToCSV(), writer)``. *transform* "
-"is called after *scale_to*."
+"yielding. For example, set ``transform=(ToCSV(), writer)``. *transform* "
+"is called after *scale*."
 msgstr ""
 
 #: lena.flow.GroupPlots:30 of
 msgid ""
 "*yield_selected* defines whether selected items should be yielded during "
-"*run* like other items. Use it if you want to have both single and "
-"combined plots. By default, selected plots are not yielded."
+":meth:`run` like other items (by default not). Use it to have both single"
+" and combined plots."
 msgstr ""
 
 #: lena.flow.GroupPlots.run:1 of
-msgid "Run the flow and yield final groups."
+msgid "Run the *flow* and yield final groups."
 msgstr ""
 
 #: lena.flow.GroupPlots.run:3 of
 msgid ""
-"Each item of the flow is checked with the selector. If it is selected, it"
-" is added to groups. Otherwised it is yielded."
+"Each item of the *flow* is checked with the selector. If it is selected, "
+"it is added to groups. Otherwise, it is yielded."
 msgstr ""
 
 #: lena.flow.GroupPlots.run:7 of
 msgid ""
-"After the flow is finished, groups are yielded. Groups are lists of "
-"items, which have same keys from *group_by*. Each group's context "
-"(including empty) is inserted into a list in *context.group*. The "
-"resulting context is updated with the intersection of groups' contexts. "
-"For uniformity, if *yield_selected* is True, single values are also "
-"updated: data is put into a list of one element, and context is updated "
-"with *group* key. Its value is copy (not deep copy) of context's values, "
-"so future updates to subdictionaries which existed during this run will "
-"be effective in *context.group*."
+"After the *flow* is finished, groups are yielded. Groups are lists of "
+"items, which have same keys returned from *group_by*. Each group's "
+"context (including empty one) is inserted into a list in *context.group*."
+" The resulting context is updated with the intersection of groups' "
+"contexts."
 msgstr ""
 
-#: lena.flow.GroupPlots.run:22 of
+#: lena.flow.GroupPlots.run:15 of
 msgid ""
-"If *scale_to* was set, plots are normalized to the given value or plot. "
-"If that plot was not selected (is missing in the captured group) or its "
-"norm could not be calculated, :exc:`~lena.core.LenaValueError` is raised."
+"If *scale* was set, plots are normalized to the given value or plot. If "
+"that plot was not selected (is missing in the captured group) or its norm"
+" could not be calculated, :exc:`.LenaValueError` is raised."
 msgstr ""
 
 #: lena.flow.GroupScale:3 of
 msgid ""
 "*scale_to* defines the method of scaling. If a number is given, group "
 "items are scaled to that. Otherwise it is converted to a "
-":class:`~lena.flow.Selector`, which must return a unique item from the "
-"group. Group items will be scaled to the scale of that item."
+":class:`.Selector`, which must return a unique item from the group. Group"
+" items will be scaled to the scale of that item."
 msgstr ""
 
 #: lena.flow.GroupScale:9 of
@@ -544,7 +553,27 @@ msgstr ""
 #: lena.flow.GroupScale.scale:9 of
 msgid ""
 "If any item could not be rescaled and options were not set to ignore "
-"that, :exc:`~lena.core.LenaValueError` is raised."
+"that, :exc:`.LenaValueError` is raised."
+msgstr ""
+
+#: lena.flow.Not:1 of
+msgid "Bases: :class:`lena.flow.selectors.Selector`"
+msgstr ""
+
+#: lena.flow.Not:3 of
+msgid "*selector* will initialize a :class:`.Selector`."
+msgstr ""
+
+#: lena.flow.Not.__call__:1 of
+msgid "Negate the result of the initialized *selector*."
+msgstr ""
+
+#: lena.flow.Not.__call__:3 of
+msgid ""
+"This is a complete negation (including the case of an error encountered "
+"in the *selector*). For example, if the *selector* is *variable.name*, "
+"and *value*'s context contains no *\"variable\"*, "
+"*Not(\"variable.name\")(value)* will be ``True``."
 msgstr ""
 
 #: lena.flow.Selector:3 of
@@ -570,7 +599,7 @@ msgstr ""
 #: lena.flow.Selector:14 of
 msgid ""
 "A string means that value's context must conform to that (as in "
-":func:`lena.context.check_context_str`)."
+":func:`context.contains <.contains>`)."
 msgstr ""
 
 #: lena.flow.Selector:17 of
@@ -582,9 +611,7 @@ msgid ""
 msgstr ""
 
 #: lena.flow.Selector:23 of
-msgid ""
-"If incorrect arguments are provided, :exc:`~lena.core.LenaTypeError` is "
-"raised."
+msgid "If incorrect arguments are provided, :exc:`.LenaTypeError` is raised."
 msgstr ""
 
 #: lena.flow.Selector.__call__:1 of
@@ -593,11 +620,11 @@ msgstr ""
 
 #: lena.flow.Selector.__call__:3 of
 msgid ""
-"If an exception occurs, the result is False. It is safe to use non-"
-"existing attributes, etc."
+"If an exception occurs, the result is ``False``. Thus it is safe to use "
+"non-existing attributes or arbitrary contexts."
 msgstr ""
 
-#: ../../source/flow.rst:94
+#: ../../source/flow.rst:99
 msgid "Iterators"
 msgstr ""
 
@@ -659,7 +686,7 @@ msgstr ""
 msgid "Yield values from *start* to *stop* with *step*."
 msgstr ""
 
-#: ../../source/flow.rst:100
+#: ../../source/flow.rst:105
 msgid "Split into bins"
 msgstr ""
 
@@ -681,29 +708,28 @@ msgstr ""
 #: lena.flow.split_into_bins.ReduceBinContent:8 of
 msgid ""
 "*Select* determines which types should be transformed. The types must be "
-"given in a ``list`` (not a tuple) or as a general :class:`Selector`. "
+"given in a ``list`` (not a tuple) or as a general :class:`.Selector`. "
 "Example: ``select=[lena.math.vector3, list]``."
 msgstr ""
 
 #: lena.flow.split_into_bins.ReduceBinContent:13 of
 msgid ""
 "*transform* is a *Sequence* or element applied to bin contents. If "
-"*transform* is not a :class:`~lena.core.Sequence` or an element with "
-"*run* method, it is converted to a :class:`~lena.core.Sequence`. Example:"
-" ``transform=Split([X(), Y(), Z()])`` (provided that you have X, Y, Z "
-"variables)."
+"*transform* is not a :class:`.Sequence` or an element with *run* method, "
+"it is converted to a :class:`.Sequence`. Example: ``transform=Split([X(),"
+" Y(), Z()])`` (provided that you have X, Y, Z variables)."
 msgstr ""
 
 #: lena.flow.split_into_bins.ReduceBinContent:20 of
 msgid ""
-":class:`ReduceBinContent` creates histograms, which may be plotted, that "
-"is bins contain only data without context. By default, context of all "
+":class:`.ReduceBinContent` creates histograms, which may be plotted, that"
+" is bins contain only data without context. By default, context of all "
 "bins except one is not used. If *drop_bins_context* is ``False``, a "
 "histogram of bin context is added to context."
 msgstr ""
 
 #: lena.flow.split_into_bins.ReduceBinContent:27 of
-msgid "In case of wrong arguments, :exc:`~lena.core.LenaTypeError` is raised."
+msgid "In case of wrong arguments, :exc:`.LenaTypeError` is raised."
 msgstr ""
 
 #: lena.flow.split_into_bins.ReduceBinContent.run:1 of
@@ -724,17 +750,17 @@ msgstr ""
 
 #: lena.flow.split_into_bins.SplitIntoBins:3 of
 msgid ""
-"*seq* is a :class:`~lena.core.FillComputeSeq` sequence, which corresponds"
-" to the analysis being compared for different bins. It can be a tuple "
-"containing a *FillCompute* element. Deep copy of *seq* will be used to "
-"produce each bin's content."
+"*seq* is a :class:`.FillComputeSeq` sequence, which corresponds to the "
+"analysis being compared for different bins. It can be a tuple containing "
+"a *FillCompute* element. Deep copy of *seq* will be used to produce each "
+"bin's content."
 msgstr ""
 
 #: lena.flow.split_into_bins.SplitIntoBins:9 of
 msgid ""
 "*arg_func* is a function which takes data and returns argument value used"
-" to compute the bin index. A :class:`~lena.variables.variable.Variable` "
-"must be provided. Example of a two-dimensional function: ``arg_func = "
+" to compute the bin index. A :class:`.Variable` must be provided. Example"
+" of a two-dimensional function: ``arg_func = "
 "lena.variables.Variable(\"xy\", lambda event: (event.x, event.y))``."
 msgstr ""
 
@@ -747,12 +773,12 @@ msgstr ""
 
 #: lena.flow.split_into_bins.SplitIntoBins:20 of
 msgid ""
-"*transform* is a :class:`~lena.core.Sequence`, which is applied to "
-"results. The final histogram may contain vectors, histograms and any "
-"other data the analysis produced. To be able to plot them, *transform* "
-"can extract vector components or do other work to simplify structures. By"
-" default, *transform* is :class:`TransformBins`. Pass an empty tuple to "
-"disable it."
+"*transform* is a :class:`.Sequence`, which is applied to results. The "
+"final histogram may contain vectors, histograms and any other data the "
+"analysis produced. To be able to plot them, *transform* can extract "
+"vector components or do other work to simplify structures. By default, "
+"*transform* is :class:`.TransformBins`. Pass an empty tuple to disable "
+"it."
 msgstr ""
 
 #: lena.flow.split_into_bins.SplitIntoBins:29 of
@@ -761,10 +787,9 @@ msgstr ""
 
 #: lena.flow.split_into_bins.SplitIntoBins:31 of
 msgid ""
-"If *edges* are not increasing, "
-":exc:`~lena.core.exceptions.LenaValueError` is raised. In case of other "
-"argument initialization problems, "
-":exc:`~lena.core.exceptions.LenaTypeError` is raised."
+"If *edges* are not increasing, :exc:`.exceptions.LenaValueError` is "
+"raised. In case of other argument initialization problems, "
+":exc:`.exceptions.LenaTypeError` is raised."
 msgstr ""
 
 #: lena.flow.split_into_bins.SplitIntoBins.compute:1 of
@@ -773,14 +798,13 @@ msgstr ""
 
 #: lena.flow.split_into_bins.SplitIntoBins.compute:3 of
 msgid ""
-":class:`~lena.structures.Histogram` is created from :attr:`edges` and "
-"bins taken from compute() for :attr:`bins`. Context is preserved in "
-"histogram bins."
+":class:`.Histogram` is created from :attr:`edges` and bins taken from "
+"compute() for :attr:`bins`. Context is preserved in histogram bins."
 msgstr ""
 
 #: lena.flow.split_into_bins.SplitIntoBins.compute:8 of
 msgid ""
-":class:`SplitIntoBins` context is added to *context.split_into_bins* as "
+":class:`.SplitIntoBins` context is added to *context.split_into_bins* as "
 "*histogram* (corresponding to *edges*) and *variable* (corresponding to "
 "*arg_func*) subcontexts."
 msgstr ""
@@ -809,18 +833,16 @@ msgid ""
 "*create_edges_str* is a callable, which creates a string from bin's edges"
 " and coordinate names and adds that to context. It is passed parameters "
 "*(edges, var_context)*, where *var_context* is Variable context "
-"containing variable names (it can be a single "
-":class:`~lena.variable.Variable` or :class:`~lena.variable.Combine`)."
+"containing variable names (it can be a single :class:`.Variable` or "
+":class:`.Combine`)."
 msgstr ""
 
-#: lena.flow.split_into_bins.TransformBins:13 of
+#: lena.flow.split_into_bins.TransformBins:12 of
 msgid "By default, it is :func:`cell_to_string`."
 msgstr ""
 
-#: lena.flow.split_into_bins.TransformBins:15 of
-msgid ""
-"If *create_edges_str* is not callable, :exc:`~lena.core.LenaTypeError` is"
-" raised."
+#: lena.flow.split_into_bins.TransformBins:14 of
+msgid "If *create_edges_str* is not callable, :exc:`.LenaTypeError` is raised."
 msgstr ""
 
 #: lena.flow.split_into_bins.cell_to_string:1 of
@@ -860,6 +882,318 @@ msgid "For example, if the histogram is two-dimensional, return hist[0][0]."
 msgstr ""
 
 #: lena.flow.split_into_bins.get_example_bin:5 of
-msgid "*struct* can be a :class:`~lena.structures.Histogram` or an array of bins."
+msgid "*struct* can be a :class:`.Histogram` or an array of bins."
 msgstr ""
+
+#~ msgid "Group data."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "If the Sequence *seq* contains a "
+#~ ":class:`Cache`, which has an up-to-"
+#~ "date cache, a :class:`~lena.core.Source` is"
+#~ " built based on the flattened *seq*"
+#~ " and returned. Otherwise the *seq* is"
+#~ " returned unchanged."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "If cache exists and is readable, "
+#~ "but could not be deleted, "
+#~ ":exc:`~lena.core.LenaEnvironmentError` is raised."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "For each value from the *container*, "
+#~ "calculate ``seq.run([value])``. This can be"
+#~ " a list or a single value. If"
+#~ " *one_result* is True, the result "
+#~ "must be a single value. In this"
+#~ " case, if results contain less than"
+#~ " or more than one element, "
+#~ ":exc:`~lena.core.LenaValueError` is raised."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Since data can be produced in "
+#~ "different places, several classes are "
+#~ "needed to support this. First, the "
+#~ "plots of interest must be selected "
+#~ "(for example, one-dimensional histograms). "
+#~ "This is done by :class:`Selector`. "
+#~ "Selected plots must be grouped. For "
+#~ "example, we may want to plot data"
+#~ " *x* versus Monte-Carlo *x*, but "
+#~ "not data *x* vs data *y*. Data "
+#~ "is grouped by :class:`GroupBy`. To "
+#~ "preserve the group, we can't yield "
+#~ "it to the following elements, but "
+#~ "have to transform the plots inside "
+#~ ":class:`GroupPlots`. We can also scale "
+#~ "(normalize) all plots to one using "
+#~ ":class:`GroupScale`."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Data is added during :meth:`update`. "
+#~ "Groups are available as :attr:`groups` "
+#~ "attribute."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Groups is a mapping of *keys* "
+#~ "(return values of *group_by*) and lists"
+#~ " of items with the same key."
+#~ msgstr ""
+
+#~ msgid "Combine data with same attributes."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "*group_by* is a function, which returns"
+#~ " distinct hashable results for items "
+#~ "from different groups."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "It can be a dot-separated string,"
+#~ " which corresponds to context. Otherwise,"
+#~ " :exc:`~lena.core.LenaTypeError` is raised."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Plots to be grouped are chosen by"
+#~ " *select*, which acts as a boolean"
+#~ " function. If *select* is not a "
+#~ ":class:`Selector`, it is converted to "
+#~ "that class. See :class:`Selector` for "
+#~ "more options."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Plots are grouped by *group_by*, which"
+#~ " returns different keys for different "
+#~ "groups. If it is not an instance"
+#~ " of :class:`GroupBy`, it is converted "
+#~ "to that class. See :class:`GroupBy` for"
+#~ " more options."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "*scale_to* is a number or a "
+#~ "string. A number means the scale, "
+#~ "to which plots must be normalized. "
+#~ "A string is a name of the "
+#~ "plot to which other plots must be"
+#~ " normalized. If *scale_to* is not an"
+#~ " instance of :class:`GroupScale`, it is "
+#~ "converted to that class. If a plot"
+#~ " could not be rescaled, "
+#~ ":exc:`~lena.core.LenaValueError` is raised. For "
+#~ "more options, use :class:`GroupScale`."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "*transform* is a sequence, which "
+#~ "processes individual plots before yielding."
+#~ " For example, ``transform=(HistToCSV(), "
+#~ "writer)``. *transform* is called after "
+#~ "*scale_to*."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "*yield_selected* defines whether selected "
+#~ "items should be yielded during *run* "
+#~ "like other items. Use it if you"
+#~ " want to have both single and "
+#~ "combined plots. By default, selected "
+#~ "plots are not yielded."
+#~ msgstr ""
+
+#~ msgid "Run the flow and yield final groups."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Each item of the flow is checked"
+#~ " with the selector. If it is "
+#~ "selected, it is added to groups. "
+#~ "Otherwised it is yielded."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "After the flow is finished, groups "
+#~ "are yielded. Groups are lists of "
+#~ "items, which have same keys from "
+#~ "*group_by*. Each group's context (including"
+#~ " empty) is inserted into a list "
+#~ "in *context.group*. The resulting context "
+#~ "is updated with the intersection of "
+#~ "groups' contexts. For uniformity, if "
+#~ "*yield_selected* is True, single values "
+#~ "are also updated: data is put into"
+#~ " a list of one element, and "
+#~ "context is updated with *group* key. "
+#~ "Its value is copy (not deep copy)"
+#~ " of context's values, so future "
+#~ "updates to subdictionaries which existed "
+#~ "during this run will be effective "
+#~ "in *context.group*."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "If *scale_to* was set, plots are "
+#~ "normalized to the given value or "
+#~ "plot. If that plot was not "
+#~ "selected (is missing in the captured "
+#~ "group) or its norm could not be"
+#~ " calculated, :exc:`~lena.core.LenaValueError` is "
+#~ "raised."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "*scale_to* defines the method of "
+#~ "scaling. If a number is given, "
+#~ "group items are scaled to that. "
+#~ "Otherwise it is converted to a "
+#~ ":class:`~lena.flow.Selector`, which must return "
+#~ "a unique item from the group. "
+#~ "Group items will be scaled to the"
+#~ " scale of that item."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "If any item could not be rescaled"
+#~ " and options were not set to "
+#~ "ignore that, :exc:`~lena.core.LenaValueError` is "
+#~ "raised."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "A string means that value's context "
+#~ "must conform to that (as in "
+#~ ":func:`lena.context.check_context_str`)."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "If incorrect arguments are provided, "
+#~ ":exc:`~lena.core.LenaTypeError` is raised."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "If an exception occurs, the result "
+#~ "is False. It is safe to use "
+#~ "non-existing attributes, etc."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "*Select* determines which types should "
+#~ "be transformed. The types must be "
+#~ "given in a ``list`` (not a tuple)"
+#~ " or as a general :class:`Selector`. "
+#~ "Example: ``select=[lena.math.vector3, list]``."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "*transform* is a *Sequence* or element"
+#~ " applied to bin contents. If "
+#~ "*transform* is not a "
+#~ ":class:`~lena.core.Sequence` or an element "
+#~ "with *run* method, it is converted "
+#~ "to a :class:`~lena.core.Sequence`. Example: "
+#~ "``transform=Split([X(), Y(), Z()])`` (provided "
+#~ "that you have X, Y, Z variables)."
+#~ msgstr ""
+
+#~ msgid ""
+#~ ":class:`ReduceBinContent` creates histograms, which"
+#~ " may be plotted, that is bins "
+#~ "contain only data without context. By"
+#~ " default, context of all bins except"
+#~ " one is not used. If "
+#~ "*drop_bins_context* is ``False``, a histogram"
+#~ " of bin context is added to "
+#~ "context."
+#~ msgstr ""
+
+#~ msgid "In case of wrong arguments, :exc:`~lena.core.LenaTypeError` is raised."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "*seq* is a :class:`~lena.core.FillComputeSeq` "
+#~ "sequence, which corresponds to the "
+#~ "analysis being compared for different "
+#~ "bins. It can be a tuple containing"
+#~ " a *FillCompute* element. Deep copy "
+#~ "of *seq* will be used to produce"
+#~ " each bin's content."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "*arg_func* is a function which takes "
+#~ "data and returns argument value used "
+#~ "to compute the bin index. A "
+#~ ":class:`~lena.variables.variable.Variable` must be "
+#~ "provided. Example of a two-dimensional"
+#~ " function: ``arg_func = "
+#~ "lena.variables.Variable(\"xy\", lambda event: "
+#~ "(event.x, event.y))``."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "*transform* is a :class:`~lena.core.Sequence`, "
+#~ "which is applied to results. The "
+#~ "final histogram may contain vectors, "
+#~ "histograms and any other data the "
+#~ "analysis produced. To be able to "
+#~ "plot them, *transform* can extract "
+#~ "vector components or do other work "
+#~ "to simplify structures. By default, "
+#~ "*transform* is :class:`TransformBins`. Pass an"
+#~ " empty tuple to disable it."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "If *edges* are not increasing, "
+#~ ":exc:`~lena.core.exceptions.LenaValueError` is raised. "
+#~ "In case of other argument initialization"
+#~ " problems, :exc:`~lena.core.exceptions.LenaTypeError` "
+#~ "is raised."
+#~ msgstr ""
+
+#~ msgid ""
+#~ ":class:`~lena.structures.Histogram` is created from"
+#~ " :attr:`edges` and bins taken from "
+#~ "compute() for :attr:`bins`. Context is "
+#~ "preserved in histogram bins."
+#~ msgstr ""
+
+#~ msgid ""
+#~ ":class:`SplitIntoBins` context is added to "
+#~ "*context.split_into_bins* as *histogram* "
+#~ "(corresponding to *edges*) and *variable* "
+#~ "(corresponding to *arg_func*) subcontexts."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "*create_edges_str* is a callable, which "
+#~ "creates a string from bin's edges "
+#~ "and coordinate names and adds that "
+#~ "to context. It is passed parameters "
+#~ "*(edges, var_context)*, where *var_context* is"
+#~ " Variable context containing variable names"
+#~ " (it can be a single "
+#~ ":class:`~lena.variable.Variable` or "
+#~ ":class:`~lena.variable.Combine`)."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "If *create_edges_str* is not callable, "
+#~ ":exc:`~lena.core.LenaTypeError` is raised."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "*struct* can be a "
+#~ ":class:`~lena.structures.Histogram` or an array "
+#~ "of bins."
+#~ msgstr ""
 
