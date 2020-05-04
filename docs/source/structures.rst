@@ -21,10 +21,12 @@ Structures
 .. autosummary::
 
     check_edges_increasing
+    get_bin_edges
     get_bin_on_value_1d
     get_bin_on_value
     get_bin_on_index
     iter_bins
+    iter_cells
     init_bins
     integral
     make_hist_context

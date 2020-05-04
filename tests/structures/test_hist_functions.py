@@ -1,10 +1,16 @@
 import pytest
 
 from lena.core import LenaIndexError, LenaTypeError, LenaValueError
-# from lena.structures import Histogram
+from lena.math import mesh
+from lena.structures import Histogram
 from lena.structures.hist_functions import (
-    iter_bins, integral, check_edges_increasing,
-    get_bin_on_value_1d, get_bin_on_value, get_bin_on_index,
+    check_edges_increasing,
+    get_bin_edges,
+    get_bin_on_value_1d, get_bin_on_value,
+    get_bin_on_index,
+    integral,
+    iter_bins,
+    iter_cells,
     unify_1_md,
 )
 
@@ -19,6 +25,13 @@ def test_check_edges_increasing():
     with pytest.raises(LenaValueError):
         check_edges_increasing([[1]])
     check_edges_increasing([1, 2, 3])
+
+
+def test_get_bin_edges():
+    hist = Histogram(mesh((0, 5), 5))
+    assert get_bin_edges(0, hist.edges) == (0, 1)
+    hist = Histogram(mesh(((0, 5), (0, 1)), (5, 2)))
+    assert get_bin_edges((0, 1), hist.edges) == [(0, 1), (0.5, 1)]
 
 
 def test_get_bin_on_value_1d():
@@ -78,6 +91,13 @@ def test_get_bin_on_index():
     assert get_bin_on_index(0, [[0, 1], [0, 0]]) == [0, 1]
     with pytest.raises(LenaIndexError):
         get_bin_on_index(2, [[0, 1], [0, 0]])
+
+
+def test_iter_cells():
+    hist = Histogram(mesh((0, 2), 2))
+    assert list(iter_cells(hist)) == [((0, 1), 0), ((1, 2), 0)]
+    hist = Histogram(mesh(((0, 5), (0, 1)), (5, 2)))
+    assert list(iter_cells(hist))[:2] == [([(0, 1), (0, 0.5)], 0), ([(0, 1), (0.5, 1)], 0)]
 
 
 def test_unify_1_md():

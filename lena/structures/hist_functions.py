@@ -37,7 +37,7 @@ def check_edges_increasing(edges):
     If length of *edges* or its subarray is less than 2
     or if some subarray of *edges*
     contains not strictly increasing values,
-    :exc:`LenaValueError` is raised.
+    :exc:`.LenaValueError` is raised.
     """
     if not len(edges):
         raise lena.core.LenaValueError("edges must be non-empty")
@@ -53,6 +53,27 @@ def check_edges_increasing(edges):
         _check_edges_increasing_1d(arr)
 
 
+def get_bin_edges(index, edges):
+    """Return edges of the bin for the given *edges* of a histogram.
+
+    In one-dimensional case *index* must be an integer and a tuple
+    of *(x_low_edge, x_high_edge)* for that bin is returned.
+
+    In a multidimensional case *index* is a container of numeric indices
+    in each dimension.
+    A list of bin edges in each dimension is returned."""
+    # todo: maybe give up this 1- and multidimensional unification
+    # and write separate functions for each case.
+    if not hasattr(edges[0], '__iter__'):
+        # 1-dimensional edges
+        if hasattr(index, '__iter__'):
+            index = index[0]
+        return (edges[index], edges[index+1])
+    # multidimensional edges
+    return [(edges[coord][i], edges[coord][i+1])
+            for coord, i in enumerate(index)]
+
+
 def get_bin_on_index(index, bins):
     """Return bin corresponding to multidimensional *index*.
 
@@ -60,7 +81,7 @@ def get_bin_on_index(index, bins):
     If *index* length is less than dimension of *bins*,
     a subarray of *bins* is returned.
 
-    In case of an index error, :exc:`LenaIndexError` is raised.
+    In case of an index error, :exc:`.LenaIndexError` is raised.
 
     Example:
 
@@ -168,7 +189,7 @@ def get_bin_on_value(arg, edges):
     Each 1-dimensional subarray consists of increasing numbers.
 
     *arg* and *edges* must have the same length
-    (otherwise :exc:`LenaValueError` is raised).
+    (otherwise :exc:`.LenaValueError` is raised).
     *arg* and *edges* must be iterable and support *len()*.
 
     Return list of indices in *edges* corresponding to *arg*.
@@ -306,7 +327,7 @@ def integral(bins, edges):
 
     *bins* contain values, and *edges* form the mesh
     for the integration.
-    Their format is defined in :class:`Histogram` description.
+    Their format is defined in :class:`.Histogram` description.
     """
     total = 0
     for ind, bin_content in iter_bins(bins):
@@ -340,9 +361,19 @@ def iter_bins(bins):
                 yield (((ind,) + sub_ind), val)
 
 
+def iter_cells(hist):
+    """Iterate cells of a histogram *hist*.
+
+    For each bin, yield a *(bin edges, bin content)* tuple.
+    The order of iteration is the same as for :func:`iter_bins`.
+    """
+    for bin_ind, bin_ in iter_bins(hist.bins):
+        yield (get_bin_edges(bin_ind, hist.edges), bin_)
+
+
 def make_hist_context(hist, context):
     """Update *context* with the context
-    of a :class:`Histogram` *hist*.
+    of a :class:`.Histogram` *hist*.
 
     Deep copy of updated context is returned.
     """
