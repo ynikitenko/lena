@@ -10,6 +10,11 @@ from lena.structures import Histogram
 from lena.structures.numpy_histogram import NumpyHistogram
 
 
+## Ignore numpy warning raised when trying to use an empty histogram.
+# /usr/local/lib64/python3.7/site-packages/numpy/lib/histograms.py:908: RuntimeWarning: invalid value encountered in true_divide
+#    return n/db/n.sum(), bin_edges
+
+@pytest.mark.filterwarnings("ignore:::numpy.lib.histograms")
 def test_numpy_histogram():
     nhist = NumpyHistogram(bins=list(range(0, 5)), density=True)
     filled_hist = Histogram([0, 1, 2, 3, 4], bins=[0.25, 0.25, 0.25 ,0.25])
