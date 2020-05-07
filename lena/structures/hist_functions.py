@@ -6,6 +6,7 @@ They are not needed for normal usage.
 """
 from __future__ import print_function
 
+import collections
 import copy
 import operator
 import sys
@@ -17,6 +18,9 @@ else:
 
 import lena.core
 from . import graph
+
+
+HistCell = collections.namedtuple("hist_cell", ("edges, bin, index"))
 
 
 def _check_edges_increasing_1d(arr):
@@ -368,7 +372,7 @@ def iter_cells(hist):
     The order of iteration is the same as for :func:`iter_bins`.
     """
     for bin_ind, bin_ in iter_bins(hist.bins):
-        yield (get_bin_edges(bin_ind, hist.edges), bin_)
+        yield HistCell(get_bin_edges(bin_ind, hist.edges), bin_, bin_ind)
 
 
 def make_hist_context(hist, context):

@@ -8,6 +8,7 @@ from lena.structures.hist_functions import (
     get_bin_edges,
     get_bin_on_value_1d, get_bin_on_value,
     get_bin_on_index,
+    HistCell,
     integral,
     iter_bins,
     iter_cells,
@@ -95,9 +96,13 @@ def test_get_bin_on_index():
 
 def test_iter_cells():
     hist = Histogram(mesh((0, 2), 2))
-    assert list(iter_cells(hist)) == [((0, 1), 0), ((1, 2), 0)]
+    assert list(iter_cells(hist)) == [HistCell((0, 1.), 0, (0,)),
+                                      HistCell((1., 2.), 0, (1,))]
     hist = Histogram(mesh(((0, 5), (0, 1)), (5, 2)))
-    assert list(iter_cells(hist))[:2] == [([(0, 1), (0, 0.5)], 0), ([(0, 1), (0.5, 1)], 0)]
+    assert list(iter_cells(hist))[:2] == [
+        HistCell([(0, 1.), (0, 0.5)], 0, (0, 0)),
+        HistCell([(0, 1.), (0.5, 1.)], 0, (0, 1))
+    ]
 
 
 def test_unify_1_md():
