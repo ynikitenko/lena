@@ -1,11 +1,13 @@
 import setuptools
 
+
 with open("README.rst", "r") as readme:
     long_description = readme.read()
 
+
 setuptools.setup(
     name="lena",
-    version="0.1",
+    version="0.2",
     author="Yaroslav Nikitenko",
     author_email="metst13@gmail.com",
     description="Lena is an architectural framework for data analysis",

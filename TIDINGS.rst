@@ -1,4 +1,76 @@
 ====================
+  Lena release 0.2
+====================
+
+Lena v0.2 was released on May 9, 2020.
+
+What's new
+----------
+
+* Adds Russian translation (partial).
+* Adds documentation for math.refine_mesh and math.flatten.
+
+* lena.context changes:
+
+  * str_to_dict allows empty string and can accept a dictionary.
+  * Adds str_to_list.
+  * Adds UpdateContext.
+  * Renames *check_context_str* to *contains*.
+    It accepts strings without dots and allows values to be compared with a string.
+    Adds it to the documentation.
+
+* lena.flow changes:
+
+  * GroupPlots yields unchanged values if yield_selected is True.
+  * Adds Not, a negative Selector.
+
+* lena.output changes:
+
+  * Writer corrects absolute paths runtime where relative paths must be present.
+  * ToCSV uses duplicate_last_bin option for to_csv method when possible.
+
+* lena.structures changes:
+
+  * Adds cur_context keyword argument to Graph. Rescaled Graph retains the same *sort*.
+  * Adds histogram functions get_bin_edges and iter_cells.
+  * Adds HistCell class.
+  * Adds *context* keyword argument to Histogram.
+
+
+Bug fixes
+---------
+
+* Fixes context.get_recursively.
+* Fixes context.update_context.
+* Fixes structures.Graph.to_csv.
+
+Deprecations and backward incompatible changes
+----------------------------------------------
+
+* Renames flow.GroupPlots initialization keyword argument *scale_to* to *scale*.
+* structures.Histogram is no longer a subclass of FillCompute.
+
+* lena.output changes:
+
+  * MakeFilename accepts only a string for its make\_ keyword arguments
+    (which are renamed to filename, dirname and fileext),
+    and it no longer accepts a Sequence.
+    MakeFilename requires double braces in context formatting strings.
+    Its run method becomes __call__.
+  * Moves format_context from output to context.
+    format_context accepts a single string argument and
+    only double braces instead of single ones.
+  * Removes HistToCSV (deprecated since Lena 0.1).
+
+Technical changes
+-----------------
+
+* Adds pytest.ini. Ignores warnings irrelevant to Lena.
+* Adds TIDINGS.rst (release notes).
+* Recommended Jinja2 version becomes 2.11.0 or newer.
+
+
+====================
   Lena release 0.1
 ====================
 
