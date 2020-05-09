@@ -8,6 +8,7 @@ from __future__ import print_function
 
 import collections
 import copy
+import itertools
 import operator
 import sys
 if sys.version_info.major == 3:
@@ -20,7 +21,10 @@ import lena.core
 from . import graph
 
 
-HistCell = collections.namedtuple("hist_cell", ("edges, bin, index"))
+class HistCell(collections.namedtuple("HistCell", ("edges, bin, index"))):
+    """A namedtuple with fields *edges, bin, index*."""
+    # from Aaron Hall's answer https://stackoverflow.com/a/28568351/952234
+    __slots__ = ()
 
 
 def _check_edges_increasing_1d(arr):
@@ -365,14 +369,108 @@ def iter_bins(bins):
                 yield (((ind,) + sub_ind), val)
 
 
-def iter_cells(hist):
-    """Iterate cells of a histogram *hist*.
+def iter_cells(hist, ranges=None, coord_ranges=None):
+    """Iterate cells of a histogram *hist*, possibly in a subrange.
 
-    For each bin, yield a *(bin edges, bin content)* tuple.
+    For each bin, yield a :class:`HistCell`
+    containing *bin edges, bin content* and *bin index*.
     The order of iteration is the same as for :func:`iter_bins`.
+
+    *ranges* are the ranges of bin indices to be used
+    for each coordinate
+    (the lower value is included, the upper value is excluded).
+
+    *coord_ranges* set real coordinate ranges based on histogram edges.
+    Obviously, they can be not exactly bin edges.
+    If one of the ranges for the given coordinate
+    is outside the histogram edges,
+    then only existing histogram edges within the range are selected.
+    If the coordinate range is completely outside histogram edges,
+    nothing is yielded.
+    If a lower or upper *coord_range*
+    falls within a bin, this bin is yielded.
+    Note that if a coordinate range falls on a bin edge,
+    the number of generated bins can be unstable
+    because of limited float precision.
+
+    *ranges* and *coord_ranges* are tuples of tuples of limits
+    in corresponding dimensions. 
+    For one-dimensional histogram it must be a tuple 
+    containing a tuple, for example
+    *((None, None),)*.
+
+    ``None`` as an upper or lower *range* means no limit
+    (*((None, None),)* is equivalent to *((0, len(bins)),)*
+    for a 1-dimensional histogram).
+
+    If a *range* index is lower than 0 or higher than possible index,
+    :exc:`.LenaValueError` is raised.
+    If both *coord_ranges* and *ranges* are provided,
+    :exc:`.LenaTypeError` is raised.
     """
-    for bin_ind, bin_ in iter_bins(hist.bins):
-        yield HistCell(get_bin_edges(bin_ind, hist.edges), bin_, bin_ind)
+    # for bin_ind, bin_ in iter_bins(hist.bins):
+    #     yield HistCell(get_bin_edges(bin_ind, hist.edges), bin_, bin_ind)
+    # if bins and edges are calculated each time, save the result now
+    bins, edges = hist.bins, hist.edges
+    # todo: hist.edges must be same
+    # for 1- and multidimensional histograms.
+    if hist.dim == 1:
+        edges = (edges,)
+
+    if coord_ranges is not None:
+        if ranges is not None:
+            raise lena.core.LenaTypeError(
+                "only ranges or coord_ranges can be provided, not both"
+            )
+        ranges = []
+        if not isinstance(coord_ranges[0], (tuple, list)):
+            coord_ranges = (coord_ranges, )
+        for coord, coord_range in enumerate(coord_ranges):
+            # todo: (dis?)allow None as an infinite range.
+            # todo: raise or transpose unordered coordinates?
+            # todo: change the order of function arguments.
+            lower_bin_ind = get_bin_on_value_1d(coord_range[0], edges[coord])
+            if lower_bin_ind == -1:
+                 lower_bin_ind = 0
+            upper_bin_ind = get_bin_on_value_1d(coord_range[1], edges[coord])
+            max_ind = len(edges[coord])
+            if upper_bin_ind == max_ind:
+                 upper_bin_ind -= 1
+            if lower_bin_ind >= max_ind or upper_bin_ind <= 0:
+                 # histogram edges are outside the range.
+                 return
+            ranges.append((lower_bin_ind, upper_bin_ind))
+
+    if not ranges:
+        ranges = ((None, None),) * hist.dim
+
+    real_ind_ranges = []
+    for coord, coord_range in enumerate(ranges):
+        low, up = coord_range
+        if low is None:
+            low = 0
+        else:
+            # negative indices should not be supported
+            if low < 0:
+                raise lena.core.LenaValueError(
+                    "low must be not less than 0 if provided"
+                )
+        max_ind = len(edges[coord]) - 1
+        if up is None:
+            up = max_ind
+        else:
+            # huge indices should not be supported as well.
+            if up > max_ind:
+                raise lena.core.LenaValueError(
+                    "up must not be greater than len(edges)-1, if provided"
+                )
+        real_ind_ranges.append(list(range(low, up)))
+
+    indices = list(itertools.product(*real_ind_ranges))
+    for ind in indices:
+        yield HistCell(get_bin_edges(ind, edges),
+                       get_bin_on_index(ind, bins),
+                       ind)
 
 
 def make_hist_context(hist, context):

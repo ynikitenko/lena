@@ -20,6 +20,7 @@ Structures
 .. currentmodule:: lena.structures.hist_functions
 .. autosummary::
 
+    HistCell
     check_edges_increasing
     get_bin_edges
     get_bin_on_value_1d

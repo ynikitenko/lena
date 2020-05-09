@@ -95,14 +95,63 @@ def test_get_bin_on_index():
 
 
 def test_iter_cells():
+    ## full range iteration works.
+    # 1d histogram
     hist = Histogram(mesh((0, 2), 2))
-    assert list(iter_cells(hist)) == [HistCell((0, 1.), 0, (0,)),
-                                      HistCell((1., 2.), 0, (1,))]
+    assert list(iter_cells(hist)) == [HistCell([(0, 1.)], 0, (0,)),
+                                      HistCell([(1., 2.)], 0, (1,))]
+    # multidimensional histogram
     hist = Histogram(mesh(((0, 5), (0, 1)), (5, 2)))
     assert list(iter_cells(hist))[:2] == [
         HistCell([(0, 1.), (0, 0.5)], 0, (0, 0)),
         HistCell([(0, 1.), (0.5, 1.)], 0, (0, 1))
     ]
+
+    ## None works
+    # 1-dimensional histogram works
+    hist = Histogram(mesh((0, 4), 4))
+
+    assert list(iter_cells(hist, ranges=((None, 3),))) == [
+        HistCell(edges=[(0, 1.0)], bin=0, index=(0,)),
+        HistCell(edges=[(1.0, 2.0)], bin=0, index=(1,)),
+        HistCell(edges=[(2.0, 3.0)], bin=0, index=(2,)),
+        # HistCell(edges=(3.0, 4), bin=0, index=(3,)),
+    ]
+
+    # empty coord_range yields nothing
+    assert list(iter_cells(hist, coord_ranges=((-10, -5)))) == []
+
+    # nonexistent ranges are not allowed
+    with pytest.raises(LenaValueError):
+        list(iter_cells(hist, ranges=((None, 30),)))
+    with pytest.raises(LenaValueError):
+        list(iter_cells(hist, ranges=((-1, None),)))
+    with pytest.raises(LenaTypeError):
+        list(iter_cells(hist, ranges=((None, None),), coord_ranges=(None, None)))
+
+    # multidimensional histogram works
+    hist = Histogram(mesh(((0, 4), (0, 2)), (4, 2)))
+
+    assert list(iter_cells(hist, ranges=((1, None), (0, 2)))) == [
+        # HistCell(edges=[(0, 1.0), (0, 1.0)], bin=0, index=(0, 0)),
+        # HistCell(edges=[(0, 1.0), (1.0, 2)], bin=0, index=(0, 1)),
+        HistCell(edges=[(1.0, 2.0), (0, 1.0)], bin=0, index=(1, 0)),
+        HistCell(edges=[(1.0, 2.0), (1.0, 2)], bin=0, index=(1, 1)),
+        HistCell(edges=[(2.0, 3.0), (0, 1.0)], bin=0, index=(2, 0)),
+        HistCell(edges=[(2.0, 3.0), (1.0, 2)], bin=0, index=(2, 1)),
+        HistCell(edges=[(3.0, 4), (0, 1.0)], bin=0, index=(3, 0)),
+        HistCell(edges=[(3.0, 4), (1.0, 2)], bin=0, index=(3, 1)),
+    ]
+
+    # coord_ranges containing hist.edges produce same result as a full range
+    # multidimensional
+    assert list(iter_cells(hist, ranges=((None, None), (0, None)))) == \
+        list(iter_cells(hist, coord_ranges=((0, 50), (-100, 100))))
+
+    # empty range on first coordinate yields nothing
+    assert list(iter_cells(hist, coord_ranges=((-10, -5), (-100, 100)))) == []
+    # empty range on second coordinate yields nothing
+    assert list(iter_cells(hist, coord_ranges=((0, 10), (-100, -10)))) == []
 
 
 def test_unify_1_md():
