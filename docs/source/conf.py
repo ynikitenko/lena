@@ -41,7 +41,8 @@ release = u'0.2'
 
 # If your documentation needs a minimal Sphinx version, state it here.
 #
-# needs_sphinx = '1.0'
+# otherwise autodoc_default_options raises an error.
+# needs_sphinx = '2.0'
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
@@ -67,7 +68,9 @@ extensions = [
 # unfortunately, this gives a warning when __call__ is missing
 # https://github.com/sphinx-doc/sphinx/issues/6771
 autodoc_default_options = {
-    'members': True,
+    # https://github.com/sphinx-doc/sphinx/issues/5459
+    # for sphinx older than 2.0 None means True
+    'members': None,
     'special-members': '__call__',
     # 'undoc-members': True,
     # 'exclude-members': '__weakref__'
