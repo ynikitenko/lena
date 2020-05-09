@@ -52,6 +52,7 @@ Sequences
 
 .. automodule:: lena.core
     :no-members:
+    :no-special-members:
 
 .. _Sequence:
 .. autoclass:: Sequence

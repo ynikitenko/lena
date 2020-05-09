@@ -83,6 +83,7 @@ Group plots
 -----------
 .. automodule:: lena.flow.group_plots
     :no-members:
+    :no-special-members:
 
 .. currentmodule:: lena.flow
 .. autoclass:: GroupBy
@@ -91,9 +92,7 @@ Group plots
 
 .. autoclass:: Not
     :show-inheritance:
-    :special-members: __call__
 .. autoclass:: Selector
-    :special-members: __call__
 
 Iterators
 ---------

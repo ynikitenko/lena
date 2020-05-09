@@ -31,9 +31,9 @@ copyright = u'2020, Yaroslav Nikitenko'
 author = u'Yaroslav Nikitenko'
 
 # The short X.Y version
-version = u'0.1'
+version = u'0.2'
 # The full version, including alpha/beta/rc tags
-release = u'0.1'
+release = u'0.2'
 # release = u'0.1-alpha'
 
 
@@ -62,15 +62,16 @@ extensions = [
 
 # automodapi seems nice, but I could't get it generate separate class pages
 # automodapi_inheritance_diagram = False
-autodoc_default_flags = ['members']
+
+# autodoc_default_flags = ['members']
 # unfortunately, this gives a warning when __call__ is missing
 # https://github.com/sphinx-doc/sphinx/issues/6771
-# autodoc_default_options = {
-#     'members': True,
-#     'special-members': '__call__',
-#     # 'undoc-members': True,
-#     # 'exclude-members': '__weakref__'
-# }
+autodoc_default_options = {
+    'members': True,
+    'special-members': '__call__',
+    # 'undoc-members': True,
+    # 'exclude-members': '__weakref__'
+}
 autosummary_generate = True
 
 # Both the class' and the __init__ method's docstring are concatenated and inserted.
