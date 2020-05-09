@@ -10,13 +10,13 @@ What's new
 * Lena added to PyPI.
 * Adds tutorial part 2 (Split).
 
-* lena.context changes::
+* lena.context changes:
 
   * lena.context.update_recursively accepts a string as *other* argument.
   * Adds lena.context.difference.
   * Adds a parameter *level* to lena.context.intersection.
 
-* lena.core changes::
+* lena.core changes:
 
   * FillCompute can be explicitly cast from FillRequest.
   * Adds *reset* method and keyword argument to FillRequest.
@@ -24,12 +24,12 @@ What's new
   * Adds *copy_buf* parameter to Split.
   * Adds LenaZeroDivisionError.
 
-* lena.flow changes::
+* lena.flow changes:
 
   * Adds lena.flow.Zip.
   * Adds lena.flow.get_data_context.
 
-* lena.math changes::
+* lena.math changes:
 
   * Adds lena.math.Sum.
   * Adds parameter *pass_on_empty* to Mean.
@@ -55,17 +55,17 @@ Deprecations and backward incompatible changes
 * Removes lena.run (unused).
 * Removes *rescale_value* kwarg from Graph.
 
-* lena.context changes::
+* lena.context changes:
 
   * Renames str_to_context to str_to_dict, adds that to documentation.
   * Undocuments several context functions (probably unuseful).
 
-* lena.math changes::
+* lena.math changes:
 
   * Numpy histogram no longer has a compute method.
   * lena.math.Mean now raises LenaZeroDivisionError instead of LenaRuntimeError.
 
-* lena.output changes::
+* lena.output changes:
 
   * Removes 'repeat' from RenderLaTeX. Makes Template and Environment private.
   * If data has *to_csv* method, that must support kwargs *separator* and *header*.
