@@ -227,3 +227,30 @@ def test_variable():
             }
         }
     )
+
+
+def test_getattr_and_var_context():
+    x_mm = Variable("x", unit="mm", getter=lambda x: x*10, type="coordinate")
+    y_mm = Variable("y", unit="mm", getter=lambda x: x*10, type="coordinate")
+
+    # Variable attribute works
+    assert x_mm.type == "coordinate"
+
+    # getter should not be in var_context
+    assert "getter" not in x_mm.var_context
+
+    # Combine attribute works
+    combine1 = Combine(x_mm, name="xy")
+    assert combine1.name == "xy"
+
+    xy_range = [(0,1), (0,1)]
+    combine2 = Combine(x_mm, y_mm, name="xy", range=xy_range)
+    assert combine2.range == xy_range
+
+    # name and getter should not be in var_context
+    assert "getter" not in combine1.var_context
+
+    # Compose attribute works
+    compose = Compose(x_mm, y_mm, name="xy", type="coordinate")
+    assert compose.type == "coordinate"
+    assert "getter" not in compose.var_context

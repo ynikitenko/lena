@@ -105,8 +105,11 @@ class Variable(object):
             raise lena.core.LenaTypeError(
                 "a callable getter must be provided, {} given".format(getter)
             )
+        # getter is public for possible performance implementations
+        # (without context)
         self.getter = getter
 
+        # var_context is public, so that one can get all attributes
         self.var_context = {
             "name": self.name,
         }
@@ -131,7 +134,6 @@ class Variable(object):
         # context = copy.deepcopy(context)
         var_context = context.get("variable")
         if var_context:
-            # todo: check that several compose context work
             # deep copy, otherwise it will be updated during update_recursively
             context["variable"]["compose"] = copy.deepcopy(var_context)
         # update recursively, because we need to preserve "type"
@@ -150,12 +152,11 @@ class Variable(object):
         if name.startswith('_'):
             raise AttributeError(name)
         try:
-            attr = self.var_context[name]
+            return self.var_context[name]
         except KeyError:
             raise lena.core.LenaAttributeError(
                 "{} missing in {}".format(name, self.name)
             )
-        return attr
 
     def get(self, key, default=None):
         """Return the attribute *key* if present, else default.
@@ -213,15 +214,14 @@ class Combine(Variable):
         name = kwargs.pop("name", None)
         if name is None:
             name = "_".join([var.name for var in self._vars])
-        var_context = {
-            "name": name,
-            "dim": self.dim,
-            "getter": getter,
-        }
+        var_context = {}
+        var_context.update(kwargs)
+        assert "dim" not in kwargs  # to set it manually is meaningless
+        var_context.update({"dim": self.dim})
         var_context["combine"] = tuple(
             copy.deepcopy(var.var_context) for var in self._vars
         )
-        super(Combine, self).__init__(**var_context)
+        super(Combine, self).__init__(name=name, getter=getter, **var_context)
 
     def __getitem__(self, index):
         """Get variable at the given *index*."""
