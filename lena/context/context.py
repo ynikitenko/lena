@@ -31,6 +31,11 @@ class Context(dict):
         which should accept a dictionary and return a string.
         The default is ``json.dumps``.
 
+        All public attributes of a :class:`Context`
+        can be got or set using dot notation
+        (for example, *context["data_path"]*
+        is equal to *context.data_path*).
+
         Tip
         ---
             JSON and Python representations are different.
@@ -39,6 +44,10 @@ class Context(dict):
 
         If *formatter* is given but is not callable,
         :exc:`.LenaTypeError` is raised.
+        If the attribute to be got is missing,
+        :exc:`.LenaAttributeError` is raised.
+        An attempt to get a private attribute raises
+        :exc:`AttributeError`.
         """
         # todo: maybe add intersphinx reference to json
         if d is None:
@@ -50,13 +59,12 @@ class Context(dict):
                     "formatter must be callable, "
                     "{} given".format(formatter)
                 )
-            self.formatter = formatter
+            self._formatter = formatter
         else:
-            self.formatter = lambda s: json.dumps(s, sort_keys=True, indent=4)
+            self._formatter = lambda s: json.dumps(s, sort_keys=True, indent=4)
+        # formatter should better be private,
+        # otherwise it'll mess with other attributes
         # self.formatter = pprint.PrettyPrinter(indent=1)
-
-    def __repr__(self):
-        return self.formatter(self)
 
     def __call__(self, value):
         """Convert *value*'s context to :class:`Context` on the fly.
@@ -72,3 +80,29 @@ class Context(dict):
         """
         data, context = lena.flow.get_data_context(value)
         return (data, Context(context))
+
+    def __getattr__(self, name):
+        # see comment for Variable
+        if name.startswith('_'):
+            # this is not LenaAttributeError,
+            # as it wouldn't be so for other Lena classes
+            # that don't implement __getattr__
+            raise AttributeError(name)
+        try:
+            return self[name]
+        except KeyError:
+            raise lena.core.LenaAttributeError(
+                "{} missing".format(name)
+            )
+
+    def __repr__(self):
+        return self._formatter(self)
+
+    def __setattr__(self, attr, value):
+        if attr in ["_formatter"]:
+            # from https://stackoverflow.com/a/17020163/952234
+            super(Context, self).__setattr__(attr, value)
+        elif attr.startswith('_'):
+            raise AttributeError(attr)
+        else:
+            self[attr] = value

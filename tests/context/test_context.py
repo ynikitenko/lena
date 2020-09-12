@@ -1,5 +1,6 @@
 from __future__ import print_function
 
+import copy
 import json
 import pytest
 
@@ -28,3 +29,19 @@ def test_context():
     # Context can also be accepted
     res = c((1, Context()))
     assert res[1] == Context({})
+
+    ## attribute access
+    d1 = copy.deepcopy(d)
+    c = Context(d1)
+    assert c.a == d["a"]
+    # missing attributes raise
+    with pytest.raises(lena.core.LenaAttributeError):
+        c.b
+    c.b = 3
+    d1["b"] = 3
+    assert c == d1
+    # private attributes raise
+    with pytest.raises(AttributeError):
+        c._aaa = 3
+    with pytest.raises(AttributeError):
+        c._aaa
