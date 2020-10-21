@@ -35,6 +35,8 @@ class Context(dict):
         can be got or set using dot notation
         (for example, *context["data_path"]*
         is equal to *context.data_path*).
+        Only one level of nesting is accessible
+        using dot notation.
 
         Tip
         ---
@@ -82,11 +84,14 @@ class Context(dict):
         return (data, Context(context))
 
     def __getattr__(self, name):
-        # see comment for Variable
+        # we don't implement getting nested attributes,
+        # because that would require creating proxy objects
+        # - maybe in the future if needed.
         if name.startswith('_'):
             # this is not LenaAttributeError,
             # as it wouldn't be so for other Lena classes
             # that don't implement __getattr__
+            # see comment for Variable
             raise AttributeError(name)
         try:
             return self[name]
