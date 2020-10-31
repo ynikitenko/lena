@@ -22,7 +22,7 @@ clean:
 	rm -rf build/html/
 	rm source/lena.*.rst source/modules.rst source/lena.rst
 
-# Create Russian documentation:
+## Create Russian documentation ##
 # sphinx-build -b gettext source _build/gettext
 # Update it later:
 # sphinx-intl update -p _build/gettext -l ru
@@ -33,3 +33,7 @@ clean:
 # To add another language, create a different project on Readthedocs
 # https://docs.readthedocs.io/en/stable/localization.html#project-with-multiple-translations
 # Update its versions (otherwise only latest will be shown).
+
+## Create Russian RST ##
+# python2 /usr/local/bin/xml2rst.py _build/xml/ru/tutorial/1-introduction.xml > 1-intro.rst
+# Probably, manually substitute excessive spaces.
