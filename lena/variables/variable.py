@@ -193,10 +193,14 @@ class Combine(Variable):
 
         *dim* is the number of variables.
 
+        *range*. If all variables have an attribute *range*,
+        the *range* of this variable is set to a list of them.
+
         All *args* must be *Variables*
         and there must be at least one of them,
         otherwise :class:`LenaTypeError` is raised.
         """
+        # set _vars, dim and getter.
         if not args:
             raise lena.core.LenaTypeError(
                 "Combine must be initialized with 1 or more variables"
@@ -211,6 +215,7 @@ class Combine(Variable):
         self.dim = len(args)
         getter = lambda val: tuple(var.getter(val) for var in self._vars)
 
+        # update var_context with name and kwargs.
         name = kwargs.pop("name", None)
         if name is None:
             name = "_".join([var.name for var in self._vars])
@@ -221,6 +226,12 @@ class Combine(Variable):
         var_context["combine"] = tuple(
             copy.deepcopy(var.var_context) for var in self._vars
         )
+
+        # set range of the combined variables
+        if all(hasattr(var, "range") for var in self._vars):
+            range_ = [var.range for var in self._vars]
+            var_context["range"] = range_
+
         super(Combine, self).__init__(name=name, getter=getter, **var_context)
 
     def __getitem__(self, index):

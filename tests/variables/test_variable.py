@@ -19,14 +19,28 @@ def test_combine():
         Combine("xy")
     with pytest.raises(LenaTypeError):
         Combine(lambda x: x)
-    mm = Variable("mm", unit="mm", getter=lambda x: x*10, type="coordinate")
+    mm = Variable("mm", unit="mm", getter=lambda x: x*10, type="coordinate", range=[0, 100])
     c = Combine(mm, name="xy")
     assert c[0] == mm
+
+    # range creation works
+    assert c.range == [mm.range]
+    cm = Variable("cm", unit="cm", getter=lambda x: x, type="coordinate", range=[0, 10])
+    c2 = Combine(mm, cm)
+    assert c2.range == [mm.range, cm.range]
+    # same explicitly
+    assert c2.range == [[0, 100], [0, 10]]
+    # has no range
+    eV = Variable("cm", unit="cm", getter=lambda x: x, type="coordinate")
+    c3 = Combine(mm, eV)
+    with pytest.raises(lena.core.LenaAttributeError):
+        c3.range
 
     ## __call__ works
     data = [1, 2, 3]
     results = map(c, data)
     assert [res[0] for res in results]  == [(10,), (20,), (30,)]
+    mm = Variable("mm", unit="mm", getter=lambda x: x*10, type="coordinate")
     m = Variable("m", unit="m", getter=lambda x: x/100., type="coordinate")
     c = Combine(mm, m)
     results = map(c, data)
