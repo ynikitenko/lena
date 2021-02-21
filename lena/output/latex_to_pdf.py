@@ -1,8 +1,8 @@
 """Convert LaTeX to PDF."""
 from __future__ import print_function
 
-import os
 import collections 
+import os
 import subprocess
 
 import lena.core 
@@ -10,23 +10,25 @@ import lena.context
 
 
 class LaTeXToPDF(object):
-    """Run pdflatex binary for LaTeX files.
+    """Run ``pdflatex`` binary for LaTeX files.
 
     It runs in parallel (separate process is spawned for each job)
     and non-interactively.
     """
-    def __init__(self, verbose=1, create_command=None):
-        """Initialize object.
 
-        verbose = 0 means no output messages.
-        1 prints pdflatex error messages.
-        More than 1 prints pdflatex stdout.
+    def __init__(self, overwrite=False, verbose=1, create_command=None):
+        """*overwrite* sets whether existing unchanged pdfs
+        shall be overwritten during :meth:`run`.
 
-        If you need to run pdflatex (or other executable)
+        *verbose = 0* allows no output messages.
+        1 prints ``pdflatex`` error messages.
+        More than 1 prints ``pdflatex`` stdout.
+
+        If you need to run ``pdflatex`` (or other executable)
         with different parameters, provide its command.
 
         *create_command* is a function which accepts
-        texfile_name, outfilename, output_directory, context
+        *texfile_name, outfilename, output_directory, context*
         (in this order) and returns a list
         made of the command and its arguments.
 
@@ -35,6 +37,7 @@ class LaTeXToPDF(object):
                     "-output-directory", output_directory,
                     texfile_name]
         """
+        self._overwrite = overwrite
         self.verbose = verbose
         if create_command and not callable(create_command):
             raise lena.core.LenaTypeError(
@@ -49,6 +52,14 @@ class LaTeXToPDF(object):
 
     def run(self, flow):
         """Convert all incoming LaTeX files to pdf.
+
+        A *value* from *flow* corresponds to a TeX file
+        if its *context.output.filetype* is *"tex"*.
+        Other values pass unchanged.
+
+        If the resulting pdf file exists and *context.output.changed*
+        is not set to ``True``, pdf rendering is not run.
+        Set *overwrite* to ``True`` to always recreate pdfs.
         """
         def is_tex_file(context):
             """May be transformed by this class."""
@@ -82,9 +93,11 @@ class LaTeXToPDF(object):
         def launch(texfile_name, outfilename, output_directory, context, pool):
             """Add process to pool."""
             if self.create_command:
-                command = self.create_command(texfile_name, outfilename, output_directory, context)
+                command = self.create_command(texfile_name, outfilename,
+                                              output_directory, context)
             else:
-                command = ["pdflatex", "-halt-on-error", "-interaction", "batchmode",
+                command = ["pdflatex", "-halt-on-error",
+                           "-interaction", "batchmode",
                            "-output-directory", output_directory,
                            texfile_name]
             command_str = " ".join(command)
@@ -97,28 +110,40 @@ class LaTeXToPDF(object):
             )
             pool[outfilename] = (process, context)
 
+        # todo: probably can delete this line
         val = None # if flow is empty
         for val in flow:
             # check for finished pdfs on each iteration
             for out_val in pop_returned_processes(self.processes):
                 yield out_val
-            if isinstance(val, tuple) and len(val) == 2:
-                data, context = lena.flow.get_data_context(val)
-                if not is_tex_file(context):
-                    yield val
-                    continue
-                # no deepcopy, because it's a Run element
-                context.update({"output": {"filetype": "pdf"}})
-                texfile_name = data
-                data = texfile_name.replace(".tex", ".pdf")
-                output_directory = os.path.dirname(texfile_name)
-                launch(texfile_name, data, output_directory, context, self.processes)
-            else:
+            data, context = lena.flow.get_data_context(val)
+            if not is_tex_file(context):
                 yield val
+                continue
+            # no deepcopy, because it's a Run element
+            outputc = context["output"]
+            outputc["filetype"] = "pdf"
+            texfile_name = data
+            data = texfile_name.replace(".tex", ".pdf")
+            output_directory = os.path.dirname(texfile_name)
+
+            changed = outputc.get("changed", False)
+            if not self._overwrite and os.path.exists(data) and not changed:
+                # pdf file exists and data is unchanged
+                outputc["changed"] = False
+                if self.verbose:
+                    print("# file unchanged, LaTeXToPDF skips {}"\
+                          .format(texfile_name))
+                yield (data, context)
+            else:
+                outputc["changed"] = True
+                launch(texfile_name, data, output_directory, context,
+                       self.processes)
 
         # this data mustn't be reused
         del val
 
+        # having read all data, wait for finishing processes
         for filename in list(self.processes.keys()):
             process, context = self.processes[filename]
             val = (filename, context)
