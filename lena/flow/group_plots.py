@@ -13,7 +13,56 @@ we can't yield its members to the following elements,
 but have to transform the plots inside :class:`.GroupPlots`.
 We can also scale (normalize) all plots to one
 using :class:`.GroupScale`.
+
+Example from real analysis:
+
+.. code-block:: python
+
+    Sequence(
+        # ... read data and produce histograms ...
+        MakeFilename(dirname="background/{{run_number}}"),
+        UpdateContext("output.plot.name", "{{variable.name}}",
+                      raise_on_missing=True),
+        lena.flow.GroupPlots(
+            group_by="variable.coordinate",
+            # Select either Histograms (data) or Graphs (fit),
+            # but only having "variable.coordinate" in context
+            select=("variable.coordinate", [Histogram, Graph]),
+            # scale to data
+            scale=Not("fit"),
+            transform=(
+                ToCSV(),
+                # scaled plots will be written to separate files
+                MakeFilename(
+                    "{{output.filename}}_scaled",
+                    overwrite=True,
+                ),
+                UpdateContext("output.plot.name", "{{variable.name}}",
+                              raise_on_missing=True),
+                writer,
+                # Several prints were used during this code creation
+                # Print(transform=lambda val: val[1]["plot"]["name"]),
+            ),
+            # since we make further processing below,
+            # we yield the resulting groups
+            yield_selected=True,
+        ),
+        # create file names for combined plots
+        MakeFilename("combined_{{variable.coordinate}}"),
+        # non-combined plots will still need file names
+        MakeFilename("{{variable.name}}"),
+        lena.output.ToCSV(),
+        writer,
+        lena.context.Context(),
+        # here our jinja template renders a group as a list of items
+        lena.output.RenderLaTeX(template_path=TEMPLATE_PATH,
+                                select_template=select_template),
+        # we have a single template, no more groups are present
+        writer,
+        lena.output.LaTeXToPDF(),
+    )
 """
+
 from __future__ import print_function
 
 import copy
@@ -27,7 +76,7 @@ class GroupPlots(object):
     """Group several plots."""
 
     def __init__(self, group_by, select, transform=(), scale=None,
-                 yield_selected=False):
+                 yield_selected=True):
         """Plots to be grouped are chosen by *select*,
         which acts as a boolean function.
         If *select* is not a :class:`.Selector`, it is converted
@@ -40,6 +89,11 @@ class GroupPlots(object):
         it is converted to that class.
         Use :class:`.GroupBy` for more options.
 
+        *transform* is a sequence, which processes individual plots
+        before yielding.
+        For example, set ``transform=(ToCSV(), writer)``.
+        *transform* is called after *scale*.
+
         *scale* is a number or a string.
         A number means the scale, to which plots must be normalized.
         A string is a name of the plot to which other plots
@@ -50,13 +104,8 @@ class GroupPlots(object):
         :exc:`.LenaValueError` is raised.
         For more options, use :class:`.GroupScale`.
 
-        *transform* is a sequence, which processes individual plots
-        before yielding.
-        For example, set ``transform=(ToCSV(), writer)``.
-        *transform* is called after *scale*.
-
         *yield_selected* defines whether selected items should be
-        yielded during :meth:`run` like other items (by default not).
+        yielded during :meth:`run` like other items (by default yes).
         Use it to have both single and combined plots.
         """
         if isinstance(select, lena.flow.Selector):
@@ -107,7 +156,7 @@ class GroupPlots(object):
             # get common context
             contexts = [lena.flow.get_context(val) for val in grp]
             context = lena.context.intersection(*contexts)
-            # add 'group' to context
+            # add "group" to context
             context.update({"group": contexts})
             # data list contains only data part
             # todo: maybe optimize to get_data_context
