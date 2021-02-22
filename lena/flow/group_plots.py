@@ -43,8 +43,7 @@ Example from real analysis:
                 # Several prints were used during this code creation
                 # Print(transform=lambda val: val[1]["plot"]["name"]),
             ),
-            # since we make further processing below,
-            # we yield the resulting groups
+            # make both single and combined plots of coordinates
             yield_selected=True,
         ),
         # create file names for combined plots
@@ -76,7 +75,7 @@ class GroupPlots(object):
     """Group several plots."""
 
     def __init__(self, group_by, select, transform=(), scale=None,
-                 yield_selected=True):
+                 yield_selected=False):
         """Plots to be grouped are chosen by *select*,
         which acts as a boolean function.
         If *select* is not a :class:`.Selector`, it is converted
@@ -105,8 +104,9 @@ class GroupPlots(object):
         For more options, use :class:`.GroupScale`.
 
         *yield_selected* defines whether selected items should be
-        yielded during :meth:`run` like other items (by default yes).
-        Use it to have both single and combined plots.
+        yielded during :meth:`run`.
+        By default it is ``False``: if we used a variable in a combined
+        plot, we don't create a separate plot of that.
         """
         if isinstance(select, lena.flow.Selector):
             self._selector = select
@@ -143,6 +143,9 @@ class GroupPlots(object):
         which have same keys returned from *group_by*.
         Each group's context (including empty one) is inserted
         into a list in *context.group*.
+        If any element's *context.output.changed* is ``True``,
+        the final *context.output.changed* is set to ``True``
+        (and to ``False`` otherwise).
         The resulting context is updated with the intersection
         of groups' contexts.
 
@@ -152,17 +155,6 @@ class GroupPlots(object):
         or its norm could not be calculated,
         :exc:`.LenaValueError` is raised.
         """
-        def update_group_with_context(grp):
-            # get common context
-            contexts = [lena.flow.get_context(val) for val in grp]
-            context = lena.context.intersection(*contexts)
-            # add "group" to context
-            context.update({"group": contexts})
-            # data list contains only data part
-            # todo: maybe optimize to get_data_context
-            grp = [lena.flow.get_data(val) for val in grp]
-            return (grp, context)
-
         for val in flow:
             # I can't understand why, but without deep copy
             # histogram.bins (not context!) will be same
@@ -175,6 +167,20 @@ class GroupPlots(object):
             else:
                 yield val
         # flow finished
+
+        def update_group_with_context(grp):
+            # get common context
+            contexts = [lena.flow.get_context(val) for val in grp]
+            changed = any((lena.context.get_recursively(c, "output.changed", False)
+                           for c in contexts))
+            context = lena.context.intersection(*contexts)
+            lena.context.update_recursively(context, "output.changed", changed)
+            # add "group" to context
+            context.update({"group": contexts})
+            # data list contains only data part
+            # todo: maybe optimize to get_data_context
+            grp = [lena.flow.get_data(val) for val in grp]
+            return (grp, context)
 
         # yield groups of selected plots
         groups = self._group_by.groups
