@@ -387,28 +387,45 @@ def make_context(obj, *attrs):
     return context
 
 
-def str_to_dict(s):
+def str_to_dict(s, value=_sentinel):
     """Create a dictionary from a dot-separated string *s*.
 
+    If the *value* is provided, it becomes the value of 
+    the deepest key represented by *s*.
+
     Dots represent nested dictionaries.
-    *s*, if not empty, must have at least two dot-separated parts
+    If *s* is non-empty and *value* is not provided,
+    then *s* must have at least two dot-separated parts
     (*a.b*), otherwise :exc:`.LenaValueError` is raised.
+    If a *value* is provided, *s* must be non-empty.
 
     If *s* is empty, an empty dictionary is returned.
-    *s* can be a dictionary. In this case it is returned as it is.
 
-    Example:
+    Examples:
 
     >>> str_to_dict("a.b.c d")
     {'a': {'b': 'c d'}}
+    >>> str_to_dict("output.changed", True)
+    {'output': {'changed': True}}
     """
-    # todo: add a parameter to recover ints from ints?
     if s == "":
-        return {}
-    elif isinstance(s, dict):
-        return s
+        if value is _sentinel:
+            return {}
+        else:
+            raise lena.core.LenaValueError(
+                "to make a dict with a value, "
+                "provide at least one dot-separated key"
+            )
+    # """*s* can be a dictionary. In this case it is returned as it is.
+    # If s were a dictionary, value mustn't had been allowed.
+    # # todo: probably this is a bad design,
+    # # and dicts should not be allowed here.
+    # # This is not used in lena modules.
+    # elif isinstance(s, dict):
+    #     return s
     parts = s.split(".")
-    d = {}
+    if value is not _sentinel:
+        parts.append(value)
     def nest_list(d, l):
         """Convert list *l* to nested dictionaries in *d*."""
         len_l = len(l)
@@ -416,12 +433,12 @@ def str_to_dict(s):
             d.update([(l[0], l[1])])
         elif len_l < 2:
             raise lena.core.LenaValueError(
-                "to make a dict, provide at least two dot-separated values."
+                "to make a dict, provide at least two dot-separated values"
             )
         else:
             d.update([(l[0], nest_list({}, l[1:]))])
         return d
-    nest_list(d, parts)
+    d = nest_list({}, parts)
     return d
 
 

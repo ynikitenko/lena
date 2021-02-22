@@ -21,6 +21,12 @@ def test_contains():
     assert lena.context.contains(d, "a.b") is True
     # not string contents are cast to strings
     assert lena.context.contains(d, "e.1") is True
+    ## test values with exception when cast to string
+    class NoString():
+        def __repr__(self):
+            raise ValueError
+    badd = {"key": NoString()}
+    assert lena.context.contains(badd, "key.1") is False
 
 
 def test_difference():
@@ -248,14 +254,22 @@ def test_make_context():
 
 
 def test_str_to_dict():
+    ## test with only one argument
     # empty string produces an empty dict
     assert lena.context.str_to_dict("") == {}
     # otherwise s must have at least two dot-separated parts
     with pytest.raises(lena.core.LenaValueError):
         lena.context.str_to_dict("s")
-    # dictionary is returned unchanged
-    d = {"d": "d"}
-    assert lena.context.str_to_dict(d) == d
+    # this functionality is removed.
+    # # dictionary is returned unchanged
+    # d = {"d": "d"}
+    # assert lena.context.str_to_dict(d) == d
+
+    ## test with an explicit value
+    # short strings are prohibited
+    with pytest.raises(lena.core.LenaValueError):
+        lena.context.str_to_dict("", 5)
+    assert lena.context.str_to_dict("s", 5) == {"s": 5}
 
 
 def test_str_to_list():

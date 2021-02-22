@@ -22,7 +22,10 @@ def test_pdf_to_png(mocker):
     res = list(pdf_to_png.run(data))
     assert res ==  [
         ('output/file.csv', {'output': {'filename': 'y', 'filetype': 'csv'}}),
-        ('output/file.png', {'output': {'filename': 'y', 'filetype': 'png'}})
+        # since no png file exists,
+        # mocker imitates creation of a new one, thus changed=True
+        ('output/file.png', {'output': {'changed': True,
+                                        'filename': 'y', 'filetype': 'png'}})
     ]
 
     command = ['pdftoppm', 'output/file.pdf', 'output/file', '-png', '-singlefile']
