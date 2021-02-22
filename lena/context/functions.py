@@ -396,7 +396,7 @@ def str_to_dict(s, value=_sentinel):
     Dots represent nested dictionaries.
     If *s* is non-empty and *value* is not provided,
     then *s* must have at least two dot-separated parts
-    (*a.b*), otherwise :exc:`.LenaValueError` is raised.
+    (*"a.b"*), otherwise :exc:`.LenaValueError` is raised.
     If a *value* is provided, *s* must be non-empty.
 
     If *s* is empty, an empty dictionary is returned.
@@ -418,9 +418,7 @@ def str_to_dict(s, value=_sentinel):
             )
     # """*s* can be a dictionary. In this case it is returned as it is.
     # If s were a dictionary, value mustn't had been allowed.
-    # # todo: probably this is a bad design,
-    # # and dicts should not be allowed here.
-    # # This is not used in lena modules.
+    # probably this is a bad design,
     # elif isinstance(s, dict):
     #     return s
     parts = s.split(".")
@@ -449,7 +447,7 @@ def str_to_list(s):
     This is different from *str.split*: the latter would
     return a list with one empty string.
     Contrarily to :func:`str_to_dict`, this function allows
-    arbitrary number of dots in *s* (or none).
+    an arbitrary number of dots in *s* (or none).
     """
     if s == "":
         return []
@@ -505,11 +503,14 @@ def update_nested(d, other):
     d.update(other)
 
 
-def update_recursively(d, other):
+def update_recursively(d, other, value=_sentinel):
     """Update dictionary *d* with items from *other* dictionary.
 
     *other* can be a dot-separated string. In this case
-    :func:`str_to_dict` is used to convert it to a dictionary.
+    :func:`str_to_dict` is used to convert it and the *value*
+    to a dictionary.
+    A *value* argument is allowed only when *other* is a string,
+    otherwise :exc:`.LenaValueError` is raised.
 
     Existing values are updated recursively,
     that is including nested subdictionaries.
@@ -527,12 +528,20 @@ def update_recursively(d, other):
     >>> update_recursively(d1, {"b": 2})
     >>> d1 == {'a': 1, 'b': 2}
     True
-
-    Both *d* and *other* must be dictionaries,
-    otherwise :exc:`.LenaTypeError` is raised.
     """
+    # skip this docstring, because it's trivial.
+    # Both *d* and *other* must be dictionaries,
+    # otherwise :exc:`.LenaTypeError` is raised.
+    # it would be cleaner to allow only dict as other,
+    # but it's very clear and useful to allow
+    # lena.context.update_recursively(context, "output.changed", True)
     if isinstance(other, str):
-        other = str_to_dict(other)
+        other = str_to_dict(other, value)
+    else:
+        if value is not _sentinel:
+            raise lena.core.LenaValueError(
+                "explicit value is allowed only when other is a string"
+            )
     if not isinstance(d, dict) or not isinstance(other, dict):
         raise lena.core.LenaTypeError(
             "d and other must be dicts, {} and {} provided".format(d, other)

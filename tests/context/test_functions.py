@@ -313,3 +313,10 @@ def test_update_recursively():
         update_recursively(1, {})
     update_recursively(d1, {"a": {"b": "c"}})
     assert d1 == {"a": {"b": "c"}, "b": 2, "e": {"f": 2}}
+
+    ## test explicit value
+    d_empty = {}
+    update_recursively(d_empty, "output.changed", True)
+    assert d_empty == {"output": {"changed": True}}
+    with pytest.raises(lena.core.LenaValueError):
+        update_recursively(d_empty, {"a": "b"}, "fail")
