@@ -211,6 +211,10 @@ class Writer(object):
                     # size = maximum size (bytes) to read
                     # negative or omitted means whole content
                     size = -1
+                    # security warning: say an adversary creates
+                    # a huge file and adds its path to context (!).
+                    # Then the program will crash
+                    # trying to read that in memory.
                     existing_data = fil.read(size)
                 if data != existing_data:
                     self._write_data(filepath, data)
@@ -236,10 +240,11 @@ class Writer(object):
         # write output to filesystem
         # todo: allow binary files
         with open(filepath, "w") as fil:
-            try:
-                fil.write(data)
-            except TypeError:
-                raise lena.core.LenaTypeError(
-                    "can't write data {} to file {}"
-                    .format(data, filepath)
-                )
+            fil.write(data)
+            # we write only strings, so no TypeError is expected.
+            # If one occurs, the user will note that.
+            # except TypeError:
+            #     raise lena.core.LenaTypeError(
+            #         "can't write data {} to file {}"
+            #         .format(data, filepath)
+            #     )
