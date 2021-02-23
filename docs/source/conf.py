@@ -27,13 +27,13 @@ highlight_language = 'python'
 # -- Project information -----------------------------------------------------
 
 project = u'Lena'
-copyright = u'2020, Yaroslav Nikitenko'
+copyright = u'2020-2021, Yaroslav Nikitenko'
 author = u'Yaroslav Nikitenko'
 
 # The short X.Y version
-version = u'0.2'
+version = u'0.3'
 # The full version, including alpha/beta/rc tags
-release = u'0.2'
+release = u'0.3'
 # release = u'0.1-alpha'
 
 

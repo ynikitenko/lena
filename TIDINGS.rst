@@ -1,8 +1,64 @@
 ====================
+  Lena release 0.3
+====================
+
+Lena v0.3 was released on 23rd February 2021.
+
+What's new
+----------
+
+Existing unchanged plots are no longer reprocessed.
+This not only allows large time savings when adding new plots to existing ones,
+but also improves code quality: the analyst is not tempted to comment out
+already built plots in order to save processing time.
+
+* Adds an example to GroupPlots.
+
+* context changes:
+
+  * Writer, LaTeXToPDF and PDFToPNG from lena.output and GroupPlots from lena.flow
+    use and modify *context.output.changed*.
+
+* lena.context changes:
+
+  * Context attributes can be got and set with dot notation.
+  * str_to_dict allows a new keyword argument *value*.
+  * update_recursively allows a new keyword argument *value*.
+
+* lena.output changes:
+
+  * Adds *overwrite* keyword argument to LaTeXToPDF.
+  * Adds *overwrite* keyword argument to PDFToPNG.
+  * Adds *verbose*, *existing_unchanged* and *overwrite*
+    initialization keyword arguments to Writer.
+
+* variables.Combine now creates a *range* attribute if all its variables have range.
+
+Bug fixes
+---------
+
+* Fixes var_context in variables.Combine.
+
+Deprecations and backward incompatible changes
+----------------------------------------------
+
+* lena.context changes:
+
+  * Context.formatter is now private.
+  * str_to_dict no longer accepts a dictionary.
+
+Technical changes
+-----------------
+
+* Lena is tested to work with Python 3.9, which was released in October 2020.
+* New tests added. Test coverage is 92% (232/2776 missing vs total).
+
+
+====================
   Lena release 0.2
 ====================
 
-Lena v0.2 was released on May 9, 2020.
+Lena v0.2 was released on May 9th, 2020.
 
 What's new
 ----------

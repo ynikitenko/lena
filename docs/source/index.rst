@@ -203,6 +203,8 @@ To get started, read the :doc:`tutorial`.
 
 Complete documentation for Lena modules can be found in the :doc:`reference`.
 
+See `Release Notes <https://github.com/ynikitenko/lena/blob/master/TIDINGS.rst>`_ for changes.
+
 .. and specific topics
     For general questions, see :doc:`Questions & Answers <questions_and_answers>`.
 
