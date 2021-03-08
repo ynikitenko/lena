@@ -21,7 +21,7 @@ class Zip(object):
         with these fields and *name* (by default "zip").
         *Fields* in this case must have same length as *sequences*
         (unless they are a string),
-        or :exc:`.LenaTypeError* is raised.
+        or :exc:`.LenaTypeError` is raised.
         """
         if not sequences:
             raise exceptions.LenaTypeError(

@@ -7,6 +7,8 @@ from lena.flow.group_plots import GroupPlots
 from lena.flow.group_scale import GroupScale
 from lena.flow.iterators import Chain, CountFrom, ISlice
 from lena.flow.print_ import Print
+from lena.flow.read_root_file import ReadROOTFile
+from lena.flow.read_root_tree import ReadROOTTree
 from lena.flow.selectors import Not, Selector
 from lena.flow.split_into_bins import (
     SplitIntoBins, ReduceBinContent, TransformBins,
@@ -16,14 +18,20 @@ from lena.flow.zip import Zip
 
 
 __all__ = [
+    # elements
     'Cache', 'Count', 'DropContext', 'End', 'Print',
     'Chain', 'CountFrom', 'ISlice',
+    'ReadROOTFile',
+    'ReadROOTTree',
     'Zip',
+    # functions
     'get_context', 'get_data', 'get_data_context',
+    # groups
     'GroupBy', 'GroupScale',
     'Not', 'Selector',
     'seq_map',
     'TransformIf',
+    # split into bins
     'SplitIntoBins',
     'ReduceBinContent', 'TransformBins', 
     'get_example_bin',
