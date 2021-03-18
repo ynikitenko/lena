@@ -4,6 +4,8 @@ import copy
 import pytest
 
 import lena.core, lena.output
+from lena.core import Sequence
+from lena.flow import Print
 from lena.output import MakeFilename
 from lena.context import format_context
 
@@ -12,12 +14,6 @@ def test_make_filename_init():
     # all format arguments must be strings
     with pytest.raises(lena.core.LenaTypeError):
         MakeFilename(0)
-    with pytest.raises(lena.core.LenaTypeError):
-        MakeFilename(filename=0)
-    with pytest.raises(lena.core.LenaTypeError):
-        MakeFilename(dirname=0)
-    with pytest.raises(lena.core.LenaTypeError):
-        MakeFilename(fileext=0)
 
     # zero arguments are prohibited
     with pytest.raises(lena.core.LenaTypeError):
@@ -26,6 +22,11 @@ def test_make_filename_init():
     # wrong format_str
     with pytest.raises(lena.core.LenaValueError):
         MakeFilename(filename="{}}")
+
+    # prefix and suffix must be provided separately with filename
+    with pytest.raises(lena.core.LenaTypeError):
+        MakeFilename(filename="filename", prefix="wrong_")
+
 
 def test_make_filename():
     data = [(0, {"output": {"filename": "exists"}}),
@@ -85,3 +86,47 @@ def test_make_filename():
     # context is unchanged
     d = {}
     assert mk((0, d))[1] is d
+
+
+def test_make_filename_prefix_suffix():
+    data = [(0, {"output": {"filename": "file_name"}})]
+    mk1 = MakeFilename(suffix="_suff1", prefix="pref1_")
+    mk2 = MakeFilename(suffix="_suff2", prefix="pref2_")
+
+    # existing file names are unchanged
+    seq12_1 = Sequence(mk1, Print(), mk2)
+    assert list(seq12_1.run(copy.deepcopy(data))) == [(
+        0, {'output':
+            {'filename': 'file_name',
+             'prefix': 'pref2_pref1_',
+             'suffix': '_suff1_suff2'}}
+    )]
+
+    # prefix and suffix are properly added
+    seq12_2 = Sequence(mk1, mk2, MakeFilename("filename"))
+    assert list(seq12_2.run([0])) == [(
+        0, {'output': {'filename': 'pref2_pref1_filename_suff1_suff2'}}
+    )]
+
+    ## Overwrite works
+    # it doesn't harm when file name is produced
+    mk3 = MakeFilename(suffix="_suff2", overwrite=True)
+    seq13 = Sequence(mk1, mk3, MakeFilename("filename3"))
+    assert list(seq13.run(copy.deepcopy(data))) == [
+        (0, {'output':
+             {'prefix': 'pref1_', 'suffix': '_suff2', 
+              'filename': 'file_name'}})
+    ]
+
+    # it really works
+    seq13_2 = Sequence(mk1, mk3, MakeFilename("filename132"))
+    assert list(seq13_2.run([0])) == [
+        (0, {'output': {'filename': 'pref1_filename132_suff2'}})
+    ]
+
+    # formatting arguments work
+    mk4 = MakeFilename(prefix="{{a}}_")
+    seq14 = Sequence(mk1, mk4, MakeFilename("filename14"))
+    assert list(seq14.run([(0, {"a": "A"})])) == [
+        (0, {'a': 'A', 'output': {'filename': 'A_pref1_filename14_suff1'}})
+    ]
