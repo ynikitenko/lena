@@ -70,6 +70,7 @@ def test_run():
                 }
             })
     ]
+    return "file.root"
 
 # # manually test that tree was written:
 # root_file = ROOT.TFile("file.root")

@@ -6,13 +6,13 @@ from lena.flow.read_root_tree import ReadROOTTree
 from .test_write_root_tree import test_data
 
 
-def test_read_root_tree():
+def test_read_root_tree(rootfile):
     # branches or get_entry must be provided
     with pytest.raises(lena.core.LenaTypeError):
         read_tree = ReadROOTTree()
 
     # get tree from file
-    fil = ROOT.TFile("file.root")
+    fil = ROOT.TFile(rootfile)
     tree = fil.Get("tree")
     data = [tree]
 
