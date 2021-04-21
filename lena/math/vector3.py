@@ -53,8 +53,9 @@ class vector3(object):
 
         **Attributes**
 
-        *vector3* has usual vector attributes: *x*, *y*, *z*
-        and spherical coordinates *r*, *phi*, *theta*.
+        *vector3* has usual vector attributes: *x*, *y*, *z*,
+        spherical coordinates *r*, *phi*, *theta* and cylindrical
+        *rho* and *rho2* (*x^2 + y^2*).
 
         They are connected through this formula:
 
@@ -161,6 +162,10 @@ class vector3(object):
         return self._v[1]
     def getz(self):
         return self._v[2]
+    def getrho(self):
+        return sqrt(self._v[0]**2 + self._v[1]**2)
+    def getrho2(self):
+        return self._v[0]**2 + self._v[1]**2
 
     def setx(self, value):
         self._v[0] = float(value)
@@ -168,10 +173,20 @@ class vector3(object):
         self._v[1] = float(value)
     def setz(self, value):
         self._v[2] = float(value)
+    def setrho(self, value):
+        scale = value / self.getrho()
+        self._v[0] *= scale
+        self._v[1] *= scale
+    def setrho2(self, value):
+        scale = value / self.getrho2()
+        self._v[0] *= sqrt(scale)
+        self._v[1] *= sqrt(scale)
 
     x = property(getx, setx)
     y = property(gety, sety)
     z = property(getz, setz)
+    rho = property(getrho, setrho)
+    rho2 = property(getrho2, setrho2)
 
     def getr(self):
         return self._mag()
