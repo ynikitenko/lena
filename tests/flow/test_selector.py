@@ -44,6 +44,50 @@ def test_selector():
     dsel = Selector("name.x")
     assert [dsel(val) for val in data] == [True, False]
 
+    ## And and Or with initialized selectors work.
+    sel_and = Selector([Selector(len)])
+    assert [sel_and(dt[0]) for dt in data] == [False]*2
+    sel_or = Selector((Selector(len),))
+    assert [sel_or(dt[0]) for dt in data] == [False]*2
+
+
+def test_raise_on_error():
+    data = [1, "s", []]
+    sel1 = Selector(lambda x: len(x))
+    # no errors is raised
+    assert list(map(sel1, data)) == [False, True, False]
+
+    sel2 = Selector(lambda x: len(x), raise_on_error=True)
+    assert sel2("s") == 1
+    # error is raised
+    with pytest.raises(TypeError):
+        sel2(1)
+
+    ## Not works
+    # raise on error has no effect here
+    sel3 = Not(sel2, raise_on_error=False)
+    with pytest.raises(TypeError):
+        sel3(1)
+    # raise on error has no effect here
+    sel4 = Not(sel1, raise_on_error=True)
+    assert sel4(1) == True
+
+    # raise on error works
+    sel5 = Not(lambda x: len(x), raise_on_error=True)
+    assert sel5("s") == False
+    with pytest.raises(TypeError):
+        sel5(1)
+
+    ## And and Or raise properly.
+    # Or works
+    sel_or = Selector([len], raise_on_error=True)
+    with pytest.raises(TypeError):
+        sel_or(1)
+    # And works
+    sel_and = Selector((len,), raise_on_error=True)
+    with pytest.raises(TypeError):
+        sel_and(1)
+
 
 def test_not():
     # simple type
