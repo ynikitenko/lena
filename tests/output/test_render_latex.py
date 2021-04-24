@@ -5,6 +5,7 @@ import jinja2
 import os
 import pytest
 import sys
+import copy
 from copy import deepcopy
 
 import lena
@@ -141,3 +142,34 @@ def test_select_data():
         RenderLaTeX(select_data=1)
     render = RenderLaTeX(select_data=lambda _: True)
     assert render._select_data(0) is True
+
+
+def test_verbose(capsys):
+    template_dir = os.path.dirname(inspect.getfile(inspect.currentframe()))
+    renderer = RenderLaTeX("hist1.tex", template_dir)
+    val = (None, {})
+    # verbose=1: selected values are printed
+    render1 = RenderLaTeX(
+        "hist1.tex",
+        template_dir,
+        select_data=lambda _: True,
+        verbose=1
+    )
+    list(render1.run([copy.deepcopy(val)]))
+    captured = capsys.readouterr()
+    assert captured.out == "RenderLaTeX: selected (None, {})\n"
+
+    # verbose=2: not selected values are printed too
+    render2 = RenderLaTeX(
+        "hist1.tex",
+        template_dir,
+        select_data=lambda val: val[0],
+        verbose=2
+    )
+    data = [(None, {}), (1, {})]
+    list(render2.run(data))
+    captured = capsys.readouterr()
+    assert captured.out == (
+        "RenderLaTeX: not selected (None, {})\n"
+        "RenderLaTeX: selected (1, {})\n"
+    )

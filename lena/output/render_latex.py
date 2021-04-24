@@ -1,7 +1,6 @@
 """Create LaTeX text from templates and data."""
 from __future__ import print_function
 
-import copy
 import jinja2
 
 import lena.core
@@ -80,7 +79,8 @@ def _select_template_or_default(val, default=""):
 class RenderLaTeX(object):
     """Create LaTeX from templates and data."""
 
-    def __init__(self, select_template="", template_path=".", select_data=None):
+    def __init__(self, select_template="", template_path=".", select_data=None,
+                 verbose=0):
         """*select_template* is a string or a callable.
         If a string, it is the name of the template to be used
         (unless *context.output.template* overwrites that).
@@ -96,7 +96,11 @@ class RenderLaTeX(object):
 
         *select_data* is a callable to choose data to be rendered.
         It should accept a value from flow and return boolean.
-        If it is not provided, by default CSV files are selected.
+        By default CSV files are selected (see :meth:`run`).
+
+        *verbose* controls the verbosity of output.
+        If it is 1, selected values are printed during :meth:`run`.
+        If it is 2 or higher, not selected values are printed as well.
         """
         if isinstance(select_template, str):
             self._select_template = lambda _: \
@@ -120,30 +124,37 @@ class RenderLaTeX(object):
             )
         self._loader = jinja2.FileSystemLoader(template_path)
         self._environment = _Environment(loader=self._loader)
+        self._verbose = verbose
         # print("templates:", self._environment.list_templates())
 
     def run(self, flow):
         """Render values from *flow* to LaTeX.
 
-        If no *select_data* was initialized,
-        values with *context.output.filetype* equal to "csv"
+        If no custom *select_data* was initialized,
+        values with *context.output.filetype* equal to *"csv"*
         are selected by default.
 
-        Rendered LaTeX text is yielded in the data part
-        of the tuple (no write to filesystem occurs).
-        *context.output.filetype* updates to "tex".
+        Rendered LaTeX text is yielded as the data part of the tuple
+        (use :class:`.Writer` to write that to the filesystem).
+        *context.output.filetype* updates to *"tex"*.
 
         Not selected values pass unchanged.
         """
         _update_recursively = lena.context.update_recursively
+        verbose = self._verbose
+        select_data = self._select_data
         for val in flow:
-            data, context = lena.flow.get_data_context(val)
-            if self._select_data(val):
+            if select_data(val):
+                if verbose:
+                    print("RenderLaTeX: selected", val)
                 template = self._environment.get_template(self._select_template(val))
+                context = lena.flow.get_context(val)
                 _update_recursively(context, {"output": {"filetype": "tex"}})
                 _update_recursively(context, {"output": {"fileext": "tex"}})
 
                 data = template.render(context)
                 yield (data, context)
             else:
+                if verbose >= 2:
+                    print("RenderLaTeX: not selected", val)
                 yield val
