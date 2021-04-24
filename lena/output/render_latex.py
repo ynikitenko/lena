@@ -146,7 +146,7 @@ class RenderLaTeX(object):
         for val in flow:
             if select_data(val):
                 if verbose:
-                    print("RenderLaTeX: selected", val)
+                    print("# RenderLaTeX: selected", val)
                 template = self._environment.get_template(self._select_template(val))
                 context = lena.flow.get_context(val)
                 _update_recursively(context, {"output": {"filetype": "tex"}})
@@ -156,5 +156,5 @@ class RenderLaTeX(object):
                 yield (data, context)
             else:
                 if verbose >= 2:
-                    print("RenderLaTeX: not selected", val)
+                    print("# RenderLaTeX: not selected", val)
                 yield val

@@ -157,7 +157,7 @@ def test_verbose(capsys):
     )
     list(render1.run([copy.deepcopy(val)]))
     captured = capsys.readouterr()
-    assert captured.out == "RenderLaTeX: selected (None, {})\n"
+    assert captured.out == "# RenderLaTeX: selected (None, {})\n"
 
     # verbose=2: not selected values are printed too
     render2 = RenderLaTeX(
@@ -170,6 +170,6 @@ def test_verbose(capsys):
     list(render2.run(data))
     captured = capsys.readouterr()
     assert captured.out == (
-        "RenderLaTeX: not selected (None, {})\n"
-        "RenderLaTeX: selected (1, {})\n"
+        "# RenderLaTeX: not selected (None, {})\n"
+        "# RenderLaTeX: selected (1, {})\n"
     )
