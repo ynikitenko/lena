@@ -21,8 +21,8 @@ class LaTeXToPDF(object):
         shall be overwritten during :meth:`run`.
 
         *verbose = 0* allows no output messages.
-        1 prints ``pdflatex`` error messages.
-        More than 1 prints ``pdflatex`` stdout.
+        1 prints ``pdflatex`` command and output in case of errors.
+        More than 1 prints all ``pdflatex`` output.
 
         If you need to run ``pdflatex`` (or other executable)
         with different parameters, provide its command.
@@ -33,7 +33,7 @@ class LaTeXToPDF(object):
         made of the command and its arguments.
 
         Default command is:
-            ["pdflatex", "-halt-on-error", "-interaction", "batchmode",
+            ["pdflatex", "-halt-on-error", "-interaction", "errorstopmode",
                     "-output-directory", output_directory,
                     texfile_name]
         """
@@ -73,14 +73,15 @@ class LaTeXToPDF(object):
 
         def pop_returned_processes(processes, verbose=True):
             """Remove returned processes from pool."""
-            for filename in list(processes.keys()):
+            for filename in processes.keys():
                 proc, context = processes[filename]
                 returncode = proc.poll()
-                if returncode != None:
+                if returncode is not None:
                     # process terminated
-                    # if verbose:
-                    #     print(stdoutdata, end='')
-                    #     print(stderrdata, end='')
+                    ## this part is probably unused and untested
+                    if verbose > 1 or (verbose and returncode):
+                        print(stdoutdata.decode())
+                        print(stderrdata.decode())
                     if returncode:
                         # an error occurred
                         del processes[filename]
@@ -97,7 +98,7 @@ class LaTeXToPDF(object):
                                               output_directory, context)
             else:
                 command = ["pdflatex", "-halt-on-error",
-                           "-interaction", "batchmode",
+                           "-interaction", "errorstopmode",
                            "-output-directory", output_directory,
                            texfile_name]
             command_str = " ".join(command)
@@ -114,7 +115,8 @@ class LaTeXToPDF(object):
         val = None # if flow is empty
         for val in flow:
             # check for finished pdfs on each iteration
-            for out_val in pop_returned_processes(self.processes):
+            for out_val in pop_returned_processes(self.processes,
+                                                  self.verbose):
                 yield out_val
             data, context = lena.flow.get_data_context(val)
             if not is_tex_file(context):
@@ -164,12 +166,17 @@ class LaTeXToPDF(object):
                 self.processes.clear()
                 raise StopIteration
             else:
-                if self.verbose > 1:
-                    print("LaTeXToPDF stdout:", stdoutdata, end='')
+                returncode = process.returncode
                 if self.verbose:
-                    if stderrdata:
-                        print("LaTeXToPDF stderror:", stderrdata, end='')
-                returncode = process.poll()
+                    # In fact, it's not possible
+                    # to distinguish stdout from stderr,
+                    # because pdflatex writes errors to stdout...
+                    # stdoutdata is bytes object.
+                    # Need to decode that to get newlines.
+                    if returncode or self.verbose > 1:
+                        print(stdoutdata.decode())
+                        if stderrdata:
+                            print(stderrdata.decode())
                 if not returncode:
                     yield val
 
