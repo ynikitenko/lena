@@ -79,7 +79,7 @@ def _select_template_or_default(val, default=""):
 class RenderLaTeX(object):
     """Create LaTeX from templates and data."""
 
-    def __init__(self, select_template="", template_path=".", select_data=None,
+    def __init__(self, select_template="", template_dir=".", select_data=None,
                  verbose=0):
         """*select_template* is a string or a callable.
         If a string, it is the name of the template to be used
@@ -90,8 +90,8 @@ class RenderLaTeX(object):
         and no template could be found in the context,
         :exc:`.LenaRuntimeError` is raised.
 
-        *template_path* is the path for templates
-        (used in jinja2.FileSystemLoader).
+        *template_dir* is the path to the directory with templates
+        (used by jinja2.FileSystemLoader).
         By default, it is the current directory.
 
         *select_data* is a callable to choose data to be rendered.
@@ -122,7 +122,7 @@ class RenderLaTeX(object):
                 "select_template must be a string or a callable, "
                 "{} provided".format(select_template)
             )
-        self._loader = jinja2.FileSystemLoader(template_path)
+        self._loader = jinja2.FileSystemLoader(template_dir)
         self._environment = _Environment(loader=self._loader)
         self._verbose = verbose
         # print("templates:", self._environment.list_templates())
