@@ -5,10 +5,12 @@ import jinja2
 import os
 import pytest
 import sys
-
 from copy import deepcopy
 
-from lena.output.render_latex import RenderLaTeX, _Template, _Environment
+import lena
+from lena.output.render_latex import (
+    RenderLaTeX, _Template, _Environment, _select_template_or_default
+)
 from lena.context import get_recursively, update_recursively
 
 
@@ -46,16 +48,30 @@ def test_environment():
     t2 = env.from_string(r'Hello \VAR{ name }!')
     assert t2.render(name='John Doe') == u'Hello John Doe!'
     
-    assert jinja2.Environment(variable_start_string=r'\VAR{', undefined=jinja2.DebugUndefined).from_string("{{ val }}").render({"val": "Hello"}) ==  u'{{ val }}'
-    assert jinja2.Environment(variable_start_string=r'\VAR{', variable_end_string='}').from_string(r'\VAR{ val }').render({"val": "Hello"}) == u'Hello'
-    assert jinja2.Environment(variable_start_string=r'\VAR{', variable_end_string='}', undefined=jinja2.DebugUndefined).from_string("{{ val }}").render({"val": "Hello"}) == u'{{ val }}'
-    assert jinja2.Environment(variable_start_string=r'\VAR{', undefined=jinja2.DebugUndefined).from_string(r"\VAR{ val }}").render({"val": "Hello"}) == u'Hello'
+    assert jinja2.Environment(
+        variable_start_string=r'\VAR{', undefined=jinja2.DebugUndefined
+    ).from_string("{{ val }}").render({"val": "Hello"}) ==  u'{{ val }}'
+    assert jinja2.Environment(
+        variable_start_string=r'\VAR{', variable_end_string='}'
+    ).from_string(r'\VAR{ val }').render({"val": "Hello"}) == u'Hello'
+    assert jinja2.Environment(
+        variable_start_string=r'\VAR{', variable_end_string='}',
+        undefined=jinja2.DebugUndefined
+    ).from_string("{{ val }}").render({"val": "Hello"}) == u'{{ val }}'
+    assert jinja2.Environment(
+        variable_start_string=r'\VAR{', undefined=jinja2.DebugUndefined
+    ).from_string(r"\VAR{ val }}").render({"val": "Hello"}) == u'Hello'
     # Incorrect, should be "\VAR{ val }}"
     # Submitted to https://github.com/pallets/jinja/issues/958
     # That bug was closed, a new wrapper was suggested (DIY).
-    assert jinja2.Environment(variable_start_string=r'\VAR{', undefined=jinja2.DebugUndefined).from_string(r"\VAR{ val }}").render({"val1": "Hello"}) == u'{{ val }}'
-    assert jinja2.Environment(undefined=jinja2.DebugUndefined).from_string("{{ val }}").render({"val1": "Hello"}) == u'{{ val }}'
-    assert jinja2.Environment(variable_start_string=r'\VAR{').from_string(r"\VAR{ val }}").render({"val": "Hello"}) == u'Hello'
+    assert jinja2.Environment(
+        variable_start_string=r'\VAR{',
+        undefined=jinja2.DebugUndefined
+    ).from_string(r"\VAR{ val }}").render({"val1": "Hello"}) == u'{{ val }}'
+    assert jinja2.Environment(undefined=jinja2.DebugUndefined)\
+        .from_string("{{ val }}").render({"val1": "Hello"}) == u'{{ val }}'
+    assert jinja2.Environment(variable_start_string=r'\VAR{')\
+        .from_string(r"\VAR{ val }}").render({"val": "Hello"}) == u'Hello'
 
 
 def test_render_latex():
@@ -66,8 +82,9 @@ def test_render_latex():
 
     ## Template inheritance works ##
     context = {"output": {"filetype": "csv", "filepath": "output.csv"}}
-    data, new_context = next(renderer.run([("output.csv", deepcopy(context))]))
-    # print(data, new_context)
+    data, new_context = next(
+        renderer.run([("output.csv", deepcopy(context))])
+    )
     rendered_file = os.path.join(curpath, "rendered.tex")
     with open(rendered_file) as fil:
         rendered = "".join(fil.readlines())
@@ -80,7 +97,47 @@ def test_render_latex():
     # print(data)
     # print(rendered)
     assert repr(data + "\n") == repr(rendered)
-    assert new_context == {'output': {'fileext': 'tex', 'filetype': 'tex', "filepath": "output.csv"}}
+    assert new_context == {
+        'output': {
+            "fileext": "tex",
+            "filetype": "tex",
+            "filepath": "output.csv"
+        }
+    }
 
     # not selected data passes unchanged
     assert list(renderer.run([("output.csv", {})])) == [("output.csv", {})]
+
+
+def test_select_template():
+    select = _select_template_or_default
+    # raises if no template could be found
+    empty = (None, {})
+    with pytest.raises(lena.core.LenaRuntimeError):
+        select(empty)
+    # returns default if set
+    assert select(empty, default="default") == "default"
+
+    # output.template is used if present
+    context_with_template = {"output": {"template": "from_context"}}
+    val = (None, context_with_template)
+    assert select(val) == "from_context"
+    # output.template overwrites default
+    assert select(val, default="default") == "from_context"
+
+    # wrong type raises
+    with pytest.raises(lena.core.LenaTypeError):
+        RenderLaTeX(select_template=1)
+
+    # custom function works
+    sel = lambda _: "template"
+    render = RenderLaTeX(select_template=sel)
+    assert render._select_template(val) == "template"
+
+
+def test_select_data():
+    # select_data must be None or callable
+    with pytest.raises(lena.core.LenaTypeError):
+        RenderLaTeX(select_data=1)
+    render = RenderLaTeX(select_data=lambda _: True)
+    assert render._select_data(0) is True

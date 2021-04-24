@@ -7,14 +7,15 @@ import jinja2
 import lena.core
 import lena.flow
 import lena.context
+from lena.context import get_recursively as _get_recursively
 
 
 _ljinja_env = {
-        "block_start_string": '\BLOCK{',
+        "block_start_string": r'\BLOCK{',
         "block_end_string": '}',
-        "variable_start_string": '\VAR{',
+        "variable_start_string": r'\VAR{',
         "variable_end_string": '}',
-        "comment_start_string": '\#{',
+        "comment_start_string": r'\#{',
         "comment_end_string": '}',
         "line_statement_prefix": '%-',
         "line_comment_prefix": '%#',
@@ -58,25 +59,22 @@ class _Environment(jinja2.Environment):
 def _is_csv(value):
     """Test whether context.output.filetype is "csv"."""
     context = lena.flow.get_context(value)
-    return lena.context.get_recursively(
+    return _get_recursively(
         context, "output.filetype", None
     ) == "csv"
 
 
-def _select_template(default):
-    def select_template(val):
-        data, context = lena.flow.get_data_context(val)
-        # this is not tested, documented and used
-        # out_template = lena.context.get_recursively(context, "output.template", None)
-        # if out_template:
-        #     return out_template
-        if not default:
-            raise lena.core.LenaRuntimeError(
-                "context contains no template and empty default provided, "
-                "{} is context".format(context)
-            )
-        return default
-    return select_template
+def _select_template_or_default(val, default=""):
+    data, context = lena.flow.get_data_context(val)
+    out_template = _get_recursively(context, "output.template", None)
+    if out_template:
+        return out_template
+    if not default:
+        raise lena.core.LenaRuntimeError(
+            "context contains no template and empty default provided, "
+            "{} is context".format(context)
+        )
+    return default
 
 
 class RenderLaTeX(object):
@@ -101,7 +99,8 @@ class RenderLaTeX(object):
         If it is not provided, by default CSV files are selected.
         """
         if isinstance(select_template, str):
-            self._select_template = _select_template(select_template)
+            self._select_template = lambda _: \
+                _select_template_or_default(_, default=select_template)
         elif callable(select_template):
             self._select_template = select_template
         else:
@@ -136,17 +135,14 @@ class RenderLaTeX(object):
 
         Not selected values pass unchanged.
         """
+        _update_recursively = lena.context.update_recursively
         for val in flow:
             data, context = lena.flow.get_data_context(val)
             if self._select_data(val):
                 template = self._environment.get_template(self._select_template(val))
+                _update_recursively(context, {"output": {"filetype": "tex"}})
+                _update_recursively(context, {"output": {"fileext": "tex"}})
 
-                lena.context.update_recursively(
-                    context, {"output": {"filetype": "tex"}}
-                )
-                lena.context.update_recursively(
-                    context, {"output": {"fileext": "tex"}}
-                )
                 data = template.render(context)
                 yield (data, context)
             else:
