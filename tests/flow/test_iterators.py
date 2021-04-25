@@ -9,6 +9,11 @@ from lena.flow import DropContext, CountFrom
 from lena.flow.iterators import ISlice
 from tests.examples.fill import StoreFilled
 
+from hypothesis import strategies as s
+from hypothesis import given
+# don't think anything would change with other numbers
+hypo_int_max = 200
+
 
 def test_chain():
     nums = [1, 2, 3]
@@ -81,3 +86,67 @@ def test_islice():
     for i in range(0, 19):
         isl.fill_into(store, i)
     assert store.list == list(range(10, 20, 2))
+
+
+def test_negative_islice():
+    # negative stop
+    isl1 = ISlice(-1)
+    data = [0, 1, 2]
+    assert list(isl1.run(iter(data))) == [0, 1]
+
+    # positive start, negative stop
+    isl2 = ISlice(1, -1)
+    assert list(isl2.run(iter(data))) == [1]
+
+    # negative start, negative stop
+    isl3 = ISlice(-2, -1)
+    assert list(isl3.run(iter(data))) == [1]
+
+    # negative start, positive stop
+    isl4 = ISlice(-2, 2)
+    assert list(isl4.run(iter(data))) == [1]
+
+    ## step works
+    s = slice(None, None, 2)
+    isl5 = ISlice(s.start, s.stop, s.step)
+    assert list(isl5.run(iter(range(0, 6)))) == list(range(0, 6))[s.start:s.stop:s.step]
+
+    # step with negative index works
+    s = slice(-3, 3, 2)
+    isl6 = ISlice(s.start, s.stop, s.step)
+    assert list(isl6.run(iter(range(0, 6)))) == list(range(0, 6))[s.start:s.stop:s.step]
+
+    # initialization works correctly (seems not always)
+    isl7 = ISlice(-3, 5, None)
+    assert (isl7._start, isl7._stop, isl7._step) == (-3, 5, 1)
+
+    for s in [slice(-3, 3, 2), slice(-3, 4, 3), slice(-3, 5),
+              # negative very large start should have no effect,
+              # like getting all elements.
+              slice(-100, 3)]:
+        isl = ISlice(s.start, s.stop, s.step)
+        for data in [range(0), range(4), range(10), range(20)]:
+            assert list(isl.run(iter(data))) == list(data)[s.start:s.stop:s.step]
+
+    # to check it myself.
+    isl8 = ISlice(-100, 3)
+    assert list(isl8.run(iter(range(5)))) == list(range(3))
+
+    # step must be a natural number
+    # negative step raises
+    with pytest.raises(lena.core.LenaValueError):
+        ISlice(None, None, -1)
+    # zero step raises
+    with pytest.raises(lena.core.LenaValueError):
+        ISlice(None, None, 0)
+
+
+start_stop_s = s.one_of(s.none(), s.integers(-hypo_int_max, hypo_int_max))
+step_s = s.integers(1, hypo_int_max)
+
+@given(start=start_stop_s, stop=start_stop_s, step=step_s,
+       data_len=s.integers(0, hypo_int_max))
+def test_islice_hypothesis(start, stop, step, data_len):
+    data = list(range(data_len))
+    isl = ISlice(start, stop, step)
+    assert list(isl.run(iter(data))) == data[start:stop:step]
