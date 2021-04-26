@@ -6,13 +6,13 @@ from itertools import count, islice
 import lena.flow
 from lena.core import Source, LenaStopFill
 from lena.flow import DropContext, CountFrom
-from lena.flow.iterators import ISlice
+from lena.flow.iterators import ISlice, Reverse
 from tests.examples.fill import StoreFilled
 
 from hypothesis import strategies as s
 from hypothesis import given
-# don't think anything would change with other numbers
-hypo_int_max = 200
+# all bugs converged to at most 3.
+hypo_int_max = 20
 
 
 def test_chain():
@@ -139,6 +139,19 @@ def test_negative_islice():
     # zero step raises
     with pytest.raises(lena.core.LenaValueError):
         ISlice(None, None, 0)
+    # it but raises
+    with pytest.raises(lena.core.LenaValueError):
+        ISlice(-1, -1, 0)
+    # it should raise also for non-integer numbers.
+    with pytest.raises(lena.core.LenaValueError):
+        ISlice(-1, -1, 1.5)
+
+    # found by hypothesis, but yesterday it was not found...
+    # Pytest for the whole package doesn't show any error!
+    # Is hypothesis reliable?..
+    isl = ISlice(-3, -1, 1)
+    data = list(range(3))
+    assert list(isl.run(iter(data))) == [0, 1]
 
 
 start_stop_s = s.one_of(s.none(), s.integers(-hypo_int_max, hypo_int_max))
@@ -150,3 +163,13 @@ def test_islice_hypothesis(start, stop, step, data_len):
     data = list(range(data_len))
     isl = ISlice(start, stop, step)
     assert list(isl.run(iter(data))) == data[start:stop:step]
+
+
+def test_reverse():
+    r = Reverse()
+    assert list(r.run(iter([]))) == []
+    assert list(r.run(iter([1]))) == [1]
+    # it really works!
+    assert list(r.run(iter([1, 2]))) == [2, 1]
+    # just in case
+    assert list(r.run(iter([1, 2, 3]))) == [3, 2, 1]

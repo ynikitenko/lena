@@ -1,4 +1,6 @@
-"""Adapters to iterators from ``itertools``."""
+"""Iterators allow to transform a data flow
+or create a new one.
+"""
 try:
     from future_builtins import zip
 except ModuleNotFoundError:
@@ -84,6 +86,12 @@ class ISlice(object):
         For example, to discard the last 200 elements
         one has to a) read the whole flow, b) store 200 elements
         during each iteration.
+
+        It is not possible to use negative indices with
+        :meth:`fill_into`, because it doesn't control the flow
+        and doesn't know when it is finished.
+        To obtain a negative step,
+        use a composition with :class:`Reverse`.
         """
         # todo: rename to Slice in the next release.
         from itertools import islice
@@ -101,9 +109,9 @@ class ISlice(object):
             # negative indices
             s = slice(*args)
             self._start, self._stop, step = s.start, s.stop, s.step
-            # if step is None, it is 1 by default.
-            step = step or 1
-            if step <= 0:
+            if step is None:
+                step = 1
+            if step <= 0 or int(step) != step:
                 raise lena.core.LenaValueError(
                     "step must be a natural number (integer >= 1)"
                 )
@@ -118,7 +126,8 @@ class ISlice(object):
     def fill_into(self, element, value):
         """Fill *element* with *value*.
 
-        Element must have a ``fill(value)`` method.
+        Values are filled in the order defined by *(start, stop, step)*.
+        *Element* must have a ``fill(value)`` method.
         """
         if self._index > self._next_index:
             try:
@@ -155,10 +164,7 @@ class ISlice(object):
                 # skip *start* values
                 for _ in zip(range(start), flow):
                     pass
-                if stop is None:
-                    for val in flow:
-                        yield val
-                    return
+                # stop=None is handled in islice
                 # stop is negative
                 d = fill_deque(flow, -stop)
                 if len(d) < -stop:
@@ -179,14 +185,15 @@ class ISlice(object):
                 if stop <= start:
                     return
                 if stop < 0:
-                    # will exhaust all flow and fill the deque
+                    # exhaust all flow and fill the deque
                     # with last maxlen elements
                     d = deque(flow, maxlen=-start)
                     ind = 0
                     # imitate
                     # for val in d[:stop-start]:
                     # which is not possible with a deque.
-                    while ind < len(d) + stop:
+                    len_d = len(d)
+                    while ind < len_d + stop:
                         yield d.popleft()
                         ind += 1
                 else:
@@ -213,5 +220,29 @@ class ISlice(object):
 
 
     def run(self, flow):
-        """Yield values from *start* to *stop* with *step*."""
+        """Yield values from *flow* from *start* to *stop* with *step*.
+        """
         return self._islice(flow)
+
+
+class Reverse():
+    """Reverse the flow (yield values from last to first).
+
+    Warning
+    -------
+        This element will consume the whole flow.
+    """
+
+    def __init__(self):
+        # no ideas yet. Maybe allow maxsize?
+        # However, that is not implemented in list.__init__ .
+        pass
+
+    def run(self, flow):
+        """Consume the *flow* and yield values in reverse order."""
+        all_huge_flow = list(flow)
+        while 1:
+            try:
+                yield all_huge_flow.pop()
+            except IndexError:
+                return

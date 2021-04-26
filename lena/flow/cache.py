@@ -54,7 +54,7 @@ class Cache(object):
         You can give it *.pkl* extension.
 
         *method* can be *pickle* or *cPickle* (faster pickle).
-        For Python3 they are same.
+        For Python 3 they are same.
 
         *protocol* is pickle protocol.
         Version 2 is the highest supported by Python 2.
