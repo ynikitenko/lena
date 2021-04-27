@@ -128,6 +128,15 @@ class ISlice(object):
 
         Values are filled in the order defined by *(start, stop, step)*.
         *Element* must have a ``fill(value)`` method.
+
+        When the filling should stop,
+        :exc:`.LenaStopFill` is raised
+        (:class:`.Split` handles this normally).
+        Sometimes for *step* more than one
+        :exc:`.LenaStopFill` will be raised
+        before reaching *stop* elements.
+        Early exceptions are an optimization and
+        don't affect the correctness of this method.
         """
         if self._index > self._next_index:
             try:

@@ -1,7 +1,11 @@
 from __future__ import print_function
 
-import pytest
+import sys
 from itertools import count, islice
+
+import pytest
+from hypothesis import strategies as s
+from hypothesis import given
 
 import lena.flow
 from lena.core import Source, LenaStopFill
@@ -9,8 +13,6 @@ from lena.flow import DropContext, CountFrom
 from lena.flow.iterators import ISlice, Reverse
 from tests.examples.fill import StoreFilled
 
-from hypothesis import strategies as s
-from hypothesis import given
 # all bugs converged to at most 3.
 hypo_int_max = 20
 
@@ -52,7 +54,7 @@ def test_count_from():
     assert list(islice(it(), 5)) == list(range(10, 20, 2))
 
 
-def test_islice():
+def test_islice_run():
     c = count()
     ### test __init__ and run ###
     # stop works
@@ -67,25 +69,6 @@ def test_islice():
     # start, stop, step work
     isl = ISlice(0, 10, 2)
     list(isl.run(count())) == list(range(0, 10, 2))
-
-    ### test fill ###
-    store = StoreFilled()
-    # start, stop work
-    isl = ISlice(10, 15)
-    for i in range(0, 15):
-        isl.fill_into(store, i)
-    assert store.list == list(range(10, 15))
-    with pytest.raises(LenaStopFill):
-        isl = ISlice(10, 15)
-        for i in range(0, 16):
-            isl.fill_into(store, i)
-    # step works
-    store.reset()
-    isl = ISlice(10, 20, 2)
-    # 18 will be filled last
-    for i in range(0, 19):
-        isl.fill_into(store, i)
-    assert store.list == list(range(10, 20, 2))
 
 
 def test_negative_islice():
@@ -154,8 +137,9 @@ def test_negative_islice():
     assert list(isl.run(iter(data))) == [0, 1]
 
 
-start_stop_s = s.one_of(s.none(), s.integers(-hypo_int_max, hypo_int_max))
-step_s = s.integers(1, hypo_int_max)
+start_stop_s = s.one_of(s.none(),
+                        s.integers(-hypo_int_max, hypo_int_max))
+step_s       = s.integers(1, hypo_int_max)
 
 @given(start=start_stop_s, stop=start_stop_s, step=step_s,
        data_len=s.integers(0, hypo_int_max))
@@ -163,6 +147,86 @@ def test_islice_hypothesis(start, stop, step, data_len):
     data = list(range(data_len))
     isl = ISlice(start, stop, step)
     assert list(isl.run(iter(data))) == data[start:stop:step]
+
+
+def test_islice_fill_into():
+    store = StoreFilled()
+    # start, stop work
+    isl = ISlice(10, 15)
+    for i in range(0, 15):
+        isl.fill_into(store, i)
+    assert store.list == list(range(10, 15))
+    with pytest.raises(LenaStopFill):
+        isl = ISlice(10, 15)
+        for i in range(0, 16):
+            isl.fill_into(store, i)
+    # step works
+    store.reset()
+    isl = ISlice(10, 20, 2)
+    # 18 will be filled last
+    for i in range(0, 19):
+        isl.fill_into(store, i)
+    assert store.list == list(range(10, 20, 2))
+
+    # found by hypothesis
+    store = StoreFilled()
+    isl = ISlice(None, None, 1)
+    data = [0]
+    for val in data:
+        isl.fill_into(store, val)
+    assert store.list == [0]
+
+    store = StoreFilled()
+    isl = ISlice(None, 1, 2)
+    data = [0, 1]
+    with pytest.raises(LenaStopFill):
+        for val in data:
+            isl.fill_into(store, val)
+    assert store.list == [0]
+
+    store = StoreFilled()
+    isl = ISlice(None, 2, 2)
+    data = [0, 1]
+    with pytest.raises(LenaStopFill):
+        for val in data:
+            isl.fill_into(store, val)
+    assert store.list == [0]
+
+
+start_stop_non_neg = s.one_of(s.none(),
+                              s.integers(0, hypo_int_max))
+@given(start=start_stop_non_neg,
+       # stop=s.integers(0, hypo_int_max),
+       stop=start_stop_non_neg,
+       step=step_s,
+       data_len=s.integers(1, hypo_int_max))
+def test_islice_hypothesis_fill_into(start, stop, step, data_len):
+    # data_len >= 1, because if the flow is empty,
+    # there is nothing to check.
+    data = list(range(data_len))
+    isl = ISlice(start, stop, step)
+    if start is None:
+        start = 0
+    if stop is None:
+        stop = sys.maxsize
+    store = StoreFilled()
+    if True:
+    # to check this condition is pretty hard. For earliest raise
+    # we don't check about when and whether LenaStopFill is raised.
+    # if stop == 0 or data_len > stop or (data_len == stop and step != 1):
+    # if stop == 0 or stop < data_len:
+        try:
+            for val in data:
+                isl.fill_into(store, val)
+        except LenaStopFill:
+            assert store.list == data[start:stop:step]
+        else:
+            assert store.list == data[start:stop:step]
+            # assert "should had raised" and False
+    else:
+        for val in data:
+            isl.fill_into(store, val)
+        assert store.list == data[start:stop:step]
 
 
 def test_reverse():
