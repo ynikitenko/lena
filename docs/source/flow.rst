@@ -9,6 +9,7 @@ Flow
     Cache
     DropContext
     End
+    Filter
     Print
 
 ..     Count
@@ -65,6 +66,8 @@ which didn't fit other categories.
 .. autoclass:: DropContext
     :members:
 .. autoclass:: End
+    :members:
+.. autoclass:: Filter
     :members:
 .. autoclass:: Print
     :members:

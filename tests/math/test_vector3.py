@@ -31,6 +31,14 @@ def test_eq():
         v1 > 0
 
 
+def test_operations():
+    v1 = vector3([3, 4, 5])
+    v1 *= 2
+    assert v1 == vector3([6, 8, 10])
+    v1 /= 2
+    assert v1 == vector3([3, 4, 5])
+
+
 def test_cylindrical():
     v1 = vector3([3, 4, 5])
     # rho computed

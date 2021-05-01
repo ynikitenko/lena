@@ -129,6 +129,10 @@ class vector3(object):
             )
         self._v = list(map(float, v))
 
+    # todo: add fromcylindrical?
+    # make set_ and get_ functions private. What's the use of them?
+    # Make constructor accept no list, but just 3 numbers.
+
     @classmethod
     def fromspherical(cls, r, phi, theta):
         r"""Construct vector3 from spherical coordinates.

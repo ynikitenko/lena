@@ -17,10 +17,10 @@ import sys
 sys.path.insert(0, os.path.abspath('../../'))
 
 def setup(app):
-    app.add_javascript('copybutton.js')
-    app.add_stylesheet('custom.css')
-    app.add_javascript('custom.js')
-    app.add_javascript('https://cdn.jsdelivr.net/npm/clipboard@1/dist/clipboard.min.js')
+    app.add_js_file('copybutton.js')
+    app.add_css_file('custom.css')
+    app.add_js_file('custom.js')
+    app.add_js_file('https://cdn.jsdelivr.net/npm/clipboard@1/dist/clipboard.min.js')
 
 highlight_language = 'python'
 

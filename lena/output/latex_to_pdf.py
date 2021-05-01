@@ -38,6 +38,7 @@ class LaTeXToPDF(object):
                     texfile_name]
         """
         self._overwrite = overwrite
+        # todo: make verbose private.
         self.verbose = verbose
         if create_command and not callable(create_command):
             raise lena.core.LenaTypeError(

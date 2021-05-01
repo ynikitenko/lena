@@ -15,12 +15,14 @@ from lena.flow.split_into_bins import (
     get_example_bin,
 )
 from lena.flow.zip import Zip
+from .filter import Filter
 
 
 __all__ = [
     # elements
     'Cache', 'Count', 'DropContext', 'End', 'Print',
     'Chain', 'CountFrom', 'ISlice',
+    'Filter',
     'ReadROOTFile',
     'ReadROOTTree',
     'Zip',
