@@ -7,6 +7,7 @@ from lena.flow.group_plots import GroupPlots
 from lena.flow.group_scale import GroupScale
 from lena.flow.iterators import Chain, CountFrom, ISlice
 from lena.flow.print_ import Print
+from .progress import Progress
 from lena.flow.read_root_file import ReadROOTFile
 from lena.flow.read_root_tree import ReadROOTTree
 from lena.flow.selectors import Not, Selector
@@ -20,9 +21,16 @@ from .filter import Filter
 
 __all__ = [
     # elements
-    'Cache', 'Count', 'DropContext', 'End', 'Print',
-    'Chain', 'CountFrom', 'ISlice',
+    'Cache',
+    'Count',
+    'DropContext',
+    'End',
     'Filter',
+    'Print',
+    'Progress',
+    # iterators
+    'Chain', 'CountFrom', 'ISlice',
+    # others
     'ReadROOTFile',
     'ReadROOTTree',
     'Zip',

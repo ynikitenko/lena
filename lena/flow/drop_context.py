@@ -3,7 +3,7 @@ from lena.flow.functions import _has_context
 
 
 class DropContext():
-    """Sequence, which transform *(data, context)* flow
+    """Sequence that transforms *(data, context)* flow
     so that only *data* remains in the inner sequence.
     Context is restored outside *DropContext*.
 

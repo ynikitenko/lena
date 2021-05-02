@@ -11,6 +11,7 @@ Flow
     End
     Filter
     Print
+    Progress
 
 ..     Count
 ..    Transform
@@ -70,6 +71,8 @@ which didn't fit other categories.
 .. autoclass:: Filter
     :members:
 .. autoclass:: Print
+    :members:
+.. autoclass:: Progress
     :members:
 ..
     .. autoclass:: Transform
