@@ -45,6 +45,8 @@ Flow
     Chain
     CountFrom
     ISlice
+    Reverse
+    Slice
 
 **Split into bins:**
 

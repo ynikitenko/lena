@@ -5,7 +5,7 @@ import pytest
 from lena.core import Sequence, Source, FillRequest, FillRequestSeq, Run
 from lena.core import LenaNotImplementedError, LenaTypeError
 from lena.flow import Print
-from lena.flow import ISlice
+from lena.flow import Slice
 from lena.math import Mean, Sum
 
 
@@ -34,7 +34,7 @@ def test_fill_request_seq():
             ),
             reset=False,
         ),
-        ISlice(10)
+        Slice(10)
     )
     assert list(s1()) == [0, 1, 3, 6, 10, 15, 21, 28, 36, 45]
 
@@ -46,7 +46,7 @@ def test_fill_request_seq():
             lambda x: x-1,
             reset=False,
         ),
-        ISlice(10)
+        Slice(10)
     )
     assert list(s2()) == [0, 2, 5, 9, 14, 20, 27, 35, 44, 54]
 

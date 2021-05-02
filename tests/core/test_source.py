@@ -5,7 +5,7 @@ from itertools import islice
 
 import lena.core
 from lena.core import Source, Sequence
-from lena.flow import ISlice
+from lena.flow import Slice
 
 
 def cnt0(): 
@@ -16,7 +16,7 @@ def cnt0():
 
 
 def test_source():
-    it5 = ISlice(5)
+    it5 = Slice(5)
     sseq = Source(cnt0, it5)
     assert list(sseq()) == [0, 1, 2, 3, 4]
 

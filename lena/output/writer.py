@@ -88,7 +88,7 @@ class Writer(object):
         def normalize_path(path_name, path):
             if os.path.isabs(path):
                 warnings.warn(
-                    "{} must not be absolute path, {} given"
+                    "{} should not be an absolute path, {} given"
                     .format(path_name, path),
                     RuntimeWarning
                 )

@@ -64,7 +64,7 @@ In this case use a sequence *Source*:
 .. code-block:: python
 
     from lena.core import Sequence, Source
-    from lena.flow import CountFrom, ISlice
+    from lena.flow import CountFrom, Slice
 
     s = Sequence(
         lambda i: pow(-1, i) * (2 * i + 1),
@@ -72,7 +72,7 @@ In this case use a sequence *Source*:
     spi = Source(
         CountFrom(0),
         s,
-        ISlice(10**6),
+        Slice(10**6),
         lambda x: 4./x,
         Sum(),
     )
@@ -117,10 +117,10 @@ because it doesn't accept any incoming flow.
 
 Since we can't use an infinite series in practice,
 we must stop it at some point. 
-We take the first million of its items using an *ISlice* element.
-*ISlice* and *CountFrom* are similar to *islice* and *count* functions
+We take the first million of its items using a *Slice* element.
+*Slice* and *CountFrom* are similar to *islice* and *count* functions
 from Python's standard library module *itertools*.
-*ISlice* can also be initialized with *start, stop[, step]* arguments,
+*Slice* can also be initialized with *start, stop[, step]* arguments,
 which allow to skip some initial or final subset of data (defined by its index),
 or take each *step*-th item
 (if the *step* is two, use all even indices from zero).
@@ -417,7 +417,7 @@ and add some more elements to the sequence:
         Print(),
         ReadData(),
         # Print(),
-        ISlice(1000),
+        Slice(1000),
         lambda val: val[0][0], # data.x
         Histogram(mesh((-10, 10), 10)),
         Context(),
@@ -433,7 +433,7 @@ we can put any number of *Print* elements anywhere we want.
 We don't need to search for other files and add print statements there
 to see the input and output values.
 
-*ISlice*, which we met earlier when approximating *pi*,
+*Slice*, which we met earlier when approximating *pi*,
 limits the flow to the specified number of items.
 If we are not sure that our analysis is already correct,
 we can select only a small amount of data to test that.

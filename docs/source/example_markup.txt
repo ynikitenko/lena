@@ -1,6 +1,6 @@
 :class:`Chain` can be used as a ``Source`` to generate data.
 
-:class:`ISlice` (*start, stop* [*, step*])
+:class:`Slice` (*start, stop* [*, step*])
 Similar to :func:`itertools.islice`
 
 *iterables* will be chained during ``__call__()``,

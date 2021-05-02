@@ -1,21 +1,21 @@
-from lena.flow.cache import Cache
-from lena.flow.drop_context import DropContext
-from lena.flow.elements import Count, End, TransformIf
-from lena.flow.functions import get_data, get_context, get_data_context, seq_map
-from lena.flow.group_by import GroupBy
-from lena.flow.group_plots import GroupPlots
-from lena.flow.group_scale import GroupScale
-from lena.flow.iterators import Chain, CountFrom, ISlice
-from lena.flow.print_ import Print
+from .cache import Cache
+from .drop_context import DropContext
+from .elements import Count, End, TransformIf
+from .functions import get_data, get_context, get_data_context, seq_map
+from .group_by import GroupBy
+from .group_plots import GroupPlots
+from .group_scale import GroupScale
+from .iterators import Chain, CountFrom, Slice, ISlice, Reverse
+from .print_ import Print
 from .progress import Progress
-from lena.flow.read_root_file import ReadROOTFile
-from lena.flow.read_root_tree import ReadROOTTree
-from lena.flow.selectors import Not, Selector
-from lena.flow.split_into_bins import (
+from .read_root_file import ReadROOTFile
+from .read_root_tree import ReadROOTTree
+from .selectors import Not, Selector
+from .split_into_bins import (
     SplitIntoBins, ReduceBinContent, TransformBins,
     get_example_bin,
 )
-from lena.flow.zip import Zip
+from .zip import Zip
 from .filter import Filter
 
 
@@ -29,7 +29,11 @@ __all__ = [
     'Print',
     'Progress',
     # iterators
-    'Chain', 'CountFrom', 'ISlice',
+    'Chain',
+    'CountFrom',
+    'ISlice',
+    'Reverse',
+    'Slice',
     # others
     'ReadROOTFile',
     'ReadROOTTree',

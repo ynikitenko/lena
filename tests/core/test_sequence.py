@@ -1,13 +1,13 @@
 """args is a list of functions or executable classes.
 
->>> it2 = ISlice(2)
+>>> it2 = Slice(2)
 >>>
 >>> for el in it2.run(cnt0()):
 ...        print(el, end=" ")
 0 1 
 >>>
->>> from lena.flow import Count, Print, ISlice
->>> it5  = ISlice(5)
+>>> from lena.flow import Count, Print, Slice
+>>> it5  = Slice(5)
 >>> seq = Source(cnt0, Sequence(it5))
 >>> res = seq()
 >>> for val in res:
@@ -34,7 +34,7 @@ from itertools import islice
 
 from lena.core import LenaTypeError
 from lena.core import Source, Sequence
-from lena.flow import Count, Print, ISlice, TransformIf
+from lena.flow import Count, Print, Slice, TransformIf
 from lena.flow import Print
 from itertools import islice
 from tests.core.test_fill_compute_seq import mul2
@@ -48,14 +48,14 @@ def cnt0():
 
 
 def test_sequence_init():
-    it5 = ISlice(5)
+    it5 = Slice(5)
     sseq = Source(cnt0, it5)
     with pytest.raises(LenaTypeError):
         sseq = Source(cnt0, it5, ())
 
 
 def test_sequence():
-    it5 = ISlice(5)
+    it5 = Slice(5)
     sseq = Source(cnt0, it5)
     assert list(sseq()) == [0, 1, 2, 3, 4]
     seq = Sequence(TransformIf(int, lambda i: i+1))

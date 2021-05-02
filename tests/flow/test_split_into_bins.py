@@ -8,10 +8,8 @@ import lena.flow.split_into_bins as sib
 from lena.core import Split, FillCompute, Sequence
 from lena.variables import Variable
 from lena.structures import Histogram
-from lena.flow import DropContext, ISlice
-from lena.flow.split_into_bins import (
-    SplitIntoBins, TransformBins, ReduceBinContent, _iter_bins_with_edges, 
-)
+from lena.flow import SplitIntoBins, TransformBins, ReduceBinContent
+from lena.flow.split_into_bins import _iter_bins_with_edges
 
 from tests.examples.fill_compute import Count, Sum
 

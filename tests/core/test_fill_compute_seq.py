@@ -6,7 +6,7 @@ from lena.core import Sequence, Source, FillCompute, FillComputeSeq, Run
 from lena.core import LenaNotImplementedError, LenaTypeError
 from lena.core import is_fill_compute_seq
 from lena.flow import Print
-from lena.flow import ISlice
+from lena.flow import Slice
 from lena.math import Mean
 
 
@@ -29,18 +29,18 @@ def test_fill_compute_seq():
     with pytest.raises(LenaTypeError):
         FillComputeSeq(Run(Mean()), Mean())
 
-    s1 = Source(cnt1, mul2, ISlice(10), FillCompute(Mean()))
+    s1 = Source(cnt1, mul2, Slice(10), FillCompute(Mean()))
     assert next(s1()) == 11.
 
-    s2 = Source(cnt1, ISlice(10), FillComputeSeq(Mean(), mul2))
+    s2 = Source(cnt1, Slice(10), FillComputeSeq(Mean(), mul2))
     assert list(s2()) == [11.]
 
-    s3 = Source(cnt1, ISlice(10), FillComputeSeq(mul2, FillCompute(Mean())))
+    s3 = Source(cnt1, Slice(10), FillComputeSeq(mul2, FillCompute(Mean())))
     assert next(s3()) == 11.0
 
-    s4 = Source(cnt1, ISlice(10), FillComputeSeq(mul2, FillCompute(Mean()), Print()))
+    s4 = Source(cnt1, Slice(10), FillComputeSeq(mul2, FillCompute(Mean()), Print()))
     # tuple initialization works
-    s41 = Source(cnt1, ISlice(10), FillComputeSeq((mul2, FillCompute(Mean()), Print())))
+    s41 = Source(cnt1, Slice(10), FillComputeSeq((mul2, FillCompute(Mean()), Print())))
     assert next(s4()) == 11.0
     assert next(s41()) == 11.0
     # 11.0
@@ -59,7 +59,7 @@ def test_fill_compute_seq():
     assert len(s3) == 3
     assert len(s4) == 3
     # can get item
-    assert isinstance(s2[1], ISlice)
+    assert isinstance(s2[1], Slice)
 
     # Test FillComputeSeq
     assert len(s5) == 3

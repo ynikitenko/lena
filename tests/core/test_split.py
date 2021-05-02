@@ -12,7 +12,7 @@ from lena.core import (
     LenaAttributeError, LenaRuntimeError, LenaTypeError, LenaValueError,
     LenaStopFill,
 )
-from lena.flow import Cache, ISlice
+from lena.flow import Cache, Slice
 from tests.example_sequences import (ASCIILowercase, ASCIIUppercase,
     ascii_lowercase, ascii_uppercase, lowercase_cached_filename, lowercase_cached_seq, id_)
 # from tests.examples.fill_compute import Count
@@ -144,14 +144,14 @@ def test_split_with_fill_computes():
         # print(list(seq3()))
         list(seq3())
 
-    seq = Split([(ISlice(2), Sum()), Count()])
+    seq = Split([(Slice(2), Sum()), Count()])
     # print(seq._sequences[0])
     assert list(seq.run(flowc)) == [(1, orig_context), (6, counter_context)]
 
 
 def test_split_with_fill_request():
     FillRequest(Sum())
-    seq1 = Split([(ISlice(1000), FillRequest(Sum()))])
+    seq1 = Split([(Slice(1000), FillRequest(Sum()))])
     seq2 = Split([FillRequestSeq(FillRequest(Sum()))])
     seq3 = Split([FillRequest(Sum())])
     flow = [0, (1, {}), 2, 3]

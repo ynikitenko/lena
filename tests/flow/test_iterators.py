@@ -10,7 +10,8 @@ from hypothesis import given
 import lena.flow
 from lena.core import Source, LenaStopFill
 from lena.flow import DropContext, CountFrom
-from lena.flow.iterators import ISlice, Reverse
+from lena.flow import Reverse
+from lena.flow import Slice
 from tests.examples.fill import StoreFilled
 
 # all bugs converged to at most 3.
@@ -32,10 +33,10 @@ def test_count_from():
     s = Source(CountFrom(),
          # lambda i: (i, {str(i): i}),
          # DropContext(
-         #     ISlice(5),
+         #     Slice(5),
          #     lambda i: i + 1,
          # ),
-         ISlice(10),
+         Slice(10),
     )
     results = s()
     assert [result for result in s()] == list(range(10))
@@ -58,81 +59,81 @@ def test_islice_run():
     c = count()
     ### test __init__ and run ###
     # stop works
-    isl = ISlice(10)
+    isl = Slice(10)
     list(isl.run(c)) == list(range(0, 10))
     # start, stop works
-    isl = ISlice(10, 10)
+    isl = Slice(10, 10)
     list(isl.run(c)) == []
     c = count()
-    isl = ISlice(10, 15)
+    isl = Slice(10, 15)
     list(isl.run(c)) == list(range(10, 15))
     # start, stop, step work
-    isl = ISlice(0, 10, 2)
+    isl = Slice(0, 10, 2)
     list(isl.run(count())) == list(range(0, 10, 2))
 
 
 def test_negative_islice():
     # negative stop
-    isl1 = ISlice(-1)
+    isl1 = Slice(-1)
     data = [0, 1, 2]
     assert list(isl1.run(iter(data))) == [0, 1]
 
     # positive start, negative stop
-    isl2 = ISlice(1, -1)
+    isl2 = Slice(1, -1)
     assert list(isl2.run(iter(data))) == [1]
 
     # negative start, negative stop
-    isl3 = ISlice(-2, -1)
+    isl3 = Slice(-2, -1)
     assert list(isl3.run(iter(data))) == [1]
 
     # negative start, positive stop
-    isl4 = ISlice(-2, 2)
+    isl4 = Slice(-2, 2)
     assert list(isl4.run(iter(data))) == [1]
 
     ## step works
     s = slice(None, None, 2)
-    isl5 = ISlice(s.start, s.stop, s.step)
+    isl5 = Slice(s.start, s.stop, s.step)
     assert list(isl5.run(iter(range(0, 6)))) == list(range(0, 6))[s.start:s.stop:s.step]
 
     # step with negative index works
     s = slice(-3, 3, 2)
-    isl6 = ISlice(s.start, s.stop, s.step)
+    isl6 = Slice(s.start, s.stop, s.step)
     assert list(isl6.run(iter(range(0, 6)))) == list(range(0, 6))[s.start:s.stop:s.step]
 
     # initialization works correctly (seems not always)
-    isl7 = ISlice(-3, 5, None)
+    isl7 = Slice(-3, 5, None)
     assert (isl7._start, isl7._stop, isl7._step) == (-3, 5, 1)
 
     for s in [slice(-3, 3, 2), slice(-3, 4, 3), slice(-3, 5),
               # negative very large start should have no effect,
               # like getting all elements.
               slice(-100, 3)]:
-        isl = ISlice(s.start, s.stop, s.step)
+        isl = Slice(s.start, s.stop, s.step)
         for data in [range(0), range(4), range(10), range(20)]:
             assert list(isl.run(iter(data))) == list(data)[s.start:s.stop:s.step]
 
     # to check it myself.
-    isl8 = ISlice(-100, 3)
+    isl8 = Slice(-100, 3)
     assert list(isl8.run(iter(range(5)))) == list(range(3))
 
     # step must be a natural number
     # negative step raises
     with pytest.raises(lena.core.LenaValueError):
-        ISlice(None, None, -1)
+        Slice(None, None, -1)
     # zero step raises
     with pytest.raises(lena.core.LenaValueError):
-        ISlice(None, None, 0)
+        Slice(None, None, 0)
     # it but raises
     with pytest.raises(lena.core.LenaValueError):
-        ISlice(-1, -1, 0)
+        Slice(-1, -1, 0)
     # it should raise also for non-integer numbers.
     with pytest.raises(lena.core.LenaValueError):
-        ISlice(-1, -1, 1.5)
+        Slice(-1, -1, 1.5)
 
     # found by hypothesis, but yesterday it was not found...
     # Pytest for the whole package doesn't show any error!
     # Is hypothesis reliable?..
-    isl = ISlice(-3, -1, 1)
+    isl = Slice(-3, -1, 1)
     data = list(range(3))
     assert list(isl.run(iter(data))) == [0, 1]
 
@@ -145,24 +146,24 @@ step_s       = s.integers(1, hypo_int_max)
        data_len=s.integers(0, hypo_int_max))
 def test_islice_hypothesis(start, stop, step, data_len):
     data = list(range(data_len))
-    isl = ISlice(start, stop, step)
+    isl = Slice(start, stop, step)
     assert list(isl.run(iter(data))) == data[start:stop:step]
 
 
 def test_islice_fill_into():
     store = StoreFilled()
     # start, stop work
-    isl = ISlice(10, 15)
+    isl = Slice(10, 15)
     for i in range(0, 15):
         isl.fill_into(store, i)
     assert store.list == list(range(10, 15))
     with pytest.raises(LenaStopFill):
-        isl = ISlice(10, 15)
+        isl = Slice(10, 15)
         for i in range(0, 16):
             isl.fill_into(store, i)
     # step works
     store.reset()
-    isl = ISlice(10, 20, 2)
+    isl = Slice(10, 20, 2)
     # 18 will be filled last
     for i in range(0, 19):
         isl.fill_into(store, i)
@@ -170,14 +171,14 @@ def test_islice_fill_into():
 
     # found by hypothesis
     store = StoreFilled()
-    isl = ISlice(None, None, 1)
+    isl = Slice(None, None, 1)
     data = [0]
     for val in data:
         isl.fill_into(store, val)
     assert store.list == [0]
 
     store = StoreFilled()
-    isl = ISlice(None, 1, 2)
+    isl = Slice(None, 1, 2)
     data = [0, 1]
     with pytest.raises(LenaStopFill):
         for val in data:
@@ -185,7 +186,7 @@ def test_islice_fill_into():
     assert store.list == [0]
 
     store = StoreFilled()
-    isl = ISlice(None, 2, 2)
+    isl = Slice(None, 2, 2)
     data = [0, 1]
     with pytest.raises(LenaStopFill):
         for val in data:
@@ -204,7 +205,7 @@ def test_islice_hypothesis_fill_into(start, stop, step, data_len):
     # data_len >= 1, because if the flow is empty,
     # there is nothing to check.
     data = list(range(data_len))
-    isl = ISlice(start, stop, step)
+    isl = Slice(start, stop, step)
     if start is None:
         start = 0
     if stop is None:

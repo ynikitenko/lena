@@ -13,7 +13,7 @@ from tests.example_sequences import (
 )
 from lena.core import Source
 from lena.flow.cache import Cache
-from lena.flow.iterators import ISlice
+from lena.flow.iterators import Slice
 from tests.shortcuts import cnt1, cnt1c
 
 
@@ -32,7 +32,7 @@ def test_cache_2():
     # works well in sequence
     s1 = Source(
             cnt1,
-            ISlice(2),
+            Slice(2),
             Cache("cache.tmp"),
          )
     res1 = [result for result in s1()]
@@ -51,7 +51,7 @@ def test_cache_2():
     s3 = Source(
             cnt1,
             Cache("cache.tmp"),
-            ISlice(1),
+            Slice(1),
          )
     res3 = [result for result in s3()]
     assert res3 != res2
@@ -60,7 +60,7 @@ def test_cache_2():
     # works well for flow with context
     s4c = Source(
             cnt1c,
-            ISlice(2),
+            Slice(2),
             Cache("cache_c.tmp"),
          )
     res4 = [result for result in s4c()]

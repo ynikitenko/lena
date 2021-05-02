@@ -24,14 +24,14 @@ def main():
     # s0 = Source(
     #     lena.flow.CountFrom(0),
     #     s,
-    #     lena.flow.ISlice(5),
+    #     lena.flow.Slice(5),
     # )
     # results = s0()
     # print(list(results))
     spi = Source(
         lena.flow.CountFrom(0),
         s,
-        lena.flow.ISlice(10**6),
+        lena.flow.Slice(10**6),
         lambda x: 4./x,
         Sum(),
     )

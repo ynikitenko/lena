@@ -8,7 +8,7 @@ from lena.core import LenaTypeError, LenaValueError, LenaNotImplementedError
 from lena.core import (
     Call, FillInto, FillCompute, FillRequest, SourceEl, Run
 )
-from lena.flow import ISlice, CountFrom
+from lena.flow import Slice, CountFrom
 from lena.math import Sum
 from tests.examples.fill import StoreFilled
 from tests.examples.numeric import Add
@@ -132,17 +132,17 @@ def test_fill_request():
         FillRequest(lambda _: 0)
 
     # bufsize 10
-    s1 = Source(CountFrom(), ISlice(100), FillRequest(Sum(), reset=False, bufsize=10))
+    s1 = Source(CountFrom(), Slice(100), FillRequest(Sum(), reset=False, bufsize=10))
     results = list(s1())
     assert results == [45, 190, 435, 780, 1225, 1770, 2415, 3160, 4005, 4950]
 
     # bufsize 1
-    s2 = Source(CountFrom(), ISlice(10), FillRequest(Sum(), reset=False, bufsize=1))
+    s2 = Source(CountFrom(), Slice(10), FillRequest(Sum(), reset=False, bufsize=1))
     results = list(s2())
     assert results == [0, 1, 3, 6, 10, 15, 21, 28, 36, 45]
 
     # derive from FillCompute
-    s3 = Source(CountFrom(), ISlice(10), FillRequest(Sum(), bufsize=1.))
+    s3 = Source(CountFrom(), Slice(10), FillRequest(Sum(), bufsize=1.))
     results = list(s3())
     assert results == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
     sum = Sum()

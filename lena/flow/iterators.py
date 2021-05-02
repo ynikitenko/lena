@@ -8,6 +8,7 @@ except ModuleNotFoundError:
     pass
 import collections
 import itertools
+import warnings
 
 import lena.core
 
@@ -50,15 +51,45 @@ class CountFrom(object):
             yield val
 
 
-class ISlice(object):
+def ISlice(*args, **kwargs):
+    """Deprecated since Lena 0.4. Use :class:`Slice`."""
+    warnings.warn("ISlice is deprecated since Lena 0.4. Use Slice.",
+                  DeprecationWarning, stacklevel=2)
+    return Slice(*args, **kwargs)
+
+
+class Reverse():
+    """Reverse the flow (yield values from last to first).
+
+    Warning
+    -------
+        This element will consume the whole flow.
+    """
+
+    def __init__(self):
+        # no ideas yet. Maybe allow maxsize?
+        # However, that is not implemented in list.__init__ .
+        pass
+
+    def run(self, flow):
+        """Consume the *flow* and yield values in reverse order."""
+        all_huge_flow = list(flow)
+        while 1:
+            try:
+                yield all_huge_flow.pop()
+            except IndexError:
+                return
+
+
+class Slice(object):
     """Slice data flow from *start* to *stop* with *step*."""
 
     def __init__(self, *args):
         """Initialization:
 
-        :class:`ISlice` (*stop*)
+        :class:`Slice` (*stop*)
 
-        :class:`ISlice` (*start, stop* [*, step*])
+        :class:`Slice` (*start, stop* [*, step*])
 
         Similar to :func:`itertools.islice` or :func:`range`.
         Negative indices for *start* and *stop* are supported
@@ -66,17 +97,17 @@ class ISlice(object):
 
         Examples:
 
-        >>> ISlice(1000)  # doctest: +SKIP
+        >>> Slice(1000)  # doctest: +SKIP
 
         analyse only one thousand first events (no other values
         from flow are generated).
         Use it for quick checks of data on small subsamples.
 
-        >>> ISlice(-1)  # doctest: +SKIP
+        >>> Slice(-1)  # doctest: +SKIP
 
         yields all elements from the flow except the last one.
 
-        >>> ISlice(1, -1)  # doctest: +SKIP
+        >>> Slice(1, -1)  # doctest: +SKIP
 
         yields all elements from the flow
         except the first and the last one.
@@ -232,26 +263,3 @@ class ISlice(object):
         """Yield values from *flow* from *start* to *stop* with *step*.
         """
         return self._islice(flow)
-
-
-class Reverse():
-    """Reverse the flow (yield values from last to first).
-
-    Warning
-    -------
-        This element will consume the whole flow.
-    """
-
-    def __init__(self):
-        # no ideas yet. Maybe allow maxsize?
-        # However, that is not implemented in list.__init__ .
-        pass
-
-    def run(self, flow):
-        """Consume the *flow* and yield values in reverse order."""
-        all_huge_flow = list(flow)
-        while 1:
-            try:
-                yield all_huge_flow.pop()
-            except IndexError:
-                return

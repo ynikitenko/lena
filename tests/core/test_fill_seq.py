@@ -5,7 +5,6 @@ import pytest
 import lena.core 
 from lena.core import Sequence, Source
 from lena.core import FillSeq, FillInto
-from lena.flow.iterators import ISlice
 from tests.examples.fill import StoreFilled
 from tests.examples.numeric import Add
 
