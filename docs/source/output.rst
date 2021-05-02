@@ -8,7 +8,7 @@ Output
     MakeFilename
     PDFToPNG
     ToCSV
-    Writer
+    Write
 
 .. not covered yet: JSONEncoder, ExtendedHistToHist
 
@@ -31,6 +31,7 @@ Output
 .. autoclass:: ToCSV
 .. autofunction:: hist1d_to_csv
 .. autofunction:: hist2d_to_csv
+.. autoclass:: Write
 .. autoclass:: Writer
 
 LaTeX

@@ -4,7 +4,7 @@ import os
 
 from lena.core import Sequence, Source
 from lena.math import mesh
-from lena.output import ToCSV, Writer, LaTeXToPDF, PDFToPNG
+from lena.output import ToCSV, Write, LaTeXToPDF, PDFToPNG
 from lena.output import MakeFilename, RenderLaTeX
 from lena.structures import Histogram
 
@@ -19,9 +19,9 @@ def main():
         Histogram(mesh((-10, 10), 10)),
         ToCSV(),
         MakeFilename("x"),
-        Writer("output"),
+        Write("output"),
         RenderLaTeX("histogram_1d.tex"),
-        Writer("output"),
+        Write("output"),
         LaTeXToPDF(),
         PDFToPNG(),
     )

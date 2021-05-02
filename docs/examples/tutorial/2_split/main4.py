@@ -7,7 +7,7 @@ import lena.flow
 from lena.core import Sequence, Split, Source
 from lena.structures import Histogram
 from lena.math import mesh
-from lena.output import ToCSV, Writer, LaTeXToPDF, PDFToPNG
+from lena.output import ToCSV, Write, LaTeXToPDF, PDFToPNG
 from lena.output import MakeFilename, RenderLaTeX
 from lena.variables import Variable, Compose, Combine
 
@@ -49,7 +49,7 @@ def select_template(val):
 
 def main():
     data_file = os.path.join("..", "data", "double_ev.csv")
-    writer = Writer("output")
+    write = Write("output")
     s = Sequence(
         ReadDoubleEvents(),
         Split(
@@ -66,9 +66,9 @@ def main():
         ),
         MakeFilename("{{variable.particle}}/{{variable.coordinate}}"),
         ToCSV(),
-        writer,
+        write,
         RenderLaTeX(select_template, template_path="templates"),
-        writer,
+        write,
         LaTeXToPDF(),
         PDFToPNG(),
     )

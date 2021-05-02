@@ -44,7 +44,6 @@ Flow
 
     Chain
     CountFrom
-    ISlice
     Reverse
     Slice
 
@@ -112,12 +111,3 @@ Split into bins
 ---------------
 
 .. automodule:: lena.flow.split_into_bins
-
-
-
-..  the end
-    .. autoclass:: ISlice
-        :members:
-
-    .. autoclass:: CountFrom
-        :special-members: __call__

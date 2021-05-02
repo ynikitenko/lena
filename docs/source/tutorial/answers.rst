@@ -92,13 +92,13 @@ A simple output function could be the following:
 .. code-block:: python
 
     def output(output_dir="output"):
-        writer = lena.output.Writer(output_dir)
+        write = lena.output.Write(output_dir)
         s = lena.core.Sequence(
             lena.output.ToCSV(),
-            writer,
+            write,
             lena.context.Context(),
             lena.output.RenderLaTeX(),  # initialize properly here
-            writer,
+            write,
             lena.output.LaTeXToPDF(),
             lena.output.PDFToPNG(),
         )

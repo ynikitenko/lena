@@ -100,17 +100,17 @@ Here is a working example:
                 lambda vec: vec[0],
                 Histogram(mesh((-10, 10), 10)),
                 ToCSV(),
-                Writer("output", "x"),
+                Write("output", "x"),
             ),
             (
                 lambda vec: vec[1],
                 Histogram(mesh((-10, 10), 10)),
                 ToCSV(),
-                Writer("output", "y"),
+                Write("output", "y"),
             ),
         ]),
         RenderLaTeX("histogram_1d.tex", "templates"),
-        Writer("output"),
+        Write("output"),
         LaTeXToPDF(),
         PDFToPNG(),
     )
@@ -122,14 +122,14 @@ Lena Histogram is a FillCompute element.
 The elements of the list in *Split* (tuples in this example)
 during the initialization of *Split* are transformed into FillCompute sequences.
 The *lambdas* select parts of vectors, which will fill the corresponding histogram.
-After the histogram is filled, it is given appropriate name by *Writer*
+After the histogram is filled, it is given appropriate name by *Write*
 (so that they could be distinguished in the following flow).
 
 .. 
-    .. admonition:: Writer
+    .. admonition:: Write
 
-*Writer* has two initialization parameters: the default directory and the default file name.
-Writer only writes strings (and *unicode* in Python 2).
+*Write* has two initialization parameters: the default directory and the default file name.
+Write only writes strings (and *unicode* in Python 2).
 Its corresponding context is called *output* (as its module).
 If *output* is missing in the context, values pass unchanged.
 Otherwise, file name and extension are searched in *context.output*.
@@ -138,14 +138,14 @@ then the default file name or "txt" are used.
 The default file name should be used only when you are sure
 that only one file is going to be written, otherwise it will be rewritten
 every time.
-The defaults *Writer*'s parameters are empty string (current directory)
+The defaults *Write*'s parameters are empty string (current directory)
 and "output" (resulting in *output.txt*).
 
 *ToCSV* yields a string and sets *context.output.fileext* to *"csv"*.
-In the example above Writer objects write CSV data to *output/x.csv*
+In the example above Write objects write CSV data to *output/x.csv*
 and *output/y.csv*.
 
-For each file written, *Writer* yields a tuple *(file path, context)*,
+For each file written, *Write* yields a tuple *(file path, context)*,
 where *context.output.filepath* is updated with the path to file.
 
 After the histograms are filled and written,
@@ -160,8 +160,8 @@ One of the basic principles in programming is
 
 In the example above, we wanted to give distinct names to histograms
 in different analysis branches,
-and used two *writers* to do that.
-However, we can move *ToCSV* and *Writer*
+and used two *writes* to do that.
+However, we can move *ToCSV* and *Write*
 outside the *Split* (and make our code one line shorter):
 
 .. _main2_py:
@@ -185,12 +185,12 @@ outside the *Split* (and make our code one line shorter):
             ),
         ]),
         ToCSV(),
-        Writer("output"),
+        Write("output"),
         # ... as earlier ...
     )
 
 Element *MakeFilename* adds file name to *context.output*.
-*Writer* doesn't need a default file name anymore.
+*Write* doesn't need a default file name anymore.
 Now it writes two different files,
 because *context.output.filename* is different.
 
@@ -212,7 +212,7 @@ but let us unite them in one element (and improve the *cohesion* of our code):
 
     def main():
         data_file = os.path.join("..", "data", "normal_3d.csv")
-        writer = Writer("output")
+        write = Write("output")
         s = Sequence(
             ReadData(),
             Split([
@@ -231,9 +231,9 @@ but let us unite them in one element (and improve the *cohesion* of our code):
             ]),
             MakeFilename("{{variable.name}}"),
             ToCSV(),
-            writer,
+            write,
             RenderLaTeX("histogram_1d.tex", "templates"),
-            writer,
+            write,
             LaTeXToPDF(),
             PDFToPNG(),
         )
@@ -267,7 +267,7 @@ and is available as a method *getter*.
 which take arguments from context.
 In our example, *MakeFilename("{{variable.name}}")* creates file name from *context.variable.name*.
 
-Note also that since two *Writers* do the same thing, we rewrote them as one object.
+Note also that since two *Writes* do the same thing, we rewrote them as one object.
 
 Combine
 ^^^^^^^
@@ -651,7 +651,7 @@ that your analysis will remain correct.
 
 There are several things in Lena that help against context interference:
 
-    - elements change their own context (*Writer* changes *context.output* and not *context.variable*),
+    - elements change their own context (*Write* changes *context.output* and not *context.variable*),
     - if *Split* has several sequences, it makes a deep copy of the flow before feeding that to them,
     - *FillCompute* and *FillRequest* elements make a deep copy of context before yielding [#f3]_.
 

@@ -9,7 +9,14 @@ import lena.core
 import lena.flow
 
 
-class Writer(object):
+def Writer(*args, **kwargs):
+    """Deprecated since Lena 0.4. Use :class:`Write`."""
+    warnings.warn("Writer is deprecated since Lena 0.4. Use Write.",
+                  DeprecationWarning, stacklevel=2)
+    return Write(*args, **kwargs)
+
+
+class Write(object):
     """Write text data to filesystem."""
 
     def __init__(self, output_directory="", output_filename="output",
@@ -28,16 +35,17 @@ class Writer(object):
         (unless different extensions are provided through the context).
         It is recommended to create filename explicitly using
         :class:`.MakeFilename`.
-        The default writer's output file can be useful in case of errors,
+        The default writer's output file is useful in case of errors,
         when explicit file name didn't work.
 
-        *verbose* regulates whether additional information
+        *verbose* sets whether additional information
         should be printed on the screen.
         *verbose* set to ``False`` disables runtime messages.
 
         *existing_unchanged* and *overwrite* are used during :meth:`run`
         to change the handling of existing files.
-        They are mutually exclusive: if one tries to use them simultaneously,
+        They are mutually exclusive:
+        if one tries to use them simultaneously,
         :exc:`.LenaValueError` is raised.
         """
         self.output_directory = output_directory
@@ -106,14 +114,14 @@ class Writer(object):
     def run(self, flow):
         """Only strings (and unicode in Python 2) are written.
         To be written, data must have "output" dictionary in context
-        and *context["output"]["writer"]* not set to ``False``.
+        and *context["output"]["write"]* not set to ``False``.
         Other values pass unchanged.
 
         Full name of the file to be written (*filepath*)
         has the form *self.output_directory/dirname/filename.fileext*,
         where *dirname*, *filename* and file extension *fileext*
         are searched in *context["output"]*.
-        If *filename* is missing, Writer's default filename is used.
+        If *filename* is missing, Write's default filename is used.
         If *fileext* is missing, then *filetype* is used; if it is
         also absent, the default file extension is "txt".
         It is usually enough to provide *fileext*.
@@ -131,18 +139,18 @@ class Writer(object):
         it retains its previous value.
 
         Example: suppose you have a sequence
-        *(Histogram, ToCSV, Writer, RenderLaTeX, Writer, LaTeXToPDF)*.
+        *(Histogram, ToCSV, Write, RenderLaTeX, Write, LaTeXToPDF)*.
         If both histogram representation and LaTeX template
         exist and are unchanged,
-        the second *Writer* signals *context.output.changed=False*,
+        the second *Write* signals *context.output.changed=False*,
         and LaTeXToPDF doesn't regenerate the plot.
         If LaTeX template was unchanged, but the previous context
-        from the first *Writer* signals *context.output.changed=True*,
-        then in the second *Writer* template is not rewritten,
+        from the first *Write* signals *context.output.changed=True*,
+        then in the second *Write* template is not rewritten,
         but *context.output.changed* remains ``True``.
         On the second run, even if we check file contents,
         the program will run faster for unchanged files
-        even for :class:`Writer`,
+        even for :class:`Write`,
         because read speed is typically higher than write speed.
 
         File name with full path is yielded as data.
@@ -159,7 +167,7 @@ class Writer(object):
             # check context
             if ("output" not in context
                 or not isinstance(context["output"], dict)
-                or not context["output"].get("writer", True)
+                or not context["output"].get("write", True)
                ):
                 return False
             # check data
@@ -195,7 +203,7 @@ class Writer(object):
                 if self._existing_unchanged:
                     outputc["changed"] = changed
                     if self._verbose:
-                        print("# file unchanged, Writer skips {}"\
+                        print("# file unchanged, Write skips {}"\
                               .format(filepath))
                     yield (filepath, context)
                     continue
@@ -222,7 +230,7 @@ class Writer(object):
                 else:
                     # False, unless explicitly set to True
                     if self._verbose:
-                        print("# file unchanged, Writer skips {}"\
+                        print("# file unchanged, Write skips {}"\
                               .format(filepath))
                     outputc["changed"] = changed
             else:

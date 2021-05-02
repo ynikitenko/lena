@@ -1,8 +1,8 @@
-from lena.output.pdf_to_png import PDFToPNG
-from lena.output.latex_to_pdf import LaTeXToPDF
-from lena.output.make_filename import MakeFilename
-from lena.output.writer import Writer
-from lena.output.to_csv import ToCSV, hist1d_to_csv, hist2d_to_csv
+from .pdf_to_png import PDFToPNG
+from .latex_to_pdf import LaTeXToPDF
+from .make_filename import MakeFilename
+from .write import Writer, Write
+from .to_csv import ToCSV, hist1d_to_csv, hist2d_to_csv
 
 imported = []
 try:
@@ -20,6 +20,7 @@ __all__ = [
     'LaTeXToPDF',
     'MakeFilename',
     'RenderLaTeX',
+    'Write',
     'Writer',
     'ToCSV', 'hist1d_to_csv', 'hist2d_to_csv'
 ] + imported

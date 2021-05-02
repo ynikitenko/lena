@@ -39,7 +39,7 @@ Example from real analysis:
                 ),
                 UpdateContext("output.plot.name", "{{variable.name}}",
                               raise_on_missing=True),
-                writer,
+                write,
                 # Several prints were used during this code creation
                 # Print(transform=lambda val: val[1]["plot"]["name"]),
             ),
@@ -51,13 +51,13 @@ Example from real analysis:
         # non-combined plots will still need file names
         MakeFilename("{{variable.name}}"),
         lena.output.ToCSV(),
-        writer,
+        write,
         lena.context.Context(),
         # here our jinja template renders a group as a list of items
         lena.output.RenderLaTeX(template_path=TEMPLATE_PATH,
                                 select_template=select_template),
         # we have a single template, no more groups are present
-        writer,
+        write,
         lena.output.LaTeXToPDF(),
     )
 """
@@ -90,7 +90,7 @@ class GroupPlots(object):
 
         *transform* is a sequence, which processes individual plots
         before yielding.
-        For example, set ``transform=(ToCSV(), writer)``.
+        For example, set ``transform=(ToCSV(), write)``.
         *transform* is called after *scale*.
 
         *scale* is a number or a string.

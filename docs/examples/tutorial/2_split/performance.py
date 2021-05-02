@@ -8,7 +8,7 @@ import sys
 from lena.core import Sequence, Split, Source
 from lena.structures import Histogram
 from lena.math import mesh
-from lena.output import ToCSV, Writer, LaTeXToPDF, PDFToPNG
+from lena.output import ToCSV, Write, LaTeXToPDF, PDFToPNG
 from lena.output import MakeFilename, RenderLaTeX
 from lena.variables import Variable
 
@@ -16,7 +16,7 @@ from read_data import ReadData
 
 
 def main_copybuf(data_file):
-    writer = Writer("output")
+    write = Write("output")
     s = Sequence(
         ReadData(),
         Split([
@@ -35,9 +35,9 @@ def main_copybuf(data_file):
         ]),
         MakeFilename("{{variable.name}}"),
         ToCSV(),
-        # writer,
+        # write,
         # RenderLaTeX("histogram_1d.tex", "templates"),
-        # writer,
+        # write,
         # LaTeXToPDF(),
         # PDFToPNG(),
     )

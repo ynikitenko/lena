@@ -5,7 +5,7 @@ import os
 from lena.core import Sequence, Split, Source
 from lena.structures import Histogram
 from lena.math import mesh
-from lena.output import ToCSV, Writer, LaTeXToPDF, PDFToPNG
+from lena.output import ToCSV, Write, LaTeXToPDF, PDFToPNG
 from lena.output import MakeFilename, RenderLaTeX
 
 from read_data import ReadData
@@ -33,9 +33,9 @@ def main():
             ),
         ]),
         ToCSV(),
-        Writer("output"),
+        Write("output"),
         RenderLaTeX("histogram_1d.tex", "templates"),
-        Writer("output"),
+        Write("output"),
         LaTeXToPDF(),
         PDFToPNG(),
     )

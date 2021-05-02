@@ -135,7 +135,7 @@ class RenderLaTeX(object):
         are selected by default.
 
         Rendered LaTeX text is yielded as the data part of the tuple
-        (use :class:`.Writer` to write that to the filesystem).
+        (use :class:`.Write` to write that to the filesystem).
         *context.output.filetype* updates to *"tex"*.
 
         Not selected values pass unchanged.

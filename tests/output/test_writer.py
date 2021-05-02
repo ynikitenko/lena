@@ -7,11 +7,11 @@ import sys
 import warnings
 
 import lena.core
-from lena.output import Writer
+from lena.output import Write
 
 
-def test_writer_makefilename():
-    w = Writer("", "x")
+def test_write_makefilename():
+    w = Write("", "x")
     # default name for empty context
     assert w._make_filename({}) == ("", "x", "txt", "x.txt")
     # name from context
@@ -22,9 +22,9 @@ def test_writer_makefilename():
     outputc = {"filename": "y", "fileext": "csv"}
     assert w._make_filename(outputc) == ("", "y", "csv", "y.csv")
     # default filename
-    w1 = Writer()
+    w1 = Write()
     assert w1._make_filename({}) == ("", "output", "txt", "output.txt")
-    w2 = Writer("output")
+    w2 = Write("output")
     # in fact, directory path is not appended in this function
     path = os.path.join("output", "output.txt")
     assert w2._make_filename({}) == ("", "output", "txt", path)
@@ -32,23 +32,23 @@ def test_writer_makefilename():
         w2._make_filename({"filename": ""})
 
 
-def test_writer():
+def test_write():
     # test init
     with pytest.raises(lena.core.LenaTypeError):
-        Writer(1)
+        Write(1)
     with pytest.raises(lena.core.LenaTypeError):
-        Writer(output_filename=1)
+        Write(output_filename=1)
     with pytest.raises(lena.core.LenaValueError):
-        Writer(existing_unchanged=True, overwrite=True)
-    w1 = Writer()
+        Write(existing_unchanged=True, overwrite=True)
+    w1 = Write()
     # unwritten values pass unchanged
     indata = [1, 2, 
               (3, {}),
               # note that context.output is not a dict!
-              (4, {"output": ("writer", True)}),
-              ("5", {"output": {"writer": False}}),
+              (4, {"output": ("write", True)}),
+              ("5", {"output": {"write": False}}),
               # only here data part is checked
-              (6, {"output": {"writer": True}}),
+              (6, {"output": {"write": True}}),
              ]
     assert list(w1.run(indata)) == indata
     # empty filename is prohibited
@@ -56,7 +56,7 @@ def test_writer():
         list(w1.run([("0", {"output": {"filename": ""}})]))
 
 
-def test_writer_writes(mocker):
+def test_write_writes(mocker):
     m = mocker.mock_open()
     if sys.version[0] == "2":
         mocker.patch("__builtin__.open", m)
@@ -65,7 +65,7 @@ def test_writer_writes(mocker):
     # otherwise the current directory "" would be absent
     mocker.patch("os.path.exists", lambda val: val == "")
 
-    w1 = Writer()
+    w1 = Write()
     data = [("0", {"output": {"filename": "y", "filetype": "csv"}})]
     res = list(w1.run(data))
     call = mocker.call
@@ -80,7 +80,7 @@ def test_writer_writes(mocker):
                              })]
 
     makedirs = mocker.patch("os.makedirs")
-    w2 = Writer("output")
+    w2 = Write("output")
     res = list(w2.run(data))
     assert makedirs.mock_calls == [call("output")]
 
@@ -103,7 +103,7 @@ def test_writer_writes(mocker):
         ]
 
 
-def test_writer_changed(mocker):
+def test_write_changed(mocker):
     m = mocker.mock_open()
     if sys.version[0] == "2":
         mocker.patch("__builtin__.open", m)
@@ -113,7 +113,7 @@ def test_writer_changed(mocker):
 
     # overwrite set to True always overwrites
     data = [("1", {"output": {"filename": "x"}})]
-    w_overwrite = Writer(overwrite=True)
+    w_overwrite = Write(overwrite=True)
     assert list(w_overwrite.run(data)) == [
         ('x.txt',
          {'output': {'changed': True,
@@ -132,7 +132,7 @@ def test_writer_changed(mocker):
 
     # existing_unchanged skips all existing files
     data_2 = [("2", {"output": {"filename": "x"}})]
-    w_unchanged = Writer(existing_unchanged=True)
+    w_unchanged = Write(existing_unchanged=True)
     # clear the list of calls
     m.reset_mock()
     assert list(w_unchanged.run(copy.deepcopy(data_2))) == [
@@ -146,7 +146,7 @@ def test_writer_changed(mocker):
     assert m.mock_calls == []
 
 
-def test_writer_cached(mocker):
+def test_write_cached(mocker):
     m = mocker.mock_open(read_data="1")
     if sys.version[0] == "2":
         mocker.patch("__builtin__.open", m)
@@ -156,7 +156,7 @@ def test_writer_cached(mocker):
     data_1 = [("1", {"output": {"filename": "x"}})]
 
     # unchanged data is not written
-    assert list(Writer().run(copy.deepcopy(data_1))) == [
+    assert list(Write().run(copy.deepcopy(data_1))) == [
         ('x.txt',
          {'output': {'changed': False,
                      'fileext': 'txt',
@@ -172,7 +172,7 @@ def test_writer_cached(mocker):
 
     # even if file is unchanged, context.output.changed remains the same
     data_changed = [("1", {"output": {"filename": "x", "changed": True}})]
-    assert list(Writer().run(copy.deepcopy(data_changed))) == [
+    assert list(Write().run(copy.deepcopy(data_changed))) == [
         ('x.txt',
          {'output': {'changed': True,
                      'fileext': 'txt',
@@ -186,7 +186,7 @@ def test_writer_cached(mocker):
     ]
 
 
-def test_writer_changed_data(mocker):
+def test_write_changed_data(mocker):
     m = mocker.mock_open(read_data="pi")
     if sys.version[0] == "2":
         mocker.patch("__builtin__.open", m)
@@ -197,7 +197,7 @@ def test_writer_changed_data(mocker):
     # changed data is written
     data_changed = [("1", {"output": {"filename": "x_changed"}})]
     # changed is True
-    assert list(Writer().run(copy.deepcopy(data_changed))) == [
+    assert list(Write().run(copy.deepcopy(data_changed))) == [
         ('x_changed.txt',
          {'output': {'changed': True,
                      'fileext': 'txt',

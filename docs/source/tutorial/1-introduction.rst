@@ -388,7 +388,7 @@ it must be written to a file.
 first it is a *csv* table, then it may become a *pdf* plot, etc.)
 Since there is only one file expected, we can simply call it *x*.
 
-*Writer* element writes text data to the file system.
+*Write* element writes text data to the file system.
 It is initialized with the name of the output directory.
 To be written, the context of a value must have an “output” subdictionary.
 
