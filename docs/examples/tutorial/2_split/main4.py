@@ -1,5 +1,3 @@
-from __future__ import print_function
-
 import os
 
 import lena.context
@@ -33,8 +31,8 @@ coordinates_1d = [
     )
     for coordinate in [
         Compose(particle, coord)
-            for coord in x, y, z
-            for particle in positron, neutron
+            for coord in (x, y, z)
+            for particle in (positron, neutron)
     ]
 ]
 
@@ -61,13 +59,13 @@ def main():
                 Histogram(mesh(((-10, 10), (-10, 10)), (10, 10))),
                 MakeFilename("{{variable.particle}}/{{variable.name}}"),
              )
-             for particle in positron, neutron
+             for particle in (positron, neutron)
             ]
         ),
         MakeFilename("{{variable.particle}}/{{variable.coordinate}}"),
         ToCSV(),
         write,
-        RenderLaTeX(select_template, template_path="templates"),
+        RenderLaTeX(select_template, template_dir="templates"),
         write,
         LaTeXToPDF(),
         PDFToPNG(),

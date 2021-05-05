@@ -30,7 +30,7 @@ class Filter():
               (and :class:`Filter` does not do that).
         
             This doesn't mean that we recommend against this class:
-            sometimes it can be quick and useful, and if one's
+            sometimes it can be quick and explicit, and if one's
             class name provides absolutely no clue what it does,
             a general :class:`Filter` would be more readable.
         """

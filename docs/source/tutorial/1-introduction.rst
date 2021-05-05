@@ -35,7 +35,6 @@ The simplest *Lena* program may be the following.
 We use a sequence with one element,
 an anonymous function, which is created in Python by *lambda* keyword:
 
->>> from __future__ import print_function
 >>> from lena.core import Sequence
 >>> s = Sequence(
 ...     lambda i: pow(-1, i) * (2 * i + 1),
@@ -45,11 +44,7 @@ an anonymous function, which is created in Python by *lambda* keyword:
 ...     print(res)
 1 -3 5 -7
 
-Lena supports both Python versions, 2 and 3.
-It is simple to do it in your code, if you want.
-The first line allows to use *print()* for any version of Python.
-The next line imports a *Lena* class.
-
+The first line imports a *Lena* class *Sequence*.
 A *Sequence* can be initialized from several elements.
 To make the *Sequence* do the actual work, we use its method *run*.
 *Run*'s argument is an iterable (in this case a list of four numbers). 
