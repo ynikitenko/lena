@@ -1,6 +1,8 @@
 import collections
 
 import pytest
+pytestmark = pytest.mark.root
+
 import ROOT
 
 import lena
