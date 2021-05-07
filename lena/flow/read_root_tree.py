@@ -32,9 +32,6 @@ class ReadROOTTree():
             e.g. *copy.deepcopy* in *get_entry*.
             Otherwise all items collected will be the last read value.
         """
-        # todo: should this class belong
-        # to lena.flow or lena.input, lena.readers?
-
         # This loads other classes faster,
         # and if ROOT is not installed,
         # still enables "from lena.flow import ReadROOTTree",

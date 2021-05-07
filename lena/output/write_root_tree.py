@@ -1,6 +1,4 @@
 # needs ROOT installed
-from __future__ import print_function
-
 import array
 import collections
 import copy

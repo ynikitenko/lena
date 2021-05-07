@@ -3,8 +3,6 @@ import copy
 import inspect
 import sys
 
-import ROOT
-
 import lena
 
 
@@ -29,6 +27,11 @@ class ReadROOTFile():
         If *selector* is given, both *types* and *keys* must
         be omitted, or :exc:`.LenaValueError` is raised.
         """
+        try:
+            import ROOT
+        except ImportError:
+            raise ImportError("ROOT not installed")
+
         if selector is not None:
             if keys or types:
                 raise lena.core.LenaValueError(
@@ -104,6 +107,7 @@ class ReadROOTFile():
         don't save yielded values to a list,
         or make proper copies of them in advance.
         """
+        import ROOT
         for val in flow:
             data, context = lena.flow.get_data_context(val)
 

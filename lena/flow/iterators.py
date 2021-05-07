@@ -3,7 +3,7 @@ or create a new one.
 """
 try:
     from future_builtins import zip
-except ModuleNotFoundError:
+except ImportError:
     # not existent in Python 3.9
     pass
 import collections
