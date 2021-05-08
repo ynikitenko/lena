@@ -2,24 +2,24 @@
 *Sequences* consist of *elements*.
 Basic Lena sequences and element types are defined in this module.
 """
-from lena.core.exceptions import (
+from .exceptions import (
     LenaException,
     LenaAttributeError, LenaEnvironmentError, LenaIndexError, LenaKeyError,
     LenaNotImplementedError,
     LenaRuntimeError, LenaStopFill, LenaTypeError, LenaValueError,
     LenaZeroDivisionError,
 )
-from lena.core.lena_sequence import LenaSequence
+from .lena_sequence import LenaSequence
 
-from lena.core.adapters import (
+from .adapters import (
     Call, FillCompute, FillInto, FillRequest, Run, SourceEl
 )
-from lena.core.sequence import Sequence
-from lena.core.source import Source
-from lena.core.fill_compute_seq import FillComputeSeq
-from lena.core.fill_seq import FillSeq
-from lena.core.fill_request_seq import FillRequestSeq
-from lena.core.split import Split
+from .sequence import Sequence
+from .source import Source
+from .fill_compute_seq import FillComputeSeq
+from .fill_seq import FillSeq
+from .fill_request_seq import FillRequestSeq
+from .split import Split
 from .meta import alter_sequence, flatten
 from .check_sequence_type import (
     is_source,

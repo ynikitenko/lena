@@ -1,6 +1,6 @@
-from lena.structures.graph import Graph
-from lena.structures.histogram import Histogram
-from lena.structures.hist_functions import (
+from .graph import Graph
+from .histogram import Histogram
+from .hist_functions import (
     check_edges_increasing,
     get_bin_edges,
     get_bin_on_value_1d, get_bin_on_value, get_bin_on_index,
@@ -13,7 +13,7 @@ from lena.structures.hist_functions import (
     make_hist_context,
     unify_1_md
 )
-from lena.structures.numpy_histogram import NumpyHistogram
+from .numpy_histogram import NumpyHistogram
 
 
 __all__ = [

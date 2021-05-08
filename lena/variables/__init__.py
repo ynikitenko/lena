@@ -1,5 +1,5 @@
-from lena.variables.variable import Variable, Combine, Compose
-from lena.variables.functions import abs, Cm
+from .variable import Variable, Combine, Compose
+from .functions import abs, Cm
 
 
 __all__ = [

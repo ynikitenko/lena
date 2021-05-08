@@ -1,5 +1,5 @@
-from lena.context.context import Context
-from lena.context.functions import (
+from .context import Context
+from .functions import (
     contains,
     difference, format_context, get_recursively,
     intersection, iterate_update, make_context,

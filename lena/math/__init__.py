@@ -1,7 +1,7 @@
-from lena.math.meshes import mesh, md_map, flatten, refine_mesh
-from lena.math.utils import clip, isclose
-from lena.math.vector3 import vector3
-from lena.math.elements import Mean, Sum
+from .meshes import mesh, md_map, flatten, refine_mesh
+from .utils import clip, isclose
+from .vector3 import vector3
+from .elements import Mean, Sum
 
 __all__ = [
     'clip',
