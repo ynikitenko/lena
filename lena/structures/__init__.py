@@ -13,14 +13,8 @@ from lena.structures.hist_functions import (
     make_hist_context,
     unify_1_md
 )
+from lena.structures.numpy_histogram import NumpyHistogram
 
-imported = []
-try:
-    from lena.structures.numpy_histogram import NumpyHistogram
-except ImportError:
-    pass
-else:
-    imported.append('NumpyHistogram')
 
 __all__ = [
     'Graph', 'Histogram',
@@ -34,5 +28,6 @@ __all__ = [
     'iter_bins',
     'iter_cells',
     'make_hist_context',
-    'unify_1_md'
-] + imported
+    'unify_1_md',
+    'NumpyHistogram',
+]

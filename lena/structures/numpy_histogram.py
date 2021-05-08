@@ -1,8 +1,6 @@
 """Fill data into a histogram using numpy histogram."""
 from __future__ import print_function
 
-import numpy
-
 import lena.flow
 import lena.structures
 from . import hist_functions as hf
@@ -37,6 +35,9 @@ class NumpyHistogram(object):
 
         A keyword argument *reset* specifies the exact behaviour of *request*.
         """
+        import numpy
+        self._create_hist = numpy.histogram
+
         self._reset = kwargs.pop("reset", True)
         self._args = args
         self._kwargs = kwargs
@@ -59,7 +60,9 @@ class NumpyHistogram(object):
         If *reset* was set during the initialization,
         *reset* method is called.
         """
-        bins, edges = numpy.histogram(self._data, *self._args, **self._kwargs)
+        bins, edges = self._create_hist(self._data, *self._args, **self._kwargs)
+        # since np.histogram returns exactly two arrays, bins and edges,
+        # complete information is conserved in the Histogram.
         hist = lena.structures.Histogram(edges, bins)
         # deep copy is made here
         context = hf.make_hist_context(hist, self._cur_context)
