@@ -1,12 +1,10 @@
-from __future__ import print_function
-
+import copy
+from copy import deepcopy
 import inspect
 import jinja2
 import os
 import pytest
 import sys
-import copy
-from copy import deepcopy
 
 import lena
 from lena.output.render_latex import (

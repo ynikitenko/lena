@@ -5,6 +5,7 @@ from .functions import (
     intersection, iterate_update, make_context,
     str_to_dict, str_to_list, update_nested, update_recursively,
 )
+# will import, but can't be used if jinja2 is missing
 from .update_context import UpdateContext
 
 

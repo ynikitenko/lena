@@ -1,9 +1,7 @@
-from __future__ import print_function
-
+# requires jinja2
 import copy
 import re
 
-import jinja2
 import lena.core
 import lena.context
 import lena.flow
@@ -88,6 +86,7 @@ class UpdateContext():
         and the last two symbols of *update*,
         otherwise :exc:`.LenaValueError` is raised.
         """
+        import jinja2
         # The "Context" in the class name means any general context
         # (not only :class:`.Context`).
 
@@ -173,6 +172,7 @@ class UpdateContext():
         *raise_on_missing* is ``True`` and
         the update argument is missing in *value*'s context.
         """
+        import jinja2
         data, context = lena.flow.get_data_context(value)
         if isinstance(self._update, (str, jinja2.Template)):
             if self._context_value:
