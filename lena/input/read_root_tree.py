@@ -7,10 +7,10 @@ import lena
 
 
 class ReadROOTTree():
-    """Read ROOT trees coming from *flow*."""
+    """Read ROOT trees from flow."""
 
     def __init__(self, branches=None, get_entry=None):
-        """There are two ways in which trees could be read.
+        """Trees can be read in two ways.
 
         In the first variant, *branches* is a list of strings
         that enables to read the specified tree branches,
@@ -27,10 +27,10 @@ class ReadROOTTree():
 
         Note
         ====
-            If you plan to collect the resulting values
-            (not use them on the fly), make sure that you use
-            e.g. *copy.deepcopy* in *get_entry*.
-            Otherwise all items collected will be the last read value.
+            To collect the resulting values
+            (not use them on the fly), make copies of them
+            in *get_entry* (e.g. use *copy.deepcopy*).
+            Otherwise all items will be the last value read.
         """
         # This loads other classes faster,
         # and if ROOT is not installed,
@@ -94,12 +94,18 @@ class ReadROOTTree():
             yield entry_tuple(*(getattr(entry, br) for br in branches))
 
     def run(self, flow):
+        """Read ROOT trees from *flow* and yield their contents.
+
+        *context.input.root_tree_name* is updated with the name
+        of the current tree.
+        """
         import ROOT
 
         for val in flow:
             # get tree
             tree, context = lena.flow.get_data_context(val)
             if not isinstance(tree, ROOT.TTree):
+                # todo: should not other values be forbidden?
                 yield val
                 continue
 
@@ -113,7 +119,7 @@ class ReadROOTTree():
             #     file_name = tree_dir.GetName()
             #     data_c["root_file_path"] = file_name
             data_c["root_tree_name"] = tree.GetName()
-            lena.context.update_recursively(context, {"data": data_c})
+            lena.context.update_recursively(context, {"input": data_c})
 
             # get entries
             if self._branches:

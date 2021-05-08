@@ -25,7 +25,7 @@ def test_read_root_tree(rootfile):
         data, context = val
         tree_data.append((data.x, data.y))
         assert context == {
-            'data': {
+            'input': {
                 'root_tree_name': 'tree'
             }
         }

@@ -17,8 +17,8 @@ def test_read_root_file(rootfile):
         data, context = val
         assert data_names[ind] == data.GetName()
         assert context == {
-            'data': {
-                'root_file_path': rootfile,
+            "input": {
+                "root_file_path": rootfile,
             }
         }
     # in this list objects from file will be None!

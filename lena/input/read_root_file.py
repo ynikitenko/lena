@@ -94,9 +94,9 @@ class ReadROOTFile():
 
         For file to be read,
         data part of the value must be a string and
-        *context.data.read_root_file* must not be `False`.
+        *context.input.read_root_file* must not be `False`.
 
-        *context.data.root_file_path* is updated
+        *context.input.root_file_path* is updated
         with the path to the ROOT file.
 
         Warning
@@ -105,11 +105,14 @@ class ReadROOTFile():
         all its contained objects are destroyed.
         Make all processing within one flow:
         don't save yielded values to a list,
-        or make proper copies of them in advance.
+        or save copies of them.
         """
-        import ROOT
+        from ROOT import TFile
+        from lena.context import get_recursively, update_recursively
+        from lena.flow import get_data_context
+        from copy import deepcopy
         for val in flow:
-            data, context = lena.flow.get_data_context(val)
+            data, context = get_data_context(val)
 
             # skip not ROOT files
             if sys.version[0] == 2:
@@ -117,17 +120,17 @@ class ReadROOTFile():
             else:
                 str_type = str
             if not isinstance(data, str_type) or not \
-                lena.context.get_recursively(context, "data.read_root_file",
+                get_recursively(context, "input.read_root_file",
                                              True):
                 yield val
                 continue
 
-            root_file = ROOT.TFile(data, "read")
+            root_file = TFile(data, "read")
             # context of separate keys shall be updated
             # when they are transformed to other types
             # in other elements
-            lena.context.update_recursively(
-                context, {"data": {"root_file_path": data}}
+            update_recursively(
+                context, {"input": {"root_file_path": data}}
             )
 
             def get_key_names(fil):
@@ -140,7 +143,7 @@ class ReadROOTFile():
                 if self._selector:
                     if not self._selector(obj):
                         continue
-                yield (obj, copy.deepcopy(context))
+                yield (obj, deepcopy(context))
 
             # will be closed after
             # following elements used its data
