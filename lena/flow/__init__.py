@@ -8,8 +8,6 @@ from .group_scale import GroupScale
 from .iterators import Chain, CountFrom, Slice, ISlice, Reverse
 from .print_ import Print
 from .progress import Progress
-from .read_root_file import ReadROOTFile
-from .read_root_tree import ReadROOTTree
 from .selectors import Not, Selector
 from .split_into_bins import (
     SplitIntoBins, ReduceBinContent, TransformBins,
@@ -34,19 +32,19 @@ __all__ = [
     'ISlice',
     'Reverse',
     'Slice',
-    # others
-    'ReadROOTFile',
-    'ReadROOTTree',
     'Zip',
     # functions
     'get_context', 'get_data', 'get_data_context',
     # groups
-    'GroupBy', 'GroupScale',
-    'Not', 'Selector',
+    'GroupBy',
+    'GroupScale',
+    'Not',
+    'Selector',
     'seq_map',
     'TransformIf',
     # split into bins
     'SplitIntoBins',
-    'ReduceBinContent', 'TransformBins', 
+    'ReduceBinContent',
+    'TransformBins',
     'get_example_bin',
 ]

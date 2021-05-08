@@ -4,7 +4,7 @@ pytestmark = pytest.mark.root
 import ROOT
 
 import lena
-from lena.flow.read_root_file import ReadROOTFile
+from lena.input import ReadROOTFile
 
 
 def test_read_root_file(rootfile):

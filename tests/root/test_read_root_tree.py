@@ -4,7 +4,7 @@ pytestmark = pytest.mark.root
 import ROOT
 
 import lena
-from lena.flow.read_root_tree import ReadROOTTree
+from lena.input import ReadROOTTree
 from .test_write_root_tree import test_data
 
 
