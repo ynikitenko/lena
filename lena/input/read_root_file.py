@@ -25,7 +25,7 @@ class ReadROOTFile():
         *selector* is a general function that accepts
         an object from a ROOT file and returns a boolean.
         If *selector* is given, both *types* and *keys* must
-        be omitted, or :exc:`.LenaValueError` is raised.
+        be omitted, or :exc:`.LenaTypeError` is raised.
         """
         try:
             import ROOT
@@ -34,7 +34,7 @@ class ReadROOTFile():
 
         if selector is not None:
             if keys or types:
-                raise lena.core.LenaValueError(
+                raise lena.core.LenaTypeError(
                     "if selector is provided, keys and types "
                     "must not be passed"
                 )
@@ -55,7 +55,7 @@ class ReadROOTFile():
                 any((not isinstance(key, basestring) for key in keys))) or \
                (sys.version[0] > 2 and
                 any((not isinstance(key, str) for key in keys))):
-                raise lena.core.LenaValueError(
+                raise lena.core.LenaTypeError(
                     "keys must contain only strings"
                 )
                 # todo: allow regular expressions
