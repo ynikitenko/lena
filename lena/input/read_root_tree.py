@@ -13,10 +13,14 @@ class ReadROOTTree():
         """Trees can be read in two ways.
 
         In the first variant, *leaves* is a list of strings
-        that enables to read the specified tree leaves,
-        and only them (thus to speed up data reading).
+        that enables to read the specified tree leaves.
+        Only branches containing the leaves are read.
+        To get a leaf from a specific branch, add it to
+        the leaf's name with a slash, e.g. *"my_branch/my_leaf"*.
         Tree entries are yielded as named tuples
         with fields named after *leaves*.
+
+        A leaf can contain a branch name prepended
 
         In the second variant, *get_entries*
         is a function that accepts a ROOT tree
@@ -79,9 +83,31 @@ class ReadROOTTree():
         self._get_entries = get_entries
 
     def _read_leaves(self, tree):
-        leaves = self._leaves
+        all_leaves = self._leaves
         # disable all branches
         tree.SetBranchStatus("*", 0)
+
+        leaves_with_branches = []
+        # leaves without branch names in them
+        leaves = []
+        for leaf in all_leaves:
+            if '/' in leaf:
+                leaves_with_branches.append(leaf)
+            else:
+                leaves.append(leaf)
+        tree_branches = set(br.GetName() for br in tree.GetListOfBranches())
+        allowed_branches = set()
+        leaves_with_branches_names = []
+        for leaf in leaves_with_branches:
+            # "branch_name/leaf_name"
+            br, leaf_name = leaf.split('/')
+            if br not in tree_branches:
+                raise lena.core.LenaRuntimeError(
+                    "branch {} for leaf {} not found in tree {}"
+                    .format(br, leaf, tree.GetName())
+                )
+            allowed_branches.add(br)
+            leaves_with_branches_names.append(leaf_name)
 
         ## find branches for our leaves
         all_branches = tree.GetListOfBranches()
@@ -107,7 +133,6 @@ class ReadROOTTree():
                 if leaf in br_leaves:
                     leaves_branches[leaf].append(br.GetName())
 
-        allowed_branches = set()
         for leaf in leaves:
             nbranches = len(leaves_branches[leaf])
             if not nbranches:
@@ -128,10 +153,16 @@ class ReadROOTTree():
         for br in allowed_branches:
             tree.SetBranchStatus(br, 1)
 
+        # join all leave names for simplicity
+        leaves_names = leaves[:]
+        for leaf in leaves_with_branches:
+            leaves_names.append(leaf.replace('/', '_'))
+        leaves.extend(leaves_with_branches_names)
+
         # create output type
         tree_name = tree.GetName()
         tup_name = tree_name + "_entry" if tree_name else "tree_entry"
-        entry_tuple = collections.namedtuple(tup_name, leaves)
+        entry_tuple = collections.namedtuple(tup_name, leaves_names)
 
         # yield entries
         for entry in tree:
@@ -142,6 +173,11 @@ class ReadROOTTree():
 
         *context.input.root_tree_name* is updated with the name
         of the current tree.
+
+        The tree must have one and only one branch corresponding to
+        each leaf, otherwise :exc:`.LenaRuntimeError` is raised.
+        To read leaves with the same name in several branches,
+        specify branch names for them.
         """
         import ROOT
         get_data_context = lena.flow.get_data_context
