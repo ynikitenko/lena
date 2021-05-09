@@ -9,7 +9,7 @@ import lena
 class ReadROOTTree():
     """Read ROOT trees from flow."""
 
-    def __init__(self, branches=None, get_entry=None):
+    def __init__(self, branches=None, get_entries=None):
         """Trees can be read in two ways.
 
         In the first variant, *branches* is a list of strings
@@ -18,18 +18,18 @@ class ReadROOTTree():
         Tree entries are yielded as named tuples
         with fields named after *branches*.
 
-        In the second variant, the tree is set up elsewhere.
-        It has an associated object, which is filled with tree entries
-        and returned with *get_entry*.
+        In the second variant, *get_entries*
+        is a function that accepts a ROOT tree
+        and yields its entries.
 
-        Exactly one of *branches* or *get_entry* (not both)
+        Exactly one of *branches* or *get_entries* (not both)
         must be provided, otherwise :exc:`.LenaTypeError` is raised.
 
         Note
         ====
             To collect the resulting values
             (not use them on the fly), make copies of them
-            in *get_entry* (e.g. use *copy.deepcopy*).
+            in *get_entries* (e.g. use *copy.deepcopy*).
             Otherwise all items will be the last value read.
         """
         # This loads other classes faster,
@@ -56,15 +56,15 @@ class ReadROOTTree():
                 raise lena.core.LenaValueError(
                     "branches must be strings without regular expressions"
                 )
-            if get_entry is not None:
+            if get_entries is not None:
                 raise lena.core.LenaTypeError(
-                    "either branches or get_entry should be supplied, "
+                    "either branches or get_entries should be supplied, "
                     "not both"
                 )
         else:
-            if get_entry is None:
+            if get_entries is None:
                 raise lena.core.LenaTypeError(
-                    "initialize branches or get_entry"
+                    "initialize branches or get_entries"
                 )
         # todo: allow empty branches to signify all branches.
         # Use TTree:GetListOfBranches()
@@ -72,11 +72,11 @@ class ReadROOTTree():
         # because it's suboptimal to read all data instead of needed,
         # but that would decouple data from code.
 
-        if get_entry is not None and not callable(get_entry):
-            raise lena.core.LenaTypeError("get_entry must be callable")
+        if get_entries is not None and not callable(get_entries):
+            raise lena.core.LenaTypeError("get_entries must be callable")
 
         self._branches = branches
-        self._get_entry = get_entry
+        self._get_entries = get_entries
 
     def _read_branches(self, tree):
         branches = self._branches
@@ -100,31 +100,34 @@ class ReadROOTTree():
         of the current tree.
         """
         import ROOT
+        get_data_context = lena.flow.get_data_context
+        update_recursively = lena.context.update_recursively
+        deepcopy = copy.deepcopy
 
         for val in flow:
             # get tree
-            tree, context = lena.flow.get_data_context(val)
+            tree, context = get_data_context(val)
             if not isinstance(tree, ROOT.TTree):
                 # todo: should not other values be forbidden?
                 yield val
                 continue
 
             # add context.data
-            data_c = {}
-            tree_dir = tree.GetDirectory()
+            input_c = {}
             # if a ROOT file was opened in a Sequence,
             # its path will be already in the context.
             ## a tree can exist outside of a file, in memory.
+            # tree_dir = tree.GetDirectory()
             # if tree_dir:
             #     file_name = tree_dir.GetName()
             #     data_c["root_file_path"] = file_name
-            data_c["root_tree_name"] = tree.GetName()
-            lena.context.update_recursively(context, {"input": data_c})
+            input_c["root_tree_name"] = tree.GetName()
+            update_recursively(context, {"input": input_c})
 
             # get entries
             if self._branches:
                 for data in self._read_branches(tree):
-                    yield (data, copy.deepcopy(context))
-            elif self._get_entry:
-                for entry in tree:
-                    yield (self._get_entry(), copy.deepcopy(context))
+                    yield (data, deepcopy(context))
+            elif self._get_entries:
+                for entry in self._get_entries(tree):
+                    yield (entry, deepcopy(context))
