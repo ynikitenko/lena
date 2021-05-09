@@ -9,20 +9,20 @@ import lena
 class ReadROOTTree():
     """Read ROOT trees from flow."""
 
-    def __init__(self, branches=None, get_entries=None):
+    def __init__(self, leaves=None, get_entries=None):
         """Trees can be read in two ways.
 
-        In the first variant, *branches* is a list of strings
-        that enables to read the specified tree branches,
+        In the first variant, *leaves* is a list of strings
+        that enables to read the specified tree leaves,
         and only them (thus to speed up data reading).
         Tree entries are yielded as named tuples
-        with fields named after *branches*.
+        with fields named after *leaves*.
 
         In the second variant, *get_entries*
         is a function that accepts a ROOT tree
         and yields its entries.
 
-        Exactly one of *branches* or *get_entries* (not both)
+        Exactly one of *leaves* or *get_entries* (not both)
         must be provided, otherwise :exc:`.LenaTypeError` is raised.
 
         Note
@@ -38,35 +38,35 @@ class ReadROOTTree():
         # instead of "from lena.flow.read_root_tree import ReadROOTTree"
         import ROOT
 
-        if branches is not None:
+        if leaves is not None:
             err_msg = ""
-            if not isinstance(branches, list):
-                err_msg = "branches must be a list of strings"
+            if not isinstance(leaves, list):
+                err_msg = "leaves must be a list of strings"
             if sys.version_info.major == 2:
-                if any((not isinstance(br, basestring) for br in branches)):
+                if any((not isinstance(br, basestring) for br in leaves)):
                     # ROOT allows unicode names.
-                    err_msg = "branches must be a list of strings"
+                    err_msg = "leaves must be a list of strings"
             else:
-                if any((not isinstance(br, str) for br in branches)):
-                    err_msg = "branches must be a list of strings"
+                if any((not isinstance(br, str) for br in leaves)):
+                    err_msg = "leaves must be a list of strings"
             if err_msg:
                 raise lena.core.LenaTypeError(err_msg)
             # todo: maybe allow regexps in the future.
-            if any(('*' in br for br in branches)):
+            if any(('*' in br for br in leaves)):
                 raise lena.core.LenaValueError(
-                    "branches must be strings without regular expressions"
+                    "leaves must be strings without regular expressions"
                 )
             if get_entries is not None:
                 raise lena.core.LenaTypeError(
-                    "either branches or get_entries should be supplied, "
+                    "either leaves or get_entries should be supplied, "
                     "not both"
                 )
         else:
             if get_entries is None:
                 raise lena.core.LenaTypeError(
-                    "initialize branches or get_entries"
+                    "initialize leaves or get_entries"
                 )
-        # todo: allow empty branches to signify all branches.
+        # todo: allow empty leaves to signify all leaves.
         # Use TTree:GetListOfBranches()
         # This would be not a particularly good design,
         # because it's suboptimal to read all data instead of needed,
@@ -75,23 +75,67 @@ class ReadROOTTree():
         if get_entries is not None and not callable(get_entries):
             raise lena.core.LenaTypeError("get_entries must be callable")
 
-        self._branches = branches
+        self._leaves = leaves
         self._get_entries = get_entries
 
-    def _read_branches(self, tree):
-        branches = self._branches
+    def _read_leaves(self, tree):
+        leaves = self._leaves
         # disable all branches
         tree.SetBranchStatus("*", 0)
+
+        ## find branches for our leaves
+        all_branches = tree.GetListOfBranches()
+        # branches that correspond to our leaves
+        leaves_branches = {leaf: [] for leaf in leaves}
+        for br in all_branches:
+            # branch title always contains leaflist,
+            # see TBranch constructors and TTree::Branch methods.
+            br_leaflist = br.GetTitle()
+            br_leaves = []
+            for leaf in br_leaflist.split(':'):
+                # branch names are parts before possible [...]/
+                ind = leaf.find('[')
+                if ind != -1:
+                    br_leaves.append(leaf[:ind])
+                    continue
+                ind = leaf.find('/')
+                if ind != -1:
+                    br_leaves.append(leaf[:ind])
+                    continue
+                br_leaves.append(leaf)
+            for leaf in leaves:
+                if leaf in br_leaves:
+                    leaves_branches[leaf].append(br.GetName())
+
+        allowed_branches = set()
+        for leaf in leaves:
+            nbranches = len(leaves_branches[leaf])
+            if not nbranches:
+                raise lena.core.LenaRuntimeError(
+                    "no branch for leaf {} found in the tree {}"
+                    .format(leaf, tree.GetName())
+                )
+            elif nbranches > 1:
+                raise lena.core.LenaRuntimeError(
+                    "several branches were found for leaf {} "
+                    "in the tree {}: {}"
+                    .format(leaf, tree.GetName(), leaves_branches[leaf])
+                )
+            # exactly one branch found
+            allowed_branches.add(leaves_branches[leaf][0])
+
         # enable allowed branches
-        for br in branches:
+        for br in allowed_branches:
             tree.SetBranchStatus(br, 1)
+
         # create output type
         tree_name = tree.GetName()
         tup_name = tree_name + "_entry" if tree_name else "tree_entry"
-        entry_tuple = collections.namedtuple(tup_name, branches)
+        entry_tuple = collections.namedtuple(tup_name, leaves)
+
         # yield entries
         for entry in tree:
-            yield entry_tuple(*(getattr(entry, br) for br in branches))
+            yield entry_tuple(*(getattr(entry, lf) for lf in leaves))
 
     def run(self, flow):
         """Read ROOT trees from *flow* and yield their contents.
@@ -125,8 +169,8 @@ class ReadROOTTree():
             update_recursively(context, {"input": input_c})
 
             # get entries
-            if self._branches:
-                for data in self._read_branches(tree):
+            if self._leaves:
+                for data in self._read_leaves(tree):
                     yield (data, deepcopy(context))
             elif self._get_entries:
                 for entry in self._get_entries(tree):

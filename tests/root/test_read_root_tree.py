@@ -9,7 +9,7 @@ from .test_write_root_tree import test_data
 
 
 def test_read_root_tree(rootfile):
-    # branches or get_entry must be provided
+    # leaves or get_entry must be provided
     with pytest.raises(lena.core.LenaTypeError):
         read_tree = ReadROOTTree()
 
@@ -19,7 +19,7 @@ def test_read_root_tree(rootfile):
     data = [tree]
 
     # ReadROOTTree runs.
-    read_tree = ReadROOTTree(branches=["x", "y"])
+    read_tree = ReadROOTTree(leaves=["x", "y"])
     tree_data = []
     for val in read_tree.run(data):
         data, context = val

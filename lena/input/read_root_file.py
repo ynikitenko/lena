@@ -19,10 +19,10 @@ class ReadROOTFile():
         Only simple keys are currently allowed (no regular expressions).
 
         If both *types* and *keys* are provided, then
-        objects that satisfy any of *types* *or* *keys*
+        objects that satisfy any of *types* or *keys*
         are read.
 
-        *selector* is a general function, which accepts
+        *selector* is a general function that accepts
         an object from a ROOT file and returns a boolean.
         If *selector* is given, both *types* and *keys* must
         be omitted, or :exc:`.LenaValueError` is raised.
@@ -93,19 +93,21 @@ class ReadROOTFile():
         """Read ROOT files from *flow* and yield objects they contain.
 
         For file to be read,
-        data part of the value must be a string and
+        data part of the value must be a string (file's path) and
         *context.input.read_root_file* must not be `False`.
+        Other values pass unchanged.
+        After all entries from the file are yielded, it is closed.
 
         *context.input.root_file_path* is updated
         with the path to the ROOT file.
 
         Warning
         =======
-        After a ROOT file is closed,
-        all its contained objects are destroyed.
-        Make all processing within one flow:
-        don't save yielded values to a list,
-        or save copies of them.
+            After a ROOT file is closed,
+            all its contained objects are destroyed.
+            Make all processing within one flow:
+            don't save yielded values to a list,
+            or save copies of them.
         """
         from ROOT import TFile
         from lena.context import get_recursively, update_recursively
