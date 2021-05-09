@@ -3,6 +3,7 @@ from .latex_to_pdf import LaTeXToPDF
 from .make_filename import MakeFilename
 from .write import Writer, Write
 from .to_csv import ToCSV, hist1d_to_csv, hist2d_to_csv
+from .write_root_tree import WriteROOTTree
 
 
 def raise_on_usage(clsname, modname):
@@ -28,6 +29,7 @@ __all__ = [
     'RenderLaTeX',
     'Write',
     'Writer',
+    'WriteROOTTree',
     'ToCSV', 'hist1d_to_csv', 'hist2d_to_csv',
     'RenderLaTeX'
 ]

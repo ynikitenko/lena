@@ -41,6 +41,8 @@ class ReadROOTTree():
         # still enables "from lena.flow import ReadROOTTree",
         # instead of "from lena.flow.read_root_tree import ReadROOTTree"
         import ROOT
+        # todo: add tuple_name to kwargs
+        # (otherwise T_entry can look weird/frightening)
 
         if leaves is not None:
             err_msg = ""

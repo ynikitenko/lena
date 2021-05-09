@@ -9,6 +9,7 @@ Output
     PDFToPNG
     ToCSV
     Write
+..    WriteROOTTree
 
 .. not covered yet: JSONEncoder, ExtendedHistToHist
 
@@ -33,6 +34,7 @@ Output
 .. autofunction:: hist2d_to_csv
 .. autoclass:: Write
 .. autoclass:: Writer
+.. .. autoclass:: WriteROOTTree
 
 LaTeX
 -----

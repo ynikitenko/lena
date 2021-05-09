@@ -8,12 +8,12 @@ import lena
 
 
 class WriteROOTTree():
-    """Write data from the incoming flow to a ROOT tree."""
+    """Write data to a ROOT tree."""
 
     def __init__(self, name, root_file):
         """*name* is the name of the tree.
 
-        Only tuples produced by lena :module:`Variables`
+        Only tuples produced by lena :ref:`module_variables`
         or namedtuples can be written to tree.
         They can contain only int and float Python types.
         For more general options, use a ROOT tree directly.
@@ -33,6 +33,10 @@ class WriteROOTTree():
         to the same file several times.
         *Recreate* (default) means that file
         will be completely overwritten.
+
+        Note
+        ----
+            To use this class, `ROOT <https://root.cern/>`__ must be installed.
         """
         import ROOT
         # todo: name -> tree, so that a tree could be passed?
@@ -252,7 +256,7 @@ class WriteROOTTree():
         If an opened ROOT file was provided during the initialization,
         it is the user's responsibility to close that.
 
-        *Context.data* is updated with *root_file_path*
+        *Context.output* is updated with *root_file_path*
         and *root_tree_name*.
         """
         # otherwise the function won't know its name
@@ -300,7 +304,7 @@ class WriteROOTTree():
                 root_file.Close()
 
         lena.context.update_recursively(
-            context, {"data": copy.deepcopy(self._data_c)}
+            context, {"output": copy.deepcopy(self._data_c)}
         )
 
         yield (self._root_file_name, context)

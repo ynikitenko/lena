@@ -58,7 +58,7 @@ def test_run():
     assert list(seq.run(data)) == [
         ('file.root',
             {
-                "data": {
+                "output": {
                     'root_file_path': 'file.root',
                     'root_tree_name': 'tree'
                 },
