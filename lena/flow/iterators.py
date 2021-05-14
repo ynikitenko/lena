@@ -53,7 +53,7 @@ class CountFrom(object):
 
 def ISlice(*args, **kwargs):
     """Deprecated since Lena 0.4. Use :class:`Slice`."""
-    warnings.warn("ISlice is deprecated since Lena 0.4. Use Slice.",
+    warnings.warn("ISlice is deprecated since Lena 0.4. Use Slice. In:",
                   DeprecationWarning, stacklevel=2)
     return Slice(*args, **kwargs)
 

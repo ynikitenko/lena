@@ -11,7 +11,7 @@ import lena.flow
 
 def Writer(*args, **kwargs):
     """Deprecated since Lena 0.4. Use :class:`Write`."""
-    warnings.warn("Writer is deprecated since Lena 0.4. Use Write.",
+    warnings.warn("Writer is deprecated since Lena 0.4. Use Write. In:",
                   DeprecationWarning, stacklevel=2)
     return Write(*args, **kwargs)
 
@@ -45,8 +45,7 @@ class Write(object):
         *existing_unchanged* and *overwrite* are used during :meth:`run`
         to change the handling of existing files.
         They are mutually exclusive:
-        if one tries to use them simultaneously,
-        :exc:`.LenaValueError` is raised.
+        simultaneous use raises :exc:`.LenaValueError`.
         """
         self.output_directory = output_directory
         self._output_filename = output_filename
