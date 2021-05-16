@@ -59,8 +59,13 @@ class LaTeXToPDF(object):
         Other values pass unchanged.
 
         If the resulting pdf file exists and *context.output.changed*
-        is not set to ``True``, pdf rendering is not run.
-        Set *overwrite* to ``True`` to always recreate pdfs.
+        is set to ``False``, pdf rendering is not run.
+        If *context.output.changed* is not set, then modification times
+        for *.tex* and *.pdf* files are compared:
+        if the template *.tex* is newer, it is reprocessed.
+        Set the initialization argument *overwrite* to ``True``
+        to always recreate pdfs.
+        All non-existent files are always created.
         """
         def is_tex_file(context):
             """May be transformed by this class."""
@@ -130,7 +135,19 @@ class LaTeXToPDF(object):
             data = texfile_name.replace(".tex", ".pdf")
             output_directory = os.path.dirname(texfile_name)
 
-            changed = outputc.get("changed", False)
+            try:
+                changed = outputc["changed"]
+            except KeyError:
+                # if context.output.changed is missing, we compare times
+                # for tex and pdf files.
+                try:
+                    pdf_time = os.path.getmtime(data)
+                except os.error:
+                    # probably changed won't be used, but anyway
+                    changed = True
+                else:
+                    tex_time = os.path.getmtime(texfile_name)
+                    changed = tex_time > pdf_time
             if not self._overwrite and os.path.exists(data) and not changed:
                 # pdf file exists and data is unchanged
                 outputc["changed"] = False
