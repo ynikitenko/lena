@@ -54,7 +54,7 @@ Example from real analysis:
         write,
         lena.context.Context(),
         # here our jinja template renders a group as a list of items
-        lena.output.RenderLaTeX(template_path=TEMPLATE_PATH,
+        lena.output.RenderLaTeX(template_dir=TEMPLATE_DIR,
                                 select_template=select_template),
         # we have a single template, no more groups are present
         write,
