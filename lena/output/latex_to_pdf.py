@@ -79,7 +79,9 @@ class LaTeXToPDF(object):
 
         def pop_returned_processes(processes, verbose=True):
             """Remove returned processes from pool."""
-            for filename in processes.keys():
+            # not to iterate a mutated dictionary!
+            keys = processes.keys()
+            for filename in keys:
                 proc, context = processes[filename]
                 returncode = proc.poll()
                 if returncode is not None:
@@ -120,7 +122,7 @@ class LaTeXToPDF(object):
         # todo: probably can delete this line
         val = None # if flow is empty
         for val in flow:
-            # check for finished pdfs on each iteration
+            ## check for finished pdfs on each iteration
             for out_val in pop_returned_processes(self.processes,
                                                   self.verbose):
                 yield out_val
