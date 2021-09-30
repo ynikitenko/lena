@@ -80,7 +80,9 @@ class LaTeXToPDF(object):
         def pop_returned_processes(processes, verbose=True):
             """Remove returned processes from pool."""
             # not to iterate a mutated dictionary!
-            keys = processes.keys()
+            # make a copy, because keys() are still a dynamic view.
+            keys = processes.copy().keys()
+
             for filename in keys:
                 proc, context = processes[filename]
                 returncode = proc.poll()
