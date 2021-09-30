@@ -483,6 +483,14 @@ def update_nested(d, other):
             "other must be a dictionary of size one, "
             "{} provided".format(other)
         )
+    # todo: add a keyword argument copy by default True,
+    # which would make a deep copy of *other*.
+    # This would allow flexibility in the case if someone
+    # really wants to have a mutable structure in two places
+    # - but is that a really good design?..
+    # this allows flexibility, since one may create a dict on-the-fly
+    # Note also that copy.deepcopy keeps a ``memo'' dictionary
+    # of objects already copied during the current copying pass
     def get_most_nested_subdict_with(key, d):
         while True:
             if key in d:

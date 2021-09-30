@@ -84,7 +84,9 @@ def cell_to_string(cell_edges, var_context=None, coord_names=None,
     """
     if coord_names is None:
         if var_context is None:
-            coord_names = ["coord{}".format(ind) for ind in range(len(cell_edges))]
+            coord_names = [
+                "coord{}".format(ind) for ind in range(len(cell_edges))
+            ]
         else:
             if "combine" in var_context:
                 coord_names = [var["name"]
@@ -166,7 +168,8 @@ class TransformBins(object):
             ## so deep copy is not needed
             ## But in this case data can't be used twice!!
             # context = copy.deepcopy(context)
-            for histc, bin_edges in _iter_bins_with_edges(data.bins, data.edges):
+            for histc, bin_edges in \
+                    _iter_bins_with_edges(data.bins, data.edges):
                 hist, ana_context = lena.flow.get_data_context(histc)
                 split_var = lena.context.get_recursively(
                     context, "split_into_bins.variable", None
@@ -272,7 +275,8 @@ class ReduceBinContent(object):
             # bins should be transformed.
             # Several iterations can happen, in principle.
             generators = _MdSeqMap(
-                lambda cell: copy.deepcopy(self._transform).run([cell]), hist.bins
+                lambda cell: copy.deepcopy(self._transform).run([cell]),
+                hist.bins
             )
             for new_bins in generators:
                 new_data = lena.math.md_map(lena.flow.get_data, new_bins)
@@ -284,14 +288,21 @@ class ReduceBinContent(object):
                     all_new_context = lena.math.md_map(
                         lena.flow.get_context, new_bins
                     )
-                    cur_bin_context["bin_content"]["all_bins"] = all_new_context
+                    cur_bin_context["bin_content"]["all_bins"] = \
+                        all_new_context
                 sib_context = context.get("split_into_bins", {})
                 var_context = sib_context.get("variable", {})
                 hist_context = sib_context.get("histogram", {})
+                # todo: why explicitly these contexts?
+                # What other contexts could be updated?
                 if var_context:
-                    lena.context.update_nested(context, {"variable": var_context})
+                    lena.context.update_nested(
+                        context, {"variable": copy.deepcopy(var_context)}
+                    )
                 if hist_context:
-                    lena.context.update_nested(context, {"histogram": hist_context})
+                    lena.context.update_nested(
+                        context, {"histogram": copy.deepcopy(hist_context)}
+                    )
                 lena.context.update_nested(context, cur_bin_context)
                 # or make Histogram.edges immutable
                 edges = copy.deepcopy(hist.edges)
@@ -429,8 +440,11 @@ class SplitIntoBins(lena.core.FillCompute):
             else:
                 cur_context["split_into_bins"] = {}
             sib_context = cur_context["split_into_bins"]
-            # todo. improve consistency below
-            var_context = copy.deepcopy({"variable": self._arg_var.var_context})
+            # todo. improve consistency below.
+            # Probably rename "variable" to "arg_variable"
+            var_context = copy.deepcopy(
+                {"variable": self._arg_var.var_context}
+            )
             hist_context = copy.deepcopy(hist._hist_context)
             sib_context.update(var_context)
             sib_context.update(hist_context)

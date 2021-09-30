@@ -483,7 +483,8 @@ def make_hist_context(hist, context):
     hist_context = {
         "histogram": {
             "dim": hist.dim,
-            "ranges": hist.ranges, "nbins": hist.nbins
+            "nbins": hist.nbins,
+            "ranges": hist.ranges
         }
     }
     all_context.update(hist_context)
