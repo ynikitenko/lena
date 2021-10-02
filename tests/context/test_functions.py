@@ -280,24 +280,25 @@ def test_str_to_list():
 
 def test_update_nested():
     d1 = {"a": 1, "b": {"c": 3}}
-    d2 = {"b": {"d": 4}}
-    # dict must contain only one element
+    d2 = {"d": 4}
+    update_nested("b", d1, d2)
+    # d2 is updated with values from d1
+    assert d2 == {'d': 4, 'b': {'c': 3}}
+    # old key from d1 is inserted into d1["b"]["b"]
+    assert d1 == {'a': 1, 'b': {'b': {'c': 3}, 'd': 4}}
+
+    d1 = {"a": 1, "b": {"c": 3}}
+    d2 = {"d": 4}
+    update_nested("e", d1, d2)
+    # if key is not present in d1, it is simply inserted there
+    assert d1 == {'a': 1, 'b': {'c': 3}, 'e': {'d': 4}}
+
+    # recursive d2 is forbidden
+    d1 = {"d": {}}
+    d2 = {}
+    d2["d"] = d2
     with pytest.raises(lena.core.LenaValueError):
-        update_nested(d2, d1)
-    update_nested(d1, d2)
-    assert d2 == {'b': {'c': 3, 'd': 4}}
-    assert d1 == {'a': 1, 'b': {'c': 3, 'd': 4}}
-    d1 = {"a": 1, "b": "c"}
-    d2 = {"b": {"d": 4}}
-    # d[key] must be a dictionary
-    with pytest.raises(lena.core.LenaValueError):
-        update_nested(d1, d2)
-    # simple update works
-    d1 = {"a": 1, "b": 2}
-    d2 = {"c": 3}
-    update_nested(d1, d2)
-    assert d1 == {"a": 1, "b": 2, "c": 3}
-    assert d2 == {"c": 3}
+        update_nested("d", d1, d2)
 
 
 def test_update_recursively():

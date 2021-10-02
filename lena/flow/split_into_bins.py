@@ -186,10 +186,9 @@ class TransformBins(object):
                 # hide split_into_bins context into that.
                 # this may be useful when context and ana_context differ
                 sib_context["context"] = context
-                bin_context = {"bin": {"edges": bin_edges,
-                                       "edges_str": edges_str}}
-                lena.context.update_nested(ana_context, {"split_into_bins": sib_context})
-                lena.context.update_nested(ana_context, bin_context)
+                bin_context = {"edges": bin_edges, "edges_str": edges_str}
+                lena.context.update_nested("split_into_bins", ana_context, sib_context)
+                lena.context.update_nested("bin", ana_context, bin_context)
                 yield (hist, ana_context)
 
 
@@ -283,13 +282,12 @@ class ReduceBinContent(object):
                 ana_context = copy.deepcopy(
                     lena.flow.get_context(get_example_bin(new_bins))
                 )
-                cur_bin_context = {"bin_content": {"example_bin": ana_context}}
+                cur_bin_context = {"example_bin": ana_context}
                 if not self._drop_bins_context:
                     all_new_context = lena.math.md_map(
                         lena.flow.get_context, new_bins
                     )
-                    cur_bin_context["bin_content"]["all_bins"] = \
-                        all_new_context
+                    cur_bin_context["all_bins"] = all_new_context
                 sib_context = context.get("split_into_bins", {})
                 var_context = sib_context.get("variable", {})
                 hist_context = sib_context.get("histogram", {})
@@ -297,13 +295,13 @@ class ReduceBinContent(object):
                 # What other contexts could be updated?
                 if var_context:
                     lena.context.update_nested(
-                        context, {"variable": copy.deepcopy(var_context)}
+                        "variable", context, copy.deepcopy(var_context)
                     )
                 if hist_context:
                     lena.context.update_nested(
-                        context, {"histogram": copy.deepcopy(hist_context)}
+                        "histogram", context, copy.deepcopy(hist_context)
                     )
-                lena.context.update_nested(context, cur_bin_context)
+                lena.context.update_nested("bin_content", context, cur_bin_context)
                 # or make Histogram.edges immutable
                 edges = copy.deepcopy(hist.edges)
                 new_hist = lena.structures.Histogram(edges, new_data)

@@ -464,51 +464,67 @@ def str_to_list(s):
     return s.split(".")
 
 
-def update_nested(d, other):
-    """Update dictionary *d* with items from *other* dictionary.
+def update_nested(key, d, other):
+    """Update *d[key]* with the *other* dictionary preserving data.
 
-    *other* must be a dictionary of one element, which is used
-    as a key. If *d* doesn't contain the key,
-    *d* is updated with *other*.
-    If *d* contains the key, the value with that key is nested
-    inside the copy of *other* at the level
-    which doesn't contain the key. *d* is updated.
+    If *d* doesn't contain the *key*, it is updated with *{key: other}*.
+    If *d* contains the *key*, *d[key]* is inserted into *other[key]*
+    (so that it is not overriden).
+    If *other* contains *key* (and possibly more nested *key*-s),
+    then *d[key]* is inserted into the deepest level
+    of *other.key.key...* Finally, *d[key]* becomes *other*.
 
-    If *d[key]* is not a dictionary
-    or if there is not one key in *other*,
-    :exc:`.LenaValueError` is raised.
+    Example:
+
+    >>> context = {"variable": {"name": "x"}}
+    >>> new_var_context = {"name": "n"}
+    >>> update_nested("variable", context, copy.deepcopy(new_var_context))
+    >>> context == {'variable': {'name': 'n', 'variable': {'name': 'x'}}}
+    True
+    >>>
+    >>> update_nested("variable", context, {"name": "top"})
+    >>> context == {
+    ...    'variable': {'name': 'top',
+    ...                 'variable': {'name': 'n', 'variable': {'name': 'x'}}}
+    ... }
+    True
+
+    *other* is generally modified. Create that on the fly
+    or use *copy.deepcopy* when appropriate.
+
+    Recursive dictionaries are strongly discouraged
+    and meaningless when nesting.
+    If *other[key]* is recursive, :exc:`.LenaValueError` may be raised.
     """
-    if not isinstance(other, dict) or len(other) != 1:
-        raise lena.core.LenaValueError(
-            "other must be a dictionary of size one, "
-            "{} provided".format(other)
-        )
-    # todo: add a keyword argument copy by default True,
-    # which would make a deep copy of *other*.
-    # This would allow flexibility in the case if someone
-    # really wants to have a mutable structure in two places
-    # - but is that a really good design?..
-    # this allows flexibility, since one may create a dict on-the-fly
-    # Note also that copy.deepcopy keeps a ``memo'' dictionary
-    # of objects already copied during the current copying pass
+    # there was an idea to add a keyword argument copy_other
+    # (by default True), but the user can do that him/herself
+    # with copy.deepcopy when needed. Otherwise it would be 
+    # unnecessary complication of this interface.
+
+    # Only one key is nested. This encourages design when
+    # 1) elements combine their contexts into one key
+    # (like {"split_into_bins": {"variable": {}, "histogram": {}}})
+    # 2) elements change only one key ("variable", "histogram",...).
+
     def get_most_nested_subdict_with(key, d):
+        nested_dicts = []
         while True:
             if key in d:
+                if d in nested_dicts:
+                    raise lena.core.LenaValueError(
+                        "recursive *other* is forbidden"
+                    )
+                nested_dicts.append(d)
                 d = d[key]
             else:
                 return d
-    for val in other:
-        key = val
+
     if key in d:
-        if not isinstance(d[key], dict):
-            raise lena.core.LenaValueError(
-                "d[{}] must be a dict, {} given"
-                .format(key, d[key])
-            )
         other_most_nested = get_most_nested_subdict_with(key, other)
-        # d[key] must be a dict
-        other_most_nested.update(d[key])
-    d.update(other)
+        # insert d[key] at the lowest other.key.key....
+        other_most_nested[key] = d[key]
+
+    d[key] = other
 
 
 def update_recursively(d, other, value=_sentinel):
@@ -522,7 +538,7 @@ def update_recursively(d, other, value=_sentinel):
 
     Existing values are updated recursively,
     that is including nested subdictionaries.
-    For example:
+    Example:
 
     >>> d1 = {"a": 1, "b": {"c": 3}}
     >>> d2 = {"b": {"d": 4}}

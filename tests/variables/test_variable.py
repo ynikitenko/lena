@@ -145,6 +145,10 @@ def test_compose():
     c = Compose(positron, x)
     assert "type" not in c(data[0])[1]["variable"]
     abs_ = Variable("abs", getter = abs)
+
+    ## This test was done with a general idea,
+    # but without much thought. Many tunings here
+    # were made ad hoc. Rewrite that completely or remove.
     c1 = Compose(positron, Compose(x, abs_))
     del c1.var_context["latex_name"]
     # res1["variable"]["name"] = "positron_x"
@@ -153,6 +157,7 @@ def test_compose():
     c2 = Compose(positron, x, abs_)
     res1 = c1(data[0])
     res2 = c2(data[0])
+    # fix res1
     for update_str in [
         "variable.compose.compose.latex_name.e^+",
         "variable.compose.compose.name.positron",
@@ -161,12 +166,21 @@ def test_compose():
         # "variable.compose.type.particle",
         "variable.compose.latex_name.x",
         "variable.compose.name.x",
-    ]:
+        ]:
         cont = lena.context.str_to_dict(update_str)
         lena.context.update_recursively(res1[1], cont)
+    # fix res1 more
     del res1[1]["variable"]["compose"]["particle"]
     del res1[1]["variable"]["compose"]["type"]
-    assert res1 == res2
+    del res1[1]["variable"]["compose"]["compose"]["coordinate"]
+    del res1[1]["variable"]["compose"]["compose"]["unit"]
+    # fix res2
+    del res2[1]["variable"]["compose"]["coordinate"]
+    del res2[1]["variable"]["compose"]["unit"]
+    # data is equal
+    assert res1[0] == res2[0]
+    # context is almost equal (mod previous fixes)
+    assert res1[1] == res2[1]
 
 
 def test_variable():

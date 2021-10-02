@@ -337,7 +337,7 @@ class Compose(Variable):
             return types
         for var in self._vars[1:]:
             varc = copy.deepcopy(var.var_context)
-            lena.context.update_nested(varc, {"compose": compose})
+            lena.context.update_nested("compose", varc, compose)
             # get_lowest_compose(varc).update({"compose": compose})
             compose = varc
         # one Composed variable must be same as a simple variable

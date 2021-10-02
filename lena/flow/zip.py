@@ -84,7 +84,7 @@ class Zip(object):
             # unless one zips completely same analyses
             if self._namedtuple:
                 diff_context = self._namedtuple(*diff_context)
-            lena.context.update_nested(common_context, {"zip": diff_context})
+            lena.context.update_nested("zip", common_context, diff_context)
         return common_context
 
     def _create_data(self, values):
