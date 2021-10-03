@@ -289,13 +289,25 @@ class ReduceBinContent(object):
                     )
                     cur_bin_context["all_bins"] = all_new_context
                 sib_context = context.get("split_into_bins", {})
-                var_context = sib_context.get("variable", {})
+                var_context = ana_context.get("variable", {})
                 hist_context = sib_context.get("histogram", {})
                 # todo: why explicitly these contexts?
                 # What other contexts could be updated?
                 if var_context:
+                    # this ugly fix should be avoided:
+                    # variable.compose must be changed to variable.variable,
+                    # so that update_nested always works directly.
+                    # if "variable" in context:
+                    #     cvar = context["variable"]
+                    #     key = "compose"
+                    # else:
+                    #     cvar = context
+                    #     key = "variable"
+                    #
+                    # todo: unify variable.variable and variable.compose
                     lena.context.update_nested(
                         "variable", context, copy.deepcopy(var_context)
+                        # key, cvar, copy.deepcopy(var_context)
                     )
                 if hist_context:
                     lena.context.update_nested(
@@ -305,7 +317,9 @@ class ReduceBinContent(object):
                 # or make Histogram.edges immutable
                 edges = copy.deepcopy(hist.edges)
                 new_hist = lena.structures.Histogram(edges, new_data)
-                yield (new_hist, context)
+                # one might optimise copying of the context here,
+                # but for now we leave it like this (because it had bugs)
+                yield (new_hist, copy.deepcopy(context))
 
 
 class SplitIntoBins(lena.core.FillCompute):

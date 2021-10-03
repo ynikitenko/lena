@@ -141,7 +141,6 @@ def test_reduce_bin_content():
             'histogram': {'dim': 1},
             'variable': {'name': 'x'}
         },
-        'variable': {'name': 'x'}
     }
     X = Variable("x", lambda v: v.x)
     r = ReduceBinContent(lena.math.vector3, X, drop_bins_context=False)
