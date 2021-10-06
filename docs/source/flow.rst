@@ -52,7 +52,11 @@ Flow
 .. currentmodule:: lena.flow.split_into_bins
 .. autosummary::
 
+    ReduceBinContent
     SplitIntoBins
+    TransformBins
+    cell_to_string
+    get_example_bin
 
 Elements
 --------

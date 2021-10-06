@@ -214,8 +214,8 @@ class ReduceBinContent(object):
         Example: ``transform=Split([X(), Y(), Z()])``
         (provided that you have X, Y, Z variables).
 
-        :class:`.ReduceBinContent` creates histograms,
-        which may be plotted, that is bins contain only data
+        :class:`.ReduceBinContent` creates histograms
+        that may be plotted, and their bins contain only data
         without context.
         By default, context of all bins except one is not used.
         If *drop_bins_context* is ``False``, a histogram of 
@@ -253,10 +253,10 @@ class ReduceBinContent(object):
 
         Context is updated with *variable*, *histogram*
         and *bin_content*.
-        *variable" and *histogram* copy context from *split_into_bins*
+        *variable* and *histogram* copy context from *split_into_bins*
         (if present there).
-        *bin_content* includes context for example bin in "example_bin"
-        and (optionally) for all bins in "all_bins".
+        *bin_content* includes context for example bin in *example_bin*
+        and (optionally) for all bins in *all_bins*.
         """
         for value in flow:
             hist, context = lena.flow.get_data_context(value)
