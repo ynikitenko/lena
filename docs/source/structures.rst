@@ -15,6 +15,11 @@ Structures
 
     Graph
 
+.. currentmodule:: lena.structures.elements
+.. autosummary::
+
+    HistToGraph
+
 **Histogram functions:**
 
 .. currentmodule:: lena.structures.hist_functions
@@ -23,15 +28,20 @@ Structures
     HistCell
     check_edges_increasing
     get_bin_edges
-    get_bin_on_value_1d
-    get_bin_on_value
     get_bin_on_index
-    iter_bins
-    iter_cells
+    get_bin_on_value
+    get_bin_on_value_1d
+    hist_to_graph
     init_bins
     integral
+    iter_bins
+    iter_cells
     make_hist_context
     unify_1_md
+
+..
+    Seems there is no way to generate the list above automatically.
+    :recursive: doesn't work.
 
 Histograms
 ----------
@@ -51,6 +61,10 @@ Graph
 
 .. module:: lena.structures.graph
 .. autoclass:: Graph
+    :members:
+
+.. module:: lena.structures.elements
+.. autoclass:: HistToGraph
     :members:
 
 Histogram functions

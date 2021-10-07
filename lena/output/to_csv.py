@@ -84,9 +84,9 @@ class ToCSV(object):
     """
 
     def __init__(self, separator=",", header=None, duplicate_last_bin=True):
-        """*separator* delimits values in the output text,
+        """*separator* delimits values in the output text.
 
-        *header* is a string which becomes the first line of the output,
+        *header* is a string which becomes the first line of the output.
 
         If *duplicate_last_bin* is ``True``,
         contents of the last bin will be written in the end twice.

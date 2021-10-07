@@ -238,50 +238,60 @@ def get_bin_on_value(arg, edges):
     return indices
 
 
-def hist_to_graph(hist, context, make_graph_value=None, bin_coord="left"):
-    """Convert a :class:`.Histogram` *hist*
-    to a :class:`.Graph`.
+def hist_to_graph(hist, context, make_value=None, get_coordinate="left"):
+    """Convert a :class:`.Histogram` to a :class:`.Graph`.
 
-    *context* becomes graph's context.
+    *context* becomes the graph's context.
     For example, it can contain a scale.
 
-    *make_graph_value* is a function to set graph point's value.
+    *make_value* is a function to set graph point's value.
     By default it is bin content. This option could be used to
     create graph error bars.
-    *make_graph_value* must accept bin content and bin context
-    as positional arguments.
+    *make_value* accepts a single value (bin content),
+    which can contain a context. Define this function
+    depending on the expected data.
+    For example, to create a graph with errors
+    from a histogram where bins contain
+    a named tuple with fields *mean*, *mean_error* and a context
+    one could use
 
-    *bin_coord* signifies which will be the coordinate
-    of a graph's point created from histogram's bin.
-    Can be "left" (default), "right" and "middle".
+    >>> make_value = lambda val: (val[0].mean, val[0].mean_error)
+
+    *get_coordinate* defines what will be the coordinate
+    of a graph's point created from a histogram's bin.
+    It can be "left" (default), "right" and "middle".
 
     Return the resulting graph.
     """
+    # todo:
+    # - probably context is not needed in the graph's constructor.
     gr = graph.Graph(context=context)
-    def get_coord(edges, bin_coord):
-        if bin_coord == "left":
+    # todo: make this function a lambda without checks.
+    def get_coord(edges, get_coordinate):
+        if get_coordinate == "left":
             return tuple(coord[0] for coord in edges)
-        elif bin_coord == "right":
+        elif get_coordinate == "right":
             return tuple(coord[1] for coord in edges)
         # or center?
-        elif bin_coord == "middle":
+        elif get_coordinate == "middle":
             return tuple(0.5*(coord[0] + coord[1]) for coord in edges)
         else:
             raise lena.core.LenaValueError(
-                "bin_coord must be one of left, right or middle, "
-                "{} provided".format(bin_coord)
+                'get_coordinate must be one of "left", "right" or "middle"; '
+                '"{}" provided'.format(get_coordinate)
             )
-    # todo: move it here, of course
+    # todo: move it to this module, of course
     from lena.flow.split_into_bins import _iter_bins_with_edges as ibe
     for value, edges in ibe(hist.bins, hist.edges):
-        coord = get_coord(edges, bin_coord)
+        coord = get_coord(edges, get_coordinate)
+        # todo: unclear when bin_context is present.
         bin_value, bin_context = lena.flow.get_data_context(value)
         if not hasattr(bin_value, "__iter__"):
             bin_value = (bin_value,)
-        if make_graph_value is None:
+        if make_value is None:
             graph_value = bin_value
         else:
-            graph_value = make_graph_value(bin_value, bin_context)
+            graph_value = make_value((bin_value, bin_context))
         gr.fill((coord, graph_value))
     return gr
 

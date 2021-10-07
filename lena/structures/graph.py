@@ -26,7 +26,7 @@ class Graph(object):
 
     One can get graph points as :attr:`Graph.points` attribute.
     They will be sorted each time before return
-    if *sort* was set to True.
+    if *sort* was set to ``True``.
     An attempt to change points
     (use :attr:`Graph.points` on the left of '=')
     will raise Python's :exc:`AttributeError`.
@@ -44,7 +44,7 @@ class Graph(object):
 
         Graph coordinates are sorted by default.
         This is usually needed to plot graphs of functions.
-        If you need to keep the order of insertion, set *sort* to False.
+        If you need to keep the order of insertion, set *sort* to ``False``.
 
         By default, sorting is done using standard Python
         lists and functions. You can disable *sort* and provide your own
@@ -151,7 +151,7 @@ class Graph(object):
         A new graph with the scale equal to *other*
         is returned, the original one remains unchanged.
         Note that in this case its *points* will be a simple list
-        and new graph *sort* parameter will be True.
+        and new graph *sort* parameter will be ``True``.
 
         Graphs with scale equal to zero can't be rescaled. 
         Attempts to do that raise :exc:`.LenaValueError`.
@@ -191,14 +191,14 @@ class Graph(object):
     def to_csv(self, separator=",", header=None):
         """Convert graph's points to CSV.
 
-        *separator* delimits values, default is a comma.
+        *separator* delimits values, the default is comma.
 
         *header*, if not ``None``, is the first string of the output
         (new line is added automatically).
 
         Since a graph can be multidimensional,
         for each point first its coordinate is converted to string
-        (separated by *separator*), than each part of its value.
+        (separated by *separator*), then each part of its value.
 
         To convert :class:`Graph` to CSV inside a Lena sequence,
         use :class:`lena.output.ToCSV`.

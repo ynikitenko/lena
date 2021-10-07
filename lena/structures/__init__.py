@@ -1,3 +1,4 @@
+from .elements import HistToGraph
 from .graph import Graph
 from .histogram import Histogram
 from .hist_functions import (
@@ -22,6 +23,7 @@ __all__ = [
     'get_bin_edges',
     'get_bin_on_value_1d', 'get_bin_on_value', 'get_bin_on_index',
     'HistCell',
+    'HistToGraph',
     'hist_to_graph',
     'init_bins',
     'integral',

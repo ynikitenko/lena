@@ -1,14 +1,19 @@
+import collections
+import copy
 import pytest
 
+import lena.structures
 from lena.core import LenaIndexError, LenaTypeError, LenaValueError
 from lena.math import mesh
-from lena.structures import Histogram
-from lena.structures.hist_functions import (
+from lena.structures import Histogram, Graph
+from lena.structures import (
     check_edges_increasing,
     get_bin_edges,
     get_bin_on_value_1d, get_bin_on_value,
     get_bin_on_index,
     HistCell,
+    HistToGraph,
+    hist_to_graph,
     integral,
     iter_bins,
     iter_cells,
@@ -43,7 +48,7 @@ def test_get_bin_on_value_1d():
     assert get_bin_on_value_1d(9.009, arr) == 9
 
     arr = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 9.01]
-    assert get_bin_on_value_1d(9.01, arr) == 10 
+    assert get_bin_on_value_1d(9.01, arr) == 10
 
     arr = [0, 1, 4, 5, 7, 10]
     assert get_bin_on_value_1d(0, arr) == 0
@@ -92,6 +97,51 @@ def test_get_bin_on_index():
     assert get_bin_on_index(0, [[0, 1], [0, 0]]) == [0, 1]
     with pytest.raises(LenaIndexError):
         get_bin_on_index(2, [[0, 1], [0, 0]])
+
+
+def test_hist_to_graph():
+    hist = Histogram(mesh((0, 1), 1))
+    hist.fill(0)
+    context_no_transform = {"histogram": {"to_graph": False}}
+    data = [
+        0,
+        copy.deepcopy(hist),
+        (copy.deepcopy(hist), {}),
+        (copy.deepcopy(hist), context_no_transform),
+    ]
+    htg = HistToGraph()
+    # run works correctly
+    assert list(htg.run(data)) == [
+        0,
+        (Graph(points=[((0,), (1,))], scale=None, sort=True),
+         {}),
+        (Graph(points=[((0,), (1,))], scale=None, sort=True),
+         {}),
+        # values with the specified context are skipped
+        (Histogram([0, 1], bins=[1]),
+         {'histogram': {'to_graph': False}}),
+    ]
+    # different coordinates work
+    assert list(HistToGraph(get_coordinate="right").run([hist])) == \
+        [(Graph(points=[((1,), (1,))], scale=None, sort=True), {})]
+    assert list(HistToGraph(get_coordinate="middle").run([hist])) == \
+        [(Graph(points=[((0.5,), (1,))], scale=None, sort=True), {})]
+
+    val_with_error = collections.namedtuple("val_with_error", ["value", "error"])
+    hist1 = Histogram(mesh((0, 1), 1))
+    val = val_with_error(1, 2)
+    hist1.bins = lena.structures.init_bins(hist1.edges, val)
+    transform_value = lambda val: (val[0].value, val[0].error)
+    assert list(HistToGraph(make_value=transform_value).run([hist1])) == \
+        [(Graph(points=[((0,), (1, 2))], scale=None, sort=True), {})]
+
+    # wrong coordinate raises LenaValueError in HistToGraph
+    with pytest.raises(lena.core.LenaValueError):
+        HistToGraph(get_coordinate="left_right")
+
+    # same raises in hist_to_graph
+    with pytest.raises(lena.core.LenaValueError):
+        hist_to_graph(hist1, {}, get_coordinate="left_right")
 
 
 def test_iter_cells():
