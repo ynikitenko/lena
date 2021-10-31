@@ -1,4 +1,4 @@
-"""Split analysis on groups set by bins."""
+"""Split analysis into groups defined by bins."""
 from __future__ import print_function
 
 import copy
@@ -322,10 +322,10 @@ class ReduceBinContent(object):
                 yield (new_hist, copy.deepcopy(context))
 
 
-class SplitIntoBins(lena.core.FillCompute):
-    """Split analysis into bins."""
+class SplitIntoBins():
+    """Split analysis into groups defined by bins."""
 
-    def __init__(self, seq, arg_func, edges, transform=None):
+    def __init__(self, seq, arg_func, edges):
         """*seq* is a :class:`.FillComputeSeq` sequence,
         which corresponds to the analysis being compared
         for different bins.
@@ -343,14 +343,14 @@ class SplitIntoBins(lena.core.FillCompute):
         monotonically increasing bin edges along each dimension.
         Example: ``edges = lena.math.mesh((0, 1), 10)``.
 
-        *transform* is a :class:`.Sequence`,
-        which is applied to results.
-        The final histogram may contain vectors, histograms and
-        any other data the analysis produced. To be able to plot them,
-        *transform* can extract vector components or do other work
-        to simplify structures.
-        By default, *transform* is :class:`.TransformBins`. 
-        Pass an empty tuple to disable it.
+        Note
+        ----
+            The final histogram may contain vectors, histograms and
+            any other data the analysis produced.
+            To plot them, one can extract vector components with e.g.
+            :class:`.ReduceBinContent`.
+            If bin contents are histograms,
+            they can be yielded one by one with :class:`.TransformBins`.
 
         **Attributes**: bins, edges.
 
@@ -379,19 +379,6 @@ class SplitIntoBins(lena.core.FillCompute):
         lena.structures.check_edges_increasing(edges)
         self.bins = lena.structures.init_bins(edges, seq, deepcopy=True)
         self.edges = edges
-        if transform is None:
-            transform = TransformBins()
-        elif transform == ():
-            pass
-        elif not isinstance(transform, lena.core.Sequence):
-            try:
-                transform = lena.core.Sequence(transform)
-            except lena.core.LenaTypeError:
-                raise lena.core.LenaTypeError(
-                    "transform must be convertible to Sequence, "
-                    "{} provided".format(transform)
-                )
-        self.transform = transform
         self._cur_context = {}
 
     def fill(self, val):
@@ -460,9 +447,5 @@ class SplitIntoBins(lena.core.FillCompute):
             hist_context = copy.deepcopy(hist._hist_context)
             sib_context.update(var_context)
             sib_context.update(hist_context)
-            if self.transform:
-                results = self.transform.run([(hist, cur_context)])
-                for result in results:
-                    yield result
-            else:
-                yield (hist, cur_context)
+
+            yield (hist, cur_context)

@@ -180,9 +180,6 @@ def test_split_into_bins():
     # edges must be increasing
     with pytest.raises(lena.core.LenaValueError):
         SplitIntoBins(seq, arg_func, [0, 1, 0])
-    # transform, if set, must be convertible to Sequence
-    with pytest.raises(lena.core.LenaTypeError):
-        SplitIntoBins(seq, arg_func, edges, transform=True)
 
     ## run works
     flow = [0, 1, 2, 3, 4, 0, -1]
@@ -211,17 +208,18 @@ def test_split_into_bins():
     # need to create a new seq, otherwise old one will be used further.
     seq = Split([Sum(), Count()])
     arg_func = Variable("x", lambda x: x)
-    s = Sequence(SplitIntoBins(seq, arg_func, edges, transform=()))
+    s = Sequence(SplitIntoBins(seq, arg_func, edges))
     res = s.run(flowc)
     res_bins = map(lambda r: r[0].bins, res)
     # first element is Sum, second is Count
     assert list(res_bins) == [[0, 1, 2, 3], [2, 1, 1, 1]]
 
-    # transform works
+    # ReduceBinContent works
+    ## It was a transform kwarg, but it seems not needed.
     t = ReduceBinContent(int, lambda x: x+1)
     edges = [0, 1, 2, 3, 4]
     arg_func = Variable("x", lambda x: x)
-    s = Sequence(SplitIntoBins(seq, arg_func, edges, transform=t))
+    s = Sequence(SplitIntoBins(seq, arg_func, edges), t)
     res = list(s.run(flow))
     assert [r[0] for r in res] == [
         Histogram([0, 1, 2, 3, 4], bins=[1, 2, 3, 4]),
