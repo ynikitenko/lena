@@ -12,6 +12,7 @@ Flow
     Filter
     Print
     Progress
+    RunIf
 
 ..     Count
 ..    Transform
@@ -79,8 +80,7 @@ which didn't fit other categories.
     :members:
 .. autoclass:: Progress
     :members:
-..
-    .. autoclass:: Transform
+.. autoclass:: RunIf
     :members:
 
 Functions

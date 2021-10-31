@@ -1,4 +1,7 @@
-from lena.flow import Count, TransformIf, End
+import pytest
+
+import lena.core
+from lena.flow import Count, RunIf, End, Selector
 from tests.examples.fill import StoreFilled
 
 
@@ -38,17 +41,31 @@ def test_count():
     assert results[3] == ("foo", {'counter': 4})
 
 
-def test_transform_if():
+def test_run_if():
     data = [1, 2.5]
-    # t0-t3 check work for empty types, int, lambda and a list.
-    t0 = TransformIf(lambda _: True, lambda num: num + 1)
+    add_1 = lambda num: num + 1
+    select_all = Selector(lambda _: True)
+
+    # select all works
+    t0 = RunIf(select_all, add_1)
     assert list(t0.run(data)) == [2, 3.5]
-    t1 = TransformIf(int, lambda num: num + 1)
-    assert list(t1.run(data)) == [2, 2.5]
-    t2 = TransformIf(float, lambda num: num + 1)
+
+    # select none works
+    # ready Sequence works
+    t1 = RunIf(lambda _: False, lena.core.Sequence(add_1))
+    assert list(t1.run(data)) == [1, 2.5]
+
+    # partial selector works
+    t2 = RunIf(float, add_1)
     assert list(t2.run(data)) == [1, 3.5]
-    t3 = TransformIf([lambda val: isinstance(val, float), int], lambda num: num + 1)
-    assert list(t3.run(data)) == [2, 3.5]
+
+    ## test initialization errors
+    # not a selector raises
+    with pytest.raises(lena.core.LenaTypeError):
+        RunIf(0, add_1)
+    # not a sequence raises
+    with pytest.raises(lena.core.LenaTypeError):
+        RunIf(select_all, 0)
 
 
 def test_end():

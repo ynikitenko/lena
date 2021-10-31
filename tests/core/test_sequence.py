@@ -34,7 +34,7 @@ from itertools import islice
 
 from lena.core import LenaTypeError
 from lena.core import Source, Sequence
-from lena.flow import Count, Print, Slice, TransformIf
+from lena.flow import Count, Print, Slice, RunIf
 from lena.flow import Print
 from itertools import islice
 from tests.core.test_fill_compute_seq import mul2
@@ -58,7 +58,7 @@ def test_sequence():
     it5 = Slice(5)
     sseq = Source(cnt0, it5)
     assert list(sseq()) == [0, 1, 2, 3, 4]
-    seq = Sequence(TransformIf(int, lambda i: i+1))
+    seq = Sequence(RunIf(int, lambda i: i+1))
     print(list(seq.run(sseq())))
 
     # Test special double underscore methods,
@@ -68,7 +68,7 @@ def test_sequence():
     # can take len
     assert len(seq2) == 1
     # can get item
-    assert isinstance(seq2[0], TransformIf)
+    assert isinstance(seq2[0], RunIf)
     # deletion is prohibited
     # I don't know why, but last time both exceptions below were AttributeError
     # it changed after I based Sequence on LenaSequence 

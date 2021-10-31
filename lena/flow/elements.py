@@ -81,29 +81,57 @@ class Count(object):
         yield (data, context)
 
 
-class TransformIf(object):
-    """Transform selected flow.
+class RunIf(object):
+    """Run a sequence only for selected values.
 
-    In general this sequence should not be used,
-    and different flows should be transformed
-    to common data types (like Histograms) before merging.
-    In some cases, however, there emerge values of very different types
-    (like in :class:`.SplitIntoBins`),
-    and this class may be useful.
-    Todo: probably it should be structure-transparent
-    (that is work for histogram content directly)
+    Note
+    ----
+        In general, different flows are transformed
+        to common data types (like histograms).
+        In some complicated analyses (like in :class:`.SplitIntoBins`)
+        there can appear values of very different types,
+        for which additional transformation must be run.
+        Use this element in such cases.
 
-    Warning
-    -------
-        This class may be changed or deleted.
+        *RunIf* is similar to :class:`.Filter`,
+        but the latter can be used as a :class:`.FillInto`
+        element inside :class:`.Split`.
+
+        *RunIf* with a selector *select* (let us call its opposite
+        *not_select*) is equivalent to
+
+        .. code-block:: python
+
+            Split(
+                [
+                    (
+                        select,
+                        seq
+                    ),
+                    not_select
+                    # not selected values pass unchanged
+                ],
+                bufsize=1,
+                copy_buf=False
+            )
+
+        and can be considered "syntactic sugar". Use :class:`.Split`
+        for more flexibility.
     """
 
     def __init__(self, select, seq):
-        """*select* is converted to :class:`.Selector`.
+        """*select* is a function that accepts a value
+        (maybe with context) and returns a boolean.
+        It is converted to a :class:`.Selector`.
         See its specifications for available options.
 
-        *seq* is converted to :class:`.Sequence`.
+        *seq* is a sequence that will be run for selected values.
+        If it is not a :class:`.Sequence`, it is converted to that.
         """
+        # this element was present in Lena for a long time,
+        # but it was called TransformIf
+        # and was deprecated (undocumented).
+
         if isinstance(select, lena.flow.Selector):
             self._select = select
         else:
@@ -116,6 +144,7 @@ class TransformIf(object):
                 )
             else:
                 self._select = select
+
         if isinstance(seq, lena.core.Sequence):
             self._seq = seq
         else:
@@ -130,18 +159,25 @@ class TransformIf(object):
                 self._seq = seq
 
     def run(self, flow):
-        """Transform selected flow.
+        """Run the sequence for selected values from the *flow*.
+
+        Warning
+        -------
+            *RunIf* disrupts the flow: it feeds values to the sequence
+            one by one, and yields the results.
+            If the sequence depends on the complete flow
+            (for example, yields the maximum element),
+            this will be incorrect.
+            The flow after *RunIf* is not disrupted.
 
         Not selected values pass unchanged.
         """
-        for value in flow:
-            if self._select(value):
-                # transform with self._seq
-                for result in self._seq.run([value]):
+        for val in flow:
+            if self._select(val):
+                for result in self._seq.run([val]):
                     yield result
             else:
-                # not selected pass unchanged
-                yield value
+                yield val
 
 
 class End(object):

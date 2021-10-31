@@ -1,6 +1,6 @@
 from .cache import Cache
 from .drop_context import DropContext
-from .elements import Count, End, TransformIf
+from .elements import Count, End, RunIf
 from .functions import get_data, get_context, get_data_context, seq_map
 from .group_by import GroupBy
 from .group_plots import GroupPlots
@@ -41,7 +41,7 @@ __all__ = [
     'Not',
     'Selector',
     'seq_map',
-    'TransformIf',
+    'RunIf',
     # split into bins
     'SplitIntoBins',
     'ReduceBinContent',
