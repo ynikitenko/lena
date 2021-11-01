@@ -166,20 +166,20 @@ def test_split_into_bins():
     # seq must be FillComputeSeq
     with pytest.raises(lena.core.LenaTypeError):
         sb = SplitIntoBins(seq=lena.core.Sequence(),
-                           arg_func=Variable("no", lambda val: val[0]),
+                           arg_var=Variable("no", lambda val: val[0]),
                            edges=[0, 1, 2])
-    # arg_func must be a Variable
+    # arg_var must be a Variable
     with pytest.raises(lena.core.LenaTypeError):
         SplitIntoBins(Count(), lambda _: 1, [0, 1, 2])
     # 4 bins
     edges = [0, 1, 2, 3, 4]
-    arg_func = Variable("x", lambda x: x)
+    arg_var = Variable("x", lambda x: x)
     seq = Count()
     # this example sequence works
-    s = SplitIntoBins(seq, arg_func, edges)
+    s = SplitIntoBins(seq, arg_var, edges)
     # edges must be increasing
     with pytest.raises(lena.core.LenaValueError):
-        SplitIntoBins(seq, arg_func, [0, 1, 0])
+        SplitIntoBins(seq, arg_var, [0, 1, 0])
 
     ## run works
     flow = [0, 1, 2, 3, 4, 0, -1]
@@ -207,8 +207,8 @@ def test_split_into_bins():
 
     # need to create a new seq, otherwise old one will be used further.
     seq = Split([Sum(), Count()])
-    arg_func = Variable("x", lambda x: x)
-    s = Sequence(SplitIntoBins(seq, arg_func, edges))
+    arg_var = Variable("x", lambda x: x)
+    s = Sequence(SplitIntoBins(seq, arg_var, edges))
     res = s.run(flowc)
     res_bins = map(lambda r: r[0].bins, res)
     # first element is Sum, second is Count
@@ -218,8 +218,8 @@ def test_split_into_bins():
     ## It was a transform kwarg, but it seems not needed.
     t = ReduceBinContent(int, lambda x: x+1)
     edges = [0, 1, 2, 3, 4]
-    arg_func = Variable("x", lambda x: x)
-    s = Sequence(SplitIntoBins(seq, arg_func, edges), t)
+    arg_var = Variable("x", lambda x: x)
+    s = Sequence(SplitIntoBins(seq, arg_var, edges), t)
     res = list(s.run(flow))
     assert [r[0] for r in res] == [
         Histogram([0, 1, 2, 3, 4], bins=[1, 2, 3, 4]),
@@ -228,4 +228,4 @@ def test_split_into_bins():
 
     # 2d histogram
     # edges = lena.math.mesh(ranges=((0, 1), (0, 1)), nbins=(10, 10))
-    # s = SplitIntoBins(seq, arg_func, edges)
+    # s = SplitIntoBins(seq, arg_var, edges)

@@ -325,18 +325,17 @@ class ReduceBinContent(object):
 class SplitIntoBins():
     """Split analysis into groups defined by bins."""
 
-    def __init__(self, seq, arg_func, edges):
+    def __init__(self, seq, arg_var, edges):
         """*seq* is a :class:`.FillComputeSeq` sequence,
         which corresponds to the analysis being compared
         for different bins.
         It can be a tuple containing a *FillCompute* element.
         Deep copy of *seq* will be used to produce each bin's content.
 
-        *arg_func* is a function which takes data
-        and returns argument value used to compute the bin index.
-        A :class:`.Variable` must be provided.
+        *arg_var* is a :class:`.Variable` that takes data
+        and returns the value used to compute the bin index.
         Example of a two-dimensional function:
-        ``arg_func = lena.variables.Variable("xy",
+        ``arg_var = lena.variables.Variable("xy",
         lambda event: (event.x, event.y))``.
 
         *edges* is a sequence of arrays containing
@@ -367,13 +366,13 @@ class SplitIntoBins():
                     "seq must contain a FillCompute element, "
                     "{} provided".format(seq)
                 )
-        if isinstance(arg_func, lena.variables.Variable):
-            self._arg_var = arg_func
-            self._arg_func = arg_func.getter
+        if isinstance(arg_var, lena.variables.Variable):
+            self._arg_var = arg_var
+            self._arg_func = arg_var.getter
         else:
             raise lena.core.LenaTypeError(
-                "arg_func must be a Variable, "
-                "{} provided.".format(arg_func)
+                "arg_var must be a Variable, "
+                "{} provided.".format(arg_var)
             )
         # may raise LenaValueError
         lena.structures.check_edges_increasing(edges)
@@ -382,7 +381,7 @@ class SplitIntoBins():
         self._cur_context = {}
 
     def fill(self, val):
-        """Fill the cell corresponding to *arg_func(val)* with *val*.
+        """Fill the cell corresponding to *arg_var(val)* with *val*.
 
         Values outside of *edges* range are ignored.
         """
@@ -414,7 +413,7 @@ class SplitIntoBins():
         :class:`.SplitIntoBins` context is added
         to *context.split_into_bins* as *histogram* 
         (corresponding to *edges*) and *variable*
-        (corresponding to *arg_func*) subcontexts.
+        (corresponding to *arg_var*) subcontexts.
 
         In Python 3 the minimum number of *compute()*
         among all bins is used.
