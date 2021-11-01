@@ -326,14 +326,14 @@ class SplitIntoBins():
     """Split analysis into groups defined by bins."""
 
     def __init__(self, seq, arg_var, edges):
-        """*seq* is a :class:`.FillComputeSeq` sequence,
-        which corresponds to the analysis being compared
+        """*seq* is a :class:`.FillComputeSeq` sequence
+        (or will be converted to that)
+        that corresponds to the analysis being performed
         for different bins.
-        It can be a tuple containing a *FillCompute* element.
-        Deep copy of *seq* will be used to produce each bin's content.
+        Deep copy of *seq* is done for each bin.
 
         *arg_var* is a :class:`.Variable` that takes data
-        and returns the value used to compute the bin index.
+        and returns value used to compute the bin index.
         Example of a two-dimensional function:
         ``arg_var = lena.variables.Variable("xy",
         lambda event: (event.x, event.y))``.
@@ -358,6 +358,7 @@ class SplitIntoBins():
         In case of other argument initialization problems, 
         :exc:`.exceptions.LenaTypeError` is raised.
         """
+
         if not isinstance(seq, lena.core.FillComputeSeq):
             try:
                 seq = lena.core.FillComputeSeq(seq)
@@ -366,6 +367,7 @@ class SplitIntoBins():
                     "seq must contain a FillCompute element, "
                     "{} provided".format(seq)
                 )
+
         if isinstance(arg_var, lena.variables.Variable):
             self._arg_var = arg_var
             self._arg_func = arg_var.getter
@@ -374,8 +376,10 @@ class SplitIntoBins():
                 "arg_var must be a Variable, "
                 "{} provided.".format(arg_var)
             )
+
         # may raise LenaValueError
         lena.structures.check_edges_increasing(edges)
+
         self.bins = lena.structures.init_bins(edges, seq, deepcopy=True)
         self.edges = edges
         self._cur_context = {}
@@ -383,7 +387,7 @@ class SplitIntoBins():
     def fill(self, val):
         """Fill the cell corresponding to *arg_var(val)* with *val*.
 
-        Values outside of *edges* range are ignored.
+        Values outside the :attr:`edges` are ignored.
         """
         data, context = lena.flow.get_data_context(val)
         bin_index = lena.structures.get_bin_on_value(self._arg_func(data),
@@ -403,22 +407,29 @@ class SplitIntoBins():
         self._cur_context = context
 
     def compute(self):
-        """Yield a *(Histogram, context)* for *compute()* for each bin.
+        """Yield a *(Histogram, context)* pair for each *compute()*
+        for all bins.
 
-        :class:`.Histogram`
-        is created from :attr:`edges`
-        and bins taken from compute() for :attr:`bins`.
-        Context is preserved in histogram bins.
+        The :class:`.Histogram` is created from :attr:`edges`
+        with bin contents taken from *compute()* for :attr:`bins`.
+        Computational context is preserved in histogram's bins.
 
-        :class:`.SplitIntoBins` context is added
-        to *context.split_into_bins* as *histogram* 
-        (corresponding to *edges*) and *variable*
-        (corresponding to *arg_var*) subcontexts.
+        :class:`.SplitIntoBins` adds context
+        as *histogram* (corresponding to :attr:`edges`)
+        and *variable* (corresponding to *arg_var*) subcontexts.
+        This allows unification of :class:`.SplitIntoBins`
+        with common analysis using histograms and variables
+        (useful when creating plots from one template).
+        Old contexts, if exist,
+        are preserved in nested subcontexts
+        (that is *histogram.histogram* or *variable.variable*).
 
-        In Python 3 the minimum number of *compute()*
-        among all bins is used.
-        In Python 2, if some bin is exhausted before the others,
-        its content will be filled with None.
+        Note
+        ----
+            In Python 3 the minimum number of *compute()*
+            among all bins is used.
+            In Python 2, if some bin is exhausted before the others,
+            its content will be filled with ``None``.
         """
         # cur_context is shared with some inner sequences
         cur_context = copy.deepcopy(self._cur_context)
@@ -431,20 +442,12 @@ class SplitIntoBins():
                 break
             # result = lena.math.md_map(next, generators)
             hist = lena.structures.Histogram(self.edges, result)
-            old_sib = cur_context.pop("split_into_bins", {})
-            if old_sib:
-                # nest previous split_into_bins
-                cur_context["split_into_bins"] = {"split_into_bins": old_sib}
-            else:
-                cur_context["split_into_bins"] = {}
-            sib_context = cur_context["split_into_bins"]
-            # todo. improve consistency below.
-            # Probably rename "variable" to "arg_variable"
-            var_context = copy.deepcopy(
-                {"variable": self._arg_var.var_context}
-            )
-            hist_context = copy.deepcopy(hist._hist_context)
-            sib_context.update(var_context)
-            sib_context.update(hist_context)
+
+            var_context = copy.deepcopy(self._arg_var.var_context)
+            # todo: hist_context should be outside "histogram"
+            hist_context = copy.deepcopy(hist._hist_context["histogram"])
+
+            lena.context.update_nested("variable",  cur_context, var_context)
+            lena.context.update_nested("histogram", cur_context, hist_context)
 
             yield (hist, cur_context)

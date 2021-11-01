@@ -189,12 +189,10 @@ def test_split_into_bins():
     assert len(res) == 1
     hist, context = res[0]
     assert context == {
-        'split_into_bins': {
-            'histogram': {
-                'dim': 1, 'nbins': [4], 'ranges': [(0, 4)]
-            },
-            'variable': {'name': 'x'}
-        }
+        'histogram': {
+            'dim': 1, 'nbins': [4], 'ranges': [(0, 4)]
+        },
+        'variable': {'name': 'x'}
     }
     assert hist.edges == edges
     assert hist.bins == [2, 1, 1, 1]
