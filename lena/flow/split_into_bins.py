@@ -1,6 +1,4 @@
 """Split analysis into groups defined by bins."""
-from __future__ import print_function
-
 import copy
 
 import lena.context 
@@ -354,9 +352,9 @@ class SplitIntoBins():
         **Attributes**: bins, edges.
 
         If *edges* are not increasing,
-        :exc:`.exceptions.LenaValueError` is raised.
+        :exc:`.LenaValueError` is raised.
         In case of other argument initialization problems, 
-        :exc:`.exceptions.LenaTypeError` is raised.
+        :exc:`.LenaTypeError` is raised.
         """
 
         if not isinstance(seq, lena.core.FillComputeSeq):
@@ -431,8 +429,14 @@ class SplitIntoBins():
             In Python 2, if some bin is exhausted before the others,
             its content will be filled with ``None``.
         """
-        # cur_context is shared with some inner sequences
+        # deep copy, because cur_context is shared with inner sequences
         cur_context = copy.deepcopy(self._cur_context)
+        # update context.variable
+        # this could be done during fill, but we optimize it here.
+        var = self._arg_var
+        var._update_context(cur_context, var.var_context)
+        hist_updated = False
+
         generators = _MdSeqMap(lambda cell: cell.compute(), self.bins)
         # generators = lena.math.md_map(lambda cell: cell.compute(), self.bins)
         while True:
@@ -441,13 +445,18 @@ class SplitIntoBins():
             except StopIteration:
                 break
             # result = lena.math.md_map(next, generators)
+
             hist = lena.structures.Histogram(self.edges, result)
-
-            var_context = copy.deepcopy(self._arg_var.var_context)
-            # todo: hist_context should be outside "histogram"
-            hist_context = copy.deepcopy(hist._hist_context["histogram"])
-
-            lena.context.update_nested("variable",  cur_context, var_context)
-            lena.context.update_nested("histogram", cur_context, hist_context)
+            # histogram context depends only on edges, not on data,
+            # and is thus same for all results
+            # However, we don't optimize it here, because we would need
+            # to create bins for that.
+            if not hist_updated:
+                # without this condition
+                # it would update histogram context for each result
+                # todo: hist_context should be outside "histogram"
+                hist_context = copy.deepcopy(hist._hist_context["histogram"])
+                lena.context.update_nested("histogram", cur_context, hist_context)
+                hist_updated = True
 
             yield (hist, cur_context)

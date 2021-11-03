@@ -489,11 +489,11 @@ def update_nested(key, d, other):
     ... }
     True
 
-    *other* is generally modified. Create that on the fly
+    *other* is modified in general. Create that on the fly
     or use *copy.deepcopy* when appropriate.
 
-    Recursive dictionaries are strongly discouraged
-    and meaningless when nesting.
+    Recursive dictionaries (containing references to themselves)
+    are strongly discouraged and meaningless when nesting.
     If *other[key]* is recursive, :exc:`.LenaValueError` may be raised.
     """
     # there was an idea to add a keyword argument copy_other

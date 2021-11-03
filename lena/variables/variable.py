@@ -1,4 +1,4 @@
-"""Variables are functions to transform data and add context.
+"""Variables are functions to transform data adding context.
 
 A variable can represent a particle type, a coordinate, etc.
 They transform raw input data into Lena data with context.
@@ -41,8 +41,6 @@ True
 :class:`Combine` and :class:`Compose` are subclasses
 of a :class:`Variable`.
 """
-from __future__ import print_function
-
 import copy
 
 import lena.core
@@ -56,7 +54,7 @@ class Variable(object):
     def __init__(self, name, getter, **kwargs):
         """*name* is variable's name.
 
-        *getter* is the python function (not a :class:`Variable`)
+        *getter* is a Python function (not a :class:`Variable`)
         that performs the actual transformation of data.
         It must accept data and return data without context.
 
@@ -66,7 +64,7 @@ class Variable(object):
 
         *type* is the type of the variable.
         It depends on your application, examples are
-        'coordinate' or 'particle_type'.
+        "coordinate" or "particle_type".
         It has a special meaning: if present,
         its value is added to variable's
         context as a key with variable's name
@@ -76,21 +74,17 @@ class Variable(object):
 
         **Attributes**
 
-        *getter* is the function
-        that does the actual data transformation.
+        *getter*
 
-        *var_context* is the dictionary of attributes of the variable,
-        which is added to *context.variable* during :meth:`__call__`.
-
-        ..
-            and used during variable transformations (see :ref:`functions`).
+        *var_context* is the dictionary of attributes of the variable.
+        It is added to *context.variable* during :meth:`__call__`.
 
         All public attributes of a variable
         can be accessed using dot notation
         (for example, *var.var_context["latex_name"]*
-        can be simply *var.latex_name*).
+        can be written as *var.latex_name*).
         :exc:`.AttributeError` is raised
-        if the attribute is missing.
+        if an attribute is missing.
 
         If *getter* is a :class:`Variable` or is not callable,
         :exc:`.LenaTypeError` is raised.
@@ -98,15 +92,17 @@ class Variable(object):
         self.name = name
         if isinstance(getter, Variable):
             raise lena.core.LenaTypeError(
-                "getter should be a function on data, not a Variable. " +
-                "Got {}.".format(getter)
+                "getter should be a function on data, not a Variable "
+                "{}".format(getter)
             )
         if not callable(getter):
             raise lena.core.LenaTypeError(
-                "a callable getter must be provided, {} given".format(getter)
+                "getter must callable, {} given".format(getter)
             )
         # getter is public for possible performance implementations
         # (without context)
+        # But probably for unification with other "performance" features
+        # its name may be changed in the future.
         self.getter = getter
 
         # var_context is public, so that one can get all attributes
@@ -120,29 +116,22 @@ class Variable(object):
     def __call__(self, value):
         """Transform a *value*.
 
-        Data part of the value is transformed by the *getter*.
-        *Context.variable* is updated with the context of this variable
-        (or created if missing).
+        Data part of the value is transformed by *getter*.
 
+        *context.variable* is updated with the context of this variable
+        (or created if missing).
         If context already contained *variable*, it is preserved as
         *context.variable.compose* subcontext.
-
-        Return *(data, context)*.
         """
         data, context = lena.flow.get_data_context(value)
-        # Run (and Call) elements don't make deep copy.
-        # context = copy.deepcopy(context)
-        var_context = context.get("variable")
-        if var_context:
-            # deep copy, otherwise it will be updated during update_recursively
-            context["variable"]["compose"] = copy.deepcopy(var_context)
-        # update recursively, because we need to preserve "type"
-        # and other not overwritten data
-        lena.context.update_recursively(
-            context, {"variable": copy.deepcopy(self.var_context)}
-        )
-        new_data = self.getter(data)
-        return (new_data, context)
+        data = self.getter(data)
+        # Run and Call elements don't make a deep copy of context.
+        # update_context was made a separate function,
+        # because it was supposed to be used in a different place
+        # (like SplitIntoBins or IterateBins) - but not needed now.
+        # Maybe _update_context call should be optimized out.
+        self._update_context(context, self.var_context)
+        return (data, context)
 
     def __getattr__(self, name):
         # otherwise infinite recursion (solved by this answer):
@@ -158,6 +147,7 @@ class Variable(object):
                 "{} missing in {}".format(name, self.name)
             )
 
+    # todo: is this function really needed? Shall we delete that?
     def get(self, key, default=None):
         """Return the attribute *key* if present, else default.
 
@@ -170,6 +160,38 @@ class Variable(object):
         return lena.context.get_recursively(
             self.var_context, key, default=default
         )
+
+    @staticmethod
+    def _update_context(context, var_context):
+        # this method is private, because its exact signature
+        # is not clear at the moment. It could be a static,
+        # maybe a class method or an instance method.
+        # An instance method would be easiest to use (and
+        # wouldn't need to copy var_context from somewhere)
+        # however a static method would allow to update
+        # contexts from their dictionaries (in the context)
+        # - but is that really needed?..
+        context_var = context.get("variable")
+        if context_var:
+            # preserves variable.compose if that is present
+            context["variable"]["compose"] = copy.deepcopy(context_var)
+            # deep copy, because otherwise
+            # it will be updated during update_recursively
+            ## todo: maybe it should be variable.variable
+            # instead of variable.compose.
+
+        # update recursively, because we need to preserve "type"
+        # and other not overwritten data
+        lena.context.update_recursively(
+            context, {"variable": copy.deepcopy(var_context)}
+        )
+
+        # could be useful as a chainable method,
+        # but in general it doesn't return anything.
+        # Django allows chaining (stackoverflow),
+        # while Python supports command-query separation
+        # https://en.wikipedia.org/wiki/Command%E2%80%93query_separation
+        # return context
 
 
 class Combine(Variable):

@@ -174,6 +174,8 @@ def test_split_into_bins():
     # 4 bins
     edges = [0, 1, 2, 3, 4]
     arg_var = Variable("x", lambda x: x)
+    ### TODO: check for several output values!
+    ### Could have bugs with update_nested(histogram.context)
     seq = Count()
     # this example sequence works
     s = SplitIntoBins(seq, arg_var, edges)
@@ -188,6 +190,9 @@ def test_split_into_bins():
     # res = list(s.run(flow))
     assert len(res) == 1
     hist, context = res[0]
+    # we don't check whether variable composition
+    # creates a correct context.
+    # We only delegate that explicitly in code.
     assert context == {
         'histogram': {
             'dim': 1, 'nbins': [4], 'ranges': [(0, 4)]

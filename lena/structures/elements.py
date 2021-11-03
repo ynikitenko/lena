@@ -7,7 +7,7 @@ from .hist_functions import hist_to_graph
 
 
 class HistToGraph():
-    """Transform a :class:`.Histogram` to :class:`.Graph`."""
+    """Transform a :class:`.Histogram` to a :class:`.Graph`."""
 
     def __init__(self, make_value=None, get_coordinate="left"):
         """*make_value* is a function, that creates graph's value
@@ -38,7 +38,7 @@ class HistToGraph():
         # why can't it be a Call element, which just returns
         # unchanged values for non-histograms?
         # It could be used in a FillCompute sequence then,
-        # but probably it has some design flaws.
+        # but probably might have some design flaws.
         for val in flow:
             hist, context = lena.flow.get_data_context(val)
             if (not isinstance(hist, Histogram) or
