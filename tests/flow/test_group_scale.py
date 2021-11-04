@@ -2,13 +2,13 @@ import pytest
 
 from lena.core import LenaTypeError, LenaValueError
 from lena.flow import GroupBy, GroupScale
-from lena.structures import Histogram, Graph
+from lena.structures import histogram, Graph
 
 
 def test_group_scale():
-    h0 = Histogram([0, 1], [0])
-    h1 = Histogram([0, 1], [1])
-    h2 = Histogram([0, 2], [2])
+    h0 = histogram([0, 1], [0])
+    h1 = histogram([0, 1], [1])
+    h2 = histogram([0, 2], [2])
     g1 = Graph(((0, 1), (1, 2)))
     data = [h0, h1, h2, g1]
     gs = GroupScale(lambda _: True)

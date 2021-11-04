@@ -8,8 +8,6 @@ its scale is number of data points.
 - if histogram bins are divided by N, its scale will be divided by N.
 - Histogram and NumpyHistogram should be almost same (except for the upper edge).
 """
-from __future__ import print_function
-
 import math
 
 import hypothesis
@@ -18,7 +16,7 @@ import hypothesis.strategies as s
 from hypothesis import given
 
 from lena.core import LenaValueError, LenaTypeError
-from lena.structures import Histogram
+from lena.structures import histogram, Histogram
 from lena.math import refine_mesh, isclose
 from lena.structures.hist_functions import iter_bins, integral
 from .histogram_strategy import generate_increasing_list, generate_data_in_range
@@ -28,7 +26,7 @@ Edges1dStrategy = s.builds(generate_increasing_list)
 
 @given(Edges1dStrategy)
 def test_init_scale_zero(edges):
-    hist = Histogram(edges)
+    hist = histogram(edges)
     assert hist.scale() == 0
 
 
@@ -37,8 +35,8 @@ def test_init_scale_zero(edges):
        data_samples=s.integers(min_value=1, max_value=50)
 )
 def test_scale_linear_on_weight(edges, weight, refinement, data_samples):
-    hist1 = Histogram(edges)
-    histw = Histogram(edges)
+    hist1 = histogram(edges)
+    histw = histogram(edges)
     min_edge, max_edge = edges[0], edges[-1]
     # print(min_edge, max_edge)
     # data can be outside of range too.
@@ -76,7 +74,7 @@ def test_scale_linear_on_weight(edges, weight, refinement, data_samples):
 
     # if we refine mesh into N submeshes, its scale will be N times lower
     refined = refine_mesh(edges, refinement)
-    hr = Histogram(refined)
+    hr = histogram(refined)
     for val in data:
         hr.fill(val)
     assert isclose(h1_scale, refinement * hr.scale())
@@ -84,7 +82,7 @@ def test_scale_linear_on_weight(edges, weight, refinement, data_samples):
 
 def test_histogram_3d():
     # new 3-dimensional histogram
-    hist = Histogram([[1, 2, 3], [1, 2, 3], [1, 2, 3]])
+    hist = histogram([[1, 2, 3], [1, 2, 3], [1, 2, 3]])
 
     # new bins are zeroes
     assert hist.bins == [[[0, 0], [0, 0]], [[0, 0], [0, 0]]]
@@ -132,20 +130,14 @@ def test_histogram_3d():
 
 
 def test_histogram_1d():
-    hist = Histogram([0, 1, 2])
-    # context must be a dict
-    with pytest.raises(LenaTypeError):
-        Histogram(hist.edges, hist.bins, context=0)
-    # abandoned this idea. No exception is raised.
-    # with pytest.raises(StopIteration):
-    #     next(hist.compute())
+    hist = histogram([0, 1, 2])
     hist.fill(-10)
     assert hist.bins == [0, 0]
     hist.fill(10)
     assert hist.bins == [0, 0]
-    assert repr(hist) == 'Histogram([0, 1, 2], bins=[0, 0])'
+    assert repr(hist) == 'histogram([0, 1, 2], bins=[0, 0])'
 
-    hist = Histogram([0, 0.5, 1])
+    hist = histogram([0, 0.5, 1])
     hist.fill(0.5)
     assert hist.scale() == 0.5
 

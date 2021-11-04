@@ -6,7 +6,7 @@ from lena.core import LenaValueError
 from lena.math import isclose
 
 np = pytest.importorskip('numpy')
-from lena.structures import Histogram
+from lena.structures import histogram
 from lena.structures.numpy_histogram import NumpyHistogram
 
 
@@ -17,7 +17,7 @@ from lena.structures.numpy_histogram import NumpyHistogram
 @pytest.mark.filterwarnings("ignore:::numpy.lib.histograms")
 def test_numpy_histogram():
     nhist = NumpyHistogram(bins=list(range(0, 5)), density=True)
-    filled_hist = Histogram([0, 1, 2, 3, 4], bins=[0.25, 0.25, 0.25 ,0.25])
+    filled_hist = histogram([0, 1, 2, 3, 4], bins=[0.25, 0.25, 0.25 ,0.25])
     filled_context = {'histogram': {'ranges': [(0, 4)], 'dim': 1, 'nbins': [4]}}
 
     empty_hist, empty_cont = next(nhist.request())

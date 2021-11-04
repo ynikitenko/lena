@@ -5,7 +5,7 @@ import pytest
 import lena.structures
 from lena.core import LenaIndexError, LenaTypeError, LenaValueError
 from lena.math import mesh
-from lena.structures import Histogram, Graph
+from lena.structures import histogram, Graph
 from lena.structures import (
     check_edges_increasing,
     get_bin_edges,
@@ -34,9 +34,9 @@ def test_check_edges_increasing():
 
 
 def test_get_bin_edges():
-    hist = Histogram(mesh((0, 5), 5))
+    hist = histogram(mesh((0, 5), 5))
     assert get_bin_edges(0, hist.edges) == (0, 1)
-    hist = Histogram(mesh(((0, 5), (0, 1)), (5, 2)))
+    hist = histogram(mesh(((0, 5), (0, 1)), (5, 2)))
     assert get_bin_edges((0, 1), hist.edges) == [(0, 1), (0.5, 1)]
 
 
@@ -100,7 +100,7 @@ def test_get_bin_on_index():
 
 
 def test_hist_to_graph():
-    hist = Histogram(mesh((0, 1), 1))
+    hist = histogram(mesh((0, 1), 1))
     hist.fill(0)
     context_no_transform = {"histogram": {"to_graph": False}}
     data = [
@@ -118,7 +118,7 @@ def test_hist_to_graph():
         (Graph(points=[((0,), (1,))], scale=None, sort=True),
          {}),
         # values with the specified context are skipped
-        (Histogram([0, 1], bins=[1]),
+        (histogram([0, 1], bins=[1]),
          {'histogram': {'to_graph': False}}),
     ]
     # different coordinates work
@@ -128,7 +128,7 @@ def test_hist_to_graph():
         [(Graph(points=[((0.5,), (1,))], scale=None, sort=True), {})]
 
     val_with_error = collections.namedtuple("val_with_error", ["value", "error"])
-    hist1 = Histogram(mesh((0, 1), 1))
+    hist1 = histogram(mesh((0, 1), 1))
     val = val_with_error(1, 2)
     hist1.bins = lena.structures.init_bins(hist1.edges, val)
     transform_value = lambda val: (val[0].value, val[0].error)
@@ -147,11 +147,11 @@ def test_hist_to_graph():
 def test_iter_cells():
     ## full range iteration works.
     # 1d histogram
-    hist = Histogram(mesh((0, 2), 2))
+    hist = histogram(mesh((0, 2), 2))
     assert list(iter_cells(hist)) == [HistCell([(0, 1.)], 0, (0,)),
                                       HistCell([(1., 2.)], 0, (1,))]
     # multidimensional histogram
-    hist = Histogram(mesh(((0, 5), (0, 1)), (5, 2)))
+    hist = histogram(mesh(((0, 5), (0, 1)), (5, 2)))
     assert list(iter_cells(hist))[:2] == [
         HistCell([(0, 1.), (0, 0.5)], 0, (0, 0)),
         HistCell([(0, 1.), (0.5, 1.)], 0, (0, 1))
@@ -159,7 +159,7 @@ def test_iter_cells():
 
     ## None works
     # 1-dimensional histogram works
-    hist = Histogram(mesh((0, 4), 4))
+    hist = histogram(mesh((0, 4), 4))
 
     assert list(iter_cells(hist, ranges=((None, 3),))) == [
         HistCell(edges=[(0, 1.0)], bin=0, index=(0,)),
@@ -180,7 +180,7 @@ def test_iter_cells():
         list(iter_cells(hist, ranges=((None, None),), coord_ranges=(None, None)))
 
     # multidimensional histogram works
-    hist = Histogram(mesh(((0, 4), (0, 2)), (4, 2)))
+    hist = histogram(mesh(((0, 4), (0, 2)), (4, 2)))
 
     assert list(iter_cells(hist, ranges=((1, None), (0, 2)))) == [
         # HistCell(edges=[(0, 1.0), (0, 1.0)], bin=0, index=(0, 0)),

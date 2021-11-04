@@ -7,9 +7,9 @@ from . import hist_functions as hf
 
 
 class NumpyHistogram(object):
-    """Create a Histogram using a 1-dimensional *numpy.histogram*.
+    """Create a histogram using a 1-dimensional *numpy.histogram*.
 
-    The result of *compute* is a Lena *Histogram*,
+    The result of *compute* is a Lena :class:`.histogram`,
     but it is calculated using *numpy* histogram,
     and all its initialization arguments are passed to *numpy*.
 
@@ -55,7 +55,7 @@ class NumpyHistogram(object):
     def request(self):
         """Compute the final histogram.
 
-        Return :ref:`Histogram <Histogram>` with context.
+        Return :class:`.histogram` with context.
 
         If *reset* was set during the initialization,
         *reset* method is called.
@@ -63,7 +63,7 @@ class NumpyHistogram(object):
         bins, edges = self._create_hist(self._data, *self._args, **self._kwargs)
         # since np.histogram returns exactly two arrays, bins and edges,
         # complete information is conserved in the Histogram.
-        hist = lena.structures.Histogram(edges, bins)
+        hist = lena.structures.histogram(edges, bins)
         # deep copy is made here
         context = hf.make_hist_context(hist, self._cur_context)
         if self._reset:

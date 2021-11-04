@@ -14,7 +14,7 @@ but have to transform the plots inside :class:`.GroupPlots`.
 We can also scale (normalize) all plots to one
 using :class:`.GroupScale`.
 
-Example from real analysis:
+Example from a real analysis:
 
 .. code-block:: python
 
@@ -25,9 +25,9 @@ Example from real analysis:
                       raise_on_missing=True),
         lena.flow.GroupPlots(
             group_by="variable.coordinate",
-            # Select either Histograms (data) or Graphs (fit),
+            # Select either histograms (data) or Graphs (fit),
             # but only having "variable.coordinate" in context
-            select=("variable.coordinate", [Histogram, Graph]),
+            select=("variable.coordinate", [histogram, Graph]),
             # scale to data
             scale=Not("fit"),
             transform=(

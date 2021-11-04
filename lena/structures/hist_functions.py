@@ -91,8 +91,8 @@ def get_bin_on_index(index, bins):
 
     Example:
 
-    >>> from lena.structures import Histogram, get_bin_on_index
-    >>> hist = Histogram([0, 1], [0])
+    >>> from lena.structures import histogram, get_bin_on_index
+    >>> hist = histogram([0, 1], [0])
     >>> get_bin_on_index(0, hist.bins)
     0
     >>> get_bin_on_index((0, 1), [[0, 1], [0, 0]])
@@ -237,7 +237,7 @@ def get_bin_on_value(arg, edges):
 
 
 def hist_to_graph(hist, context, make_value=None, get_coordinate="left"):
-    """Convert a :class:`.Histogram` to a :class:`.Graph`.
+    """Convert a :class:`.histogram` to a :class:`.Graph`.
 
     *context* becomes the graph's context.
     For example, it can contain a scale.
@@ -343,7 +343,7 @@ def integral(bins, edges):
 
     *bins* contain values, and *edges* form the mesh
     for the integration.
-    Their format is defined in :class:`.Histogram` description.
+    Their format is defined in :class:`.histogram` description.
     """
     total = 0
     for ind, bin_content in iter_bins(bins):
@@ -481,9 +481,24 @@ def iter_cells(hist, ranges=None, coord_ranges=None):
                        ind)
 
 
+def _make_hist_context(hist):
+    hc = {
+        "dim": hist.dim,
+        "nbins": hist.nbins,
+        "ranges": hist.ranges
+    }
+    # do we really add scale to context?
+    # If that is important, we must always calculate that.
+    # If that is not important, then why adding that?
+    # if hist._scale is not None:
+    #     hc["scale"] = hist._scale
+    return hc
+
+
+# todo: make private and completely refactor this function.
 def make_hist_context(hist, context):
     """Update *context* with the context
-    of a :class:`.Histogram` *hist*.
+    of a :class:`.histogram` *hist*.
 
     Deep copy of updated context is returned.
     """

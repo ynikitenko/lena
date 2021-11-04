@@ -3,13 +3,13 @@ import pytest
 import lena.core
 from lena.core import LenaTypeError, LenaValueError
 from lena.flow import GroupBy, GroupScale, Selector, GroupPlots
-from lena.structures import Histogram, Graph
+from lena.structures import histogram, Graph
 
 
 def test_group_plots():
-    h0 = Histogram([0, 1], [0])
-    h1 = Histogram([0, 1], [1])
-    h2 = Histogram([0, 2], [2])
+    h0 = histogram([0, 1], [0])
+    h1 = histogram([0, 1], [1])
+    h2 = histogram([0, 2], [2])
     g1 = Graph(((0, 1), (1, 2)))
     data = [h0, h1, h2, g1, 1]
     gp = GroupPlots(type, lambda _: True, transform=(), yield_selected=False)
@@ -18,9 +18,9 @@ def test_group_plots():
     expected_results = [
         (
             [
-                Histogram([0, 1], bins=[0]),
-                Histogram([0, 1], bins=[1]),
-                Histogram([0, 2], bins=[2])
+                histogram([0, 1], bins=[0]),
+                histogram([0, 1], bins=[1]),
+                histogram([0, 2], bins=[2])
             ],
             {'group': [{}, {}, {}], 'output': {'changed': False}}
         ),
@@ -56,8 +56,8 @@ def test_group_plots():
     context_unchanged = {'group': [{}, {}], 'output': {'changed': False}}
     assert results == [(
         [
-            Histogram([0, 1], bins=[4.0]),
-            Histogram([0, 2], bins=[2.0])
+            histogram([0, 1], bins=[4.0]),
+            histogram([0, 2], bins=[2.0])
         ],
         context_unchanged
     )]
@@ -71,13 +71,13 @@ def test_group_plots():
     results = list(gp.run(data))
     # grouped data
     assert results[-1] == (
-        [Histogram([0, 1], bins=[1]), Histogram([0, 2], bins=[2])],
+        [histogram([0, 1], bins=[1]), histogram([0, 2], bins=[2])],
         context_unchanged
     )
     # selected values are yielded
     assert results[:-1] == [
-        Histogram([0, 1], bins=[1]),
-        Histogram([0, 2], bins=[2])
+        histogram([0, 1], bins=[1]),
+        histogram([0, 2], bins=[2])
     ]
 
     # yield_selected works with scale
@@ -85,13 +85,13 @@ def test_group_plots():
     results = list(gps.run(data))
     # grouped histograms are rescaled
     assert results[-1] == (
-        [Histogram([0, 1], bins=[8]), Histogram([0, 2], bins=[4])],
+        [histogram([0, 1], bins=[8]), histogram([0, 2], bins=[4])],
         context_unchanged
     )
     # scale and context of initial histograms remain the same
     assert results[:-1] == [
-        Histogram([0, 1], bins=[1]),
-        Histogram([0, 2], bins=[2])
+        histogram([0, 1], bins=[1]),
+        histogram([0, 2], bins=[2])
     ]
 
     # test that changed values create changed context

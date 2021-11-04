@@ -1,6 +1,6 @@
 from .elements import HistToGraph
 from .graph import Graph
-from .histogram import Histogram
+from .histogram import histogram, Histogram
 from .hist_functions import (
     check_edges_increasing,
     get_bin_edges,
@@ -18,7 +18,8 @@ from .numpy_histogram import NumpyHistogram
 
 
 __all__ = [
-    'Graph', 'Histogram',
+    'Graph',
+    'histogram', 'Histogram',
     'check_edges_increasing',
     'get_bin_edges',
     'get_bin_on_value_1d', 'get_bin_on_value', 'get_bin_on_index',

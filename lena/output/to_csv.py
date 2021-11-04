@@ -1,6 +1,4 @@
 """Functions and a class to convert data to CSV."""
-from __future__ import print_function
-
 import lena.context
 import lena.core
 import lena.flow 
@@ -77,7 +75,7 @@ class ToCSV(object):
     """Convert data to CSV text.
 
     These objects are converted:
-        * :class:`.Histogram`
+        * :class:`.histogram`
           (implemented only for 1- and 2-dimensional histograms).
         * any object (including :class:`.Graph`)
           with *to_csv* method.
@@ -119,7 +117,7 @@ class ToCSV(object):
         def is_writable_hist(val):
             """Test whether a value from flow can be converted to CSV."""
             data, context = lena.flow.get_data_context(val)
-            return isinstance(data, lena.structures.Histogram)
+            return isinstance(data, lena.structures.histogram)
             ## If *context.type* is "extended histogram", it is skipped,
             ## because it has non scalar bin content.
             # seems it's not used anywhere.

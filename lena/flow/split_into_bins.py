@@ -109,10 +109,10 @@ def get_example_bin(struct):
 
     For example, if the histogram is two-dimensional, return hist[0][0].
 
-    *struct* can be a :class:`.Histogram`
+    *struct* can be a :class:`.histogram`
     or an array of bins.
     """
-    if isinstance(struct, lena.structures.Histogram):
+    if isinstance(struct, lena.structures.histogram):
         return lena.structures.get_bin_on_index([0] * struct.dim, struct.bins)
     else:
         bins = struct
@@ -152,13 +152,13 @@ class TransformBins(object):
     def run(self, flow):
         for value in flow:
             data, context = lena.flow.get_data_context(value)
-            if not isinstance(data, lena.structures.Histogram):
+            if not isinstance(data, lena.structures.histogram):
                 yield value
                 continue
             # data is a histogram
             # check bins
             data00 = lena.flow.get_data(get_example_bin(data))
-            if not isinstance(data00, lena.structures.Histogram):
+            if not isinstance(data00, lena.structures.histogram):
                 yield value
                 continue
             # bin is a histogram
@@ -259,7 +259,7 @@ class ReduceBinContent(object):
         for value in flow:
             hist, context = lena.flow.get_data_context(value)
             # data part must be a histogram
-            if not isinstance(hist, lena.structures.Histogram):
+            if not isinstance(hist, lena.structures.histogram):
                 yield value
                 continue
             val = get_example_bin(hist)
@@ -312,9 +312,9 @@ class ReduceBinContent(object):
                         "histogram", context, copy.deepcopy(hist_context)
                     )
                 lena.context.update_nested("bin_content", context, cur_bin_context)
-                # or make Histogram.edges immutable
+                # or make histogram.edges immutable
                 edges = copy.deepcopy(hist.edges)
-                new_hist = lena.structures.Histogram(edges, new_data)
+                new_hist = lena.structures.histogram(edges, new_data)
                 # one might optimise copying of the context here,
                 # but for now we leave it like this (because it had bugs)
                 yield (new_hist, copy.deepcopy(context))
@@ -405,10 +405,10 @@ class SplitIntoBins():
         self._cur_context = context
 
     def compute(self):
-        """Yield a *(Histogram, context)* pair for each *compute()*
+        """Yield a *(histogram, context)* pair for each *compute()*
         for all bins.
 
-        The :class:`.Histogram` is created from :attr:`edges`
+        The :class:`.histogram` is created from :attr:`edges`
         with bin contents taken from *compute()* for :attr:`bins`.
         Computational context is preserved in histogram's bins.
 
@@ -436,11 +436,11 @@ class SplitIntoBins():
         var._update_context(cur_context, var.var_context)
 
         # update histogram context
-        _hist = lena.structures.Histogram(self.edges, self.bins)
+        _hist = lena.structures.histogram(self.edges, self.bins)
         # histogram context depends only on edges, not on data,
         # and is thus same for all results
-        lena.context.update_nested("histogram", cur_context,
-                                   _hist._hist_context["histogram"])
+        hist_context = lena.structures.hist_functions._make_hist_context(_hist)
+        lena.context.update_nested("histogram", cur_context, hist_context)
 
         generators = _MdSeqMap(lambda cell: cell.compute(), self.bins)
         # generators = lena.math.md_map(lambda cell: cell.compute(), self.bins)
@@ -451,6 +451,6 @@ class SplitIntoBins():
                 break
             # result = lena.math.md_map(next, generators)
 
-            hist = lena.structures.Histogram(self.edges, result)
+            hist = lena.structures.histogram(self.edges, result)
 
             yield (hist, cur_context)

@@ -5,6 +5,7 @@ Structures
 .. currentmodule:: lena.structures
 .. autosummary::
 
+    histogram
     Histogram
     NumpyHistogram
 
@@ -48,6 +49,9 @@ Histograms
 
 .. module:: lena.structures
 .. _Histogram:
+.. autoclass:: histogram
+    :members:
+    :inherited-members:
 .. autoclass:: Histogram
     :members:
     :inherited-members:

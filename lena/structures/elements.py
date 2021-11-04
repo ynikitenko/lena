@@ -2,12 +2,12 @@ import lena.context
 import lena.core
 import lena.flow
 
-from .histogram import Histogram
+from .histogram import histogram
 from .hist_functions import hist_to_graph
 
 
 class HistToGraph():
-    """Transform a :class:`.Histogram` to a :class:`.Graph`."""
+    """Transform a :class:`.histogram` to a :class:`.Graph`."""
 
     def __init__(self, make_value=None, get_coordinate="left"):
         """*make_value* is a function, that creates graph's value
@@ -41,7 +41,7 @@ class HistToGraph():
         # but probably might have some design flaws.
         for val in flow:
             hist, context = lena.flow.get_data_context(val)
-            if (not isinstance(hist, Histogram) or
+            if (not isinstance(hist, histogram) or
                 not lena.context.get_recursively(context,
                                                  "histogram.to_graph", True)
                 ):

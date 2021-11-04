@@ -7,7 +7,7 @@ import lena.core
 import lena.flow.split_into_bins as sib
 from lena.core import Split, FillCompute, Sequence
 from lena.variables import Variable
-from lena.structures import Histogram
+from lena.structures import histogram
 from lena.flow import SplitIntoBins, TransformBins, ReduceBinContent
 from lena.flow.split_into_bins import _iter_bins_with_edges
 
@@ -24,7 +24,7 @@ def test__iter_bins_with_edges():
     edges = [[0, 1], [0, 1]]
     bins = [[1]]
     # this (bins, edges) pair is legitimate
-    h = Histogram(edges, bins)
+    h = histogram(edges, bins)
     assert list(_iter_bins_with_edges(bins, edges)) == [(1, ((0, 1), (0, 1)))]
 
 
@@ -61,7 +61,7 @@ def test_get_example_bin():
     get_example_bin = sib.get_example_bin
     bins = [[0, 1], [1, 1]]
     assert get_example_bin(bins) == 0
-    hist = Histogram([[0, 1, 2], [0, 1, 2]], bins)
+    hist = histogram([[0, 1, 2], [0, 1, 2]], bins)
     assert get_example_bin(hist) == 0
 
 
@@ -73,12 +73,12 @@ def test_transform_bins():
     ## test run
     # not histograms pass unchanged
     # histogram bins must be histograms
-    hist = Histogram([1, 2], [1])
+    hist = histogram([1, 2], [1])
     data = [1, (2, {}), lena.structures.Graph(), hist]
     t = TransformBins()
     assert list(t.run(data)) == data
 
-    data_unchanged = [(Histogram([0, 1], [hist]), {
+    data_unchanged = [(histogram([0, 1], [hist]), {
         "split_into_bins": {
             "variable": {"name": "x"},
             "histogram": {"dim": 1}
@@ -115,15 +115,15 @@ def test_reduce_bin_content():
         ReduceBinContent(lambda _: True, 1)
 
     # not selected flow passes unchanged
-    data = [1, (2, {}), (Histogram([0, 1], [1]), {})]
+    data = [1, (2, {}), (histogram([0, 1], [1]), {})]
     r = ReduceBinContent(lena.math.vector3, lambda v: v.x)
     assert list(r.run(data)) == data
     # empty context
-    data = [(Histogram([0, 1], [lena.math.vector3([0.5, 0, 1])]), {})]
+    data = [(histogram([0, 1], [lena.math.vector3([0.5, 0, 1])]), {})]
     results = list(r.run(data))[0]
-    assert results[0] == Histogram([0, 1], bins=[0.5])
+    assert results[0] == histogram([0, 1], bins=[0.5])
     assert results[1] == {'bin_content': {'example_bin': {}}}
-    data_template = [(Histogram([0, 1], [lena.math.vector3([0.5, 0, 1])]), {
+    data_template = [(histogram([0, 1], [lena.math.vector3([0.5, 0, 1])]), {
         "split_into_bins": {
             "variable": {"name": "x"},
             "histogram": {"dim": 1}
@@ -133,7 +133,7 @@ def test_reduce_bin_content():
     results = list(r.run(data))
     assert len(results) == 1
     results = results[0]
-    assert results[0] == Histogram([0, 1], bins=[0.5])
+    assert results[0] == histogram([0, 1], bins=[0.5])
     assert results[1] == {
         'bin_content': {'example_bin': {}},
         'histogram': {'dim': 1},
@@ -146,7 +146,7 @@ def test_reduce_bin_content():
     r = ReduceBinContent(lena.math.vector3, X, drop_bins_context=False)
     data = copy.deepcopy(data_template)
     results = list(r.run(data))[0]
-    assert results[0] == Histogram([0, 1], bins=[0.5])
+    assert results[0] == histogram([0, 1], bins=[0.5])
     assert results[1] == {
         'bin_content': {
             'all_bins': [{'variable': {'name': 'x'}}],
@@ -225,8 +225,8 @@ def test_split_into_bins():
     s = Sequence(SplitIntoBins(seq, arg_var, edges), t)
     res = list(s.run(flow))
     assert [r[0] for r in res] == [
-        Histogram([0, 1, 2, 3, 4], bins=[1, 2, 3, 4]),
-        Histogram([0, 1, 2, 3, 4], bins=[3, 2, 2, 2])
+        histogram([0, 1, 2, 3, 4], bins=[1, 2, 3, 4]),
+        histogram([0, 1, 2, 3, 4], bins=[3, 2, 2, 2])
     ]
 
     # 2d histogram
