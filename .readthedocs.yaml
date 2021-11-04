@@ -1,0 +1,7 @@
+# copied from https://github.com/readthedocs/readthedocs.org/issues/8616#issuecomment-952034858
+
+version: 2
+
+python:
+   install:
+   - requirements: docs/requirements.txt

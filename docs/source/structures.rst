@@ -54,6 +54,11 @@ Histograms
     :members:
 
     .. automethod:: __eq__
+..
+    Sphinx: it doesn't work with
+    :special-members: __eq__
+    Filed a bug to
+    https://github.com/sphinx-doc/sphinx/issues/9818
 
 .. autoclass:: Histogram
     :members:

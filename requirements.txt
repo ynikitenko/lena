@@ -3,16 +3,12 @@
 jinja2 >= 2.11.0  # >=2.11.0 needed for UpdateContext (ChainableUndefined)
 # numpy is optional, install if you want.
 # numpy
-#
+
 ### Development ###
 pylint
-#
+
 ## testing ##
 pytest-mock
 hypothesis
 coverage
 pytest-cov
-#
-## manually create documentation ##
-sphinx
-sphinxcontrib-napoleon
