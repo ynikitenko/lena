@@ -140,11 +140,16 @@ class histogram():
             self.nbins = [len(edges)-1]
 
     def __eq__(self, other):
-        """Note that in many cases floating numbers should be compared
-        approximately (isclose).
+        """Two histograms are equal, if and only if they have
+        equal bins and equal edges.
+
+        If *other* is not a :class:`.histogram`, return `False`.
+
+        Note that floating numbers should be compared
+        approximately (using :func:`math.isclose`).
         """
         if not isinstance(other, histogram):
-            # in Python comparison between incomparable types is allowed
+            # in Python comparison between different types is allowed
             return False
         return self.bins == other.bins and self.edges == other.edges
 

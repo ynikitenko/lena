@@ -47,16 +47,20 @@ Structures
 Histograms
 ----------
 
-.. module:: lena.structures
+.. module:: lena.structures.histogram
 .. _Histogram:
+
 .. autoclass:: histogram
     :members:
-    :inherited-members:
+
+    .. automethod:: __eq__
+
 .. autoclass:: Histogram
     :members:
     :inherited-members:
 ..  :members: fill, compute, run
 
+.. module:: lena.structures
 .. autoclass:: NumpyHistogram
     :members:
 
