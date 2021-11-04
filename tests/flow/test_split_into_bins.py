@@ -8,7 +8,7 @@ import lena.flow.split_into_bins as sib
 from lena.core import Split, FillCompute, Sequence
 from lena.variables import Variable
 from lena.structures import histogram
-from lena.flow import SplitIntoBins, TransformBins, MapBins
+from lena.flow import SplitIntoBins, IterateBins, MapBins
 from lena.flow.split_into_bins import _iter_bins_with_edges
 
 from tests.examples.fill_compute import Count, Sum
@@ -68,14 +68,14 @@ def test_get_example_bin():
 def test_transform_bins():
     ## test init
     with pytest.raises(lena.core.LenaTypeError):
-        TransformBins(create_edges_str=1)
+        IterateBins(create_edges_str=1)
 
     ## test run
     # not histograms pass unchanged
     # histogram bins must be histograms
     hist = histogram([1, 2], [1])
     data = [1, (2, {}), lena.structures.Graph(), hist]
-    t = TransformBins()
+    t = IterateBins()
     assert list(t.run(data)) == data
 
     data_unchanged = [(histogram([0, 1], [hist]), {
@@ -99,7 +99,7 @@ def test_transform_bins():
         }
     }
     # create_edges_str works
-    t1 = TransformBins(create_edges_str=sib.cell_to_string)
+    t1 = IterateBins(create_edges_str=sib.cell_to_string)
     data = copy.deepcopy(data_unchanged)
     results1 = list(t1.run(data))
     assert results1 == results

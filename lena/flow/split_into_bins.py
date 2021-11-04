@@ -121,10 +121,10 @@ def get_example_bin(struct):
         return bins
 
 
-class TransformBins(object):
-    """Transform bins into a flattened sequence."""
+class IterateBins(object):
+    """Iterate bins of histograms."""
 
-    def __init__(self, create_edges_str=None):
+    def __init__(self, create_edges_str=None, select=None):
         """*create_edges_str* is a callable, 
         which creates a string from bin's edges
         and coordinate names
@@ -133,8 +133,12 @@ class TransformBins(object):
         where *var_context* is Variable context containing
         variable names (it can be a single
         :class:`.Variable` or :class:`.Combine`).
-        
-        By default, it is :func:`cell_to_string`.
+        By default it is :func:`.cell_to_string`.
+
+        *select* is a callable used to test bin contents.
+        By default, only those histograms are iterated where
+        bins contain histograms. Use *select* to choose other classes.
+        See :class:`.Selector` for examples.
 
         If *create_edges_str* is not callable,
         :exc:`.LenaTypeError` is raised.
@@ -148,19 +152,34 @@ class TransformBins(object):
                 "{} provided".format(create_edges_str)
             )
         self._create_edges_str = create_edges_str
+        if select is None:
+            # bins contain histograms
+            self._select = lena.flow.Selector(lena.structures.histogram)
+        else:
+            self._select = lena.flow.Selector(select)
 
     def run(self, flow):
+        """Yield histogram bins one by one.
+
+        For each :class:`.histogram`, if its bins pass the
+        *selector*, they are iterated.
+        "edges" (with bin edges) and "edges_str" (their representation)
+        are added to *context.bin*.
+
+        Not histograms pass unchanged.
+        """
         for value in flow:
             data, context = lena.flow.get_data_context(value)
+            # select histograms
             if not isinstance(data, lena.structures.histogram):
                 yield value
                 continue
-            # data is a histogram
-            # check bins
+            # bins contain histograms
             data00 = lena.flow.get_data(get_example_bin(data))
-            if not isinstance(data00, lena.structures.histogram):
+            if not self._select(data00):
                 yield value
                 continue
+
             # bin is a histogram
             ## context is not shared, but yielded,
             ## so deep copy is not needed
@@ -347,7 +366,7 @@ class SplitIntoBins():
             To plot them, one can extract vector components with e.g.
             :class:`.MapBins`.
             If bin contents are histograms,
-            they can be yielded one by one with :class:`.TransformBins`.
+            they can be yielded one by one with :class:`.IterateBins`.
 
         **Attributes**: bins, edges.
 

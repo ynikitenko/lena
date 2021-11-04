@@ -53,9 +53,9 @@ Flow
 .. currentmodule:: lena.flow.split_into_bins
 .. autosummary::
 
+    IterateBins
     MapBins
     SplitIntoBins
-    TransformBins
     cell_to_string
     get_example_bin
 
