@@ -143,7 +143,7 @@ class histogram():
         """Two histograms are equal, if and only if they have
         equal bins and equal edges.
 
-        If *other* is not a :class:`.histogram`, return `False`.
+        If *other* is not a :class:`.histogram`, return ``False``.
 
         Note that floating numbers should be compared
         approximately (using :func:`math.isclose`).

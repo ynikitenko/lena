@@ -1,6 +1,4 @@
 """mesh, md_map, flatten work with multidimensional data."""
-from __future__ import print_function
-
 from itertools import count, islice
 
 
@@ -84,7 +82,7 @@ def md_map(f, array):
 
     arr_0 = array[0]
     # Tuples can be (data, context) pairs,
-    # they should not be expanded in ReduceBinContent.
+    # they should not be expanded in MapBins
     # if isinstance(arr_0, (list, tuple)):
     if isinstance(arr_0, list):
         return [md_map(f, ar) for ar in array]

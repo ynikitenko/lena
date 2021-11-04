@@ -190,7 +190,7 @@ class TransformBins(object):
                 yield (hist, ana_context)
 
 
-class ReduceBinContent(object):
+class MapBins(object):
     """Transform bin content of histograms.
 
     This class is used when histogram bins contain complex structures.
@@ -199,20 +199,20 @@ class ReduceBinContent(object):
     we shall create 3 histograms corresponding to vector's components.
     """
 
-    def __init__(self, select, transform, drop_bins_context=True):
+    def __init__(self, select, seq, drop_bins_context=True):
         """*Select* determines which types should be transformed.
         The types must be given in a ``list`` (not a tuple)
         or as a general :class:`.Selector`.
         Example: ``select=[lena.math.vector3, list]``.
 
-        *transform* is a *Sequence* or element applied to bin contents.
-        If *transform* is not a :class:`.Sequence`
+        *seq* is a *Sequence* or element applied to bin contents.
+        If *seq* is not a :class:`.Sequence`
         or an element with *run* method, it is converted to a 
         :class:`.Sequence`.
-        Example: ``transform=Split([X(), Y(), Z()])``
+        Example: ``seq=Split([X(), Y(), Z()])``
         (provided that you have X, Y, Z variables).
 
-        :class:`.ReduceBinContent` creates histograms
+        :class:`.MapBins` creates histograms
         that may be plotted, and their bins contain only data
         without context.
         By default, context of all bins except one is not used.
@@ -232,16 +232,16 @@ class ReduceBinContent(object):
                 )
         self._selector = select
 
-        if not lena.core.is_run_el(transform):
+        if not lena.core.is_run_el(seq):
             try:
-                transform = lena.core.Sequence(transform)
+                seq = lena.core.Sequence(seq)
             except lena.core.LenaTypeError:
                 raise lena.core.LenaTypeError(
-                    "transform must be a Sequence or convertible to that, "
+                    "seq must be a Sequence or convertible to that, "
                     "or an element with run method; "
-                    "{} provided".format(transform)
+                    "{} provided".format(seq)
                 )
-        self._transform = transform
+        self._seq = seq
         self._drop_bins_context = bool(drop_bins_context)
 
     def run(self, flow):
@@ -272,7 +272,7 @@ class ReduceBinContent(object):
             # bins should be transformed.
             # Several iterations can happen, in principle.
             generators = _MdSeqMap(
-                lambda cell: copy.deepcopy(self._transform).run([cell]),
+                lambda cell: copy.deepcopy(self._seq).run([cell]),
                 hist.bins
             )
             for new_bins in generators:
@@ -345,7 +345,7 @@ class SplitIntoBins():
             The final histogram may contain vectors, histograms and
             any other data the analysis produced.
             To plot them, one can extract vector components with e.g.
-            :class:`.ReduceBinContent`.
+            :class:`.MapBins`.
             If bin contents are histograms,
             they can be yielded one by one with :class:`.TransformBins`.
 

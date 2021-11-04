@@ -8,7 +8,7 @@ import lena.flow.split_into_bins as sib
 from lena.core import Split, FillCompute, Sequence
 from lena.variables import Variable
 from lena.structures import histogram
-from lena.flow import SplitIntoBins, TransformBins, ReduceBinContent
+from lena.flow import SplitIntoBins, TransformBins, MapBins
 from lena.flow.split_into_bins import _iter_bins_with_edges
 
 from tests.examples.fill_compute import Count, Sum
@@ -108,15 +108,15 @@ def test_transform_bins():
 def test_reduce_bin_content():
     ## test init
     with pytest.raises(lena.core.LenaTypeError):
-        ReduceBinContent(1, ())
+        MapBins(1, ())
     # this works
-    ReduceBinContent(lambda _: True, ())
+    MapBins(lambda _: True, ())
     with pytest.raises(lena.core.LenaTypeError):
-        ReduceBinContent(lambda _: True, 1)
+        MapBins(lambda _: True, 1)
 
     # not selected flow passes unchanged
     data = [1, (2, {}), (histogram([0, 1], [1]), {})]
-    r = ReduceBinContent(lena.math.vector3, lambda v: v.x)
+    r = MapBins(lena.math.vector3, lambda v: v.x)
     assert list(r.run(data)) == data
     # empty context
     data = [(histogram([0, 1], [lena.math.vector3([0.5, 0, 1])]), {})]
@@ -143,7 +143,7 @@ def test_reduce_bin_content():
         },
     }
     X = Variable("x", lambda v: v.x)
-    r = ReduceBinContent(lena.math.vector3, X, drop_bins_context=False)
+    r = MapBins(lena.math.vector3, X, drop_bins_context=False)
     data = copy.deepcopy(data_template)
     results = list(r.run(data))[0]
     assert results[0] == histogram([0, 1], bins=[0.5])
@@ -217,9 +217,9 @@ def test_split_into_bins():
     # first element is Sum, second is Count
     assert list(res_bins) == [[0, 1, 2, 3], [2, 1, 1, 1]]
 
-    # ReduceBinContent works
+    # MapBins works
     ## It was a transform kwarg, but it seems not needed.
-    t = ReduceBinContent(int, lambda x: x+1)
+    t = MapBins(int, lambda x: x+1)
     edges = [0, 1, 2, 3, 4]
     arg_var = Variable("x", lambda x: x)
     s = Sequence(SplitIntoBins(seq, arg_var, edges), t)

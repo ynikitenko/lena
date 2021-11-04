@@ -10,7 +10,7 @@ from .print_ import Print
 from .progress import Progress
 from .selectors import Not, Selector
 from .split_into_bins import (
-    SplitIntoBins, ReduceBinContent, TransformBins,
+    SplitIntoBins, MapBins, TransformBins,
     get_example_bin,
 )
 from .zip import Zip
@@ -44,7 +44,7 @@ __all__ = [
     'RunIf',
     # split into bins
     'SplitIntoBins',
-    'ReduceBinContent',
+    'MapBins',
     'TransformBins',
     'get_example_bin',
 ]

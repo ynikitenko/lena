@@ -53,7 +53,7 @@ Flow
 .. currentmodule:: lena.flow.split_into_bins
 .. autosummary::
 
-    ReduceBinContent
+    MapBins
     SplitIntoBins
     TransformBins
     cell_to_string
