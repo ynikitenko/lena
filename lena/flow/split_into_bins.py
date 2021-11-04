@@ -432,10 +432,15 @@ class SplitIntoBins():
         # deep copy, because cur_context is shared with inner sequences
         cur_context = copy.deepcopy(self._cur_context)
         # update context.variable
-        # this could be done during fill, but we optimize it here.
         var = self._arg_var
         var._update_context(cur_context, var.var_context)
-        hist_updated = False
+
+        # update histogram context
+        _hist = lena.structures.Histogram(self.edges, self.bins)
+        # histogram context depends only on edges, not on data,
+        # and is thus same for all results
+        lena.context.update_nested("histogram", cur_context,
+                                   _hist._hist_context["histogram"])
 
         generators = _MdSeqMap(lambda cell: cell.compute(), self.bins)
         # generators = lena.math.md_map(lambda cell: cell.compute(), self.bins)
@@ -447,16 +452,5 @@ class SplitIntoBins():
             # result = lena.math.md_map(next, generators)
 
             hist = lena.structures.Histogram(self.edges, result)
-            # histogram context depends only on edges, not on data,
-            # and is thus same for all results
-            # However, we don't optimize it here, because we would need
-            # to create bins for that.
-            if not hist_updated:
-                # without this condition
-                # it would update histogram context for each result
-                # todo: hist_context should be outside "histogram"
-                hist_context = copy.deepcopy(hist._hist_context["histogram"])
-                lena.context.update_nested("histogram", cur_context, hist_context)
-                hist_updated = True
 
             yield (hist, cur_context)

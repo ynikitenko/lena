@@ -4,15 +4,13 @@ These functions are used for low-level work
 with histograms and their contents.
 They are not needed for normal usage.
 """
-from __future__ import print_function
-
 import collections
 import copy
 import itertools
 import operator
 import sys
 if sys.version_info.major == 3:
-    # we don't want to import reduce to this module.
+    # don't import reduce to this module
     from functools import reduce as _reduce
 else:
     _reduce = reduce
