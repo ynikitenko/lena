@@ -215,19 +215,20 @@ class IterateBins(object):
 class MapBins(object):
     """Transform bin content of histograms.
 
-    This class is used when histogram bins contain complex structures.
+    This class can be used when histogram bins
+    contain complex structures.
     For example, in order to plot a histogram
-    with a 3-dimensional vector in each bin,
-    we shall create 3 histograms corresponding to vector's components.
+    with a 3-dimensional vector in each bin, one can create 3 histograms
+    corresponding to the vector's components.
     """
 
     def __init__(self, select, seq, drop_bins_context=True):
-        """*Select* determines which types should be transformed.
-        The types must be given in a ``list`` (not a tuple)
+        """*select* determines which types should be transformed.
+        The types can be given in a ``list``
         or as a general :class:`.Selector`.
         Example: ``select=[lena.math.vector3, list]``.
 
-        *seq* is a *Sequence* or element applied to bin contents.
+        *seq* is a sequence or an element applied to bin contents.
         If *seq* is not a :class:`.Sequence`
         or an element with *run* method, it is converted to a
         :class:`.Sequence`.
@@ -235,13 +236,14 @@ class MapBins(object):
         (provided that you have X, Y, Z variables).
 
         :class:`.MapBins` creates histograms
-        that may be plotted, and their bins contain only data
+        that may be plotted, because their bins contain only data
         without context.
-        By default, context of all bins except one is not used.
-        If *drop_bins_context* is ``False``, a histogram of
-        bin context is added to context.
+        If *drop_bins_context* is ``False``, context remains in bins.
+        By default, context of all histogram bins is discarded.
+        This discourages compositions of :class:`.MapBins`:
+        make compositions of their internal sequences instead.
 
-        In case of wrong arguments,
+        In case of incorrect arguments,
         :exc:`.LenaTypeError` is raised.
         """
         if not isinstance(select, lena.flow.Selector):
@@ -264,81 +266,73 @@ class MapBins(object):
                     "{} provided".format(seq)
                 )
         self._seq = seq
+
         self._drop_bins_context = bool(drop_bins_context)
 
     def run(self, flow):
         """Transform histograms from *flow*.
 
-        Not selected values pass unchanged.
+        *context.value* is updated with bin context.
+        It is assumed that all bins have the same context
+        (because they were produced by the same sequence),
+        therefore an arbitrary bin is taken
+        and contexts of all other bins are ignored.
 
-        Context is updated with *variable*, *histogram*
-        and *bin_content*.
-        *variable* and *histogram* copy context from *split_into_bins*
-        (if present there).
-        *bin_content* includes context for example bin in *example_bin*
-        and (optionally) for all bins in *all_bins*.
+        Not selected values pass unchanged.
         """
-        for value in flow:
-            hist, context = lena.flow.get_data_context(value)
-            # data part must be a histogram
+        for val in flow:
+            hist, context = lena.flow.get_data_context(val)
+
+            # histograms are selected
             if not isinstance(hist, lena.structures.histogram):
-                yield value
+                yield val
                 continue
-            val = get_example_bin(hist)
-            # value must be selected
-            ## types are checked against data part of the bin
-            if not self._selector(val):
+
+            # bin content is selected
+            bin_ = get_example_bin(hist)
+            if not self._selector(bin_):
                 # no transformation needed
-                yield value
+                yield val
                 continue
-            # bins should be transformed.
+
+            # bins are be transformed
             # Several iterations can happen, in principle.
             generators = _MdSeqMap(
                 lambda cell: copy.deepcopy(self._seq).run([cell]),
                 hist.bins
             )
             for new_bins in generators:
-                new_data = lena.math.md_map(lena.flow.get_data, new_bins)
-                ana_context = copy.deepcopy(
-                    lena.flow.get_context(get_example_bin(new_bins))
-                )
-                cur_bin_context = {"example_bin": ana_context}
-                if not self._drop_bins_context:
-                    all_new_context = lena.math.md_map(
-                        lena.flow.get_context, new_bins
-                    )
-                    cur_bin_context["all_bins"] = all_new_context
-                sib_context = context.get("split_into_bins", {})
-                var_context = ana_context.get("variable", {})
-                hist_context = sib_context.get("histogram", {})
-                # todo: why explicitly these contexts?
-                # What other contexts could be updated?
-                if var_context:
-                    # this ugly fix should be avoided:
-                    # variable.compose must be changed to variable.variable,
-                    # so that update_nested always works directly.
-                    # if "variable" in context:
-                    #     cvar = context["variable"]
-                    #     key = "compose"
-                    # else:
-                    #     cvar = context
-                    #     key = "variable"
-                    #
-                    # todo: unify variable.variable and variable.compose
-                    lena.context.update_nested(
-                        "variable", context, copy.deepcopy(var_context)
-                        # key, cvar, copy.deepcopy(var_context)
-                    )
-                if hist_context:
-                    lena.context.update_nested(
-                        "histogram", context, copy.deepcopy(hist_context)
-                    )
-                lena.context.update_nested("bin_content", context, cur_bin_context)
-                # or make histogram.edges immutable
+                if self._drop_bins_context:
+                    new_data = lena.math.md_map(lena.flow.get_data, new_bins)
+                else:
+                    # leave context in bins
+                    new_data = new_bins
+                # deep copy, or make histogram.edges immutable
                 edges = copy.deepcopy(hist.edges)
                 new_hist = lena.structures.histogram(edges, new_data)
+
+                ## update context
+                # no compositions of variables, because
+                # there is no composition between edges'
+                # and bins' transformations
+                # (all common compositions are already counted)
+                bin_context = copy.deepcopy(
+                    lena.flow.get_context(get_example_bin(new_bins))
+                )
+                # instead of having SIB context in histogram,
+                # it moved it to the histogram in this element!
+                # hist_context = sib_context.get("histogram", {})
+                # if hist_context:
+                #     lena.context.update_nested(
+                #         "histogram", context, copy.deepcopy(hist_context)
+                #     )
+
+                # we name it "value" and hope to have the same name
+                # for graph values.
+                lena.context.update_nested("value", context, bin_context)
+
                 # one might optimise copying of the context here,
-                # but for now we leave it like this (because it had bugs)
+                # but we leave it like this (because it had bugs)
                 yield (new_hist, copy.deepcopy(context))
 
 

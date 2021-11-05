@@ -84,10 +84,12 @@ def test_get_example_bin():
     assert get_example_bin(hist) == 0
 
 
-def test_transform_bins():
+def test_iterate_bins():
     ## test init
     with pytest.raises(lena.core.LenaTypeError):
         IterateBins(create_edges_str=1)
+    with pytest.raises(lena.core.LenaTypeError):
+        IterateBins(select_bins=1)
 
     ## test run
     # not histograms pass unchanged
@@ -124,7 +126,7 @@ def test_transform_bins():
     assert results1 == results
 
 
-def test_reduce_bin_content():
+def test_map_bins():
     ## test init
     with pytest.raises(lena.core.LenaTypeError):
         MapBins(1, ())
@@ -137,16 +139,16 @@ def test_reduce_bin_content():
     data = [1, (2, {}), (histogram([0, 1], [1]), {})]
     r = MapBins(lena.math.vector3, lambda v: v.x)
     assert list(r.run(data)) == data
+
     # empty context
     data = [(histogram([0, 1], [lena.math.vector3([0.5, 0, 1])]), {})]
     results = list(r.run(data))[0]
     assert results[0] == histogram([0, 1], bins=[0.5])
-    assert results[1] == {'bin_content': {'example_bin': {}}}
+    assert results[1] == {'value': {}}
+
     data_template = [(histogram([0, 1], [lena.math.vector3([0.5, 0, 1])]), {
-        "split_into_bins": {
-            "variable": {"name": "x"},
-            "histogram": {"dim": 1}
-        }
+        "variable": {"name": "x"},
+        "histogram": {"dim": 1}
     })]
     data = copy.deepcopy(data_template)
     results = list(r.run(data))
@@ -154,29 +156,21 @@ def test_reduce_bin_content():
     results = results[0]
     assert results[0] == histogram([0, 1], bins=[0.5])
     assert results[1] == {
-        'bin_content': {'example_bin': {}},
+        'value': {},
         'histogram': {'dim': 1},
-        'split_into_bins': {
-            'histogram': {'dim': 1},
-            'variable': {'name': 'x'}
-        },
+        'variable': {'name': 'x'}
     }
+
+    # retain bins context works
     X = Variable("x", lambda v: v.x)
     r = MapBins(lena.math.vector3, X, drop_bins_context=False)
     data = copy.deepcopy(data_template)
     results = list(r.run(data))[0]
-    assert results[0] == histogram([0, 1], bins=[0.5])
+    assert results[0] == histogram([0, 1], bins=[(0.5, {'variable': {'name': 'x'}})])
     assert results[1] == {
-        'bin_content': {
-            'all_bins': [{'variable': {'name': 'x'}}],
-            'example_bin': {'variable': {'name': 'x'}}
-        },
+        'value': {'variable': {'name': 'x'}},
         'histogram': {'dim': 1},
-        'split_into_bins': {
-            'histogram': {'dim': 1},
-            'variable': {'name': 'x'}
-        },
-        'variable': {'name': 'x'}
+        'variable': {'name': 'x'},
     }
 
 
