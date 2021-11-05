@@ -1,5 +1,6 @@
 """Split analysis into groups defined by bins."""
 import copy
+import itertools
 
 import lena.context 
 import lena.core
@@ -13,31 +14,24 @@ def _iter_bins_with_edges(bins, edges):
     """Yield *(bin content, bin edges)* pairs.
 
     *Bin edges* is a tuple, such that at index *i*
-    its element is bin's *(lower bound, upper bound)*,
-    on *i*-th the coordinate.
+    its element is bin's *(lower bound, upper bound)*
+    along *i*-th the coordinate.
     """
+    # todo: only a list or also a tuple, an array?
     if not isinstance(edges[0], list):
         edges = [edges]
     bins_sizes = [len(edge)-1 for edge in edges]
-    index = [0] * len(edges)
-    cur_ind = len(edges)-1
-    zeroth_bin_yielded = False
-    while cur_ind >= 0:
-        var_ind = 0
-        while var_ind < bins_sizes[cur_ind]:
-            index[cur_ind] = var_ind
-            bin_ = lena.structures.get_bin_on_index(index, bins)
-            edges_low = []
-            edges_high = []
-            for i, cur_var in enumerate(index):
-                edges_low.append(edges[i][cur_var])
-                edges_high.append(edges[i][cur_var+1])
-            if zeroth_bin_yielded is False or var_ind != 0:
-                yield (bin_, tuple(zip(edges_low, edges_high)))
-                # yield (bin_, (edges_low, edges_high))
-                zeroth_bin_yielded = True
-            var_ind += 1
-        cur_ind -= 1
+    indices = [list(range(nbins)) for nbins in bins_sizes]
+    for index in itertools.product(*indices):
+        bin_ = lena.structures.get_bin_on_index(index, bins)
+        edges_low = []
+        edges_high = []
+        for var, var_ind in enumerate(index):
+            edges_low.append(edges[var][var_ind])
+            edges_high.append(edges[var][var_ind+1])
+        yield (bin_, tuple(zip(edges_low, edges_high)))
+        # old interface:
+        # yield (bin_, (edges_low, edges_high))
 
 
 class _MdSeqMap(object):

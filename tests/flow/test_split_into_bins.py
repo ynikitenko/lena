@@ -14,18 +14,37 @@ from lena.flow.split_into_bins import _iter_bins_with_edges
 from tests.examples.fill_compute import Count, Sum
 
 
-def test__iter_bins_with_edges():
+def test_iter_bins_with_edges():
+    ibe = _iter_bins_with_edges
+
+    # one-dimensional list works
     bins = [0]
     edges = [0, 1]
-    assert list(_iter_bins_with_edges(bins, edges)) == [(0, ((0, 1),))]
-    assert list(_iter_bins_with_edges([0, 1], [0, 1, 2])) ==  [(0, ((0, 1),)), (1, ((1, 2),))]
+    assert list(ibe(bins, edges)) == [(0, ((0, 1),))]
+    assert list(ibe([0, 1], [0, 1, 2])) ==  [(0, ((0, 1),)), (1, ((1, 2),))]
+    ## old interface
     # assert list(_iter_bins_with_edges(bins, edges)) == [(0, ([0], [1]))]
     # assert list(_iter_bins_with_edges([0, 1], [0, 1, 2])) == [(0, ([0], [1])), (1, ([1], [2]))]
-    edges = [[0, 1], [0, 1]]
+
+    ## two-dimensional list works
+    # one bin
+    edges = [[0, 1], [2, 3]]
     bins = [[1]]
     # this (bins, edges) pair is legitimate
+    ## strange to test it here!
     h = histogram(edges, bins)
-    assert list(_iter_bins_with_edges(bins, edges)) == [(1, ((0, 1), (0, 1)))]
+    assert list(_iter_bins_with_edges(bins, edges)) == [(1, ((0, 1), (2, 3)))]
+
+    edges = [[0, 1, 2], [3, 4, 5]]
+    bins = [[10, 20], [30, 40]]
+    # this (bins, edges) pair is legitimate
+    h = histogram(edges, bins)
+    assert list(_iter_bins_with_edges(bins, edges)) == [
+        (10, ((0, 1), (3, 4))),
+        (20, ((0, 1), (4, 5))),
+        (30, ((1, 2), (3, 4))),
+        (40, ((1, 2), (4, 5))),
+    ]
 
 
 def test__md_seq_map():
