@@ -97,12 +97,13 @@ def test_transform_bins():
     t = IterateBins()
     assert list(t.run(data)) == data
 
-    data_unchanged = [(histogram([0, 1], [hist]), {
-        "split_into_bins": {
-            "variable": {"name": "x"},
-            "histogram": {"dim": 1}
-        }
-    })]
+    data_unchanged = [
+        (histogram([0, 1], [hist]),
+         {
+             "variable": {"name": "x"},
+             "histogram": {"dim": 1}
+         })
+    ]
     data = copy.deepcopy(data_unchanged)
     results = list(t.run(data))
     assert len(results) == 1
@@ -111,10 +112,9 @@ def test_transform_bins():
         'bin': {
             'edges': ((0, 1),), 'edges_str': '0_lte_x_lt_1'
         },
-        'split_into_bins': {
-            'context': {},
+        'bins': {
+            'variable': {'name': 'x'},
             'histogram': {'dim': 1},
-            'variable': {'name': 'x'}
         }
     }
     # create_edges_str works

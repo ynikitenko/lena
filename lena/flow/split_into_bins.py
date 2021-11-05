@@ -2,7 +2,7 @@
 import copy
 import itertools
 
-import lena.context 
+import lena.context
 import lena.core
 import lena.flow
 import lena.math
@@ -39,7 +39,7 @@ class _MdSeqMap(object):
 
     def __init__(self, generator, array):
         """*generator* is mapped to *array*'s contents.
-        Example when a bin is a sequence: 
+        Example when a bin is a sequence:
         ``generator=lambda cell: cell.compute()``.
         """
         self._generators = lena.math.md_map(generator, array)
@@ -58,7 +58,8 @@ class _MdSeqMap(object):
         return self
 
 
-def cell_to_string(cell_edges, var_context=None, coord_names=None, 
+def cell_to_string(
+        cell_edges, var_context=None, coord_names=None,
         coord_fmt="{}_lte_{}_lt_{}", coord_join="_", reverse=False):
     """Transform cell edges into a string.
 
@@ -74,6 +75,8 @@ def cell_to_string(cell_edges, var_context=None, coord_names=None,
 
     If *reverse* is True, coordinates are joined in reverse order.
     """
+    # todo: do we really need var_context?
+    # todo: even if so, why isn't that a {}? Is that dangerous?
     if coord_names is None:
         if var_context is None:
             coord_names = [
@@ -87,7 +90,7 @@ def cell_to_string(cell_edges, var_context=None, coord_names=None,
                 coord_names = [var_context["name"]]
     if len(cell_edges) != len(coord_names):
         raise lena.core.LenaValueError(
-            "coord_names must have same lenght as cell_edges, "
+            "coord_names must have same length as cell_edges, "
             "{} and {} given".format(coord_names, cell_edges)
         )
     coord_strings = [coord_fmt.format(edge[0], coord_names[ind], edge[1])
@@ -118,20 +121,19 @@ def get_example_bin(struct):
 class IterateBins(object):
     """Iterate bins of histograms."""
 
-    def __init__(self, create_edges_str=None, select=None):
-        """*create_edges_str* is a callable, 
-        which creates a string from bin's edges
-        and coordinate names
-        and adds that to context.
+    def __init__(self, create_edges_str=None, select_bins=None):
+        """*create_edges_str* is a callable
+        that creates a string from bin's edges
+        and coordinate names and adds that to the context.
         It is passed parameters *(edges, var_context)*,
-        where *var_context* is Variable context containing
+        where *var_context* is *variable* context containing
         variable names (it can be a single
         :class:`.Variable` or :class:`.Combine`).
         By default it is :func:`.cell_to_string`.
 
-        *select* is a callable used to test bin contents.
+        *select_bins* is a callable used to test bin contents.
         By default, only those histograms are iterated where
-        bins contain histograms. Use *select* to choose other classes.
+        bins contain histograms. Use *select_bins* to choose other classes.
         See :class:`.Selector` for examples.
 
         If *create_edges_str* is not callable,
@@ -139,68 +141,75 @@ class IterateBins(object):
         """
         if create_edges_str is None:
             # default
-            pass
+            create_edges_str = cell_to_string
         elif not callable(create_edges_str):
             raise lena.core.LenaTypeError(
                 "create_edges_str must be callable, "
                 "{} provided".format(create_edges_str)
             )
         self._create_edges_str = create_edges_str
-        if select is None:
-            # bins contain histograms
-            self._select = lena.flow.Selector(lena.structures.histogram)
+
+        # todo: create a selector for bins
+        # (example bins or some iterable)
+        if select_bins is None:
+            # select if bins contain histograms
+            self._select_bins = lena.flow.Selector(lena.structures.histogram)
         else:
-            self._select = lena.flow.Selector(select)
+            self._select_bins = lena.flow.Selector(select_bins)
 
     def run(self, flow):
         """Yield histogram bins one by one.
 
-        For each :class:`.histogram`, if its bins pass the
-        *selector*, they are iterated.
-        "edges" (with bin edges) and "edges_str" (their representation)
-        are added to *context.bin*.
+        For each :class:`.histogram` from the *flow*,
+        if its bins pass *select_bins*, they are iterated.
+
+        The resulting context is taken from bin's context.
+        Histogram's context is preserved in *context.bins*.
+        *context.bin* is updated with
+        "edges" (with bin edges) and "edges_str" (their representation).
+        If histogram's context contains *variable*, that is used for
+        edges' representation.
 
         Not histograms pass unchanged.
         """
-        for value in flow:
-            data, context = lena.flow.get_data_context(value)
+        update_nested = lena.context.update_nested
+        for val in flow:
+            data, hist_context = lena.flow.get_data_context(val)
             # select histograms
             if not isinstance(data, lena.structures.histogram):
-                yield value
+                yield val
                 continue
-            # bins contain histograms
+            # bins also contain histograms
             data00 = lena.flow.get_data(get_example_bin(data))
-            if not self._select(data00):
-                yield value
+            if not self._select_bins(data00):
+                yield val
                 continue
 
-            # bin is a histogram
-            ## context is not shared, but yielded,
-            ## so deep copy is not needed
-            ## But in this case data can't be used twice!!
-            # context = copy.deepcopy(context)
-            for histc, bin_edges in \
-                    _iter_bins_with_edges(data.bins, data.edges):
-                hist, ana_context = lena.flow.get_data_context(histc)
-                split_var = lena.context.get_recursively(
-                    context, "split_into_bins.variable", None
+            for histc, bin_edges in _iter_bins_with_edges(data.bins,
+                                                          data.edges):
+                hist, bin_context = lena.flow.get_data_context(histc)
+                # we assume that context.variable corresponds to
+                # the variable used for bins.
+                # If that is some old variable left in the context,
+                # remove that first! Anyway SplitIntoBins would create
+                # its correct variable (if called before this element).
+                split_var_context = lena.context.get_recursively(
+                    hist_context, "variable", None
                 )
-                if self._create_edges_str:
-                    # use predefined function
-                    edges_str = self._create_edges_str(bin_edges,
-                                                       var_context=split_var)
-                else:
-                    # default
-                    edges_str = cell_to_string(bin_edges,
-                                               var_context=split_var)
-                sib_context = context.pop("split_into_bins", {})
-                # hide split_into_bins context into that.
-                # this may be useful when context and ana_context differ
-                sib_context["context"] = context
-                bin_context = {"edges": bin_edges, "edges_str": edges_str}
-                lena.context.update_nested("split_into_bins", ana_context, sib_context)
-                lena.context.update_nested("bin", ana_context, bin_context)
-                yield (hist, ana_context)
+                # split_var_context is not modified here.
+                edges_str = self._create_edges_str(
+                    bin_edges, var_context=split_var_context
+                )
+                context_bin = {"edges": bin_edges, "edges_str": edges_str}
+
+                # bin_context is main analysis context.
+                # Update it with the surrounding histogram context.
+                # It will have some duplication, but a complete copy
+                # is needed, because it can be different in general.
+                update_nested("bins", bin_context, copy.deepcopy(hist_context))
+                # Bin position details are in *context.bin*
+                update_nested("bin", bin_context, context_bin)
+                yield (hist, bin_context)
 
 
 class MapBins(object):
@@ -220,7 +229,7 @@ class MapBins(object):
 
         *seq* is a *Sequence* or element applied to bin contents.
         If *seq* is not a :class:`.Sequence`
-        or an element with *run* method, it is converted to a 
+        or an element with *run* method, it is converted to a
         :class:`.Sequence`.
         Example: ``seq=Split([X(), Y(), Z()])``
         (provided that you have X, Y, Z variables).
@@ -229,7 +238,7 @@ class MapBins(object):
         that may be plotted, and their bins contain only data
         without context.
         By default, context of all bins except one is not used.
-        If *drop_bins_context* is ``False``, a histogram of 
+        If *drop_bins_context* is ``False``, a histogram of
         bin context is added to context.
 
         In case of wrong arguments,
@@ -366,7 +375,7 @@ class SplitIntoBins():
 
         If *edges* are not increasing,
         :exc:`.LenaValueError` is raised.
-        In case of other argument initialization problems, 
+        In case of other argument initialization problems,
         :exc:`.LenaTypeError` is raised.
         """
 
