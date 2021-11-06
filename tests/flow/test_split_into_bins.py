@@ -129,15 +129,15 @@ def test_iterate_bins():
 def test_map_bins():
     ## test init
     with pytest.raises(lena.core.LenaTypeError):
-        MapBins(1, ())
+        MapBins((), 1)
     # this works
     MapBins(lambda _: True, ())
     with pytest.raises(lena.core.LenaTypeError):
-        MapBins(lambda _: True, 1)
+        MapBins(1, select_bins=lambda _: True)
 
     # not selected flow passes unchanged
     data = [1, (2, {}), (histogram([0, 1], [1]), {})]
-    r = MapBins(lena.math.vector3, lambda v: v.x)
+    r = MapBins(lambda v: v.x, select_bins=lena.math.vector3)
     assert list(r.run(data)) == data
 
     # empty context
@@ -163,7 +163,7 @@ def test_map_bins():
 
     # retain bins context works
     X = Variable("x", lambda v: v.x)
-    r = MapBins(lena.math.vector3, X, drop_bins_context=False)
+    r = MapBins(X, select_bins=lena.math.vector3, drop_bins_context=False)
     data = copy.deepcopy(data_template)
     results = list(r.run(data))[0]
     assert results[0] == histogram([0, 1], bins=[(0.5, {'variable': {'name': 'x'}})])
@@ -232,7 +232,7 @@ def test_split_into_bins():
 
     # MapBins works
     ## It was a transform kwarg, but it seems not needed.
-    t = MapBins(int, lambda x: x+1)
+    t = MapBins(lambda x: x+1, select_bins=int)
     edges = [0, 1, 2, 3, 4]
     arg_var = Variable("x", lambda x: x)
     s = Sequence(SplitIntoBins(seq, arg_var, edges), t)

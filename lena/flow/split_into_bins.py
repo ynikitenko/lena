@@ -222,18 +222,19 @@ class MapBins(object):
     corresponding to the vector's components.
     """
 
-    def __init__(self, select, seq, drop_bins_context=True):
-        """*select* determines which types should be transformed.
-        The types can be given in a ``list``
-        or as a general :class:`.Selector`.
-        Example: ``select=[lena.math.vector3, list]``.
-
-        *seq* is a sequence or an element applied to bin contents.
+    def __init__(self, seq, select_bins, drop_bins_context=True):
+        """*seq* is a sequence or an element applied to bin contents.
         If *seq* is not a :class:`.Sequence`
         or an element with *run* method, it is converted to a
         :class:`.Sequence`.
         Example: ``seq=Split([X(), Y(), Z()])``
         (provided that you have X, Y, Z variables).
+
+        If *select_bins* is ``True`` for histogram's bins
+        (tested on an arbitrary bin), the histogram is transformed.
+        Bin types can be given in a ``list``
+        or as a general :class:`.Selector`.
+        Example: ``select_bins=[lena.math.vector3, list]``.
 
         :class:`.MapBins` creates histograms
         that may be plotted, because their bins contain only data
@@ -246,16 +247,6 @@ class MapBins(object):
         In case of incorrect arguments,
         :exc:`.LenaTypeError` is raised.
         """
-        if not isinstance(select, lena.flow.Selector):
-            try:
-                select = lena.flow.Selector(select)
-            except lena.core.LenaTypeError:
-                raise lena.core.LenaTypeError(
-                    "select must be convertible to a Selector, "
-                    "{} given".format(select)
-                )
-        self._selector = select
-
         if not lena.core.is_run_el(seq):
             try:
                 seq = lena.core.Sequence(seq)
@@ -266,6 +257,16 @@ class MapBins(object):
                     "{} provided".format(seq)
                 )
         self._seq = seq
+
+        if not isinstance(select_bins, lena.flow.Selector):
+            try:
+                select_bins = lena.flow.Selector(select_bins)
+            except lena.core.LenaTypeError:
+                raise lena.core.LenaTypeError(
+                    "select_bins must be convertible to a Selector, "
+                    "{} given".format(select_bins)
+                )
+        self._select_bins = select_bins
 
         self._drop_bins_context = bool(drop_bins_context)
 
@@ -290,7 +291,7 @@ class MapBins(object):
 
             # bin content is selected
             bin_ = get_example_bin(hist)
-            if not self._selector(bin_):
+            if not self._select_bins(bin_):
                 # no transformation needed
                 yield val
                 continue
