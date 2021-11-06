@@ -141,12 +141,12 @@ def test_map_bins():
     assert list(r.run(data)) == data
 
     # empty context
-    data = [(histogram([0, 1], [lena.math.vector3([0.5, 0, 1])]), {})]
+    data = [(histogram([0, 1], [lena.math.vector3(0.5, 0, 1)]), {})]
     results = list(r.run(data))[0]
     assert results[0] == histogram([0, 1], bins=[0.5])
     assert results[1] == {}
 
-    data_template = [(histogram([0, 1], [lena.math.vector3([0.5, 0, 1])]), {
+    data_template = [(histogram([0, 1], [lena.math.vector3(0.5, 0, 1)]), {
         "variable": {"name": "x"},
         "histogram": {"dim": 1}
     })]
