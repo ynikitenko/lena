@@ -144,7 +144,7 @@ def test_map_bins():
     data = [(histogram([0, 1], [lena.math.vector3([0.5, 0, 1])]), {})]
     results = list(r.run(data))[0]
     assert results[0] == histogram([0, 1], bins=[0.5])
-    assert results[1] == {'value': {}}
+    assert results[1] == {}
 
     data_template = [(histogram([0, 1], [lena.math.vector3([0.5, 0, 1])]), {
         "variable": {"name": "x"},
@@ -156,7 +156,6 @@ def test_map_bins():
     results = results[0]
     assert results[0] == histogram([0, 1], bins=[0.5])
     assert results[1] == {
-        'value': {},
         'histogram': {'dim': 1},
         'variable': {'name': 'x'}
     }
@@ -221,7 +220,7 @@ def test_split_into_bins():
     res = seq.run(flowc)
     assert list(res) == [9, 7]
 
-    # need to create a new seq, otherwise old one will be used further.
+    # need to create a new seq, otherwise old one will be reused
     seq = Split([Sum(), Count()])
     arg_var = Variable("x", lambda x: x)
     s = Sequence(SplitIntoBins(seq, arg_var, edges))
@@ -232,15 +231,43 @@ def test_split_into_bins():
 
     # MapBins works
     ## It was a transform kwarg, but it seems not needed.
-    t = MapBins(lambda x: x+1, select_bins=int)
+    map_no_context = MapBins(lambda x: x+1, select_bins=int)
     edges = [0, 1, 2, 3, 4]
     arg_var = Variable("x", lambda x: x)
-    s = Sequence(SplitIntoBins(seq, arg_var, edges), t)
-    res = list(s.run(flow))
+    sib = SplitIntoBins(seq, arg_var, edges)
+
+    s_map_no_context = Sequence(copy.deepcopy(sib), map_no_context)
+    res = list(s_map_no_context.run(flow))
     assert [r[0] for r in res] == [
         histogram([0, 1, 2, 3, 4], bins=[1, 2, 3, 4]),
         histogram([0, 1, 2, 3, 4], bins=[3, 2, 2, 2])
     ]
+    # no interference between contexts occurred,
+    # proper deep copies were made.
+    # context.value is missing because it is empty.
+    assert [r[1] for r in res] == [
+        {'histogram': {'dim': 1,
+                       'nbins': [4],
+                       'ranges': [(0, 4)]},
+         'variable': {'name': 'x'}},
+        {'histogram': {'dim': 1,
+                       'nbins': [4],
+                       'ranges': [(0, 4)]},
+         'variable': {'name': 'x'}},
+    ]
+
+    map_with_context = MapBins(Variable("add1", lambda x: x+1), select_bins=int)
+    s_map_with_context = Sequence(copy.deepcopy(sib), map_with_context)
+    res_c = list(s_map_with_context.run(flow))
+    # data doesn't change
+    assert [r[0] for r in res_c] == [r[0] for r in res]
+    # context is updated correctly
+    new_context = {'histogram': {'dim': 1,
+                                 'nbins': [4],
+                                 'ranges': [(0, 4)]},
+                   'value': {'variable': {'name': 'add1'}},
+                   'variable': {'name': 'x'}}
+    assert [r[1] for r in res_c] == [new_context, new_context]
 
     # 2d histogram
     # edges = lena.math.mesh(ranges=((0, 1), (0, 1)), nbins=(10, 10))

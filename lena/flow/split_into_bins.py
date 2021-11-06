@@ -273,7 +273,7 @@ class MapBins(object):
     def run(self, flow):
         """Transform histograms from *flow*.
 
-        *context.value* is updated with bin context.
+        *context.value* is updated with bin context (if that exists).
         It is assumed that all bins have the same context
         (because they were produced by the same sequence),
         therefore an arbitrary bin is taken
@@ -283,6 +283,7 @@ class MapBins(object):
         """
         for val in flow:
             hist, context = lena.flow.get_data_context(val)
+            update_nested = lena.context.update_nested
 
             # histograms are selected
             if not isinstance(hist, lena.structures.histogram):
@@ -313,6 +314,7 @@ class MapBins(object):
                 new_hist = lena.structures.histogram(edges, new_data)
 
                 ## update context
+                new_context = copy.deepcopy(context)
                 # no compositions of variables, because
                 # there is no composition between edges'
                 # and bins' transformations
@@ -330,11 +332,12 @@ class MapBins(object):
 
                 # we name it "value" and hope to have the same name
                 # for graph values.
-                lena.context.update_nested("value", context, bin_context)
+                if bin_context:
+                    update_nested("value", new_context, bin_context)
 
                 # one might optimise copying of the context here,
                 # but we leave it like this (because it had bugs)
-                yield (new_hist, copy.deepcopy(context))
+                yield (new_hist, new_context)
 
 
 class SplitIntoBins():
@@ -405,8 +408,12 @@ class SplitIntoBins():
         Values outside the :attr:`edges` are ignored.
         """
         data, context = lena.flow.get_data_context(val)
+        # deep copy, because internal sequences may modify context
+        context = copy.deepcopy(context)
         bin_index = lena.structures.get_bin_on_value(self._arg_func(data),
                                                      self.edges)
+        # we fill it manually, because histogram.fill does
+        # subarr[ind] += weight
         subarr = self.bins
         for ind in bin_index:
             # underflow
@@ -449,8 +456,8 @@ class SplitIntoBins():
         # deep copy, because cur_context is shared with inner sequences
         cur_context = copy.deepcopy(self._cur_context)
         # update context.variable
-        var = self._arg_var
-        var._update_context(cur_context, var.var_context)
+        self._arg_var._update_context(cur_context,
+                                      copy.deepcopy(self._arg_var.var_context))
 
         # update histogram context
         _hist = lena.structures.histogram(self.edges, self.bins)
@@ -470,4 +477,4 @@ class SplitIntoBins():
 
             hist = lena.structures.histogram(self.edges, result)
 
-            yield (hist, cur_context)
+            yield (hist, copy.deepcopy(cur_context))

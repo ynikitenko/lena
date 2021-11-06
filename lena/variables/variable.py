@@ -130,7 +130,9 @@ class Variable(object):
         # because it was supposed to be used in a different place
         # (like SplitIntoBins or IterateBins) - but not needed now.
         # Maybe _update_context call should be optimized out.
-        self._update_context(context, self.var_context)
+        # deep copy, because we don't know
+        # whether users will have nested keys
+        self._update_context(context, copy.deepcopy(self.var_context))
         return (data, context)
 
     def __getattr__(self, name):
@@ -171,9 +173,12 @@ class Variable(object):
         # however a static method would allow to update
         # contexts from their dictionaries (in the context)
         # - but is that really needed?..
+
+        # no deep copy of var_context is made
+        # (do it in user code if needed)
         context_var = context.get("variable")
         if context_var:
-            # preserves variable.compose if that is present
+            # preserve variable.compose if that is present
             context["variable"]["compose"] = copy.deepcopy(context_var)
             # deep copy, because otherwise
             # it will be updated during update_recursively
@@ -183,7 +188,7 @@ class Variable(object):
         # update recursively, because we need to preserve "type"
         # and other not overwritten data
         lena.context.update_recursively(
-            context, {"variable": copy.deepcopy(var_context)}
+            context, {"variable": var_context}
         )
 
         # could be useful as a chainable method,
