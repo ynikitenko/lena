@@ -114,10 +114,9 @@ class histogram():
         else:
             self.dim = 1
 
-        self._initial_bins = bins
+        # todo: add a kwarg no_check=False to disable bins testing
         if bins is None:
             self.bins = hf.init_bins(self.edges, initial_value)
-            self._initial_value = initial_value
         else:
             self.bins = bins
             # We can't make scale for an arbitrary histogram,
@@ -198,6 +197,8 @@ class histogram():
         Histograms with scale equal to zero can't be rescaled.
         :exc:`.LenaValueError` is raised if one tries to do that.
         """
+        # todo: reconsider this method. Probably get_scale
+        # and set_scale would be much better!
         if other is None:
             # return scale
             if self._scale is None or recompute:

@@ -409,6 +409,10 @@ class SplitIntoBins():
         """
         data, context = lena.flow.get_data_context(val)
         # deep copy, because internal sequences may modify context
+        # This is inefficient,
+        # because only context of the last value is needed
+        # todo: create a method _fill_data,
+        # and fill with context only for the last time
         context = copy.deepcopy(context)
         bin_index = lena.structures.get_bin_on_value(self._arg_func(data),
                                                      self.edges)
@@ -453,8 +457,9 @@ class SplitIntoBins():
             In Python 2, if some bin is exhausted before the others,
             its content will be filled with ``None``.
         """
-        # deep copy, because cur_context is shared with inner sequences
-        cur_context = copy.deepcopy(self._cur_context)
+        # no copy, because cur_context is copied during fill()
+        cur_context = self._cur_context
+        # cur_context = copy.deepcopy(self._cur_context)
         # update context.variable
         self._arg_var._update_context(cur_context,
                                       copy.deepcopy(self._arg_var.var_context))

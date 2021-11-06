@@ -7,13 +7,13 @@ create new vectors:
 >>> v1 = vector3([0, 1, 2])
 >>> v2 = vector3([3, 4, 5])
 >>> v1 + v2
-vector3([3.0, 5.0, 7.0])
+vector3([3, 5, 7])
 >>> v1 - v2
-vector3([-3.0, -3.0, -3.0])
+vector3([-3, -3, -3])
 >>> 3 * v1
-vector3([0.0, 3.0, 6.0])
+vector3([0, 3, 6])
 >>> v1 * 3
-vector3([0.0, 3.0, 6.0])
+vector3([0, 3, 6])
 
 Vector attributes can be set and read.
 Vectors can be tested for exact or approximate equality
@@ -21,7 +21,7 @@ with `==` and :meth:`isclose <vector3.isclose>` method.
 
 >>> v2.z = 0
 >>> v2
-vector3([3.0, 4.0, 0.0])
+vector3([3, 4, 0])
 >>> v2.r = 10
 >>> v2 == vector3([6, 8, 0])
 True
@@ -45,6 +45,7 @@ import lena.math
 
 class vector3(object):
     """3-dimensional vector with Cartesian and spherical coordinates."""
+
     def __init__(self, v):
         r"""Create vector3 from Cartesian coordinates.
 
@@ -90,7 +91,7 @@ class vector3(object):
         >>> x = v.getx()
         >>> v.setx(x+1)
         >>> v
-        vector3([1.0, 0.0, 0.0])
+        vector3([1, 0, 0])
 
         :math:`r^2` and :math:`\cos\theta` can be obtained
         with methods *getr2()* and *getcostheta()*.
@@ -127,7 +128,8 @@ class vector3(object):
                 "vector3 should be initialized from a 3-dimensional "
                 "container/iterable."
             )
-        self._v = list(map(float, v))
+        self._v = v
+        # self._v = list(map(float, v))
 
     # todo: add fromcylindrical?
     # make set_ and get_ functions private. What's the use of them?
@@ -162,25 +164,34 @@ class vector3(object):
 
     def getx(self):
         return self._v[0]
+
     def gety(self):
         return self._v[1]
+
     def getz(self):
         return self._v[2]
+
     def getrho(self):
         return sqrt(self._v[0]**2 + self._v[1]**2)
+
     def getrho2(self):
         return self._v[0]**2 + self._v[1]**2
 
+
     def setx(self, value):
-        self._v[0] = float(value)
+        self._v[0] = value
+
     def sety(self, value):
-        self._v[1] = float(value)
+        self._v[1] = value
+
     def setz(self, value):
-        self._v[2] = float(value)
+        self._v[2] = value
+
     def setrho(self, value):
         scale = value / self.getrho()
         self._v[0] *= scale
         self._v[1] *= scale
+
     def setrho2(self, value):
         scale = value / self.getrho2()
         self._v[0] *= sqrt(scale)
@@ -291,7 +302,7 @@ class vector3(object):
 
         >>> v1 = vector3([0, 1, 2])
         >>> v1._mag2()
-        5.0
+        5
         """
         return self.dot(self)
 
@@ -443,7 +454,7 @@ class vector3(object):
         """
         >>> v1 = vector3([0, 1, 2])
         >>> - v1
-        vector3([-0.0, -1.0, -2.0])
+        vector3([0, -1, -2])
         """
         return self * (-1)
 
@@ -489,7 +500,7 @@ class vector3(object):
         >>> v1 = vector3([0, 3, 4])
         >>> v2 = vector3([0, 1, 0])
         >>> v1.cross(v2)
-        vector3([-4.0, 0.0, 0.0])
+        vector3([-4, 0, 0])
         """
         A = self._v
         return vector3([A[1] * B[2] - A[2] * B[1],
@@ -531,7 +542,7 @@ class vector3(object):
         >>> v1 = vector3([0, 3, 4])
         >>> n1 = v1.norm()
         >>> v1n = vector3([0, 0.6, 0.8])
-        >>> (n1 - v1n)._mag() < 1e-6
+        >>> (n1 - v1n).r < 1e-6
         True
         """
         return self / self._mag()
@@ -542,11 +553,11 @@ class vector3(object):
         From the position where *B* points towards us,
         the rotation is counterclockwise (the right hand rule).
 
-        >>> v1 = vector3([1, 1, 1.0])
-        >>> v2 = vector3([0, 1, 0.0])
+        >>> v1 = vector3([1, 1, 1])
+        >>> v2 = vector3([0, 1, 0])
         >>> from math import pi
         >>> vrot = v1.rotate(pi/2, v2)
-        >>> vrot.isclose(vector3([1.0, 1.0, -1.0]))
+        >>> vrot.isclose(vector3([1, 1, -1]))
         True
         """
         # Uses Rodrigues' rotation formula,
