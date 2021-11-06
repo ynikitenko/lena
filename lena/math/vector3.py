@@ -40,9 +40,10 @@ Other values can be used as well,
 if that makes sense for the operations used
 (types are not tested during the initialization).
 For example, vectors in the examples above have integer coordinates,
-which can change if we multiply them by floats
-or rotate. For usual vector additions, though, their coordinates
-remain integer.
+which will become floats if we multiply them by floats,
+divide or maybe rotate.
+For usual vector additions or subtractions, though,
+their coordinates will remain integer.
 """
 
 from math import sin, cos, acos, pi, atan2, sqrt
@@ -311,6 +312,8 @@ class vector3(object):
         """
         return self.dot(self)
 
+    # todo: probably make r2 an attribute (like rho2)
+    # and why do we have a separate method _mag2?
     def getr2(self):
         return self._mag2()
 
@@ -346,12 +349,13 @@ class vector3(object):
 
     ## Prohibit comparison methods <, <=, >, >=, __cmp__
 
-    def __cmp__(self, B):
-        # works fine for Python 2, but __lt__, etc.
-        # should be also implemented for Python 3.
-        raise lena.core.LenaTypeError(
-            "comparison is not supported for vector3"
-        )
+    # this method is never called. Probably remove.
+    # def __cmp__(self, B):
+    #     # works fine for Python 2, but __lt__, etc.
+    #     # should be also implemented for Python 3.
+    #     raise lena.core.LenaTypeError(
+    #         "comparison is not supported for vector3"
+    #     )
 
     def __lt__(self, B):
         raise lena.core.LenaTypeError(
@@ -378,8 +382,8 @@ class vector3(object):
     def __getitem__(self, i):
         return self._v[i]
 
-    def __setitem__(self, key, value):
-        self._v[key] = float(value)
+    def __setitem__(self, ind, value):
+        self._v[ind] = float(value)
 
     def __iter__(self):
         return iter(self._v)
@@ -412,6 +416,8 @@ class vector3(object):
     # http://blog.teamtreehouse.com/operator-overloading-python
 
     def __nonzero__(self):
+        # implement truth value testing and bool()
+        # not used in Python 3 tests
         return self._mag2() != 0
 
     ## Regular Binary Operations
@@ -433,6 +439,10 @@ class vector3(object):
         >>> v1 / 2
         vector3(0.0, 0.5, 1.0)
         """
+        # in Python 3 4/2 = 2.,
+        # while in Python 2 4/2 is integer 2!
+        # so there is no need to care about preserving integers:
+        # they will be lost in general.
         return 1./c * self
 
     def __truediv__(self, c):
