@@ -7,7 +7,7 @@ with open("README.rst", "r") as readme:
 
 setuptools.setup(
     name="lena",
-    version="0.3",
+    version="0.4",
     author="Yaroslav Nikitenko",
     author_email="metst13@gmail.com",
     description="Lena is an architectural framework for data analysis",
@@ -23,7 +23,6 @@ setuptools.setup(
     packages=setuptools.find_packages(exclude=['tests', 'tests.*']),
     classifiers=[
         "Development Status :: 4 - Beta",
-        # "Development Status :: 3 - Alpha",
         "Environment :: Console", 
         "Intended Audience :: Developers",
         "Intended Audience :: Science/Research",
@@ -34,6 +33,7 @@ setuptools.setup(
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: Implementation :: PyPy",
         "Topic :: Scientific/Engineering :: Information Analysis",
         "Topic :: Software Development :: Libraries",
