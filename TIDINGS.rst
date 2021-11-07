@@ -20,12 +20,6 @@ Python code (outside Lena framework).
 Vector3 gets a stable initialization interface
 (not from a list, but from 3 coordinate values).
 
-Histogram structure becomes more robust and can be used in other
-Python code (outside Lena framework).
-
-Vector3 gets a stable initialization interface
-(not from a list, but from 3 coordinate values).
-
 Adds new elements and a new module input.
 
 * lena.flow changes:
@@ -103,7 +97,6 @@ Deprecations and backward incompatible changes
 
 * lena.flow changes:
 
-<<<<<<< HEAD
   * Renames flow.ISlice to Slice. ISlice is deprecated.
   * Renames TransformBins to IterateBins.
     Completely rework its context handling.
