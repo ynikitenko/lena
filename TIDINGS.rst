@@ -1,4 +1,164 @@
 ====================
+  Lena release 0.4
+====================
+
+Lena v0.4 was released on 7th November 2021.
+
+What's new
+----------
+
+Histograms and related algorithms get great refactoring.
+Logic and interface of SplitIntoBins, MapIntoBins and IterateBins
+has largely improved.
+These elements allow analysis to be reused for data subsamples
+defined by arbitrary values (mapped into bins).
+Histogram structure becomes more robust and can be used in other
+Python code (outside Lena framework).
+Vector3 gets a stable initialization interface
+(not from a list, but from 3 coordinate values).
+Adds new elements and a new module input.
+
+* lena.flow changes:
+
+  * Adds Filter (a standard functional instrument).
+  * IterateBins adds a keyword argument *select_bins*.
+  * Adds Progress (estimate processed / remaining data).
+  * Adds an iterator Reverse (reverse the flow).
+  * Adds RunIf (conditionally run a sequence for selected values from the flow).
+    It existed earlier as TransformIf, but was unused and deprecated.
+  * Slice supports negative *start* and *stop* parameters during run.
+  * Selector gets *raise_on_error* keyword argument
+    (previously always returned ``False``).
+
+* lena.math changes:
+
+  * vector3 supports cylindrical coordinates *rho* and *rho2*.
+
+* lena.output changes:
+
+  * LaTeXToPDF reprocesses pdf files
+    if their tex templates were modified after pdf creation.
+  * Adds *prefix* and *suffix* keyword arguments to MakeFilename.
+    They can be used to create parts of file names
+    before they are created (e.g. suffix="_log").
+  * RenderLaTeX accepts keyword argument *verbose*.
+
+* lena.structures changes:
+
+    * Adds HistToGraph.
+    * Adds histogram class.
+      Histograms are separated into a structure histogram
+      and an element Histogram (allowing great conceptual decoupling).
+      Should not affect user code in Sequences.
+
+A new module *input* was created.
+Its context name is suggested "input".
+At the moment it contains several ROOT bindings:
+*read_root_file* and *read_root_tree*
+(ROOT is a data analysis framework used by physicists,
+ https://root.cern).
+
+*lena.output* adds a submodule *write_root_tree*.
+Unfortunately, this class is not thoroughly tested
+and is not included into the documentation yet.
+
+Bug fixes
+---------
+
+* lena.flow fixes:
+
+  * Fixes Slice.
+  * Fixes split_into_bins._iter_bins_with_edges
+    (had problems with multidimensional bins; used in IterateBins).
+  * Numerous fixes in IterateBins (related to context).
+  * Numerous fixes in MapBins (related to context).
+  * Numerous fixes in SplitIntoBins (related to context).
+
+* lena.output fixes:
+
+  * Fixes LaTeXToPDF (didn't print output in case of errors even with verbosity set).
+  * Fixes LaTeXToPDF (iteration on a mutated dictionary,
+    leading to a runtime error with tens of plots).
+  * Fixes RenderLaTeX (didn't work with context.output.template).
+
+Deprecations and backward incompatible changes
+----------------------------------------------
+
+* lena.context changes:
+
+  * Context.formatter is now private.
+  * str_to_dict no longer accepts a dictionary.
+  * Refactor update_nested.
+    *other* is no longer required to be a dictionary with one key:
+    the key is now provided as the first argument.
+
+* lena.flow changes:
+
+    * Renames flow.ISlice to Slice. ISlice is deprecated.
+    * Renames TransformBins to IterateBins.
+      Completely rework its context handling.
+    * Renames ReduceBinContent to MapBins.
+      Changes semantics of a keyword argument drop_bins_context.
+      Renames its keyword argument *transform* to *seq*.
+      Renames keyword argument *select* to *select_bins*,
+      change order of keyword arguments.
+      Completely rework its context handling.
+    * SplitIntoBins adds context to *histogram* and *variable*
+      (not to *split_into_bins*).
+      This allows unification of SplitIntoBins
+      with common analysis using histograms and variables
+      (useful when creating plots from one template).
+      SplitIntoBins is no longer a descendant of FillCompute
+      (it is not needed because of structural subtyping).
+      Removes initialization keyword argument *transform*,
+      because it can be equally inserted later in the sequence.
+      Renames keyword argument *arg_func* to *arg_var*
+      (since it is a Variable).
+
+* lena.output changes:
+
+    * Renames Writer to Write. Writer is deprecated.
+    * Renames RenderLaTeX keyword argument
+      *template_path* to *template_dir* (to improve clarity).
+      Adds hash symbols to its verbose output.
+
+* math.vector3 is initialized not from a vector, but from 3 values x, y and z.
+  vector3 no longer transforms its components to floats.
+  Thus it behaves like a number in Python
+  (if it was integer, it is converted to float only when needed).
+  Removes its __cmp__ method (not used).
+* Renames structures.hist_to_graph keyword arguments
+  to coincide with those of HistToGraph
+  (*make_graph_value* to *make_value*, *bin_coord* to *get_coordinate*).
+  Changes requirements for its *make_value* argument
+  (now accepts one value instead of two).
+
+Technical changes
+-----------------
+
+* Lena is tested and works with Python 3.10.
+  Tox fails for Python 3.5-3.8 (unrelated to Lena).
+  Tox uses correct pytest.
+* Move sphinx requirements to docs/requirements.txt.
+  Update documentation for newer Sphinx.
+* Add .readthedocs.yaml config (fixes build fails on readthedocs).
+* Change absolute imports to relative ones in __init__.py in packages.
+* Import of NumpyHistogram becomes more robust
+  (less prone to numpy import errors).
+* Improves deprecation messages.
+* ISlice.fill_into is tested with Hypothesis.
+* Adds a private method variable.Variable._update_context.
+* Pytest ignores ROOT tests if ROOT is not installed.
+  ROOT tests are marked.
+  Add tests/root/conftest.py with rootfile fixture,
+  so that ROOT tests will be run in correct order
+* Code improvement and refactoring.
+* Documentation updates and improvements.
+* Several new classes / modules become 100% tested.
+* New tests added. Test coverage is 91% (286/3215 missing vs total).
+
+
+====================
   Lena release 0.3
 ====================
 
