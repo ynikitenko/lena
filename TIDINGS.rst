@@ -10,7 +10,7 @@ What's new
 Histograms and related algorithms get great refactoring.
 
 Logic and interface of SplitIntoBins, MapIntoBins and IterateBins
-has largely improved.
+have largely improved.
 These elements allow analysis to be reused for data subsamples
 defined by arbitrary values (mapped into bins).
 
@@ -34,10 +34,6 @@ Adds new elements and a new module input.
   * Selector gets *raise_on_error* keyword argument
     (previously always returned ``False``).
 
-* lena.math changes:
-
-  * vector3 supports cylindrical coordinates *rho* and *rho2*.
-
 * lena.output changes:
 
   * LaTeXToPDF reprocesses pdf files
@@ -46,6 +42,7 @@ Adds new elements and a new module input.
     They can be used to create parts of file names
     before they are created (e.g. suffix="_log").
   * RenderLaTeX accepts keyword argument *verbose*.
+    Adds hash symbols to its verbose output.
 
 * lena.structures changes:
 
@@ -54,6 +51,8 @@ Adds new elements and a new module input.
     Histograms are separated into a structure histogram
     and an element Histogram (allowing great conceptual decoupling).
     Should not affect user code in Sequences.
+
+* math.vector3 supports cylindrical coordinates *rho* and *rho2*.
 
 A new module *input* was created.
 Its context name is suggested "input".
@@ -91,7 +90,7 @@ Deprecations and backward incompatible changes
 
   * Context.formatter is now private.
   * str_to_dict no longer accepts a dictionary.
-  * Refactor update_nested.
+  * Refactors update_nested.
     *other* is no longer required to be a dictionary with one key:
     the key is now provided as the first argument.
 
@@ -123,7 +122,6 @@ Deprecations and backward incompatible changes
   * Renames Writer to Write. Writer is deprecated.
   * Renames RenderLaTeX keyword argument
     *template_path* to *template_dir* (to improve clarity).
-    Adds hash symbols to its verbose output.
 
 * math.vector3 is initialized not from a vector, but from 3 values x, y and z.
   vector3 no longer transforms its components to floats.
@@ -142,10 +140,10 @@ Technical changes
 * Lena is tested and works with Python 3.10.
   Tox fails for Python 3.5-3.8 (unrelated to Lena).
   Tox uses correct pytest.
-* Move sphinx requirements to docs/requirements.txt.
-  Update documentation for newer Sphinx.
-* Add .readthedocs.yaml config (fixes build fails on readthedocs).
-* Change absolute imports to relative ones in __init__.py in packages.
+* Moves sphinx requirements to docs/requirements.txt.
+  Updates documentation for newer Sphinx.
+* Adds .readthedocs.yaml config (fixes build fails on readthedocs).
+* Changes absolute imports to relative ones in __init__.py in packages.
 * Import of NumpyHistogram becomes more robust
   (less prone to numpy import errors).
 * Improves deprecation messages.
@@ -158,7 +156,7 @@ Technical changes
 * Code improvement and refactoring.
 * Documentation updates and improvements.
 * Several new classes / modules become 100% tested.
-* New tests added. Test coverage is 91% (286/3215 missing vs total).
+* Adds new tests. Test coverage is 91% (286/3215 missing vs total).
 
 
 ====================
