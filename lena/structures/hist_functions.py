@@ -10,13 +10,14 @@ import itertools
 import operator
 import sys
 if sys.version_info.major == 3:
-    # don't import reduce to this module
     from functools import reduce as _reduce
 else:
     _reduce = reduce
 
 import lena.core
-from . import graph
+import lena.structures.graph
+# todo: move it to this module
+import lena.flow.split_into_bins
 
 
 class HistCell(collections.namedtuple("HistCell", ("edges, bin, index"))):
@@ -236,60 +237,61 @@ def get_bin_on_value(arg, edges):
     return indices
 
 
-def hist_to_graph(hist, context, make_value=None, get_coordinate="left"):
+def hist_to_graph(hist, make_value=None, get_coordinate="left", scale=None):
     """Convert a :class:`.histogram` to a :class:`.Graph`.
 
-    *context* becomes the graph's context.
-    For example, it can contain a scale.
+    *make_value* is a function to set the value of a graph's point.
+    By default it is bin content.
+    *make_value* accepts a single value (bin content) without context.
 
-    *make_value* is a function to set graph point's value.
-    By default it is bin content. This option could be used to
-    create graph error bars.
-    *make_value* accepts a single value (bin content),
-    which can contain a context. Define this function
-    depending on the expected data.
+    This option could be used to create graph's error bars.
     For example, to create a graph with errors
     from a histogram where bins contain
     a named tuple with fields *mean*, *mean_error* and a context
     one could use
 
-    >>> make_value = lambda val: (val[0].mean, val[0].mean_error)
+    >>> make_value = lambda bin_: (bin_.mean, bin_.mean_error)
 
     *get_coordinate* defines what will be the coordinate
     of a graph's point created from a histogram's bin.
     It can be "left" (default), "right" and "middle".
 
+    *scale* becomes the graph's scale (unknown by default).
+
     Return the resulting graph.
     """
-    # todo:
-    # - probably context is not needed in the graph's constructor.
-    gr = graph.Graph(context=context)
-    # todo: make this function a lambda without checks.
-    def get_coord(edges, get_coordinate):
-        if get_coordinate == "left":
-            return tuple(coord[0] for coord in edges)
-        elif get_coordinate == "right":
-            return tuple(coord[1] for coord in edges)
-        # or center?
-        elif get_coordinate == "middle":
-            return tuple(0.5*(coord[0] + coord[1]) for coord in edges)
-        else:
-            raise lena.core.LenaValueError(
-                'get_coordinate must be one of "left", "right" or "middle"; '
-                '"{}" provided'.format(get_coordinate)
-            )
-    # todo: move it to this module, of course
-    from lena.flow.split_into_bins import _iter_bins_with_edges as ibe
-    for value, edges in ibe(hist.bins, hist.edges):
-        coord = get_coord(edges, get_coordinate)
+    gr = lena.structures.graph.Graph(scale=scale)
+
+    ## Could have allowed get_coordinate to be callable
+    # (for generality), but 1) first find a use case,
+    # 2) histogram bins could be adjusted in the first place.
+    if get_coordinate == "left":
+        get_coord = lambda edges: tuple(coord[0] for coord in edges)
+    elif get_coordinate == "right":
+        get_coord = lambda edges: tuple(coord[1] for coord in edges)
+    # *middle* between the two edges, not the *center* of the bin
+    # as a whole (because the graph corresponds to a point)
+    elif get_coordinate == "middle":
+        get_coord = lambda edges: tuple(0.5*(coord[0] + coord[1])
+                                        for coord in edges)
+    else:
+        raise lena.core.LenaValueError(
+            'get_coordinate must be one of "left", "right" or "middle"; '
+            '"{}" provided'.format(get_coordinate)
+        )
+
+    _ibe = lena.flow.split_into_bins._iter_bins_with_edges
+    for value, edges in _ibe(hist.bins, hist.edges):
+        coord = get_coord(edges)
         # todo: unclear when bin_context is present.
-        bin_value, bin_context = lena.flow.get_data_context(value)
+        bin_value = lena.flow.get_data(value)
+        # todo: maybe it should be only a tuple?
         if not hasattr(bin_value, "__iter__"):
             bin_value = (bin_value,)
         if make_value is None:
             graph_value = bin_value
         else:
-            graph_value = make_value((bin_value, bin_context))
+            graph_value = make_value(bin_value)
         gr.fill((coord, graph_value))
     return gr
 

@@ -1,6 +1,4 @@
 """Graph is a function at given points."""
-from __future__ import print_function
-
 import copy
 
 import lena.core

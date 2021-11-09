@@ -179,11 +179,12 @@ class Variable(object):
         context_var = context.get("variable")
         if context_var:
             # preserve variable.compose if that is present
+            # This is variable.compose (not variable.variable),
+            # because it underlines that variable composition
+            # is not simply update_nested.
             context["variable"]["compose"] = copy.deepcopy(context_var)
             # deep copy, because otherwise
             # it will be updated during update_recursively
-            ## todo: maybe it should be variable.variable
-            # instead of variable.compose.
 
         # update recursively, because we need to preserve "type"
         # and other not overwritten data
