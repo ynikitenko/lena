@@ -9,12 +9,6 @@ from .iterators import Chain, CountFrom, Slice, ISlice, Reverse
 from .print_ import Print
 from .progress import Progress
 from .selectors import Not, Selector
-from .split_into_bins import (
-    IterateBins,
-    MapBins,
-    SplitIntoBins,
-    get_example_bin,
-)
 from .zip import Zip
 from .filter import Filter
 
@@ -44,9 +38,4 @@ __all__ = [
     'Selector',
     'seq_map',
     'RunIf',
-    # split into bins
-    'SplitIntoBins',
-    'IterateBins',
-    'MapBins',
-    'get_example_bin',
 ]

@@ -4,12 +4,13 @@ import pytest
 import copy
 
 import lena.core
-import lena.flow.split_into_bins as sib
 from lena.core import Split, FillCompute, Sequence
 from lena.variables import Variable
 from lena.structures import histogram
-from lena.flow import SplitIntoBins, IterateBins, MapBins
-from lena.flow.split_into_bins import _iter_bins_with_edges
+from lena.structures import cell_to_string, get_example_bin
+from lena.structures import SplitIntoBins, IterateBins, MapBins
+from lena.structures.split_into_bins import _MdSeqMap
+from lena.structures.hist_functions import _iter_bins_with_edges
 
 from tests.examples.fill_compute import Count, Sum
 
@@ -48,7 +49,6 @@ def test_iter_bins_with_edges():
 
 
 def test__md_seq_map():
-    _MdSeqMap = sib._MdSeqMap
     arr = [Count(), Count()]
     arr[1].fill(1)
     seq_map = _MdSeqMap(lambda cell: cell.compute(), arr)
@@ -58,7 +58,6 @@ def test__md_seq_map():
 
 
 def test_cell_to_str():
-    cell_to_string = sib.cell_to_string
     assert cell_to_string(((0, 1),)) == "0_lte_coord0_lt_1"
     with pytest.raises(lena.core.LenaValueError):
         cell_to_string(((0, 1),), coord_names=["x", "y"])
@@ -77,7 +76,6 @@ def test_cell_to_str():
 
 
 def test_get_example_bin():
-    get_example_bin = sib.get_example_bin
     bins = [[0, 1], [1, 1]]
     assert get_example_bin(bins) == 0
     hist = histogram([[0, 1, 2], [0, 1, 2]], bins)
@@ -120,7 +118,7 @@ def test_iterate_bins():
         }
     }
     # create_edges_str works
-    t1 = IterateBins(create_edges_str=sib.cell_to_string)
+    t1 = IterateBins(create_edges_str=cell_to_string)
     data = copy.deepcopy(data_unchanged)
     results1 = list(t1.run(data))
     assert results1 == results

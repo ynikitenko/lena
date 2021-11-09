@@ -53,7 +53,8 @@ class HistToGraph():
         """
         from lena.flow import get_data_context
         from lena.flow import get_context
-        get_example_bin = lena.flow.split_into_bins.get_example_bin
+        # don't know differences between these two ways of imports
+        get_example_bin = lena.structures.get_example_bin
         update_nested = lena.context.update_nested
         # why can't it be a Call element, which just returns
         # unchanged values for non-histograms?

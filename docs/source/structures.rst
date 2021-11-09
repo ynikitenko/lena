@@ -21,6 +21,17 @@ Structures
 
     HistToGraph
 
+**Split into bins:**
+
+.. currentmodule:: lena.structures.split_into_bins
+.. autosummary::
+
+    IterateBins
+    MapBins
+    SplitIntoBins
+    cell_to_string
+    get_example_bin
+
 **Histogram functions:**
 
 .. currentmodule:: lena.structures.hist_functions
@@ -79,6 +90,11 @@ Graph
 .. module:: lena.structures.elements
 .. autoclass:: HistToGraph
     :members:
+
+Split into bins
+---------------
+
+.. automodule:: lena.structures.split_into_bins
 
 Histogram functions
 -------------------

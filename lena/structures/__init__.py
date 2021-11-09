@@ -2,9 +2,11 @@ from .elements import HistToGraph
 from .graph import Graph
 from .histogram import histogram, Histogram
 from .hist_functions import (
+    cell_to_string,
     check_edges_increasing,
     get_bin_edges,
     get_bin_on_value_1d, get_bin_on_value, get_bin_on_index,
+    get_example_bin,
     HistCell,
     hist_to_graph,
     init_bins,
@@ -15,16 +17,27 @@ from .hist_functions import (
     unify_1_md
 )
 from .numpy_histogram import NumpyHistogram
+from .split_into_bins import (
+    IterateBins,
+    MapBins,
+    SplitIntoBins,
+)
 
 
 __all__ = [
+    # structures
     'Graph',
-    'histogram', 'Histogram',
+    'histogram',
+    'HistCell',
+    'Histogram',
+    'HistToGraph',
+    'NumpyHistogram',
+    # hist functions
     'check_edges_increasing',
+    'cell_to_string',
     'get_bin_edges',
     'get_bin_on_value_1d', 'get_bin_on_value', 'get_bin_on_index',
-    'HistCell',
-    'HistToGraph',
+    'get_example_bin',
     'hist_to_graph',
     'init_bins',
     'integral',
@@ -32,5 +45,8 @@ __all__ = [
     'iter_cells',
     'make_hist_context',
     'unify_1_md',
-    'NumpyHistogram',
+    # split into bins
+    'SplitIntoBins',
+    'IterateBins',
+    'MapBins',
 ]

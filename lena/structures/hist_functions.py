@@ -16,14 +16,55 @@ else:
 
 import lena.core
 import lena.structures.graph
-# todo: move it to this module
-import lena.flow.split_into_bins
 
 
 class HistCell(collections.namedtuple("HistCell", ("edges, bin, index"))):
     """A namedtuple with fields *edges, bin, index*."""
     # from Aaron Hall's answer https://stackoverflow.com/a/28568351/952234
     __slots__ = ()
+
+
+def cell_to_string(
+        cell_edges, var_context=None, coord_names=None,
+        coord_fmt="{}_lte_{}_lt_{}", coord_join="_", reverse=False):
+    """Transform cell edges into a string.
+
+    *cell_edges* is a tuple of pairs *(lower bound, upper bound)*
+    for each coordinate.
+
+    *coord_names* is a list of coordinates names.
+
+    *coord_fmt* is a string,
+    which defines how to format individual coordinates.
+
+    *coord_join* is a string, which joins coordinate pairs.
+
+    If *reverse* is True, coordinates are joined in reverse order.
+    """
+    # todo: do we really need var_context?
+    # todo: even if so, why isn't that a {}? Is that dangerous?
+    if coord_names is None:
+        if var_context is None:
+            coord_names = [
+                "coord{}".format(ind) for ind in range(len(cell_edges))
+            ]
+        else:
+            if "combine" in var_context:
+                coord_names = [var["name"]
+                               for var in var_context["combine"]]
+            else:
+                coord_names = [var_context["name"]]
+    if len(cell_edges) != len(coord_names):
+        raise lena.core.LenaValueError(
+            "coord_names must have same length as cell_edges, "
+            "{} and {} given".format(coord_names, cell_edges)
+        )
+    coord_strings = [coord_fmt.format(edge[0], coord_names[ind], edge[1])
+                     for (ind, edge) in enumerate(cell_edges)]
+    if reverse:
+        coord_strings = reversed(coord_strings)
+    coord_str = coord_join.join(coord_strings)
+    return coord_str
 
 
 def _check_edges_increasing_1d(arr):
@@ -237,6 +278,23 @@ def get_bin_on_value(arg, edges):
     return indices
 
 
+def get_example_bin(struct):
+    """Return bin with zero index on each axis of the histogram bins.
+
+    For example, if the histogram is two-dimensional, return hist[0][0].
+
+    *struct* can be a :class:`.histogram`
+    or an array of bins.
+    """
+    if isinstance(struct, lena.structures.histogram):
+        return lena.structures.get_bin_on_index([0] * struct.dim, struct.bins)
+    else:
+        bins = struct
+        while isinstance(bins, list):
+            bins = bins[0]
+        return bins
+
+
 def hist_to_graph(hist, make_value=None, get_coordinate="left", scale=None):
     """Convert a :class:`.histogram` to a :class:`.Graph`.
 
@@ -280,8 +338,7 @@ def hist_to_graph(hist, make_value=None, get_coordinate="left", scale=None):
             '"{}" provided'.format(get_coordinate)
         )
 
-    _ibe = lena.flow.split_into_bins._iter_bins_with_edges
-    for value, edges in _ibe(hist.bins, hist.edges):
+    for value, edges in _iter_bins_with_edges(hist.bins, hist.edges):
         coord = get_coord(edges)
         # todo: unclear when bin_context is present.
         bin_value = lena.flow.get_data(value)
@@ -377,6 +434,30 @@ def iter_bins(bins):
         for ind, _ in enumerate(bins):
             for sub_ind, val in iter_bins(bins[ind]):
                 yield (((ind,) + sub_ind), val)
+
+
+def _iter_bins_with_edges(bins, edges):
+    """Yield *(bin content, bin edges)* pairs.
+
+    *Bin edges* is a tuple, such that at index *i*
+    its element is bin's *(lower bound, upper bound)*
+    along *i*-th the coordinate.
+    """
+    # todo: only a list or also a tuple, an array?
+    if not isinstance(edges[0], list):
+        edges = [edges]
+    bins_sizes = [len(edge)-1 for edge in edges]
+    indices = [list(range(nbins)) for nbins in bins_sizes]
+    for index in itertools.product(*indices):
+        bin_ = lena.structures.get_bin_on_index(index, bins)
+        edges_low = []
+        edges_high = []
+        for var, var_ind in enumerate(index):
+            edges_low.append(edges[var][var_ind])
+            edges_high.append(edges[var][var_ind+1])
+        yield (bin_, tuple(zip(edges_low, edges_high)))
+        # old interface:
+        # yield (bin_, (edges_low, edges_high))
 
 
 def iter_cells(hist, ranges=None, coord_ranges=None):

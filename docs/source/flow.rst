@@ -48,17 +48,6 @@ Flow
     Reverse
     Slice
 
-**Split into bins:**
-
-.. currentmodule:: lena.flow.split_into_bins
-.. autosummary::
-
-    IterateBins
-    MapBins
-    SplitIntoBins
-    cell_to_string
-    get_example_bin
-
 Elements
 --------
 Elements form Lena sequences.
@@ -111,7 +100,3 @@ Iterators
 .. automodule:: lena.flow.iterators
     :special-members: __call__
 
-Split into bins
----------------
-
-.. automodule:: lena.flow.split_into_bins
