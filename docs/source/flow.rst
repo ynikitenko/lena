@@ -45,8 +45,13 @@ Flow
 
     Chain
     CountFrom
+    ISlice
     Reverse
     Slice
+
+**Split into bins:**
+
+Since Lena 0.5 moved to :doc:`structures`.
 
 Elements
 --------

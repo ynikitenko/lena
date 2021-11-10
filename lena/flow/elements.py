@@ -106,7 +106,7 @@ class RunIf(object):
                 [
                     (
                         select,
-                        seq
+                        Sequence(*args)
                     ),
                     not_select
                     # not selected values pass unchanged
@@ -119,14 +119,17 @@ class RunIf(object):
         for more flexibility.
     """
 
-    def __init__(self, select, seq):
+    def __init__(self, select, *args):
         """*select* is a function that accepts a value
         (maybe with context) and returns a boolean.
         It is converted to a :class:`.Selector`.
         See its specifications for available options.
 
-        *seq* is a sequence that will be run for selected values.
-        If it is not a :class:`.Sequence`, it is converted to that.
+        *args* are an arbitrary number of elements
+        that will be run for selected values.
+        They are joined into a :class:`.Sequence`.
+
+        .. versionadded:: 0.4
         """
         # this element was present in Lena for a long time,
         # but it was called TransformIf
@@ -145,15 +148,15 @@ class RunIf(object):
             else:
                 self._select = select
 
-        if isinstance(seq, lena.core.Sequence):
-            self._seq = seq
+        if len(args) == 1 and isinstance(args[0], lena.core.Sequence):
+            self._seq = args[0]
         else:
             try:
-                seq = lena.core.Sequence(seq)
+                seq = lena.core.Sequence(*args)
             except lena.core.LenaTypeError:
                 raise lena.core.LenaTypeError(
-                    "seq must be a Sequence or convertible to that, "
-                    "{} provided".format(seq)
+                    "args must be a Sequence or convertible to that, "
+                    "{} provided".format(*args)
                 )
             else:
                 self._seq = seq

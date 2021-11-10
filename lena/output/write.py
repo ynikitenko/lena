@@ -10,7 +10,10 @@ import lena.flow
 
 
 def Writer(*args, **kwargs):
-    """Deprecated since Lena 0.4. Use :class:`Write`."""
+    """
+    .. deprecated:: 0.4
+       use :class:`Write`.
+    """
     warnings.warn("Writer is deprecated since Lena 0.4. Use Write. In:",
                   DeprecationWarning, stacklevel=2)
     return Write(*args, **kwargs)

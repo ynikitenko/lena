@@ -9,6 +9,7 @@ Output
     PDFToPNG
     ToCSV
     Write
+    Writer
 ..    WriteROOTTree
 
 .. not covered yet: JSONEncoder, ExtendedHistToHist

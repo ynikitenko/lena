@@ -44,11 +44,16 @@ def test_count():
 def test_run_if():
     data = [1, 2.5]
     add_1 = lambda num: num + 1
+    add_2 = lambda num: num + 2
     select_all = Selector(lambda _: True)
 
     # select all works
     t0 = RunIf(select_all, add_1)
     assert list(t0.run(data)) == [2, 3.5]
+
+    # several elements work
+    t0 = RunIf(select_all, add_1, add_2)
+    assert list(t0.run(data)) == [4, 5.5]
 
     # select none works
     # ready Sequence works

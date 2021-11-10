@@ -33,6 +33,8 @@ class Filter():
             sometimes it can be quick and explicit, and if one's
             class name provides absolutely no clue what it does,
             a general :class:`Filter` would be more readable.
+
+        .. versionadded:: 0.4
         """
         if not callable(selector):
             selector = _Selector(selector)
