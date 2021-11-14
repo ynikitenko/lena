@@ -25,6 +25,8 @@
 
 # output and executables
 docs/examples/tutorial/*/output
+# add new files from there manually
+docs/examples/performance/*
 
 # Sphinx
 docs/build

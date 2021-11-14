@@ -1,0 +1,19 @@
+\documentclass{standalone}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+
+\begin{document}
+\BLOCK{ set var = variable if variable else '' }
+\begin{tikzpicture}
+\begin{axis}[
+    \BLOCK{ if var.latex_name }
+    xlabel = {$\VAR{ var.latex_name }$ \BLOCK{ if var.unit }[$\mathrm{\VAR{ var.unit }}$]\BLOCK{ endif }},
+    \BLOCK{ endif }
+]
+\addplot [
+    const plot,
+] table [col sep=comma, header=false] {\VAR{ output.filepath }};
+\end{axis}
+\end{tikzpicture}
+\end{document}

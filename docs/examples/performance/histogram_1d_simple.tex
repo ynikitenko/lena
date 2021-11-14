@@ -1,0 +1,14 @@
+\documentclass{standalone}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+
+\begin{document}
+\begin{tikzpicture}
+\begin{axis}[]
+\addplot [
+    const plot,
+] table [col sep=comma, header=false] {\VAR{ output.filepath }};
+\end{axis}
+\end{tikzpicture}
+\end{document}
