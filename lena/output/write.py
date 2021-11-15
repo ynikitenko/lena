@@ -5,6 +5,7 @@ import os
 import sys
 import warnings
 
+import lena.context
 import lena.core
 import lena.flow
 
@@ -114,10 +115,11 @@ class Write(object):
         return (dirname, filename, fileext, filepath)
 
     def run(self, flow):
-        """Only strings (and unicode in Python 2) are written.
-        To be written, data must have "output" dictionary in context
-        and *context["output"]["write"]* not set to ``False``.
-        Other values pass unchanged.
+        """Only strings (and unicode in Python 2) and objects with a
+        method *write* are written. Method *write* must accept a string
+        with output file path as an argument.
+        To be written, *context["output"]["write"]* must not be
+        set to ``False``. Not written values pass unchanged.
 
         Full name of the file to be written (*filepath*)
         has the form *self.output_directory/dirname/filename.fileext*,
@@ -130,13 +132,15 @@ class Write(object):
 
         If the resulting file exists
         and its content is the same as the incoming data,
-        file is not overwritten.
+        file is not overwritten (unless it was produced
+        with an object's method *write*, which doesn't allow
+        to learn whether the file has changed).
         If *existing_unchanged* is ``True``, existing file contents are
         not checked (they are assumed to be not changed).
-        If *overwrite* is ``True``, file contents are not checked, and all
-        data is assumed to be changed.
-        If a file was overwritten, *output.changed* is set to ``True``,
-        otherwise if it was not set before, it is set to ``False``.
+        If *overwrite* is ``True``, file contents are not checked,
+        and all data is assumed to be changed.
+        If a file was written, then *output.changed* is set to ``True``,
+        otherwise, if it was not set before, it is set to ``False``.
         If in that case *output.changed* existed,
         it retains its previous value.
 
@@ -165,14 +169,14 @@ class Write(object):
         If *context.output.filename* is present but empty,
         :exc:`.LenaRuntimeError` is raised.
         """
-        def should_be_written(data, context):
-            # check context
-            if ("output" not in context
-                or not isinstance(context["output"], dict)
-                or not context["output"].get("write", True)
-               ):
+        def is_writable(data, context):
+            # context doesn't forbid writing
+            if not lena.context.get_recursively(context, "output.write", True):
                 return False
-            # check data
+            # data allows writing
+            if hasattr(data, "write") and callable(data.write):
+                return True
+            # check strings
             if not isinstance(data, str):
                 if sys.version_info.major == 3:
                     return False
@@ -180,13 +184,16 @@ class Write(object):
                 # elif not isinstance(data, unicode):
                     return False
             return True
+
         for val in flow:
             data, context = lena.flow.get_data_context(val)
-            if not should_be_written(data, context):
+            if not is_writable(data, context):
                 yield val
                 continue
 
             # write output
+            if "output" not in context:
+                context["output"] = {}
             outputc = context["output"]
             try:
                 dirname, filename, fileext, filepath = self._make_filename(outputc)
@@ -200,6 +207,17 @@ class Write(object):
             outputc["filepath"] = filepath
             # if nothing explicitly stated changes, data is unchanged
             changed = outputc.get("changed", False)
+
+            if hasattr(data, "write") and callable(data.write):
+                # todo: allow to check for method has_changed
+                # - allow to use write options
+                # from context.output.write_args
+                # and context.output.write_kwargs
+                # - allow existing_unchanged.
+                data.write(filepath)
+                outputc["changed"] = True
+                yield (filepath, context)
+                continue
 
             if os.path.exists(filepath):
                 if self._existing_unchanged:

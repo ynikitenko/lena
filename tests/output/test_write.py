@@ -1,10 +1,9 @@
-from __future__ import print_function
-
 import copy
 import os
-import pytest
 import sys
 import warnings
+
+import pytest
 
 import lena.core
 from lena.output import Write
@@ -42,9 +41,10 @@ def test_write():
         Write(existing_unchanged=True, overwrite=True)
     w1 = Write()
     # unwritten values pass unchanged
+    # numbers are not written
     indata = [1, 2, 
               (3, {}),
-              # note that context.output is not a dict!
+              # context.output is not a dict
               (4, {"output": ("write", True)}),
               ("5", {"output": {"write": False}}),
               # only here data part is checked
@@ -54,6 +54,29 @@ def test_write():
     # empty filename is prohibited
     with pytest.raises(lena.core.LenaRuntimeError):
         list(w1.run([("0", {"output": {"filename": ""}})]))
+
+    ## classes with write method are written
+    class WritableClass():
+
+        def __init__(self):
+            self._written = False
+
+        def write(self, filepath):
+            self._written = True
+
+    wc1 = WritableClass()
+    wc2 = WritableClass()
+    assert list(w1.run([wc1, (wc2, {"output": {"write": False}})])) == [
+        ('output.txt',
+         {'output':
+             {'fileext': 'txt', 'filepath': 'output.txt',
+              'changed': True, 'filename': 'output'}
+         }
+        ),
+        (wc2, {'output': {'write': False}})
+    ]
+    assert wc1._written is True
+    assert wc2._written is False
 
 
 def test_write_writes(mocker):
