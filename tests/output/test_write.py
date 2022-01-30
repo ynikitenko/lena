@@ -78,6 +78,17 @@ def test_write():
     assert wc1._written is True
     assert wc2._written is False
 
+    # if data part is equal to filepath, the value is skipped.
+    w2 = Write()
+    value = ('output.txt',
+             {
+                 'output': {
+                     'fileext': 'txt',
+                     'filepath': 'output.txt'
+                 }
+             })
+    assert list(w2.run([copy.deepcopy(value)])) == [value]
+
 
 def test_write_writes(mocker):
     m = mocker.mock_open()

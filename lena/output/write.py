@@ -46,8 +46,8 @@ class Write(object):
 
         *existing_unchanged* and *overwrite* are used during :meth:`run`
         to change the handling of existing files.
-        They are mutually exclusive:
-        simultaneous use raises :exc:`.LenaValueError`.
+        These options are mutually exclusive:
+        their simultaneous use raises :exc:`.LenaValueError`.
         """
         self.output_directory = output_directory
         self._output_filename = output_filename
@@ -113,17 +113,17 @@ class Write(object):
         return (dirname, filename, fileext, filepath)
 
     def run(self, flow):
-        """Only strings (and unicode in Python 2) and objects with a
+        """Only strings (and `unicode` in Python 2) and objects with a
         method *write* are written. Method *write* must accept a string
         with output file path as an argument.
-        To be written, *context["output"]["write"]* must not be
-        set to ``False``. Not written values pass unchanged.
+        If *context["output"]["write"]* is set to ``False``,
+        a value will not be written. Not written values pass unchanged.
 
         Full name of the file to be written (*filepath*)
         has the form *self.output_directory/dirname/filename.fileext*,
         where *dirname*, *filename* and file extension *fileext*
         are searched in *context["output"]*.
-        If *filename* is missing, Write's default filename is used.
+        If *filename* is missing, *Write*'s default filename is used.
         If *fileext* is missing, then *filetype* is used; if it is
         also absent, the default file extension is "txt".
         It is usually enough to provide *fileext*.
@@ -158,18 +158,22 @@ class Write(object):
         because read speed is typically higher than write speed.
 
         File name with full path is yielded as data.
-        *Context.output* is updated with *fileext* and *filename*
+        *context.output* is updated with *fileext* and *filename*
         (in case they were not present),
         and *filepath*, where *filename* is its base part
         (without output directory and extension)
         and *filepath* is the complete path.
+        If data is equal to *context.output.filepath*, this means
+        that the file was already written by another *Write*,
+        and the value is skipped (yielded unchanged).
 
         If *context.output.filename* is present but empty,
         :exc:`.LenaRuntimeError` is raised.
         """
         def is_writable(data, context):
             # context doesn't forbid writing
-            if not lena.context.get_recursively(context, "output.write", True):
+            if lena.context.get_recursively(context, "output.write", True)\
+                is False:
                 return False
             # data allows writing
             if hasattr(data, "write") and callable(data.write):
@@ -199,6 +203,16 @@ class Write(object):
                 raise lena.core.LenaRuntimeError(
                     "could not make output file name from {}".format(val)
                 )
+
+            # this file path was already written by another Write,
+            # hence it is skipped.
+            # Another option would be to create a special class
+            # for file paths to be used as a data part of a value.
+            # The used variant is less general, but practical.
+            if data == filepath:
+                yield val
+                continue
+
             # dirname is not changed, no need to update it
             outputc["filename"] = filename
             outputc["fileext"] = fileext
