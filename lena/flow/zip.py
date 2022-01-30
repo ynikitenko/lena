@@ -1,5 +1,3 @@
-from __future__ import print_function
-
 import collections
 import copy
 
@@ -11,10 +9,14 @@ from . import functions
 
 class Zip(object):
     """Like :class:`Split`, but zip output values into tuples."""
+    # """Like :class:`Split`, but zip output values into user-defined objects."""
 
     def __init__(self, sequences, name="zip", fields=[]):
-        """Initialize a list of *sequences* to work in parallel.
-        *Sequences* must be of one common type.
+    # shall be changed to this:
+    # def __init__(self, seqs, construct=tuple, with_context=False):
+    #    *Construct* is a callable which accepts a
+        """Initialize a list of sequences to work in parallel.
+        Sequences *seqs* must be of one common type.
 
         If *fields* are provided, the resulting values will be
         *namedtuples* (both data and context.zip parts)

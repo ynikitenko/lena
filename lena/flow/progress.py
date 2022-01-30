@@ -13,8 +13,8 @@ class Progress(object):
         It will be passed keyword arguments *percent*, *index*,
         *total* and *name*.
 
-        Use :class:`Progress` when large processing will
-        be done after that. For example, if you have files
+        Use :class:`Progress` before a large processing.
+        For example, if you have files
         with much data, put this element after generating file
         names, but before reading files.
         To print indices without reading the whole flow,

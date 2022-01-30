@@ -52,6 +52,9 @@ import lena.core
 import lena.math
 
 # pylint: disable=invalid-name,too-many-public-methods
+## vector3 has semantics of a simple type (compared to Lena elements),
+## hence its name is lowercase;
+## and it has many public methods because of rich allowed operations.
 
 
 class vector3(object):

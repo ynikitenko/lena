@@ -27,7 +27,7 @@ highlight_language = 'python'
 # -- Project information -----------------------------------------------------
 
 project = u'Lena'
-copyright = u'2020-2021, Yaroslav Nikitenko'
+copyright = u'2020-2022, Yaroslav Nikitenko'
 author = u'Yaroslav Nikitenko'
 
 # The short X.Y version
@@ -58,7 +58,7 @@ extensions = [
     'sphinx.ext.mathjax',
     'sphinx.ext.todo',
     'sphinx.ext.viewcode',
-    'sphinxcontrib.napoleon',
+    'sphinx.ext.napoleon',
 ]
 
 # automodapi seems nice, but I could't get it generate separate class pages
