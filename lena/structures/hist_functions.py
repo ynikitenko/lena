@@ -15,7 +15,7 @@ else:
     _reduce = reduce
 
 import lena.core
-import lena.structures.graph
+from .graph import Graph as _Graph
 
 
 class HistCell(collections.namedtuple("HistCell", ("edges, bin, index"))):
@@ -318,7 +318,7 @@ def hist_to_graph(hist, make_value=None, get_coordinate="left", scale=None):
 
     Return the resulting graph.
     """
-    gr = lena.structures.graph.Graph(scale=scale)
+    gr = _Graph(scale=scale)
 
     ## Could have allowed get_coordinate to be callable
     # (for generality), but 1) first find a use case,

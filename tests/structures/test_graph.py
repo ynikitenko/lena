@@ -1,6 +1,3 @@
-"""Test graph."""
-from __future__ import print_function
-
 import copy
 import math
 import random
@@ -14,8 +11,65 @@ import lena.flow
 from lena.core import LenaValueError
 from lena.structures import Histogram
 from lena.math import refine_mesh, isclose
-from lena.structures.graph import Graph
+from lena.structures.graph import graph, Graph
 # from histogram_strategy import generate_increasing_list, generate_data_in_range
+
+
+def test_graph_structure():
+    xs = [0, 1]
+    ys = [2, 3]
+
+    # simplest 2d initialization works
+    gr0 = graph([xs, ys])
+    assert gr0.field_names == ("x", "y")
+
+    # iteration works
+    assert list(gr0) == [(0, 2), (1, 3)]
+
+    assert gr0.scale() is None
+
+    # empty points raise
+    with pytest.raises(LenaValueError):
+        graph([], "")
+    # duplicate names raise
+    with pytest.raises(LenaValueError):
+        graph([xs, ys], "x,x")
+    # wrong sequence lengths raise
+    with pytest.raises(LenaValueError):
+        graph([[], [1]])
+    # field names are same as the points length
+    with pytest.raises(LenaValueError):
+        graph([xs, ys], "x")
+    # unset scale raises
+    with pytest.raises(LenaValueError):
+        gr0.scale(1)
+
+    # rescaling when the scale is set works
+    # 2d graph works
+    gr1 = graph(copy.deepcopy([xs, ys]), scale=2)
+    assert gr1.scale() == 2
+    gr1.scale(1)
+    assert gr1._points == [xs, [1, 1.5]]
+    assert gr1.scale() == 1
+
+    # 3d graph works
+    gr2 = graph(copy.deepcopy([xs, ys, [1, 2]]), field_names="x,y,z", scale=2)
+    gr2.scale(3)
+    assert gr2._points == [xs, ys, [1.5, 3.]]
+    assert gr2.scale() == 3
+
+    # graph with errors works
+    # x errors are unchanged, y coords change
+    gr3 = graph(copy.deepcopy([xs, ys, [1, 2]]), field_names="x, y, x_err", scale=2)
+    # spaces in field_names work
+    assert gr3.field_names == ["x", "y", "x_err"]
+    gr3.scale(1)
+    assert gr3._points == [xs, [1, 1.5], [1, 2]]
+
+    # y errors and coords change
+    gr4 = graph(copy.deepcopy([xs, ys, [1, 2]]), field_names="x,y,y_err", scale=2)
+    gr4.scale(1)
+    assert gr4._points == [xs, [1, 1.5], [0.5, 1]]
 
 
 def test_graph():

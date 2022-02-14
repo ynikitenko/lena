@@ -14,6 +14,7 @@ Structures
 .. currentmodule:: lena.structures.graph
 .. autosummary::
 
+    graph
     Graph
 
 .. currentmodule:: lena.structures.elements
@@ -84,6 +85,9 @@ Graph
 -----
 
 .. module:: lena.structures.graph
+.. autoclass:: graph
+    :members:
+
 .. autoclass:: Graph
     :members:
 

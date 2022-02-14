@@ -1,5 +1,5 @@
 from .elements import HistToGraph
-from .graph import Graph
+from .graph import graph, Graph
 from .histogram import histogram, Histogram
 from .hist_functions import (
     cell_to_string,
@@ -26,7 +26,7 @@ from .split_into_bins import (
 
 __all__ = [
     # structures
-    'Graph',
+    'graph', 'Graph',
     'histogram',
     'HistCell',
     'Histogram',
