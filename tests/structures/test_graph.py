@@ -28,15 +28,22 @@ def test_graph_structure():
 
     assert gr0.scale() is None
 
+    ## points work correctly
     # empty points raise
     with pytest.raises(LenaValueError):
         graph([], "")
-    # duplicate names raise
-    with pytest.raises(LenaValueError):
-        graph([xs, ys], "x,x")
     # wrong sequence lengths raise
     with pytest.raises(LenaValueError):
         graph([[], [1]])
+
+    ## field_names work correctly
+    # duplicate names raise
+    with pytest.raises(LenaValueError):
+        graph([xs, ys], "x,x")
+    # non-tuple field names raise
+    with pytest.raises(lena.core.LenaTypeError):
+        graph([xs, ys], ["x", "y"])
+
     # field names are same as the points length
     with pytest.raises(LenaValueError):
         graph([xs, ys], "x")
@@ -62,7 +69,7 @@ def test_graph_structure():
     # x errors are unchanged, y coords change
     gr3 = graph(copy.deepcopy([xs, ys, [1, 2]]), field_names="x, y, x_err", scale=2)
     # spaces in field_names work
-    assert gr3.field_names == ["x", "y", "x_err"]
+    assert gr3.field_names == ("x", "y", "x_err")
     gr3.scale(1)
     assert gr3._points == [xs, [1, 1.5], [1, 2]]
 

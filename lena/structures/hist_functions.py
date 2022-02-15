@@ -15,7 +15,7 @@ else:
     _reduce = reduce
 
 import lena.core
-from .graph import Graph as _Graph
+from .graph import graph as _graph, Graph as _Graph
 
 
 class HistCell(collections.namedtuple("HistCell", ("edges, bin, index"))):
@@ -295,8 +295,9 @@ def get_example_bin(struct):
         return bins
 
 
-def hist_to_graph(hist, make_value=None, get_coordinate="left", scale=None):
-    """Convert a :class:`.histogram` to a :class:`.Graph`.
+def hist_to_graph(hist, make_value=None, get_coordinate="left",
+                  field_names=("x", "y"), scale=None):
+    """Convert a :class:`.histogram` to a :class:`.graph`.
 
     *make_value* is a function to set the value of a graph's point.
     By default it is bin content.
@@ -310,16 +311,17 @@ def hist_to_graph(hist, make_value=None, get_coordinate="left", scale=None):
 
     >>> make_value = lambda bin_: (bin_.mean, bin_.mean_error)
 
-    *get_coordinate* defines what will be the coordinate
-    of a graph's point created from a histogram's bin.
+    *get_coordinate* defines what the coordinate
+    of a graph's point created from a histogram's bin will be.
     It can be "left" (default), "right" and "middle".
+
+    *field_names* set field names of the graph. Their number
+    must be the same as the dimension of the result.
 
     *scale* becomes the graph's scale (unknown by default).
 
     Return the resulting graph.
     """
-    gr = _Graph(scale=scale)
-
     ## Could have allowed get_coordinate to be callable
     # (for generality), but 1) first find a use case,
     # 2) histogram bins could be adjusted in the first place.
@@ -338,19 +340,40 @@ def hist_to_graph(hist, make_value=None, get_coordinate="left", scale=None):
             '"{}" provided'.format(get_coordinate)
         )
 
+    # todo: make_value may be bad design.
+    # Maybe allow to change the graph in the sequence.
+    # However, make_value allows not to recreate a graph
+    # or its coordinates (if that is not needed).
+
+    points = [[] for _ in field_names]
+
+    chain = itertools.chain
+
     for value, edges in _iter_bins_with_edges(hist.bins, hist.edges):
         coord = get_coord(edges)
-        # todo: unclear when bin_context is present.
-        bin_value = lena.flow.get_data(value)
-        # todo: maybe it should be only a tuple?
+
+        # Since we never use contexts here, it will be optimal
+        # to ignore them completely (remove them elswhere).
+        # bin_value = lena.flow.get_data(value)
+        bin_value = value
+
+        ## if we provide make_value, no need to adjust bin_value
+        # # todo: maybe it should be only a tuple?
+        # however, if there is no make_value, one-dimensional
+        # histogram might fail when chaining that
         if not hasattr(bin_value, "__iter__"):
             bin_value = (bin_value,)
+
         if make_value is None:
             graph_value = bin_value
         else:
             graph_value = make_value(bin_value)
-        gr.fill((coord, graph_value))
-    return gr
+
+        for arr, coord_ in zip(points, chain(coord, graph_value)):
+            arr.append(coord_)
+        # gr.fill((coord, graph_value))
+
+    return _graph(points, field_names, scale)
 
 
 def init_bins(edges, value=0, deepcopy=False):

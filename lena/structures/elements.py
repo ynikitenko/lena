@@ -12,13 +12,15 @@ from .hist_functions import hist_to_graph
 class HistToGraph():
     """Transform a :class:`.histogram` to a :class:`.Graph`."""
 
-    def __init__(self, make_value, get_coordinate="left"):
+    def __init__(self, make_value, get_coordinate="left", field_names=("x", "y")):
         """*make_value* is a :class:`.Variable`
         that creates graph's value from the bin's value.
 
         *get_coordinate* defines the coordinate of the graph's point.
         By default, it is the left bin edge. Other allowed values are
         "right" and "middle".
+
+        *field_names* set field names of resulting graphs.
 
         Incorrect values for *make_value* or *get_coordinate* raise,
         respectively,
@@ -31,13 +33,19 @@ class HistToGraph():
                 "make_value must be a Variable, "
                 "{} given".format(make_value)
             )
-        # todo: functions for coordinates should be allowed
+        # todo? functions for coordinates should be allowed
+        # -- see comment in hist_to_graph
+        # todo: do we need a run method, or should it be just __call__?
+        # -- see comment in the method! It should.
+        # todo: allow passing a scale(histogram, context?) function
+        #       to create initial scales of graphs
         if get_coordinate not in ["left", "right", "middle"]:
             raise lena.core.LenaValueError(
                 'get_coordinate must be one of "left", "right" or "middle"; '
                 '"{}" provided'.format(get_coordinate)
             )
         self._get_coordinate = get_coordinate
+        self._field_names = field_names
 
     def run(self, flow):
         """Iterate the *flow* and transform histograms to graphs.
@@ -86,6 +94,7 @@ class HistToGraph():
             graph = hist_to_graph(
                 hist,
                 make_value=self._make_value.getter,
+                field_names=self._field_names,
                 get_coordinate=self._get_coordinate
             )
             yield (graph, context)

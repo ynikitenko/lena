@@ -3,6 +3,7 @@ import copy
 import functools
 import operator
 import re
+import warnings
 
 import lena.core
 import lena.context
@@ -35,7 +36,8 @@ class graph():
         *field_names* can be a string separated by whitespace
         and/or commas
         or a sequence of strings, such as ["x", "y", "y_err"].
-        Field names must have as many elements as *points*,
+        *field_names* must be a tuple,
+        have as many elements as *points*,
         and each field name must be unique.
         Default field names are "x" and "y",
         provided for the most used 2-dimensional graphs.
@@ -87,7 +89,14 @@ class graph():
             # split(', ') won't work.
             # From https://stackoverflow.com/a/44785447/952234:
             # \s stands for whitespace.
-            field_names = re.findall(r'[^,\s]+', field_names)
+            field_names = tuple(re.findall(r'[^,\s]+', field_names))
+        elif not isinstance(field_names, tuple):
+            # It might be non-Pythonic to require a tuple
+            # (to prohibit a list), but it's important
+            # for comparisons and uniformity
+            raise lena.core.LenaTypeError(
+                "field_names must be a string or a tuple"
+            )
 
         if len(field_names) != len(points):
             raise lena.core.LenaValueError(
@@ -114,10 +123,31 @@ class graph():
         # Probably we won't add methods __del__(n), __add__(*coords),
         # since it might change the scale.
 
+    def __eq__(self, other):
+        """Two graphs are equal, if and only if they have
+        equal coordinates, field names and scales.
+
+        If *other* is not a :class:`.graph`, return ``False``.
+
+        Note that floating numbers should be compared
+        approximately (using :func:`math.isclose`).
+        Therefore this comparison may give false negatives.
+        """
+        if not isinstance(other, graph):
+            # in Python comparison between different types is allowed
+            return False
+        return (self._points == other._points and self._scale == other._scale
+                and self.field_names == other.field_names)
+
     def __iter__(self):
         """Iterate graph points one by one."""
         for val in zip(*self._points):
             yield val
+
+    def __repr__(self):
+        return """graph({}, field_names={}, scale={}""".format(
+            self._points, self.field_names, self._scale
+        )
 
     def scale(self, other=None):
         """Get or set the scale of the graph.
@@ -218,7 +248,13 @@ def _rescale_value(rescale, value):
 
 
 class Graph(object):
-    """Function at given coordinates (arbitraty dimensions).
+    """
+    .. deprecated:: 0.5
+       use :class:`graph`.
+       This class may be used in the future,
+       but with a changed interface.
+
+    Function at given coordinates (arbitraty dimensions).
 
     Graph points can be set during the initialization and
     during :meth:`fill`. It can be rescaled (producing a new :class:`Graph`).
@@ -262,6 +298,9 @@ class Graph(object):
         All filled values will be stored in it.
         To reduce data, use histograms.
         """
+        warnings.warn("Graph is deprecated since Lena 0.5. Use graph.",
+                      DeprecationWarning, stacklevel=2)
+
         self._points = points if points is not None else []
         # todo: add some sanity checks for points
         self._scale = scale

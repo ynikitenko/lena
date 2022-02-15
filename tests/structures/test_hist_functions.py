@@ -5,7 +5,7 @@ import pytest
 import lena.structures
 from lena.core import LenaIndexError, LenaTypeError, LenaValueError
 from lena.math import mesh
-from lena.structures import histogram, Graph
+from lena.structures import histogram, graph, Graph
 from lena.structures import (
     check_edges_increasing,
     get_bin_edges,
@@ -113,23 +113,24 @@ def test_hist_to_graph():
     nevents = Variable("nevents", lambda nevents: nevents)
     htg = HistToGraph(nevents)
     nev_context = {'value': {'variable': {'name': 'nevents'}}}
+    gr = graph([[0], [1]])
+
     # run works correctly
     assert list(htg.run(data)) == [
         0,
-        (Graph(points=[((0,), (1,))], scale=None, sort=True),
-         nev_context),
-        (Graph(points=[((0,), (1,))], scale=None, sort=True),
-         nev_context),
+        (gr, nev_context),
+        (gr, nev_context),
         # values with the specified context are skipped
         (histogram([0, 1], bins=[1]),
          {'histogram': {'to_graph': False}}
         ),
     ]
+
     # different coordinates work
     assert list(HistToGraph(nevents, get_coordinate="right").run([hist])) == \
-        [(Graph(points=[((1,), (1,))], scale=None, sort=True), nev_context)]
+        [(graph([[1], [1]], scale=None), nev_context)]
     assert list(HistToGraph(nevents, get_coordinate="middle").run([hist])) == \
-        [(Graph(points=[((0.5,), (1,))], scale=None, sort=True), nev_context)]
+        [(graph([[0.5], [1]], scale=None), nev_context)]
 
     val_with_error = collections.namedtuple("val_with_error", ["value", "error"])
     hist1 = histogram(mesh((0, 1), 1))
@@ -137,8 +138,12 @@ def test_hist_to_graph():
     hist1.bins = lena.structures.init_bins(hist1.edges, val)
     transform_value = Variable("value_error",
                                lambda val: (val.value, val.error))
-    assert list(HistToGraph(make_value=transform_value).run([hist1])) == \
-        [(Graph(points=[((0,), (1, 2))], scale=None, sort=True),
+    assert list(
+        HistToGraph(
+            make_value=transform_value, field_names=("x", "y", "z")
+        ).run([hist1])
+    ) == \
+        [(graph([[0], [1], [2]], field_names="x,y,z"),
           {'value': {'variable': {'name': 'value_error'}}})]
 
     # wrong make_value raises
