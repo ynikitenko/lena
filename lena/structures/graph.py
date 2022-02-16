@@ -28,20 +28,19 @@ class graph():
         For example, a 3-dimensional graph could be distinguished
         from a 2-dimensional graph with errors by its fields
         ("x", "y", "z") instead of ("x", "y", "y_err"),
-        or ("x", "y", "y_err_low", "y_err_high").
-        Field names are used to transform Lena graphs to graphs
-        from other libraries.
+        or ("E", "time", "E_err_low", "time_err_high").
         Field names don't affect drawing graphs:
         for that :class:`~Variable`-s should be used.
+        Default field names,
+        provided for the most used 2-dimensional graphs,
+        are "x" and "y".
+
         *field_names* can be a string separated by whitespace
         and/or commas
         or a sequence of strings, such as ["x", "y", "y_err"].
         *field_names* must be a tuple,
         have as many elements as *points*,
         and each field name must be unique.
-        Default field names are "x" and "y",
-        provided for the most used 2-dimensional graphs.
-
         Error fields must go after all other coordinates.
         Names of coordinate errors are those of coordinates plus "_err",
         further error details are appended after '_'
@@ -66,8 +65,17 @@ class graph():
         so use them only if you understand what you are doing.
 
         A graph can be iterated yielding tuples of numbers
-        for each point. Graph field names can be accessed
-        as its *field_names* attribute.
+        for each point.
+
+        **Attributes**
+
+        :attr:`field_names`
+
+        :attr:`dim` is the dimension of the graph,
+        that is of all its coordinates without errors.
+
+        If the initialization arguments are incorrect,
+        :exc:`~.LenaTypeError` or :exc:`~.LenaValueError` are raised.
         """
         if not points:
             raise lena.core.LenaValueError(
@@ -112,6 +120,20 @@ class graph():
         self.field_names = field_names
         self._points = points
         self._scale = scale
+
+        # x_error looks better than x_err,
+        # but x_err_low, y_err_low are much better
+        # than x_error_low and the same for y.
+        # So, for consistency and ease, we use x_err.
+
+        def get_last_coord_ind(field_names):
+            for ind, fn in enumerate(field_names):
+                if fn.endswith("_err") or "_err_" in fn:
+                    ind -= 1
+                    break
+            return ind
+
+        self.dim = get_last_coord_ind(field_names) + 1
 
         # todo: add subsequences of points as attributes
         # with field names.
@@ -184,15 +206,8 @@ class graph():
                 "can't rescale a graph with zero or unknown scale"
             )
 
-        def get_last_coord_ind_name(field_names):
-            for ind, fn in enumerate(field_names):
-                if fn.endswith("_err") or "_err_" in fn:
-                    ind -= 1
-                    break
-            return (ind, field_names[ind])
-
-        last_coord_ind, last_coord_name = \
-                get_last_coord_ind_name(self.field_names)
+        last_coord_ind = self.dim - 1
+        last_coord_name = self.field_names[last_coord_ind]
 
         def get_err_indices(coord_name, field_names):
             err_indices = []

@@ -22,6 +22,8 @@ def test_graph_structure():
     # simplest 2d initialization works
     gr0 = graph([xs, ys])
     assert gr0.field_names == ("x", "y")
+    # dim works
+    assert gr0.dim == 2
 
     # iteration works
     assert list(gr0) == [(0, 2), (1, 3)]
@@ -55,6 +57,7 @@ def test_graph_structure():
     # 2d graph works
     gr1 = graph(copy.deepcopy([xs, ys]), scale=2)
     assert gr1.scale() == 2
+    assert gr1.dim == 2
     gr1.scale(1)
     assert gr1._points == [xs, [1, 1.5]]
     assert gr1.scale() == 1
@@ -64,6 +67,7 @@ def test_graph_structure():
     gr2.scale(3)
     assert gr2._points == [xs, ys, [1.5, 3.]]
     assert gr2.scale() == 3
+    assert gr2.dim == 3
 
     # graph with errors works
     # x errors are unchanged, y coords change
@@ -76,6 +80,7 @@ def test_graph_structure():
     # y errors and coords change
     gr4 = graph(copy.deepcopy([xs, ys, [1, 2]]), field_names="x,y,y_err", scale=2)
     gr4.scale(1)
+    assert gr4.dim == 2
     assert gr4._points == [xs, [1, 1.5], [0.5, 1]]
 
 
