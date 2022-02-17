@@ -1,5 +1,19 @@
-from lena.output import hist1d_to_csv, hist2d_to_csv, ToCSV
+from lena.output import hist1d_to_csv, hist2d_to_csv, ToCSV, iterable_to_table
 from lena.structures import histogram, Histogram
+
+
+def test_iterable_to_table():
+    # one-dimensional structure is output correctly
+    it0 = (1, 2, 3.5, 4)
+    #     iterable, format_=None, header="", header_fields=(),
+    #     row_start="", row_end="", row_separator=",",
+    #     footer=""
+    assert r"\n".join(
+        iterable_to_table(it0, row_start="b", row_end="e", row_separator="s",
+                          footer="f")
+    ) == r'b1e\nb2e\nb3.5e\nb4e\nf'
+
+    it = ((1, 2), (3.5, 4))
 
 
 def test_hist_to_csv():

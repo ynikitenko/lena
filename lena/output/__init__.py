@@ -2,7 +2,7 @@ from .pdf_to_png import PDFToPNG
 from .latex_to_pdf import LaTeXToPDF
 from .make_filename import MakeFilename
 from .write import Writer, Write
-from .to_csv import ToCSV, hist1d_to_csv, hist2d_to_csv
+from .to_csv import ToCSV, hist1d_to_csv, hist2d_to_csv, iterable_to_table
 from .write_root_tree import WriteROOTTree
 
 
@@ -30,6 +30,6 @@ __all__ = [
     'Write',
     'Writer',
     'WriteROOTTree',
-    'ToCSV', 'hist1d_to_csv', 'hist2d_to_csv',
+    'iterable_to_table', 'ToCSV', 'hist1d_to_csv', 'hist2d_to_csv',
     'RenderLaTeX'
 ]

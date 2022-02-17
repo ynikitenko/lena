@@ -7,6 +7,7 @@ Output
 
     MakeFilename
     PDFToPNG
+    iterable_to_table
     ToCSV
     Write
     Writer
@@ -30,6 +31,7 @@ Output
 .. autoclass:: MakeFilename
     :special-members: __call__
 .. autoclass:: PDFToPNG
+.. autofunction:: iterable_to_table
 .. autoclass:: ToCSV
 .. autofunction:: hist1d_to_csv
 .. autofunction:: hist2d_to_csv

@@ -8,6 +8,103 @@ import lena.structures.hist_functions as hf
 # pylint: disable=invalid-name
 
 
+def iterable_to_table(
+        iterable, format_=None, header="", header_fields=(),
+        row_start="", row_end="", row_separator=",",
+        footer=""
+    ):
+    r"""Create a table from an *iterable*.
+
+    The resulting table is yielded line by line.
+    If the *header* or *footer* is empty, it is not yielded.
+
+    *format_* controls the output of individual cells in a row.
+    By default, it uses standard Python representation.
+    For finer control, one should provide a sequence
+    of formatting options for each column.
+    For floating values it is recommended to output
+    only a finite appropriate number of digits,
+    because this would allow the output to be immutable
+    between calls despite technical reasons.
+    Default formatting allows an arbitrary number of columns
+    in each cell. For tables to be well-formed, substitute
+    missing values in the *iterable* for some placeholder
+    like \"\", *None*, etc.
+
+    Each row is prepended with *row_start* and appended with *row_end*.
+    If it consists of several columns, they are joined by
+    *row_separator*.
+    Separators between rows can be added while iterating the result.
+
+    This function can be used to convert structures
+    to different formats: *csv*, *html*, *xml*, etc.
+
+    Examples:
+
+    >>> angles = [(3.1415*i/4, 180*i/4) for i in range(1, 5)]
+    >>> format_ = ("{:.2f}", "{:.0f}")
+    >>> header_fields = ("rad", "deg")
+    >>>
+    >>> csv_rows = iterable_to_table(
+    ...    angles, format_=format_,
+    ...    header="{},{}", header_fields=header_fields,
+    ...    row_separator=",",
+    ... )
+    >>> print("\n".join(csv_rows))
+    rad,deg
+    0.79,45
+    1.57,90
+    2.36,135
+    3.14,180
+    >>>
+    >>> html_rows = iterable_to_table(
+    ...    angles, format_=format_,
+    ...    header="<table>\n" + " "*4 + "<tr><td>{}</td><td>{}</td></tr>",
+    ...    header_fields=header_fields,
+    ...    row_start=" "*4 + "<tr><td>", row_end="</td></tr>",
+    ...    row_separator="</td><td>",
+    ...    footer="</table>"
+    ... )
+    >>> print("\n".join(html_rows))
+    <table>
+        <tr><td>rad</td><td>deg</td></tr>
+        <tr><td>0.79</td><td>45</td></tr>
+        <tr><td>1.57</td><td>90</td></tr>
+        <tr><td>2.36</td><td>135</td></tr>
+        <tr><td>3.14</td><td>180</td></tr>
+    </table>
+    >>>
+
+    For more complex formatting use templates
+    (see :class:`~.RenderLaTeX`).
+    """
+    if header:
+        if header_fields:
+            header = header.format(*header_fields)
+        yield header
+
+    # one value per line may be not such a useful case
+    # to be treated separately.
+    # if isinstance(format_, str):
+    #     format_str = format_
+    if format_ is not None:
+        format_str = row_separator.join(format_)
+
+    for row in iterable:
+        try:
+            cols = iter(row)
+        except TypeError:
+            cols = (row,)
+
+        if format_ is None:
+            yield row_start + row_separator.join(map(repr, cols)) + row_end
+        else:
+            yield row_start + format_str.format(*cols) + row_end
+
+    if footer:
+        yield footer
+
+
 def hist1d_to_csv(hist, header=None, separator=',', duplicate_last_bin=True):
     """Yield CSV-formatted strings for a one-dimensional histogram."""
     bins_ = hist.bins

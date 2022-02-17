@@ -74,8 +74,8 @@ class graph():
         :attr:`dim` is the dimension of the graph,
         that is of all its coordinates without errors.
 
-        If the initialization arguments are incorrect,
-        :exc:`~.LenaTypeError` or :exc:`~.LenaValueError` are raised.
+        In case of incorrect initialization arguments,
+        :exc:`~.LenaTypeError` or :exc:`~.LenaValueError` is raised.
         """
         if not points:
             raise lena.core.LenaValueError(
