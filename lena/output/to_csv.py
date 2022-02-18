@@ -1,4 +1,6 @@
 """Functions and a class to convert data to CSV."""
+import warnings
+
 import lena.context
 import lena.core
 import lena.flow 
@@ -77,6 +79,8 @@ def iterable_to_table(
 
     For more complex formatting use templates
     (see :class:`~.RenderLaTeX`).
+
+    .. versionadded:: 0.5
     """
     if header:
         if header_fields:
@@ -171,19 +175,17 @@ def hist2d_to_csv(hist, header=None, separator=',', duplicate_last_bin=True):
 class ToCSV(object):
     """Convert data to CSV text.
 
-    These objects are converted:
+    Can be converted:
         * :class:`.histogram`
           (implemented only for 1- and 2-dimensional histograms).
-        * any object (including :class:`.Graph`)
-          with *to_csv* method.
+        * any iterable object (including :class:`.graph`).
     """
 
     def __init__(self, separator=",", header=None, duplicate_last_bin=True):
         """*separator* delimits values in the output text.
+        The result is yielded as one string starting from *header*.
 
-        *header* is a string which becomes the first line of the output.
-
-        If *duplicate_last_bin* is ``True``,
+        If *duplicate_last_bin* is ``True``, then for histograms
         contents of the last bin will be written in the end twice.
         This may be useful for graphical representation:
         if last bin is from 9 to 10, then the plot may end on 9,
@@ -197,64 +199,33 @@ class ToCSV(object):
     def run(self, flow):
         """Convert values from *flow* to CSV text.
 
-        *Context.output* is updated with {"filetype": "csv"}.
+        *context.output* is updated with {"filetype": "csv"}.
         All not converted data is yielded unchanged.
 
-        If *data* has *to_csv* method, it must accept
-        keyword arguments *separator* and *header*
-        and return text.
-
-        If *context.output.to_csv* is False,
-        the value is skipped.
+        If *context.output.to_csv* is ``False``, the value is skipped.
 
         Data is yielded as a whole CSV block.
         To generate CSV line by line,
-        use :func:`hist1d_to_csv` and :func:`hist2d_to_csv`.
+        use :func:`hist1d_to_csv`, :func:`hist2d_to_csv`
+        or :func:`iterable_to_table`.
         """
         def is_writable_hist(val):
             """Test whether a value from flow can be converted to CSV."""
             data, context = lena.flow.get_data_context(val)
             return isinstance(data, lena.structures.histogram)
-            ## If *context.type* is "extended histogram", it is skipped,
-            ## because it has non scalar bin content.
-            # seems it's not used anywhere.
-            # if lena.context.get_recursively(context, "type", None) == "extended histogram":
-            #     return False
 
         for val in flow:
             data, context = lena.flow.get_data_context(val)
 
-            # output.to_csv set to False
+            # context allows conversion
             if not lena.context.get_recursively(context, "output.to_csv", True):
                 yield val
                 continue
 
-            if hasattr(data, "to_csv") and callable(data.to_csv):
-                try:
-                    # some classes (like Graph) can have to_csv
-                    # without duplicate_last_bin keyword.
-                    # If it is present, use it.
-                    text = data.to_csv(
-                        separator=self._separator, header=self._header,
-                        duplicate_last_bin=self._duplicate_last_bin
-                    )
-                except TypeError:
-                    text = data.to_csv(
-                        separator=self._separator, header=self._header
-                    )
-                ## *data.to_csv* may produce context,
-                ## which in this case updates the current context.
-                # no need to allow this. All necessary context
-                # must be contained in the data and provided with that.
-                # new_val = data.to_csv(separator=self._separator,
-                #                       header=self._header)
-                # new_data, new_context = (lena.flow.get_data(new_val),
-                #                          lena.flow.get_context(new_val))
-                # lena.context.update_recursively(context, new_context)
-                # yield (new_data, new_context)
-                lena.context.update_recursively(context, "output.filetype.csv")
-                yield (text, context)
-            elif is_writable_hist(val):
+            ### todo: add structure's context.
+
+            ## histogram
+            if isinstance(data, lena.structures.histogram):
                 if data.dim == 1:
                     lines_iter = hist1d_to_csv(
                         data, header=self._header, separator=self._separator,
@@ -266,15 +237,35 @@ class ToCSV(object):
                         duplicate_last_bin=self._duplicate_last_bin,
                     )
                 else:
-                    # todo: warning here
-                    print(
+                    warnings.warn(
                         "{}-dimensional hist_to_csv not implemented"
                         .format(data.dim)
                     )
                     yield val
                     continue
+
+                csv = "\n".join(lines_iter)
                 lena.context.update_recursively(context, "output.filetype.csv")
-                lines = "\n".join(list(lines_iter))
-                yield (lines, context)
+                yield (csv, context)
+                continue
+
+            ## iterable
+            try:
+                rows = iter(data)
+            except TypeError:
+                pass
             else:
-                yield val
+                rows = iterable_to_table(
+                    data, row_separator=self._separator, header=self._header
+                )
+                csv = "\n".join(rows)
+                lena.context.update_recursively(context, "output.filetype.csv")
+                yield (csv, context)
+                continue
+            # to prevent an iterable from writing, probably add
+            # context.to_csv = False (however, this may be bad design).
+            # Just don't pass such iterables (which won't be written)
+            # to the output part, or use filters like RunIf.
+
+            ## unknown type
+            yield val
