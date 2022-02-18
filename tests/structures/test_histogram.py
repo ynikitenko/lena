@@ -4,11 +4,12 @@
 - scale (if filled with a non-negative weight) is always non-negative.
 - scale of a histogram filled with *weight* is *weight* times scale.
 - if all data fills into the histogram with bins size 1,
-its scale is number of data points.
-- if histogram bins are divided by N, its scale will be divided by N.
+  its scale is the number of data points.
+- if histogram bins are divided by N, its scale is divided by N.
 - Histogram and NumpyHistogram should be almost same (except for the upper edge).
 """
 import math
+import sys
 
 import hypothesis
 import pytest
@@ -30,7 +31,17 @@ def test_init_scale_zero(edges):
     assert hist.scale() == 0
 
 
-@given(edges=Edges1dStrategy, weight=s.floats(),
+# we disable subnormals, because in Python 3.10 sometimes (!)
+# the test failed with an error,
+#     where False = isclose((2.2216311086621543 * 5e-324), 1.5e-323)
+# https://hypothesis.readthedocs.io/en/latest/data.html#hypothesis.strategies.floats
+if sys.version_info.major > 2:
+    floats_ = s.floats(allow_subnormal=False)
+else:
+    # in Python 2 allow_subnormal is not recognised
+    floats_ = s.floats()
+
+@given(edges=Edges1dStrategy, weight=floats_,
        refinement=s.integers(min_value=1, max_value=20),
        data_samples=s.integers(min_value=1, max_value=50)
 )

@@ -15,7 +15,7 @@ from lena.structures.graph import graph, Graph
 # from histogram_strategy import generate_increasing_list, generate_data_in_range
 
 
-def test_graph_structure():
+def test_graph():
     xs = [0, 1]
     ys = [2, 3]
 
@@ -84,7 +84,9 @@ def test_graph_structure():
     assert gr4._points == [xs, [1, 1.5], [0.5, 1]]
 
 
-def test_graph():
+# Graph is deprecated, but we keep its tests at the moment.
+@pytest.mark.filterwarnings('ignore::DeprecationWarning')
+def test_Graph():
     # sorts well
     coords = range(0, 10)
     values = map(math.sin, coords)
@@ -171,6 +173,7 @@ def test_graph():
     assert gr1 == Graph()
 
 
+@pytest.mark.filterwarnings('ignore::DeprecationWarning')
 def test_graph_equal():
     # test equality
     gr1 = Graph([(0, 1)])
@@ -194,6 +197,7 @@ def test_graph_equal():
     assert not gr2 == gr3
 
 
+@pytest.mark.filterwarnings('ignore::DeprecationWarning')
 def test_graph_to_csv():
     # to_csv works
     gr2 = Graph([(0, 1)])
