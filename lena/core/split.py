@@ -1,7 +1,4 @@
 """Split data flow and run analysis in parallel."""
-# Split and helper functions.
-from __future__ import print_function
-
 import copy
 import itertools
 
@@ -51,7 +48,7 @@ def _get_seq_with_type(seq):
                 seq = sequence.Sequence(seq)
         except exceptions.LenaTypeError:
             raise exceptions.LenaTypeError(
-                "unknown argument type. Must be one of "
+                "unknown argument type. Must be a "
                 "FillComputeSeq, FillRequestSeq or Source, "
                 "{} provided".format(seq)
             )
@@ -65,20 +62,19 @@ class Split(object):
 
     def __init__(self, seqs, bufsize=1000, copy_buf=True):
         """*seqs* must be a list of Sequence, Source, FillComputeSeq
-        or FillRequestSeq sequences
-        (any other container will raise :exc:`.LenaTypeError`).
+        or FillRequestSeq sequences.
         If *seqs* is empty, *Split* acts as an empty *Sequence* and
         yields all values it receives.
 
         *bufsize* is the size of the buffer for the input flow.
         If *bufsize* is ``None``,
         whole input flow is materialized in the buffer.
-        *bufsize* must be a natural number or ``None``,
-        otherwise :exc:`.LenaValueError` is raised.
+        *bufsize* must be a natural number or ``None``.
 
-        *copy_buf* sets whether the buffer should be copied during *run*.
+        *copy_buf* sets whether the buffer should be copied
+        during :meth:`run`.
         This is important if different sequences can change input data
-        and interfere with each other.
+        and thus interfere with each other.
 
         Common type:
             If each sequence from *seqs* has a common type,
@@ -90,6 +86,9 @@ class Split(object):
             if *copy_buf* is True), and *compute*
             yields values from all sequences in turn
             (as would also do *request* or *Source.__call__*).
+
+        In case of wrong initialization arguments, :exc:`.LenaTypeError`
+        or :exc:`.LenaValueError` is raised.
         """
         # todo: copy_buf must be always True. Isn't that?
         if not isinstance(seqs, list):
@@ -145,13 +144,14 @@ class Split(object):
 
         This method is available only if each self sequence is a
         :class:`.Source`,
-        otherwise :exc:`.LenaAttributeError` is raised during the execution.
+        otherwise runtime :exc:`.LenaAttributeError` is raised.
         """
         if self._n_seq_types != 1 or not ct.is_source(self._sequences[0]):
             raise exceptions.LenaAttributeError(
                 "Split has no method '__call__'. It should contain "
                 "only Source sequences to be callable"
             )
+        # todo: use itertools.chain and check performance difference
         for seq in self._sequences:
             for result in seq():
                 yield result

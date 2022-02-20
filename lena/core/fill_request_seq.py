@@ -1,23 +1,20 @@
-from __future__ import print_function
-
-from . import lena_sequence
-from . import fill_compute_seq
-from . import check_sequence_type
-from . import sequence
 from . import adapters
+from . import check_sequence_type
 from . import exceptions
+from . import fill_compute_seq
+from . import lena_sequence
+from . import sequence
 
 
 class FillRequestSeq(lena_sequence.LenaSequence):
-    """Sequence with one :class:`FillRequest` element.
+    """Sequence with one *FillRequest* element.
 
-    Input flow is preprocessed with the *Sequence*
+    Input flow is preprocessed with the sequence
     before the *FillRequest* element,
     then it fills the *FillRequest* element.
     
     When the results are yielded from the *FillRequest*,
-    they are postprocessed with the *Sequence* after
-    that element.
+    they are postprocessed with the elements that follow it.
     """
 
     def __init__(self, *args, **kwargs):
@@ -29,17 +26,15 @@ class FillRequestSeq(lena_sequence.LenaSequence):
         To change that, explicitly cast the first element
         to :class:`.FillInto`.
 
-        *kwargs* can contain *bufsize*, which is used during *run*.
-        See :class:`FillRequest` for more information on *run*.
-        By default *bufsize* is *1*. Other *kwargs* raise 
-        :exc:`.LenaTypeError`.
+        *kwargs* can contain *bufsize* or *reset*.
+        See :class:`FillRequest` for more information on them.
+        By default *bufsize* is *1*.
 
         If *FillRequest* element was not found,
-        or if the sequences before or after that
-        could not be correctly initialized,
+        the sequences could not be correctly initialized,
+        or unknown keyword arguments were received,
         :exc:`.LenaTypeError` is raised.
         """
-        # *args* can consist of one tuple, which in that case is expanded.
         if "bufsize" in kwargs:
             self._bufsize = kwargs.pop("bufsize")
         else:
@@ -51,6 +46,9 @@ class FillRequestSeq(lena_sequence.LenaSequence):
             raise exceptions.LenaTypeError(
                 "unknown kwargs {}".format(kwargs)
             )
+        ## not sure now. Why is it not documented?
+        # *args* can consist of one tuple,
+        # which in that case is expanded.
         fill_compute_seq._init_sequence_with_el(
             self, args, "_fill_request",
             check_sequence_type.is_fill_request_el,

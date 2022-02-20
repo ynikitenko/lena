@@ -1,5 +1,3 @@
-from __future__ import print_function
-
 import pytest
 from itertools import islice
 
@@ -8,7 +6,7 @@ from lena.core import LenaTypeError, LenaValueError, LenaNotImplementedError
 from lena.core import (
     Call, FillInto, FillCompute, FillRequest, SourceEl, Run
 )
-from lena.flow import Slice, CountFrom
+from lena.flow import Slice, CountFrom, Print
 from lena.math import Sum
 from tests.examples.fill import StoreFilled
 from tests.examples.numeric import Add
@@ -127,12 +125,31 @@ def test_fill_into():
 
 
 def test_fill_request():
+    # todo: modify Source to use iterables (incl. those from itertools)
+    # from itertools import repeat
+    def ones():
+        while True:
+            yield 1
+
     # no fill method raises
     with pytest.raises(LenaTypeError):
         FillRequest(lambda _: 0)
 
+    ## reset works
+    # reset=False works
+    s0 = Source(ones, Slice(10), FillRequest(Sum(), reset=False, bufsize=1))
+    assert list(s0()) == list(range(1, 11))
+
+    # reset=True works
+    s10 = Source(ones, Slice(10), FillRequest(Sum(), reset=True, bufsize=1))
+    assert list(s10()) == [1 for _ in range(10)]
+    # Slice can be moved after FR if bufsize=1
+    s11 = Source(ones, FillRequest(Sum(), reset=True, bufsize=1), Slice(10))
+    assert list(s11()) == [1 for _ in range(10)]
+
     # bufsize 10
-    s1 = Source(CountFrom(), Slice(100), FillRequest(Sum(), reset=False, bufsize=10))
+    s1 = Source(CountFrom(), Slice(100),
+                FillRequest(Sum(), reset=False, bufsize=10))
     results = list(s1())
     assert results == [45, 190, 435, 780, 1225, 1770, 2415, 3160, 4005, 4950]
 
@@ -180,9 +197,14 @@ def test_fill_request():
     fr = FillRequest(MyRun())
     results = list(fr.run([]))
     assert results == [True]
-    # run empty flow should yield something.
+
+    # run empty flow should yield nothing if yield_on_remainder is false!
     fr = FillRequest(Sum())
-    assert list(fr.run([])) == [0]
+    assert list(fr.run([])) == []
+    # same for yield_on_remainder=True.
+    # Because no remainder is not a remainder.
+    fr = FillRequest(Sum(), yield_on_remainder=True)
+    assert list(fr.run([])) == []
 
 
 def test_run():

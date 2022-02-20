@@ -18,8 +18,6 @@ Example:
 >>> list(my_run.run([1, 2, 3]))
 [1, 2, 3]
 """
-from __future__ import print_function
-
 import itertools
 
 from . import exceptions
@@ -216,10 +214,21 @@ class FillInto(object):
 class FillRequest(object):
     """Adapter for a *FillRequest* element.
 
-    A *FillRequest* element has methods *fill(value)* and *request()*.
+    A *FillRequest* element slices the flow during *fill*
+    and yields results for each chunk during *request*.
     """
+    # FillRequest is not deprecated, but changing its meaning.
+    # # They seem redundant, because mostly they are used
+    # # as FillCompute (and a lot of code is duplicated).
+    # # Memory warnings should be indicated elsewhere
+    # # (like special fields).
+    # # Moreover, FillCompute elements
+    # # sometimes need to be more versatile,
+    # # and FillRequest is of no help for that.
 
-    def __init__(self, el, fill="fill", request="request", reset=True, bufsize=1):
+    def __init__(self, el,
+                 fill="fill", request="request",
+                 reset=True, bufsize=1, yield_on_remainder=False):
         """Names for *fill* and *request* can be customized
         during initialization.
 
@@ -234,10 +243,13 @@ class FillRequest(object):
         it is used instead of the default one.
 
         If a keyword argument *reset* is ``True`` (default),
-        *el* must have a method *reset, and in this case
+        *el* must have a method *reset*, and in this case
         :meth:`reset` is called after each :meth:`request`
         (including those during :meth:`run`).
-        If *reset* is ``False``, :meth:`reset` is never called.
+
+        If *yield_on_remainder* is ``True``, then the output will be yielded
+        even if the element was filled less than *bufsize* times
+        (but at least once).
 
         **Attributes**
 
@@ -250,114 +262,114 @@ class FillRequest(object):
         or if *reset* is ``True``, but *el* has no method *reset*,
         :exc:`.LenaTypeError` is raised.
         """
+        # todo: rename bufsize to size or something cleverer
         fill = getattr(el, fill, None)
-        request = getattr(el, request, None)
-        el_reset = getattr(el, "reset", None)
+        # we don't allow other names for reset
+        # el_reset = getattr(el, "reset", None)
         if not callable(fill):
             raise exceptions.LenaTypeError(
                 "fill method {} must exist and be callable".format(fill)
             )
-        if reset and not callable(el_reset):
+
+        if reset and not callable(getattr(el, "reset", None)):
             raise exceptions.LenaTypeError(
                 "reset must exist and be callable"
             )
         self.fill = fill
-
         self._reset = reset
-        if callable(request):
-            self._request_meth = request
+
+        el_request = getattr(el, request, None)
+        if callable(el_request):
+            self._el_request = el_request
         else:
-            # derive from compute and reset
+            # derive from compute
             compute = getattr(el, "compute", None)
-            # reset = getattr(el, "reset", None)
-            if not callable(compute): # or not callable(reset):
+            if not callable(compute):
                 raise exceptions.LenaTypeError(
-                    "request or compute must exist and be callable"
+                    "request or compute methods must exist and be callable"
                 )
-            self.request = self._compute_reset
+            self._el_request = compute
 
         if(bufsize != int(bufsize) or bufsize < 1):
             raise exceptions.LenaValueError(
-                "bufsize must be a natural number, {} provided".format(bufsize)
+                "bufsize must be a natural number, not {}".format(bufsize)
             )
         self.bufsize = int(bufsize)
+        self._yield_on_remainder = bool(yield_on_remainder)
 
+        # looks wrong!
         run = getattr(el, "run", None)
         if run and callable(run):
             self.run = run
+
         self._el = el
 
-    def _compute_reset(self):
-        for val in self._el.compute():
-            yield val
-        if self._reset:
-            self._el.reset()
-
-    def fill(self, value): # pylint: disable=no-self-use,unused-argument
-        """Fill *self* with *value*."""
+    def fill(self, value):  # pylint: disable=no-self-use,unused-argument
+        """Fill *el* with *value*."""
         raise exceptions.LenaNotImplementedError
 
     def request(self):
-        """Yield computed values.
-
-        May be called at any time,
-        the flow may still contain zero or more items.
-        """
-        for val in self._request_meth():
+        """Yield computed values."""
+        for val in self._el_request():
             yield val
         if self._reset:
             self._el.reset()
-        # raise exceptions.LenaNotImplementedError
 
     def reset(self):
-        """Reset the element *el*."""
+        """Reset *el*."""
         self._el.reset()
 
     def run(self, flow):
-        """Implement *run* method.
+        """Process the *flow* slice by slice.
 
-        First, *fill* is called for each value in a subslice of *flow*
-        of *self.bufsize* size.
-        After that, results are yielded from *self.request()*.
-        This repeats until the *flow* is exhausted.
+        *fill* each value from a subslice of *flow*
+        of *bufsize* length, then yield results from *request*.
+        Repeat until the *flow* is exhausted.
 
-        If *fill* was not called even once (*flow* is empty),
-        the results for a general *FillRequest* are undefined
-        (for example, it can run *request* or raise an exception).
-        This adapter runs *request* in this case.
-        If the last slice is empty, *request* is not run for that.
-        Note that the last slice may contain less than *bufsize* values.
-        If that is important, implement your own method.
-
-        A slice is a non-materialized list,
-        which means that it will not take place of *bufsize* in memory.
+        If *fill* was not called even once (*flow* was empty),
+        nothing is yielded, because *bufsize* values were not obtained.
+        The last slice may contain less than *bufsize* values.
+        If there were any and if *yield_on_remainder* is ``True``,
+        *request* will be called for that.
         """
-        filled_once = False
+
         while True:
-            buf = itertools.islice(flow, self.bufsize)
-            # check whether the flow contains at least one element
+            # A slice is a non-materialized list, which means
+            # that it will not take place of *bufsize* in memory.
+            slice_ = itertools.islice(flow, self.bufsize)
+            # Reset the counter; what if it grows too large?
+            # Maybe it will allow faster nfills % bufsize?
+            # May be irrelevant though.
+            nfills = 0
+
+            # there is no other way to check
+            # whether the flow contains at least one element
             try:
-                arg = next(buf)
+                val = next(slice_)
             except StopIteration:
-                if filled_once:
-                    # if nothing was filled this time,
-                    # don't yield anything
-                    break
-                else:
-                    # *request* is run nevertheless.
+                # Unlike FillCompute, we don't yield anything
+                # if the flow was smaller than the required bufsize
+                break
+            else:
+                self.fill(val)
+                nfills += 1
+
+            for val in slice_:
+                self.fill(val)
+                nfills += 1
+
+            # Flow finished too early.
+            # Normally nfills would be equal to self.bufsize
+            if nfills % self.bufsize:
+                if self._yield_on_remainder:
+                    # can't return smth in Python 2 generator.
+                    # return self.request()
                     for result in self.request():
                         yield result
-                    break
-            else:
-                self.fill(arg)
-                filled_once = True
+                return
 
-            for arg in buf:
-                self.fill(arg)
             for result in self.request():
                 yield result
-            if self._reset:
-                self._el.reset()
 
 
 class Run(object):
