@@ -150,10 +150,10 @@ def test_split_with_fill_computes():
 
 
 def test_split_with_fill_request():
-    FillRequest(Sum())
-    seq1 = Split([(Slice(1000), FillRequest(Sum()))])
-    seq2 = Split([FillRequestSeq(FillRequest(Sum()))])
-    seq3 = Split([FillRequest(Sum())])
+    FillRequest(Sum(), reset=True)
+    seq1 = Split([(Slice(1000), FillRequest(Sum(), reset=True))])
+    seq2 = Split([FillRequestSeq(FillRequest(Sum(), reset=True))])
+    seq3 = Split([FillRequest(Sum(), reset=True)])
     flow = [0, (1, {}), 2, 3]
     for val in flow:
         seq2.fill(val)
@@ -169,6 +169,6 @@ def test_split_with_fill_request():
     assert res3 == [0]
 
     # test LenaStopFill
-    seq4 = Split([(StopFill(2), FillRequest(Sum()))])
+    seq4 = Split([(StopFill(2), FillRequest(Sum(), reset=True))])
     res4 = list(seq4.run(flow))
     assert res4 == [1]

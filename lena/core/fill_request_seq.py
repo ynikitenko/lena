@@ -46,9 +46,9 @@ class FillRequestSeq(lena_sequence.LenaSequence):
             raise exceptions.LenaTypeError(
                 "unknown kwargs {}".format(kwargs)
             )
-        ## not sure now. Why is it not documented?
-        # *args* can consist of one tuple,
-        # which in that case is expanded.
+        ##| not sure now. Why is it not documented?
+        # `-> *args* can consist of one tuple,
+        #     which in that case is expanded.
         fill_compute_seq._init_sequence_with_el(
             self, args, "_fill_request",
             check_sequence_type.is_fill_request_el,

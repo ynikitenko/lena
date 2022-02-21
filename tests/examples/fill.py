@@ -12,3 +12,6 @@ class StoreFilled(object):
 
     def reset(self):
         self.list = []
+
+    def compute(self):
+        yield self.list[:]

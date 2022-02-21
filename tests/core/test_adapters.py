@@ -12,22 +12,6 @@ from tests.examples.fill import StoreFilled
 from tests.examples.numeric import Add
 
 
-# class Sum():
-#     """Sum elements which *fill* this.
-#     """
-#     def __init__(self):
-#         self.sum = 0
-# 
-#     def fill(self, val):
-#         self.sum += val
-# 
-#     def reset(self):
-#         self.sum = 0
-# 
-#     def compute(self):
-#         yield self.sum
-
-
 class StrangeCallable():
     def strange_call(self, val):
         return val
@@ -124,87 +108,47 @@ def test_fill_into():
     assert store == [1, 1, 4]
 
 
-def test_fill_request():
-    # todo: modify Source to use iterables (incl. those from itertools)
-    # from itertools import repeat
-    def ones():
-        while True:
-            yield 1
+def test_fill_request_init():
+    # Test basic adapter properties and initialization.
+    # More complicated things are checked in test_fill_request.py
 
     # no fill method raises
     with pytest.raises(LenaTypeError):
         FillRequest(lambda _: 0)
 
-    ## reset works
-    # reset=False works
-    s0 = Source(ones, Slice(10), FillRequest(Sum(), reset=False, bufsize=1))
-    assert list(s0()) == list(range(1, 11))
-
-    # reset=True works
-    s10 = Source(ones, Slice(10), FillRequest(Sum(), reset=True, bufsize=1))
-    assert list(s10()) == [1 for _ in range(10)]
-    # Slice can be moved after FR if bufsize=1
-    s11 = Source(ones, FillRequest(Sum(), reset=True, bufsize=1), Slice(10))
-    assert list(s11()) == [1 for _ in range(10)]
-
-    # bufsize 10
-    s1 = Source(CountFrom(), Slice(100),
-                FillRequest(Sum(), reset=False, bufsize=10))
-    results = list(s1())
-    assert results == [45, 190, 435, 780, 1225, 1770, 2415, 3160, 4005, 4950]
-
-    # bufsize 1
-    s2 = Source(CountFrom(), Slice(10), FillRequest(Sum(), reset=False, bufsize=1))
-    results = list(s2())
-    assert results == [0, 1, 3, 6, 10, 15, 21, 28, 36, 45]
-
-    # derive from FillCompute
-    s3 = Source(CountFrom(), Slice(10), FillRequest(Sum(), bufsize=1.))
-    results = list(s3())
-    assert results == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-    sum = Sum()
-    sum.reset = None
+    # no reset raises
+    sum_ = Sum()
+    sum_.reset = None
     with pytest.raises(LenaTypeError):
-        FillRequest(sum)
+        FillRequest(sum_, reset=True)
+
+    # wrong bufsize raises
     with pytest.raises(LenaValueError):
-        FillRequest(Sum(), bufsize=0)
+        FillRequest(Sum(), bufsize=0, reset=False)
+
+    # missing fill raises
     class MyFillRequest(FillRequest):
         # otherwise base __init__ will be called
         def __init__(self):
             pass
-    with pytest.raises(LenaNotImplementedError):
+
+    # this was a simply wrong initialization. What to wait from that?
+    with pytest.raises(AttributeError):
         MyFillRequest().fill(1)
-    # with pytest.raises(LenaNotImplementedError):
-    #     MyFillRequest().request()
+    # missing run really raises.
+    with pytest.raises(LenaNotImplementedError):
+        MyFillRequest().run([1])
 
-    # test if run is initialized correctly
-    class MyRun():
-        def fill(self, val):
-            pass
-
-        def request(self):
-            pass
-
-        def reset(self):
-            pass
-
-        def run(self, flow):
-            return self.my_run(flow)
-
-        def my_run(self, flow):
-            yield True
-
-    fr = FillRequest(MyRun())
-    results = list(fr.run([]))
-    assert results == [True]
-
-    # run empty flow should yield nothing if yield_on_remainder is false!
-    fr = FillRequest(Sum())
-    assert list(fr.run([])) == []
-    # same for yield_on_remainder=True.
-    # Because no remainder is not a remainder.
-    fr = FillRequest(Sum(), yield_on_remainder=True)
-    assert list(fr.run([])) == []
+    # only one of *buffer_input* or *buffer_output* must be set
+    run_sum = Run(Sum())
+    with pytest.raises(LenaValueError):
+        FillRequest(run_sum, reset=False)
+    with pytest.raises(LenaValueError):
+        FillRequest(run_sum, reset=False,
+                    buffer_input=True, buffer_output=True)
+    # otherwise this element works
+    fr = FillRequest(run_sum, reset=False, buffer_input=True)
+    assert list(fr.run(iter(range(5)))) == [0, 1, 3, 6, 10]
 
 
 def test_run():

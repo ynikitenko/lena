@@ -52,6 +52,7 @@ def test_fill_request_seq_old():
                 # lambda x: x
                 reset=False,
             ),
+            buffer_input=True,
             reset=False,
         ),
         Slice(10)
@@ -71,14 +72,14 @@ def test_fill_request_seq_old():
     assert list(s2()) == [0, 2, 5, 9, 14, 20, 27, 35, 44, 54]
 
     # bufsize initialization works
-    frs = FillRequestSeq(FillRequest(Sum()))
+    frs = FillRequestSeq(FillRequest(Sum(), reset=True))
     assert frs._bufsize == 1
-    frs2 = FillRequestSeq(FillRequest(Sum()), bufsize=2)
+    frs2 = FillRequestSeq(FillRequest(Sum(), reset=True), bufsize=2)
     assert frs2._bufsize == 2
 
     # wrong keyword raises
     with pytest.raises(LenaTypeError):
-        FillRequestSeq(FillRequest(Sum()), unknown=True)
+        FillRequestSeq(FillRequest(Sum(), reset=True), unknown=True)
 
     # wrong subclassing raises (need to implement fill)
     class MyFR(FillRequestSeq):
@@ -91,7 +92,7 @@ def test_fill_request_seq_old():
     # fill with preprocess works
     s3 = FillRequestSeq(
         lambda x: x-1,
-        FillRequest(Sum()),
+        FillRequest(Sum(), reset=True),
     )
     flow = list(range(0, 4))
     for val in flow:
@@ -100,7 +101,7 @@ def test_fill_request_seq_old():
 
     # direct fill works
     s4 = FillRequestSeq(
-        FillRequest(Sum()),
+        FillRequest(Sum(), reset=True),
     )
     for val in flow:
         s4.fill(val)
