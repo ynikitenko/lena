@@ -5,8 +5,8 @@
 
 def is_fill_compute_el(obj):
     """Object contains executable methods 'fill' and 'compute'."""
-    return (hasattr(obj, 'fill')
-            and hasattr(obj, 'compute')
+    return (hasattr(obj, "fill")
+            and hasattr(obj, "compute")
             and callable(obj.fill)
             and callable(obj.compute))
 
@@ -33,7 +33,7 @@ def is_fill_compute_seq(seq):
 
 def is_fill_request_el(obj):
     """Object contains executable methods 'fill' and 'request'."""
-    return hasattr(obj, 'fill') and hasattr(obj, 'request') \
+    return hasattr(obj, "fill") and hasattr(obj, "request") \
             and callable(obj.fill) and callable(obj.request)
 
 
@@ -47,7 +47,7 @@ def is_fill_request_seq(seq):
     if is_source(seq):
         return False
     is_fcseq = False
-    if hasattr(seq, '__iter__'):
+    if hasattr(seq, "__iter__"):
         is_fcseq = any(map(is_fill_request_el, seq))
     if is_fill_request_el(seq):
         is_fcseq = True
@@ -56,7 +56,7 @@ def is_fill_request_seq(seq):
 
 def is_run_el(obj):
     """Object contains executable method 'run'."""
-    return hasattr(obj, 'run') and callable(obj.run)
+    return hasattr(obj, "run") and callable(obj.run)
 
 
 def is_source(seq):

@@ -62,13 +62,146 @@ Example from a real analysis:
     )
 """
 
-from __future__ import print_function
-
 import copy
-import numbers
 
 import lena.core
 import lena.flow
+
+
+class MapGroup(object):
+    """Apply a sequence to groups."""
+
+    def __init__(self, seq, map_scalars=True):
+        """*seq* must be a *Sequence*, a *Run* element
+        or a tuple (which will be converted to a *Sequence*).
+        
+        Set *map_scalars* to ``False`` to ignore scalar
+        values (not groups).
+        """
+        # todo: could be made a FillCompute element, depending on *seq*
+        if lena.core.is_run_el(seq):
+            self._seq = seq
+        elif isinstance(seq, tuple):
+            self._seq = lena.core.Sequence(*seq)
+        else:
+            # cast to a Run element
+            try:
+                self._seq = lena.core.Run(seq)
+            except lena.core.LenaTypeError:
+                raise lena.core.LenaTypeError(
+                    "seq must be a Run element, a tuple or should be "
+                    "able to be converted to a Run element"
+                )
+        self._map_scalars = map_scalars
+
+    def run(self, flow):
+        """Map *seq* to every group from *flow*.
+
+        A value represents a group if its context has
+        a key *group* and its data part is iterable
+        (for example, a list of values).
+        If length of data is different from the length of
+        *context.group*, :exc:`LenaRuntimeError` is raised.
+
+        *seq* must produce an equal number of results
+        for each item of group, or :exc:`LenaRuntimeError` is raised.
+        These results are yielded in groups one by one.
+
+        Common changes of group context update common context
+        (that of the value).
+        *context.output.changed* is set appropriately.
+        """
+        get_data = lena.flow.get_data
+        get_context = lena.flow.get_context
+
+        for val in flow:
+            data, context = lena.flow.get_data_context(val)
+            # single value
+            # can't see "isiterable" or similar in inspect
+            if "group" not in context or not hasattr(data, "__iter__"):
+                if not self._map_scalars:
+                    yield val
+                    continue
+
+                # process scalars
+                for res in self._seq.run([val]):
+                    yield res
+                continue
+
+            if len(data) != len(context["group"]):
+                raise lena.core.LenaRuntimeError(
+                    "data size must be same as that of context.group"
+                )
+
+            # a real group.
+            old_inter_context = lena.context.intersection(*context["group"])
+
+            # apply seq to each value from group
+            new_vals = []
+            for i in range(len(data)):
+                res_i = list(self._seq.run([(data[i], context["group"][i])]))
+                new_vals.append(res_i)
+
+            # check that new values have same length
+            n_new_vals = len(new_vals[0])
+            for new_val in new_vals[1:]:
+                if len(new_val) != n_new_vals:
+                    raise lena.core.LenaRuntimeError(
+                        "resulting groups must be of the same length, "
+                        "not {}".format(new_vals)
+                    )
+
+            # new_vals[j] is the result for j-th value in group.
+            # Join them in a different order.
+            results = []
+            for i in range(n_new_vals):
+                new_data = [get_data(val[i]) for val in new_vals]
+                new_group_context = [get_context(val[i]) for val in new_vals]
+                results.append((new_data, new_group_context))
+
+            # group common context transform should update value context
+            def update_with_group(context, new_grp_context, old_inter_context):
+                # can context.output.changed be any different value?
+                context_changed = lena.context.get_recursively(
+                    context, "output.changed", None
+                )
+                # copied from GroupPlots
+                all_changed = set(
+                    (lena.context.get_recursively(c, "output.changed", None)
+                         for c in new_grp_context)
+                )
+                all_changed.add(context_changed)
+                if any(all_changed):
+                    changed = True
+                elif False in all_changed:
+                    # at least one is not changed
+                    # (this is known, not None)
+                    changed = False
+                else:
+                    changed = None
+                # output.changed is unlikely in the intersection,
+                # but it will work if so.
+                if changed is not None:
+                    lena.context.update_recursively(
+                        context, "output.changed", changed
+                    )
+
+                new_inter_context = lena.context.intersection(*new_grp_context)
+                context_update = lena.context.difference(new_inter_context,
+                                                         old_inter_context)
+                # hopefully there is no "group" in these context intersection.
+                lena.context.update_recursively(context,
+                                                copy.deepcopy(context_update))
+                context["group"] = new_grp_context
+
+            for new_val in results[:-1]:
+                newc = copy.deepcopy(context)
+                update_with_group(newc, new_val[1], old_inter_context)
+                yield (new_val[0], newc)
+
+            # save one deep copy if there is only one resulting value
+            update_with_group(context, results[-1][1], old_inter_context)
+            yield (results[-1][0], context)
 
 
 class GroupPlots(object):
@@ -190,4 +323,6 @@ class GroupPlots(object):
                 grp = self._scale.scale(grp)
             # transform group items
             grp = lena.flow.functions.seq_map(self._transform, grp)
+            # we must apply update after transform,
+            # because otherwise output.changed logic may fail.
             yield update_group_with_context(grp)

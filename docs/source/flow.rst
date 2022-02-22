@@ -35,6 +35,7 @@ Flow
     GroupBy
     GroupPlots
     GroupScale
+    MapGroup
     Not
     Selector
 
@@ -94,6 +95,7 @@ Group plots
 .. autoclass:: GroupBy
 .. autoclass:: GroupPlots
 .. autoclass:: GroupScale
+.. autoclass:: MapGroup
 
 .. autoclass:: Not
     :show-inheritance:

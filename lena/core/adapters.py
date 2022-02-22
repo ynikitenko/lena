@@ -284,7 +284,7 @@ class FillRequest(object):
         :exc:`.LenaTypeError` is raised.
 
         .. versionchanged:: 0.5
-           Add keyword arguments *yield_on_remainder*, *buffer_input*,
+           add keyword arguments *yield_on_remainder*, *buffer_input*,
            *buffer_output*, *reset_name*.
            Require explicit *reset* for *FillCompute* elements.
         """

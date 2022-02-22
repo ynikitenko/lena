@@ -2,19 +2,113 @@ import pytest
 
 import lena.core
 from lena.core import LenaTypeError, LenaValueError
-from lena.flow import GroupBy, GroupScale, Selector, GroupPlots
-from lena.structures import histogram, Graph
+from lena.flow import GroupBy, GroupScale, Selector, GroupPlots, MapGroup
+from lena.structures import histogram, graph
+
+
+def test_map_group():
+    el = lambda i: i+1
+
+    # map scalars works
+    mgt = MapGroup(el, map_scalars=True)
+    assert list(mgt.run([1])) == [2]
+    # don't map scalars works
+    mgf = MapGroup(el, map_scalars=False)
+    assert list(mgf.run([1])) == [1]
+
+    # for now need to make lambdas use context.
+    mg1 = MapGroup(lambda val: (val[0]+1, val[1]))
+    grp1 = ([1, 3], {"group": [{}, {}]})
+    # empty context unchanged
+    assert list(mg1.run([grp1])) == [([2, 4], grp1[1])]
+
+    # intersection actually updates the resulting context
+    grp2 = ([1, 3], {"group": [{"a": 1}, {"a": 1}]})
+    # but only if that was not present before the map!
+    assert list(mg1.run([grp2])) == [([2, 4], grp2[1])]
+                                      # {"a": 1, "group": grp2[1]["group"]})]
+
+    # new common transform updates context.
+    mg2 = MapGroup(lambda val: (val[0]+1, {"b": 2}))
+    assert list(mg2.run([grp2])) == [([2, 4],
+                                      {"b": 2, "group": grp2[1]["group"]})]
+
+    # explicit changes work
+    # if we change to [True, False], it fails!
+    # Probably because of grp1 mutation.
+    for changed in [False, True]:
+        uc = lambda val: (val[0]+1, {"output": {"changed": changed}})
+        mg3 = MapGroup(uc)
+        assert list(mg3.run([grp1])) == [
+            ([2, 4],
+             {"output": {"changed": changed}, "group": grp1[1]["group"]})
+        ]
+
+    # wrong value raises
+    with pytest.raises(lena.core.LenaRuntimeError):
+        # empty context group
+        list(mg2.run([([1], {"group": []})]))
+
+    ## test initialization
+    # Run element works
+    mgr = MapGroup(lena.core.Run(el), map_scalars=True)
+    assert list(mgr.run([1])) == [2]
+
+    # Sequence works
+    mgs = MapGroup(lena.core.Sequence(el), map_scalars=True)
+    assert list(mgs.run([1])) == [2]
+
+    # tuple works
+    mgtup = MapGroup((el,), map_scalars=True)
+    assert list(mgtup.run([1])) == [2]
+
+    # unconvertible element raises
+    with pytest.raises(lena.core.LenaTypeError):
+        mgtup = MapGroup(1)
+
+    ## different number of resulting values raises
+    class RunN():
+
+        def run(self, flow):
+            for val in flow:
+                data, context = lena.flow.get_data_context(val)
+                while data:
+                    if context:
+                        yield (data, context)
+                    else:
+                        yield data
+                    data -= 1
+
+    mg4 = MapGroup(RunN(), map_scalars=True)
+    # for scalars it works
+    assert list(mg4.run([1, 2])) == [1, 2, 1]
+    # for a group of one it works
+    grpc = {"group": [{}]}
+    assert list(mg4.run([([2], grpc)])) == [([2], grpc), ([1], grpc)]
+    # for a group of several it raises
+    with pytest.raises(lena.core.LenaRuntimeError):
+        assert list(mg4.run([([1, 2], {"group": [{}, {}]})]))
 
 
 def test_group_plots():
     h0 = histogram([0, 1], [0])
     h1 = histogram([0, 1], [1])
     h2 = histogram([0, 2], [2])
-    g1 = Graph(((0, 1), (1, 2)))
-    data = [h0, h1, h2, g1, 1]
-    gp = GroupPlots(type, lambda _: True, transform=(), yield_selected=False)
+    gr1 = graph([[0, 1], [1, 2]])
+    data = [h0, h1, h2, gr1, 1]
+
+    # in Python 2 type of histogram and graph is the same
+    def tp(data):
+        if isinstance(data, histogram):
+            return "hist"
+        if isinstance(data, graph):
+            return "graph"
+        return type(data)
+
+    gp = GroupPlots(tp, lambda _: True, transform=(), yield_selected=False)
     # groups are yielded in arbitrary order (because they are in a dict)
     results = list(gp.run(data))
+    print(results)
     expected_results = [
         (
             [
@@ -28,8 +122,7 @@ def test_group_plots():
             [1], {'group': [{}], 'output': {'changed': False}}
         ),
         (
-            [Graph(points=[(0, 1), (1, 2)], sort=True)],
-            {'group': [{}], 'output': {'changed': False}}
+            [gr1], {'group': [{}], 'output': {'changed': False}}
         ),
     ]
     def assert_list_contents_equal(results, expected_results):
@@ -44,13 +137,13 @@ def test_group_plots():
     # moreover, if there are duplicates, we won't check that with set.
     # assert set(results) == set(expected_results)
 
-    gp2 = GroupPlots(GroupBy(type), Selector(lambda _: True),
+    gp2 = GroupPlots(GroupBy(tp), Selector(lambda _: True),
                      transform=lena.core.Sequence(), yield_selected=False)
     results2 = list(gp2.run(data))
     assert_list_contents_equal(results, results2)
 
     data = [h1, h2]
-    gp_scaled = GroupPlots(type, lambda _: True, scale=4, yield_selected=False)
+    gp_scaled = GroupPlots(tp, lambda _: True, scale=4, yield_selected=False)
     results = list(gp_scaled.run(data))
 
     context_unchanged = {'group': [{}, {}], 'output': {'changed': False}}
@@ -63,11 +156,11 @@ def test_group_plots():
     )]
 
     ## other values are yielded fine
-    gp = GroupPlots(type, Graph)
+    gp = GroupPlots(tp, graph)
     assert list(gp.run(data)) == data
 
     ## yield_selected works
-    gp = GroupPlots(type, lambda _: True, yield_selected=True)
+    gp = GroupPlots(tp, lambda _: True, yield_selected=True)
     results = list(gp.run(data))
     # grouped data
     assert results[-1] == (
@@ -81,7 +174,7 @@ def test_group_plots():
     ]
 
     # yield_selected works with scale
-    gps = GroupPlots(type, lambda _: True, scale=8, yield_selected=True)
+    gps = GroupPlots(tp, lambda _: True, scale=8, yield_selected=True)
     results = list(gps.run(data))
     # grouped histograms are rescaled
     assert results[-1] == (
@@ -97,7 +190,7 @@ def test_group_plots():
     # test that changed values create changed context
     data_c = [(0, {"output": {"changed": False}}),
               (1, {"output": {"changed": True}})]
-    group_plots = GroupPlots(type, lambda _: True, yield_selected=False)
+    group_plots = GroupPlots(tp, lambda _: True, yield_selected=False)
     assert list(group_plots.run(data_c))[0] == (
         [0, 1],
         {'group': [{'output': {'changed': False}}, {'output': {'changed': True}}],

@@ -41,7 +41,7 @@ def test_difference():
     assert difference(d1, None) == d1
     assert difference(None, d1) == None
     # level 1 difference between similar dicts
-    assert difference(d1, d2) == {'e': 'f'}
+    assert difference(d1, d2, level=1) == {'e': 'f'}
     # level 0 difference
     assert difference(d1, d2, level=0) == d1
 

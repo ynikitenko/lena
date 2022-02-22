@@ -167,7 +167,7 @@ class graph():
             yield val
 
     def __repr__(self):
-        return """graph({}, field_names={}, scale={}""".format(
+        return """graph({}, field_names={}, scale={})""".format(
             self._points, self.field_names, self._scale
         )
 
