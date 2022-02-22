@@ -1,5 +1,3 @@
-from __future__ import print_function
-
 import pytest
 
 import lena
@@ -30,12 +28,36 @@ def test_contains():
 
 
 def test_difference():
-    d0 = {}
     d1 = {'a': {'b': 'c d'}, 'e': 'f'}
     d2 = {'a': d1['a']}
-    assert difference(d0, d1) == d0
-    assert difference(d1, d0) == d1
+    # difference with an empty dict works
+    assert difference({}, d1) == {}
+    assert difference(d1, {}) == d1
+
+    # difference with self is empty
+    assert difference(d1, d1) == {}
+
+    # difference with not a dictionary works
+    assert difference(d1, None) == d1
+    assert difference(None, d1) == None
+    # level 1 difference between similar dicts
     assert difference(d1, d2) == {'e': 'f'}
+    # level 0 difference
+    assert difference(d1, d2, level=0) == d1
+
+    d3 = {'a': {'b': {"c d": 'e'}}}
+    d4 = {'a': {'b': {"c d": 'e', "f": "g"}}}
+    # Completely different. Complicated, but True
+    assert difference(d1, d3, level=-1) == d1
+    # One is contained in another.
+    assert difference(d3, d4, level=-1) == {}
+
+    # Some actual difference exists
+    d5 = {'a': {'b': {"c d": 'e', "h": "i"}}}
+    assert difference(d5, d4, level=-1) == {'a': {'b': {'h': 'i'}}}
+
+    # a more important property is that
+    # d1.diff(d2) + d1.intersection(d2) = d1.
 
 
 def test_format_context():

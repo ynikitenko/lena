@@ -79,7 +79,9 @@ class Zip(object):
     def _create_context(self, values):
         common_context = lena.context.intersection(*values, level=1)
         diff_context = tuple((
-            lena.context.difference(val, common_context) for val in values
+            # level was 1 originally.
+            lena.context.difference(val, common_context, level=1)
+                for val in values
         ))
         if any(diff_context):
             # in normal circumstances zip can never contain same values

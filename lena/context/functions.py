@@ -1,5 +1,4 @@
 """Functions to work with context (dictionary)."""
-from __future__ import print_function
 
 import copy
 
@@ -56,16 +55,38 @@ def contains(d, s):
             return subd == last_val
 
 
-def difference(d1, d2):
+def difference(d1, d2, level=1):
     """Return a dictionary with items from *d1* not contained in *d2*.
 
-    If a key is present both in *d1* and *d2* but has different values,
+    *level* sets the maximum depth of recursion. For infinite recursion,
+    set that to -1. For level 1,
+    if a key is present both in *d1* and *d2* but has different values,
     it is included into the difference.
+    See :func:`intersection` for more details.
+
+    .. versionadded:: 0.5
+       add keyword argument *level*.
     """
+    # can become not dicts during the recursion
+    if not isinstance(d1, dict) or not isinstance(d2, dict):
+        return d1
+
+    if d1 == d2:
+        return {}
+    elif level == 0:
+        return d1
+
+    # some keys differ
     result = {}
     for key in d1:
-        if key not in d2 or d1[key] != d2[key]:
+        if key not in d2:
             result[key] = d1[key]
+        elif d1[key] != d2[key]:
+            res = difference(d1[key], d2[key], level-1)
+            # if d2[key] contains d1[key] elements,
+            # the difference will be empty
+            if res:
+                result[key] = res
     return result
 
 
