@@ -320,7 +320,7 @@ class GroupPlots(object):
         for group_name in groups:
             grp = groups[group_name]
             if self._scale is not None:
-                grp = self._scale.scale(grp)
+                self._scale.scale(grp)
             # transform group items
             grp = lena.flow.functions.seq_map(self._transform, grp)
             # we must apply update after transform,

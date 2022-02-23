@@ -1,6 +1,4 @@
-"""Scale a group of data (GroupScale class)."""
-from __future__ import print_function
-
+"""Scale a group of data."""
 import numbers
 
 import lena.core
@@ -32,13 +30,10 @@ class GroupScale(object):
         self._allow_unknown_scale = allow_unknown_scale
 
     def scale(self, group):
-        """Scale *group* and return a rescaled group as a list.
+        """Scale each structure in a *group*.
 
         The *group* can contain *(structure, context)* pairs.
-        The original group is unchanged
-        as long as structures' *scale* method
-        returns a new structure
-        (default for Lena histograms and graphs).
+        The original group is rescaled in place.
 
         If any item could not be rescaled and
         options were not set to ignore that,
@@ -63,26 +58,19 @@ class GroupScale(object):
             scale = lena.flow.get_data(cand).scale()
 
         # rescale
-        new_group = []
         for val in group:
             data, context = lena.flow.get_data_context(val)
             try:
-                new_data = data.scale(scale)
+                data.scale(scale)
             except AttributeError as err:
-            # except lena.core.LenaAttributeError as err:
                 # scale was not set and can't be determined
-                if self._allow_unknown_scale:
-                    new_data = data
-                else:
+                if not self._allow_unknown_scale:
                     raise lena.core.LenaValueError(
                         "could not determine the scale of {}"
                         .format(val)
                     )
             except lena.core.LenaValueError as err:
                 # scale is zero and can't be changed
-                if self._allow_zero_scale:
-                    new_data = data
-                else:
+                if not self._allow_zero_scale:
                     raise err
-            new_group.append((new_data, context))
-        return new_group
+        return None

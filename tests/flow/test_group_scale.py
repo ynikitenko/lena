@@ -1,33 +1,40 @@
+import copy
 import pytest
 
 from lena.core import LenaTypeError, LenaValueError
 from lena.flow import GroupBy, GroupScale
-from lena.structures import histogram, Graph
+from lena.structures import histogram, graph
 
 
 def test_group_scale():
     h0 = histogram([0, 1], [0])
     h1 = histogram([0, 1], [1])
     h2 = histogram([0, 2], [2])
-    g1 = Graph(((0, 1), (1, 2)))
-    data = [h0, h1, h2, g1]
-    gs = GroupScale(lambda _: True)
+    gr = graph([[0, 1], [1, 2]])
+    data = [h0, h1, h2, gr]
+    data0 = copy.deepcopy(data)
+
     # too many items selected
+    gs = GroupScale(lambda _: True)
     with pytest.raises(LenaValueError):
         gs.scale(data)
-    gs = GroupScale(lambda _: False)
+
     # no items selected
+    gs = GroupScale(lambda _: False)
     with pytest.raises(LenaValueError):
         gs.scale(data)
+
+    # graph without a scale can't be rescaled
     h2sel = lambda h: h.edges[1] == 2
     gs = GroupScale(h2sel)
-    # graph without a scale can't be rescaled
     with pytest.raises(LenaValueError):
         gs.scale(data)
-    gs = GroupScale(h2sel, allow_unknown_scale=True)
+
     # histogram h0 with a zero scale can't be rescaled
+    gs = GroupScale(h2sel, allow_unknown_scale=True)
     with pytest.raises(LenaValueError):
         gs.scale(data)
+
     # values without a scale method can't be rescaled
     gs = GroupScale(h2sel)
     data1 = [h1, h2, 1]
@@ -35,14 +42,15 @@ def test_group_scale():
         gs.scale(data1)
 
     # finally, GroupScale works
+    # h2 scale is 4, so they should be equal.
     gs = GroupScale(h2sel, allow_zero_scale=True, allow_unknown_scale=True)
     gsnum = GroupScale(4, allow_zero_scale=True, allow_unknown_scale=True)
-    scaled = gs.scale(data)
-    scaled_to_num = gsnum.scale(data)
-    assert scaled == scaled_to_num
-    # group scaled adds context, so we need to get rid of that
-    scaled = [sc[0] for sc in scaled]
+    data1 = copy.deepcopy(data)
+    data2 = copy.deepcopy(data)
+    gs.scale(data1)
+    gsnum.scale(data2)
+    assert data1 == data2
+
+    # note that no context is added when we modify data in place!
     get_scale = lambda val: val.scale()
-    assert list(map(get_scale, scaled[:-1])) == [0, 4, 4]
-    # initial data is unchanged
-    assert list(map(get_scale, data[:-1])) == [0, 1, 4]
+    assert list(map(get_scale, data1)) == [0, 4, 4, None]

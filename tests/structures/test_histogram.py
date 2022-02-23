@@ -8,6 +8,7 @@
 - if histogram bins are divided by N, its scale is divided by N.
 - Histogram and NumpyHistogram should be almost same (except for the upper edge).
 """
+import copy
 import math
 import sys
 
@@ -123,18 +124,21 @@ def test_histogram_3d():
     assert integral(hist.bins, hist.edges) == 2
     assert hist._scale is None
     assert hist.scale() == 2
-    h2 = hist.scale(2)
+    # change scale
+    hist.scale(2)
     # assert h2.scale == 2
-    assert h2.scale() == 2
+    assert hist.scale() == 2
 
     # rescale
-    h1 = hist.scale(1)
+    h1 = copy.deepcopy(hist)
+    h1.scale(1)
     assert h1.bins[0][0] == [0.5, 0.5]
     # hist didn't change
     assert hist.bins[0][0] == [1, 1]
 
     # scale 0 can't be rescaled
-    h0 = hist.scale(0)
+    h0 = copy.deepcopy(hist)
+    h0.scale(0)
     assert h0.scale() == 0
     with pytest.raises(LenaValueError):
         h0.scale(0)

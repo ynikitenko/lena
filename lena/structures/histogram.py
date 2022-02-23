@@ -1,4 +1,4 @@
-"""Histogram structure and element."""
+"""Histogram structure *histogram* and element *Histogram*."""
 import lena.core
 import lena.flow
 from . import hist_functions as hf
@@ -105,11 +105,9 @@ class histogram():
         # (without lena.math.mesh). Allow bin_size in this case.
         hf.check_edges_increasing(edges)
         self.edges = edges
-        # self.fill_called = False
         self._scale = None
-        # todo: edges don't have to be of only two types
-        # But will allowing arbitrary types be a good design?
-        if isinstance(edges[0], (list, tuple)):
+
+        if hasattr(edges[0], "__iter__"):
             self.dim = len(edges)
         else:
             self.dim = 1
@@ -120,7 +118,7 @@ class histogram():
         else:
             self.bins = bins
             # We can't make scale for an arbitrary histogram,
-            # because it may contain complex values.
+            # because it may contain compound values.
             # self._scale = self.make_scale()
             wrong_bins_error = lena.core.LenaValueError(
                 "bins of incorrect shape given, {}".format(bins)
@@ -155,7 +153,7 @@ class histogram():
     def fill(self, coord, weight=1):
         """Fill histogram at *coord* with the given *weight*.
 
-        Coordinates outside the histogram's edges are ignored.
+        Coordinates outside the histogram edges are ignored.
         """
         indices = hf.get_bin_on_value(coord, self.edges)
         subarr = self.bins
@@ -185,14 +183,15 @@ class histogram():
     def scale(self, other=None, recompute=False):
         """Compute or set scale (integral of the histogram).
 
-        If *other* is None, return scale of this histogram.
+        If *other* is ``None``, return scale of this histogram.
         If its scale was not computed before,
         it is computed and stored for subsequent use
         (unless explicitly asked to *recompute*).
+        Note that after changing (filling) the histogram
+        one must explicitly recompute the scale
+        if it was computed before.
 
-        If a float *other* is provided, rescale to *other*.
-        A new histogram with the scale equal to *other*
-        is returned, the original histogram remains unchanged.
+        If a float *other* is provided, rescale self to *other*.
 
         Histograms with scale equal to zero can't be rescaled.
         :exc:`.LenaValueError` is raised if one tries to do that.
@@ -209,16 +208,12 @@ class histogram():
             scale = self.scale()
             if scale == 0:
                 raise lena.core.LenaValueError(
-                    "can't rescale histogram with zero scale"
+                    "can not rescale histogram with zero scale"
                 )
-            new_hist = histogram(
-                self.edges,
-                lena.math.md_map(lambda binc: binc * float(other) / scale,
-                                 self.bins)
-            )
-            # don't recompute the scale if needed.
-            new_hist._scale = other
-            return new_hist
+            self.bins = lena.math.md_map(lambda binc: binc * float(other) / scale,
+                                         self.bins)
+            self._scale = other
+            return None
 
 
 class Histogram():
