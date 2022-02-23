@@ -11,7 +11,7 @@ from . import source
 from . import meta
 
 
-def _get_seq_with_type(seq):
+def _get_seq_with_type(seq, bufsize=None):
     """Return a (sequence, type) pair.
     Sequence is derived from *seq*
     (or is *seq*, if that is of a sequence type).
@@ -37,7 +37,16 @@ def _get_seq_with_type(seq):
     elif ct.is_fill_request_seq(seq):
         seq_type = "fill_request"
         if not ct.is_fill_request_el(seq):
-            seq = fill_request_seq.FillRequestSeq(*seq)
+            seq = fill_request_seq.FillRequestSeq(
+                *seq, bufsize=bufsize,
+                # if we have a FillRequest element inside,
+                # it decides itself when to reset.
+                reset=False,
+                # todo: change the interface, because
+                # no difference with buffer_output: we fill
+                # without a buffer
+                buffer_input=True
+            )
     # Source is not checked,
     # because it must be Source explicitly.
     else:
@@ -102,7 +111,7 @@ class Split(object):
 
         for sequence in seqs:
             try:
-                seq, seq_type = _get_seq_with_type(sequence)
+                seq, seq_type = _get_seq_with_type(sequence, bufsize)
             except exceptions.LenaTypeError:
                 raise exceptions.LenaTypeError(
                     "unknown argument type. Must be one of "

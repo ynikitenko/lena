@@ -1,5 +1,3 @@
-from __future__ import print_function
-
 import copy
 import pytest
 
@@ -150,10 +148,15 @@ def test_split_with_fill_computes():
 
 
 def test_split_with_fill_request():
-    FillRequest(Sum(), reset=True)
-    seq1 = Split([(Slice(1000), FillRequest(Sum(), reset=True))])
-    seq2 = Split([FillRequestSeq(FillRequest(Sum(), reset=True))])
-    seq3 = Split([FillRequest(Sum(), reset=True)])
+    seq1 = Split([(
+        Slice(1000),
+        FillRequest(Sum(), reset=True, buffer_input=True)
+    )])
+    seq2 = Split([
+        FillRequestSeq(FillRequest(Sum(), reset=True, buffer_input=True),
+                       buffer_input=True, reset=False)
+    ])
+
     flow = [0, (1, {}), 2, 3]
     for val in flow:
         seq2.fill(val)
@@ -165,10 +168,17 @@ def test_split_with_fill_request():
     assert res1 == res2
 
     # run with empty flow
+    seq3 = Split([FillRequest(Sum(), reset=True, buffer_input=True)])
     res3 = list(seq3.run([]))
-    assert res3 == [0]
+    # FillRequest doesn't yield for empty slices.
+    assert res3 == []
 
     # test LenaStopFill
-    seq4 = Split([(StopFill(2), FillRequest(Sum(), reset=True))])
+    seq4 = Split([(
+        StopFill(2),
+        FillRequest(Sum(), reset=True, buffer_input=True)
+    )])
     res4 = list(seq4.run(flow))
-    assert res4 == [1]
+    assert res4 == [0, 1]
+    # now we call request for each bufsize values.
+    # assert res4 == [1]

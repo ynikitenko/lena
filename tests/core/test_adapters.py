@@ -114,17 +114,17 @@ def test_fill_request_init():
 
     # no fill method raises
     with pytest.raises(LenaTypeError):
-        FillRequest(lambda _: 0)
+        FillRequest(lambda _: 0, buffer_input=True, reset=True)
 
     # no reset raises
     sum_ = Sum()
     sum_.reset = None
     with pytest.raises(LenaTypeError):
-        FillRequest(sum_, reset=True)
+        FillRequest(sum_, reset=True, buffer_input=True)
 
     # wrong bufsize raises
     with pytest.raises(LenaValueError):
-        FillRequest(Sum(), bufsize=0, reset=False)
+        FillRequest(Sum(), bufsize=0, reset=False, buffer_input=True)
 
     # missing fill raises
     class MyFillRequest(FillRequest):

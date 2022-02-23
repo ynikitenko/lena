@@ -35,17 +35,24 @@ class FillRequestSeq(lena_sequence.LenaSequence):
         or unknown keyword arguments were received,
         :exc:`.LenaTypeError` is raised.
         """
-        if "bufsize" in kwargs:
-            self._bufsize = kwargs.pop("bufsize")
-        else:
-            self._bufsize = 1
-        reset = kwargs.pop("reset", True)
-        self._reset = reset
+        # if "bufsize" in kwargs:
+        #     self._bufsize = kwargs.pop("bufsize")
+        # else:
+        #     self._bufsize = 1
+        # reset = kwargs.pop("reset", True)
 
-        if kwargs:
-            raise exceptions.LenaTypeError(
-                "unknown kwargs {}".format(kwargs)
-            )
+        # if "buffer_input" or "buffer_output" not in kwargs:
+        #     raise exceptions.LenaTypeError(
+        #         "kwargs must contain buffer_input or buffer_output"
+        #     )
+        # buffer_input  = kwargs.pop("buffer_input", False)
+        # buffer_output = kwargs.pop("buffer_output", False)
+
+        # if kwargs:
+        #     raise exceptions.LenaTypeError(
+        #         "unknown kwargs {}".format(kwargs)
+        #     )
+
         ##| not sure now. Why is it not documented?
         # `-> *args* can consist of one tuple,
         #     which in that case is expanded.
@@ -54,7 +61,11 @@ class FillRequestSeq(lena_sequence.LenaSequence):
             check_sequence_type.is_fill_request_el,
             el_name="FillRequest", seq_name="FillRequestSeq"
         )
-        fr = adapters.FillRequest(self, reset=reset, bufsize=self._bufsize)
+        fr = adapters.FillRequest(self, **kwargs)
+        # just for tests
+        self._fr = fr
+        self._reset = fr._reset
+        # fr = adapters.FillRequest(self, reset=reset, bufsize=self._bufsize)
         self.run = fr.run
 
     def fill(self, value):
@@ -79,6 +90,8 @@ class FillRequestSeq(lena_sequence.LenaSequence):
             results = self._after.run(vals)
         else:
             results = vals
+
+        # todo: add reset here.
 
         # FillRequest must produce a generator, so no conversion is needed.
         return results

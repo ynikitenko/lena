@@ -25,9 +25,9 @@ def test_fill_request_seq():
     s1 = Source(
         ones,
         FillRequestSeq(
-            FillRequest(Sum(start=0), reset=False),
-            # this line is necessary, which is wrong!
+            FillRequest(Sum(start=0), reset=False, buffer_input=True),
             reset=False,
+            buffer_input=True,
             bufsize=1
         ),
         Slice(10)
@@ -36,21 +36,19 @@ def test_fill_request_seq():
 
 
 def test_fill_request_seq_old():
-    # FR with preprocess
-    # todo: understand next todo.
-    # todo: really 3 reset=False?
-
+    # FillRequest with preprocess works
     # how not to write tests. Unclear what the result should be.
     # But I remember that I carefully checked that when written.
+    # yes, really 3 reset=False, because 3 explicit FillRequests.
     s1 = Source(
         cnt1,
         # this FillRequest is optional
         FillRequest(
             FillRequestSeq(
                 lambda x: x-1,
-                FillRequest(Sum(start=0), reset=False),
-                # lambda x: x
+                FillRequest(Sum(start=0), reset=False, buffer_input=True),
                 reset=False,
+                buffer_input=True,
             ),
             buffer_input=True,
             reset=False,
@@ -63,23 +61,34 @@ def test_fill_request_seq_old():
     s2 = Source(
         cnt1,
         FillRequestSeq(
-            FillRequest(Sum(start=0), reset=False),
+            FillRequest(Sum(start=0), reset=False, buffer_input=True),
             lambda x: x-1,
-            reset=False,
+            reset=False, buffer_input=True
         ),
         Slice(10)
     )
     assert list(s2()) == [0, 2, 5, 9, 14, 20, 27, 35, 44, 54]
 
     # bufsize initialization works
-    frs = FillRequestSeq(FillRequest(Sum(), reset=True))
-    assert frs._bufsize == 1
-    frs2 = FillRequestSeq(FillRequest(Sum(), reset=True), bufsize=2)
-    assert frs2._bufsize == 2
+    frs = FillRequestSeq(
+        FillRequest(Sum(), reset=True, buffer_input=True),
+        buffer_input=True, reset=False
+    )
+    assert frs._fr.bufsize == 1
+    frs2 = FillRequestSeq(
+        FillRequest(Sum(), reset=True, buffer_input=True),
+        bufsize=2, buffer_input=True, reset=True
+    )
+    assert frs2._fr.bufsize == 2
 
     # wrong keyword raises
-    with pytest.raises(LenaTypeError):
-        FillRequestSeq(FillRequest(Sum(), reset=True), unknown=True)
+    # this is a TypeError now, since kwargs are passed to FillRequest
+    with pytest.raises(TypeError):
+    # with pytest.raises(LenaTypeError):
+        FillRequestSeq(
+            FillRequest(Sum(), reset=True, buffer_input=True),
+            unknown=True, buffer_input=True, reset=False
+        )
 
     # wrong subclassing raises (need to implement fill)
     class MyFR(FillRequestSeq):
@@ -90,19 +99,26 @@ def test_fill_request_seq_old():
         myfr.fill(0)
 
     # fill with preprocess works
+    flow = list(range(0, 4))
+
     s3 = FillRequestSeq(
         lambda x: x-1,
-        FillRequest(Sum(), reset=True),
+        FillRequest(Sum(), reset=True, buffer_input=True),
+        reset=True, buffer_input=True
     )
-    flow = list(range(0, 4))
     for val in flow:
         s3.fill(val)
-    assert list(s3.request()) == [2]
+    assert list(s3.request()) == [-1, 0, 1, 2]
+    # the old value was just the final value.
+    # Now we yield results for each buffer.
+    # assert list(s3.request()) == [2]
 
     # direct fill works
     s4 = FillRequestSeq(
-        FillRequest(Sum(), reset=True),
+        FillRequest(Sum(), reset=False, buffer_input=True),
+        reset=False, buffer_input=True
     )
     for val in flow:
         s4.fill(val)
-    assert list(s4.request()) == [6]
+    assert list(s4.request()) == [0, 1, 3, 6]
+    # assert list(s4.request()) == [6]
