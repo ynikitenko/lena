@@ -367,7 +367,7 @@ def hist_to_graph(hist, make_value=None, get_coordinate="left",
     if scale is True:
         scale = hist.scale()
 
-    for value, edges in _iter_bins_with_edges(hist.bins, hist.edges):
+    for value, edges in iter_bins_with_edges(hist.bins, hist.edges):
         coord = get_coord(edges)
 
         # Since we never use contexts here, it will be optimal
@@ -471,24 +471,27 @@ def iter_bins(bins):
                 yield (((ind,) + sub_ind), val)
 
 
-def _iter_bins_with_edges(bins, edges):
-    """Yield *(bin content, bin edges)* pairs.
+def iter_bins_with_edges(bins, edges):
+    """Generate *(bin content, bin edges)* pairs.
 
-    Bin edges is a tuple, such that at index i
-    its element is bin *(lower bound, upper bound)*
-    along i-th the coordinate.
+    Bin edges is a tuple, such that
+    its item at index i is *(lower bound, upper bound)*
+    of the bin at i-th coordinate.
 
     Examples:
 
     >>> from lena.math import mesh
-    >>> list(_iter_bins_with_edges([0, 1, 2], edges=mesh((0, 3), 3)))
+    >>> list(iter_bins_with_edges([0, 1, 2], edges=mesh((0, 3), 3)))
     [(0, ((0, 1.0),)), (1, ((1.0, 2.0),)), (2, ((2.0, 3),))]
     >>>
-    >>> list(_iter_bins_with_edges(
+    >>> # 2-dimensional histogram
+    >>> list(iter_bins_with_edges(
     ...     bins=[[2]], edges=mesh(((0, 1), (0, 1)), (1, 1))
     ... ))
     [(2, ((0, 1), (0, 1)))]
 
+    .. versionadded:: 0.5
+       made public.
     """
     # todo: only a list or also a tuple, an array?
     if not isinstance(edges[0], list):

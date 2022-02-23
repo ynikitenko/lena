@@ -1,5 +1,3 @@
-from __future__ import print_function
-
 import pytest
 import copy
 
@@ -10,13 +8,13 @@ from lena.structures import histogram
 from lena.structures import cell_to_string, get_example_bin
 from lena.structures import SplitIntoBins, IterateBins, MapBins
 from lena.structures.split_into_bins import _MdSeqMap
-from lena.structures.hist_functions import _iter_bins_with_edges
+from lena.structures import iter_bins_with_edges
 
 from tests.examples.fill_compute import Count, Sum
 
 
 def test_iter_bins_with_edges():
-    ibe = _iter_bins_with_edges
+    ibe = iter_bins_with_edges
 
     # one-dimensional list works
     bins = [0]
@@ -24,8 +22,8 @@ def test_iter_bins_with_edges():
     assert list(ibe(bins, edges)) == [(0, ((0, 1),))]
     assert list(ibe([0, 1], [0, 1, 2])) ==  [(0, ((0, 1),)), (1, ((1, 2),))]
     ## old interface
-    # assert list(_iter_bins_with_edges(bins, edges)) == [(0, ([0], [1]))]
-    # assert list(_iter_bins_with_edges([0, 1], [0, 1, 2])) == [(0, ([0], [1])), (1, ([1], [2]))]
+    # assert list(iter_bins_with_edges(bins, edges)) == [(0, ([0], [1]))]
+    # assert list(iter_bins_with_edges([0, 1], [0, 1, 2])) == [(0, ([0], [1])), (1, ([1], [2]))]
 
     ## two-dimensional list works
     # one bin
@@ -34,13 +32,13 @@ def test_iter_bins_with_edges():
     # this (bins, edges) pair is legitimate
     ## strange to test it here!
     h = histogram(edges, bins)
-    assert list(_iter_bins_with_edges(bins, edges)) == [(1, ((0, 1), (2, 3)))]
+    assert list(iter_bins_with_edges(bins, edges)) == [(1, ((0, 1), (2, 3)))]
 
     edges = [[0, 1, 2], [3, 4, 5]]
     bins = [[10, 20], [30, 40]]
     # this (bins, edges) pair is legitimate
     h = histogram(edges, bins)
-    assert list(_iter_bins_with_edges(bins, edges)) == [
+    assert list(iter_bins_with_edges(bins, edges)) == [
         (10, ((0, 1), (3, 4))),
         (20, ((0, 1), (4, 5))),
         (30, ((1, 2), (3, 4))),

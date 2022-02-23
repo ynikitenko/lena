@@ -16,10 +16,10 @@ from lena.structures import (
     hist_to_graph,
     integral,
     iter_bins,
+    iter_bins_with_edges,
     iter_cells,
     unify_1_md,
 )
-from lena.structures.hist_functions import _iter_bins_with_edges
 from lena.variables import Variable
 
 
@@ -175,7 +175,7 @@ def test_hist_to_graph():
 
 
 def test_iter_bins_with_edges():
-    ibe = lambda hist: _iter_bins_with_edges(hist.bins, hist.edges)
+    ibe = lambda hist: iter_bins_with_edges(hist.bins, hist.edges)
 
     # one-dimensional histogram works
     hist1 = histogram(mesh((0, 3), 3), bins=[0, 1, 2])

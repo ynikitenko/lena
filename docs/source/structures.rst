@@ -48,6 +48,7 @@ Structures
     init_bins
     integral
     iter_bins
+    iter_bins_with_edges
     iter_cells
     make_hist_context
     unify_1_md

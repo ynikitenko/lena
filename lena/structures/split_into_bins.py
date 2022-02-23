@@ -9,7 +9,7 @@ import lena.math
 import lena.structures
 import lena.variables
 from .hist_functions import (
-    cell_to_string, get_example_bin, _iter_bins_with_edges
+    cell_to_string, get_example_bin, iter_bins_with_edges
 )
 
 
@@ -104,7 +104,7 @@ class IterateBins(object):
                 yield val
                 continue
 
-            for histc, bin_edges in _iter_bins_with_edges(data.bins,
+            for histc, bin_edges in iter_bins_with_edges(data.bins,
                                                           data.edges):
                 hist, bin_context = lena.flow.get_data_context(histc)
                 # we assume that context.variable corresponds to
