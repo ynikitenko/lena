@@ -289,16 +289,13 @@ class GroupPlots(object):
         :exc:`.LenaValueError` is raised.
         """
         for val in flow:
-            # I can't understand why, but without deep copy
-            # histogram.bins (not context!) will be same
-            # if several histograms update group_by
-            val = copy.deepcopy(val)
             if self._selector(val):
                 if self._yield_selected:
                     yield copy.deepcopy(val)
                 self._group_by.update(val)
             else:
                 yield val
+
         # flow finished
 
         def update_group_with_context(grp):

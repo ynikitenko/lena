@@ -1,3 +1,4 @@
+import copy
 import pytest
 
 import lena.core
@@ -95,7 +96,8 @@ def test_group_plots():
     h1 = histogram([0, 1], [1])
     h2 = histogram([0, 2], [2])
     gr1 = graph([[0, 1], [1, 2]])
-    data = [h0, h1, h2, gr1, 1]
+    # copy not to modify original histograms
+    data = copy.deepcopy([h0, h1, h2, gr1, 1])
 
     # in Python 2 type of histogram and graph is the same
     def tp(data):
@@ -142,9 +144,9 @@ def test_group_plots():
     results2 = list(gp2.run(data))
     assert_list_contents_equal(results, results2)
 
-    data = [h1, h2]
+    data1 = copy.deepcopy([h1, h2])
     gp_scaled = GroupPlots(tp, lambda _: True, scale=4, yield_selected=False)
-    results = list(gp_scaled.run(data))
+    results = list(gp_scaled.run(data1))
 
     context_unchanged = {'group': [{}, {}], 'output': {'changed': False}}
     assert results == [(
@@ -157,11 +159,12 @@ def test_group_plots():
 
     ## other values are yielded fine
     gp = GroupPlots(tp, graph)
-    assert list(gp.run(data)) == data
+    assert list(gp.run(data1)) == data1
 
     ## yield_selected works
+    data2 = copy.deepcopy([h1, h2])
     gp = GroupPlots(tp, lambda _: True, yield_selected=True)
-    results = list(gp.run(data))
+    results = list(gp.run(data2))
     # grouped data
     assert results[-1] == (
         [histogram([0, 1], bins=[1]), histogram([0, 2], bins=[2])],
@@ -174,8 +177,9 @@ def test_group_plots():
     ]
 
     # yield_selected works with scale
+    data3 = copy.deepcopy([h1, h2])
     gps = GroupPlots(tp, lambda _: True, scale=8, yield_selected=True)
-    results = list(gps.run(data))
+    results = list(gps.run(data3))
     # grouped histograms are rescaled
     assert results[-1] == (
         [histogram([0, 1], bins=[8]), histogram([0, 2], bins=[4])],
