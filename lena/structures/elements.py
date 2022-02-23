@@ -10,21 +10,26 @@ from .hist_functions import hist_to_graph
 
 
 class HistToGraph():
-    """Transform a :class:`.histogram` to a :class:`.Graph`."""
+    """Transform a :class:`.histogram` to a :class:`.graph`."""
 
-    def __init__(self, make_value, get_coordinate="left", field_names=("x", "y")):
+    def __init__(self, make_value, get_coordinate="left",
+                 field_names=("x", "y"), scale=None):
         """*make_value* is a :class:`.Variable`
-        that creates graph's value from the bin's value.
+        that creates graph value from the bin value.
 
-        *get_coordinate* defines the coordinate of the graph's point.
+        *get_coordinate* defines the coordinate of the graph point.
         By default, it is the left bin edge. Other allowed values are
         "right" and "middle".
 
         *field_names* set field names of resulting graphs.
 
+        *scale* sets scales of resulting graphs. If it is ``True``,
+        the scale is computed from the histogram.
+
+        See :func:`hist_to_graph` for details and examples.
+
         Incorrect values for *make_value* or *get_coordinate* raise,
-        respectively,
-        :exc:`.LenaTypeError` or :exc:`.LenaValueError`.
+        respectively, :exc:`.LenaTypeError` or :exc:`.LenaValueError`.
         """
         if isinstance(make_value, lena.variables.Variable):
             self._make_value = make_value
@@ -46,6 +51,7 @@ class HistToGraph():
             )
         self._get_coordinate = get_coordinate
         self._field_names = field_names
+        self._scale = scale
 
     def run(self, flow):
         """Iterate the *flow* and transform histograms to graphs.
@@ -68,6 +74,7 @@ class HistToGraph():
         # unchanged values for non-histograms?
         # It could be used in a FillCompute sequence then,
         # but probably might have some design flaws.
+        # -- in fact, Run elements can be used as FillInto.
         #
         # Yes: FillCompute element would expect a uniform flow.
         # Odd values (not histograms) should be filtered
@@ -90,11 +97,11 @@ class HistToGraph():
             )
             lena.context.update_nested("value", context, bin_context)
 
-            # todo: should allow to add a scale
             graph = hist_to_graph(
                 hist,
                 make_value=self._make_value.getter,
                 field_names=self._field_names,
-                get_coordinate=self._get_coordinate
+                get_coordinate=self._get_coordinate,
+                scale=self._scale
             )
             yield (graph, context)

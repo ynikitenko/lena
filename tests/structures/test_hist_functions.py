@@ -19,6 +19,7 @@ from lena.structures import (
     iter_cells,
     unify_1_md,
 )
+from lena.structures.hist_functions import _iter_bins_with_edges
 from lena.variables import Variable
 
 
@@ -132,7 +133,8 @@ def test_hist_to_graph():
     assert list(HistToGraph(nevents, get_coordinate="middle").run([hist])) == \
         [(graph([[0.5], [1]], scale=None), nev_context)]
 
-    val_with_error = collections.namedtuple("val_with_error", ["value", "error"])
+    val_with_error = collections.namedtuple("val_with_error",
+                                            ["value", "error"])
     hist1 = histogram(mesh((0, 1), 1))
     val = val_with_error(1, 2)
     hist1.bins = lena.structures.init_bins(hist1.edges, val)
@@ -157,6 +159,33 @@ def test_hist_to_graph():
     # same raises in hist_to_graph
     with pytest.raises(lena.core.LenaValueError):
         hist_to_graph(hist1, get_coordinate="left_right")
+
+    # hist_to_graph works for 1-dimensional histograms
+    assert hist_to_graph(histogram([0, 1], bins=[1])) == graph([[0], [1]])
+
+    # scale works
+    # True == 1 in Python, so better to test scale 2.
+    assert hist_to_graph(histogram([0, 1], bins=[2]), scale=True) \
+            == graph([[0], [2]], scale=2)
+
+    # 2-dimensional histograms work
+    hist2 = histogram(mesh(((0, 1), (0, 1)), (1, 1)), bins=[[2]])
+    assert hist_to_graph(hist2, scale=True, field_names="x,y,z") \
+            == graph([[0], [0], [2]], scale=2, field_names="x,y,z")
+
+
+def test_iter_bins_with_edges():
+    ibe = lambda hist: _iter_bins_with_edges(hist.bins, hist.edges)
+
+    # one-dimensional histogram works
+    hist1 = histogram(mesh((0, 3), 3), bins=[0, 1, 2])
+    assert list(ibe(hist1)) == [
+        (0, ((0, 1.0),)), (1, ((1.0, 2.0),)), (2, ((2.0, 3.0),))
+    ]
+
+    # two-dimensional histogram works
+    hist2 = histogram(mesh(((0, 1), (0, 1)), (1, 1)), bins=[[2]])
+    assert list(ibe(hist2)) == [(2, ((0, 1), (0, 1)))]
 
 
 def test_iter_cells():

@@ -8,6 +8,7 @@ import collections
 import copy
 import itertools
 import operator
+import re
 import sys
 if sys.version_info.major == 3:
     from functools import reduce as _reduce
@@ -15,7 +16,7 @@ else:
     _reduce = reduce
 
 import lena.core
-from .graph import graph as _graph, Graph as _Graph
+from .graph import graph as _graph
 
 
 class HistCell(collections.namedtuple("HistCell", ("edges, bin, index"))):
@@ -312,19 +313,26 @@ def hist_to_graph(hist, make_value=None, get_coordinate="left",
     >>> make_value = lambda bin_: (bin_.mean, bin_.mean_error)
 
     *get_coordinate* defines what the coordinate
-    of a graph's point created from a histogram's bin will be.
+    of a graph point created from a histogram bin will be.
     It can be "left" (default), "right" and "middle".
 
     *field_names* set field names of the graph. Their number
     must be the same as the dimension of the result.
+    For a *make_value* above they would be
+    *("x", "y_mean", "y_mean_error")*.
 
     *scale* becomes the graph's scale (unknown by default).
+    If it is ``True``, it uses the histogram scale.
+
+    *hist* must contain only numeric bins (without context)
+    or *make_value* must remove context when creating a numeric graph.
 
     Return the resulting graph.
     """
     ## Could have allowed get_coordinate to be callable
     # (for generality), but 1) first find a use case,
     # 2) histogram bins could be adjusted in the first place.
+    # -- don't understand 2.
     if get_coordinate == "left":
         get_coord = lambda edges: tuple(coord[0] for coord in edges)
     elif get_coordinate == "right":
@@ -345,35 +353,42 @@ def hist_to_graph(hist, make_value=None, get_coordinate="left",
     # However, make_value allows not to recreate a graph
     # or its coordinates (if that is not needed).
 
-    points = [[] for _ in field_names]
+    if isinstance(field_names, str):
+        # copied from graph.__init__
+        field_names = tuple(re.findall(r'[^,\s]+', field_names))
+    elif not isinstance(field_names, tuple):
+        raise lena.core.LenaTypeError(
+            "field_names must be a string or a tuple"
+        )
+    coords = [[] for _ in field_names]
 
     chain = itertools.chain
+
+    if scale is True:
+        scale = hist.scale()
 
     for value, edges in _iter_bins_with_edges(hist.bins, hist.edges):
         coord = get_coord(edges)
 
         # Since we never use contexts here, it will be optimal
-        # to ignore them completely (remove them elswhere).
+        # to ignore them completely (remove them elsewhere).
         # bin_value = lena.flow.get_data(value)
         bin_value = value
-
-        ## if we provide make_value, no need to adjust bin_value
-        # # todo: maybe it should be only a tuple?
-        # however, if there is no make_value, one-dimensional
-        # histogram might fail when chaining that
-        if not hasattr(bin_value, "__iter__"):
-            bin_value = (bin_value,)
 
         if make_value is None:
             graph_value = bin_value
         else:
             graph_value = make_value(bin_value)
 
-        for arr, coord_ in zip(points, chain(coord, graph_value)):
-            arr.append(coord_)
-        # gr.fill((coord, graph_value))
+        # for iteration below
+        if not hasattr(graph_value, "__iter__"):
+            graph_value = (graph_value,)
 
-    return _graph(points, field_names, scale)
+        # add each coordinate to respective array
+        for arr, coord_ in zip(coords, chain(coord, graph_value)):
+            arr.append(coord_)
+
+    return _graph(coords, field_names=field_names, scale=scale)
 
 
 def init_bins(edges, value=0, deepcopy=False):
@@ -429,13 +444,10 @@ def integral(bins, edges):
     """
     total = 0
     for ind, bin_content in iter_bins(bins):
-        # print(bins, edges)
-        # print(ind, bin_content)
         bin_lengths = [
             edges[coord][i+1] - edges[coord][i]
             for coord, i in enumerate(ind)
         ]
-        # print(bin_lengths)
         # product
         vol = _reduce(operator.mul, bin_lengths, 1)
         cell_integral = vol * bin_content
@@ -462,9 +474,21 @@ def iter_bins(bins):
 def _iter_bins_with_edges(bins, edges):
     """Yield *(bin content, bin edges)* pairs.
 
-    *Bin edges* is a tuple, such that at index *i*
-    its element is bin's *(lower bound, upper bound)*
-    along *i*-th the coordinate.
+    Bin edges is a tuple, such that at index i
+    its element is bin *(lower bound, upper bound)*
+    along i-th the coordinate.
+
+    Examples:
+
+    >>> from lena.math import mesh
+    >>> list(_iter_bins_with_edges([0, 1, 2], edges=mesh((0, 3), 3)))
+    [(0, ((0, 1.0),)), (1, ((1.0, 2.0),)), (2, ((2.0, 3),))]
+    >>>
+    >>> list(_iter_bins_with_edges(
+    ...     bins=[[2]], edges=mesh(((0, 1), (0, 1)), (1, 1))
+    ... ))
+    [(2, ((0, 1), (0, 1)))]
+
     """
     # todo: only a list or also a tuple, an array?
     if not isinstance(edges[0], list):
@@ -479,8 +503,6 @@ def _iter_bins_with_edges(bins, edges):
             edges_low.append(edges[var][var_ind])
             edges_high.append(edges[var][var_ind+1])
         yield (bin_, tuple(zip(edges_low, edges_high)))
-        # old interface:
-        # yield (bin_, (edges_low, edges_high))
 
 
 def iter_cells(hist, ranges=None, coord_ranges=None):
