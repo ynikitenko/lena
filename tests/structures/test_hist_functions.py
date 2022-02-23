@@ -5,7 +5,7 @@ import pytest
 import lena.structures
 from lena.core import LenaIndexError, LenaTypeError, LenaValueError
 from lena.math import mesh
-from lena.structures import histogram, graph, Graph
+from lena.structures import histogram, graph
 from lena.structures import (
     check_edges_increasing,
     get_bin_edges,

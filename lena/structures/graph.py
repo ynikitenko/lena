@@ -1,4 +1,4 @@
-"""A graph is a function at given points."""
+"""A graph is a function at given coordinates."""
 import copy
 import functools
 import operator
@@ -13,13 +13,13 @@ import lena.flow
 class graph():
     """Numeric arrays of equal size."""
 
-    def __init__(self, points, field_names=("x", "y"), scale=None):
+    def __init__(self, coords, field_names=("x", "y"), scale=None):
         """This structure generally corresponds
         to the graph of a function
         and represents arrays of coordinates and the function values
         of arbitrary dimensions.
 
-        *points* is a list of one-dimensional
+        *coords* is a list of one-dimensional
         coordinate and value sequences (usually lists).
         There is little to no distinction between them,
         and "values" can also be called "coordinates".
@@ -39,7 +39,7 @@ class graph():
         and/or commas
         or a sequence of strings, such as ["x", "y", "y_err"].
         *field_names* must be a tuple,
-        have as many elements as *points*,
+        have as many elements as *coords*,
         and each field name must be unique.
         Error fields must go after all other coordinates.
         Names of coordinate errors are those of coordinates plus "_err",
@@ -69,6 +69,9 @@ class graph():
 
         **Attributes**
 
+        :attr:`coords` is a list \
+            of one-dimensional lists of coordinates.
+
         :attr:`field_names`
 
         :attr:`dim` is the dimension of the graph,
@@ -76,19 +79,21 @@ class graph():
 
         In case of incorrect initialization arguments,
         :exc:`~.LenaTypeError` or :exc:`~.LenaValueError` is raised.
+
+        .. versionadded:: 0.5
         """
-        if not points:
+        if not coords:
             raise lena.core.LenaValueError(
-                "points must be a non-empty sequence "
+                "coords must be a non-empty sequence "
                 "of coordinate sequences"
             )
 
-        # require points to be of the same size
-        pt_len = len(points[0])
-        for arr in points[1:]:
+        # require coords to be of the same size
+        pt_len = len(coords[0])
+        for arr in coords[1:]:
             if len(arr) != pt_len:
                 raise lena.core.LenaValueError(
-                    "points must have subsequences of equal lengths"
+                    "coords must have subsequences of equal lengths"
                 )
 
         # Unicode (Python 2) field names would be just bad,
@@ -106,9 +111,9 @@ class graph():
                 "field_names must be a string or a tuple"
             )
 
-        if len(field_names) != len(points):
+        if len(field_names) != len(coords):
             raise lena.core.LenaValueError(
-                "field_names must have must have the same size as points"
+                "field_names must have must have the same size as coords"
             )
 
         if len(set(field_names)) != len(field_names):
@@ -116,9 +121,10 @@ class graph():
                 "field_names contain duplicate names"
             )
 
-        # todo: or just fields?..
+        # field_names are better than fields,
+        # because they are unambigous (as in namedtuple).
         self.field_names = field_names
-        self._points = points
+        self.coords = coords
         self._scale = scale
 
         # x_error looks better than x_err,
@@ -135,7 +141,7 @@ class graph():
 
         self.dim = get_last_coord_ind(field_names) + 1
 
-        # todo: add subsequences of points as attributes
+        # todo: add subsequences of coords as attributes
         # with field names.
         # In case if someone wants to create a graph of another function
         # at the same coordinates.
@@ -158,17 +164,17 @@ class graph():
         if not isinstance(other, graph):
             # in Python comparison between different types is allowed
             return False
-        return (self._points == other._points and self._scale == other._scale
+        return (self.coords == other.coords and self._scale == other._scale
                 and self.field_names == other.field_names)
 
     def __iter__(self):
-        """Iterate graph points one by one."""
-        for val in zip(*self._points):
+        """Iterate graph coords one by one."""
+        for val in zip(*self.coords):
             yield val
 
     def __repr__(self):
         return """graph({}, field_names={}, scale={})""".format(
-            self._points, self.field_names, self._scale
+            self.coords, self.field_names, self._scale
         )
 
     def scale(self, other=None):
@@ -185,7 +191,7 @@ class graph():
         For example, if the graph has *x* and *y* coordinates,
         then *y* will be rescaled, and for a 3-dimensional graph
         *z* will be rescaled.
-        All errors are also rescaled together with their coordinate.
+        All errors are rescaled together with their coordinate.
         """
         # this method is called scale() for uniformity with histograms
         # And this looks really good: explicit for computations
@@ -193,10 +199,10 @@ class graph():
         #  however, the case in graph - but not in other structures))
         # and easy to remember (set_scale? rescale? change_scale_to?..)
 
-        # Abandoned: that would be redundant (not optimal)
+        # We modify the graph in place,
+        # because that would be redundant (not optimal)
         # to create a new graph
         # if we only want to change the scale of the existing one.
-        ## A new :class:`graph` is returned, the original is unchanged.
 
         if other is None:
             return self._scale
@@ -243,14 +249,14 @@ class graph():
         # but it's unavailable in Python 2 (and anyway less readable).
 
         # rescale arrays of values and errors
-        for ind, arr in enumerate(self._points):
+        for ind, arr in enumerate(self.coords):
             if ind in last_coord_indices:
                 # Python lists are faster than arrays,
                 # https://stackoverflow.com/a/62399645/952234
                 # (because each time taking a value from an array
                 #  creates a Python object)
-                self._points[ind] = list(map(partial(mul, rescale),
-                                          arr))
+                self.coords[ind] = list(map(partial(mul, rescale),
+                                             arr))
 
         self._scale = other
 
@@ -258,6 +264,7 @@ class graph():
         return None
 
 
+# used in deprecated Graph
 def _rescale_value(rescale, value):
     return rescale * lena.flow.get_data(value)
 

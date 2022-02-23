@@ -59,13 +59,13 @@ def test_graph():
     assert gr1.scale() == 2
     assert gr1.dim == 2
     gr1.scale(1)
-    assert gr1._points == [xs, [1, 1.5]]
+    assert gr1.coords == [xs, [1, 1.5]]
     assert gr1.scale() == 1
 
     # 3d graph works
     gr2 = graph(copy.deepcopy([xs, ys, [1, 2]]), field_names="x,y,z", scale=2)
     gr2.scale(3)
-    assert gr2._points == [xs, ys, [1.5, 3.]]
+    assert gr2.coords == [xs, ys, [1.5, 3.]]
     assert gr2.scale() == 3
     assert gr2.dim == 3
 
@@ -75,13 +75,13 @@ def test_graph():
     # spaces in field_names work
     assert gr3.field_names == ("x", "y", "x_err")
     gr3.scale(1)
-    assert gr3._points == [xs, [1, 1.5], [1, 2]]
+    assert gr3.coords == [xs, [1, 1.5], [1, 2]]
 
     # y errors and coords change
     gr4 = graph(copy.deepcopy([xs, ys, [1, 2]]), field_names="x,y,y_err", scale=2)
     gr4.scale(1)
     assert gr4.dim == 2
-    assert gr4._points == [xs, [1, 1.5], [0.5, 1]]
+    assert gr4.coords == [xs, [1, 1.5], [0.5, 1]]
 
 
 # Graph is deprecated, but we keep its tests at the moment.

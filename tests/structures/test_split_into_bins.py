@@ -91,7 +91,7 @@ def test_iterate_bins():
     # not histograms pass unchanged
     # histogram bins must be histograms
     hist = histogram([1, 2], [1])
-    data = [1, (2, {}), lena.structures.Graph(), hist]
+    data = [1, (2, {}), lena.structures.graph([[], []]), hist]
     t = IterateBins()
     assert list(t.run(data)) == data
 
