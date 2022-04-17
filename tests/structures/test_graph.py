@@ -71,17 +71,47 @@ def test_graph():
 
     # graph with errors works
     # x errors are unchanged, y coords change
-    gr3 = graph(copy.deepcopy([xs, ys, [1, 2]]), field_names="x, y, x_err", scale=2)
+    gr3 = graph(copy.deepcopy([xs, ys, [1, 2]]), field_names="x, y, error_x", scale=2)
     # spaces in field_names work
-    assert gr3.field_names == ("x", "y", "x_err")
+    assert gr3.field_names == ("x", "y", "error_x")
     gr3.scale(1)
     assert gr3.coords == [xs, [1, 1.5], [1, 2]]
 
     # y errors and coords change
-    gr4 = graph(copy.deepcopy([xs, ys, [1, 2]]), field_names="x,y,y_err", scale=2)
+    gr4 = graph(copy.deepcopy([xs, ys, [1, 2]]), field_names="x,y,error_y", scale=2)
     gr4.scale(1)
     assert gr4.dim == 2
     assert gr4.coords == [xs, [1, 1.5], [0.5, 1]]
+
+
+def test_graph_error_fields():
+    xs = [0, 1]
+    ys = [2, 3]
+    zs = [1, 2]
+
+    # no error fields works
+    gr0 = graph(copy.deepcopy([xs, ys]), field_names="x, y", scale=2)
+    assert gr0._parsed_error_names == []
+
+    # one error field works
+    gr1 = graph(copy.deepcopy([xs, ys, [1, 2]]),
+                field_names="x, y, error_x", scale=2)
+    assert gr1._parsed_error_names == [('error', 'x', '')]
+
+    # wrong order of fields raises
+    with pytest.raises(lena.core.LenaValueError) as exc:
+        graph([xs, ys, [1, 2], xs], field_names="x,y,error_x,z")
+    assert str(exc.value) == "errors must go after coordinate fields"
+
+    # ambiguous error fields raise
+    with pytest.raises(lena.core.LenaValueError) as exc:
+        graph([xs, ys, [1, 2]], field_names="x,x_low,error_x_low")
+    assert str(exc.value).startswith("ambiguous")
+
+    # errors with unknown field names raise
+    with pytest.raises(lena.core.LenaValueError) as exc:
+        graph([xs, ys, zs], field_names="x,y,error_z")
+    assert str(exc.value) == "no coordinate corresponding to error_z given"
 
 
 # Graph is deprecated, but we keep its tests at the moment.

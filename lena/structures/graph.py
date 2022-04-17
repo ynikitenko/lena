@@ -27,8 +27,7 @@ class graph():
         *field_names* provide the meaning of these arrays.
         For example, a 3-dimensional graph could be distinguished
         from a 2-dimensional graph with errors by its fields
-        ("x", "y", "z") instead of ("x", "y", "y_err"),
-        or ("E", "time", "E_err_low", "time_err_high").
+        ("x", "y", "z") versus ("x", "y", "error_y").
         Field names don't affect drawing graphs:
         for that :class:`~Variable`-s should be used.
         Default field names,
@@ -36,16 +35,16 @@ class graph():
         are "x" and "y".
 
         *field_names* can be a string separated by whitespace
-        and/or commas
-        or a sequence of strings, such as ["x", "y", "y_err"].
-        *field_names* must be a tuple,
-        have as many elements as *coords*,
-        and each field name must be unique.
-        Error fields must go after all other coordinates.
-        Names of coordinate errors are those of coordinates plus "_err",
-        further error details are appended after '_'
-        (see the examples above).
+        and/or commas or a tuple of strings, such as ("x", "y").
+        *field_names* must have as many elements
+        as *coords* and each field name must be unique.
         Otherwise field names are arbitrary.
+        Error fields must go after all other coordinates.
+        Name of a coordinate error is "error\_"
+        appended by coordinate name. Further error details
+        are appended after '_'. They could be arbitrary depending
+        on the problem: "low", "high", "low_90%_cl", etc. Example:
+        ("E", "time", "error_E_low", "error_time").
 
         *scale* of the graph is a kind of its norm. It could be
         the integral of the function or its other property.
@@ -104,6 +103,8 @@ class graph():
             # \s stands for whitespace.
             field_names = tuple(re.findall(r'[^,\s]+', field_names))
         elif not isinstance(field_names, tuple):
+            # todo: why field_names are a tuple,
+            # while coords are a list?
             # It might be non-Pythonic to require a tuple
             # (to prohibit a list), but it's important
             # for comparisons and uniformity
@@ -118,28 +119,30 @@ class graph():
 
         if len(set(field_names)) != len(field_names):
             raise lena.core.LenaValueError(
-                "field_names contain duplicate names"
+                "field_names contains duplicates"
             )
+
+        self.coords = coords
+        self._scale = scale
 
         # field_names are better than fields,
         # because they are unambigous (as in namedtuple).
         self.field_names = field_names
-        self.coords = coords
-        self._scale = scale
 
-        # x_error looks better than x_err,
-        # but x_err_low, y_err_low are much better
-        # than x_error_low and the same for y.
-        # So, for consistency and ease, we use x_err.
+        # decided to use "error_x_low" (like in ROOT).
+        # Other versions were x_error (looked better than x_err),
+        # but x_err_low looked much better than x_error_low).
+        try:
+            parsed_error_names = self._parse_error_names(field_names)
+        except lena.core.LenaValueError as err:
+            raise err
+            # in Python 3
+            # raise err from None
+        self._parsed_error_names = parsed_error_names
 
-        def get_last_coord_ind(field_names):
-            for ind, fn in enumerate(field_names):
-                if fn.endswith("_err") or "_err_" in fn:
-                    ind -= 1
-                    break
-            return ind
-
-        self.dim = get_last_coord_ind(field_names) + 1
+        dim = len(field_names) - len(parsed_error_names)
+        self._coord_names = field_names[:dim]
+        self.dim = dim
 
         # todo: add subsequences of coords as attributes
         # with field names.
@@ -166,6 +169,15 @@ class graph():
             return False
         return (self.coords == other.coords and self._scale == other._scale
                 and self.field_names == other.field_names)
+
+    def _get_err_indices(self, coord_name):
+        """Get error indices corresponding to a coordinate."""
+        err_indices = []
+        dim = self.dim
+        for ind, err in enumerate(self._parsed_error_names):
+            if err[1] == coord_name:
+                err_indices.append(ind+dim)
+        return err_indices
 
     def __iter__(self):
         """Iterate graph coords one by one."""
@@ -215,16 +227,8 @@ class graph():
         last_coord_ind = self.dim - 1
         last_coord_name = self.field_names[last_coord_ind]
 
-        def get_err_indices(coord_name, field_names):
-            err_indices = []
-            for ind, fn in enumerate(field_names):
-                if (fn == coord_name + "_err" or
-                    fn.startswith(coord_name + "_err_")):
-                    err_indices.append(ind)
-            return err_indices
-
         last_coord_indices = ([last_coord_ind] +
-                get_err_indices(last_coord_name, self.field_names)
+                self._get_err_indices(last_coord_name)
         )
 
         # In Python 2 3/2 is 1, so we want to be safe;
@@ -256,12 +260,57 @@ class graph():
                 # (because each time taking a value from an array
                 #  creates a Python object)
                 self.coords[ind] = list(map(partial(mul, rescale),
-                                             arr))
+                                            arr))
 
         self._scale = other
 
         # as suggested in PEP 8
         return None
+
+    def _parse_error_names(self, field_names):
+        # field_names is a parameter for easier testing,
+        # usually object's field_names are used.
+        errors = []
+
+        # collect all error fields and check that they are
+        # strictly after other fields
+        in_error_fields = False
+        # there is at least one field
+        last_coord_ind = 0
+        for ind, field in enumerate(field_names):
+            if field.startswith("error_"):
+                in_error_fields = True
+                errors.append(field)
+            else:
+                last_coord_ind = ind
+                if in_error_fields:
+                    raise lena.core.LenaValueError(
+                        "errors must go after coordinate fields"
+                    )
+
+        coords = set(field_names[:last_coord_ind+1])
+        parsed_errors = []
+
+        for err in errors:
+            err_coords = []
+            for coord in coords:
+                err_main = err[6:]  # all after "error_"
+                if err_main == coord or err_main.startswith(coord + "_"):
+                    err_coords.append(coord)
+                    err_tail = err_main[len(coord)+1:]
+            if not err_coords:
+                raise lena.core.LenaValueError(
+                    "no coordinate corresponding to {} given".format(err)
+                )
+            elif len(err_coords) > 1:
+                raise lena.core.LenaValueError(
+                    "ambiguous error " + err +\
+                    " corresponding to several coordinates given"
+                )
+            # "error" may be redundant, but it is explicit.
+            parsed_errors.append(("error", err_coords[0], err_tail))
+
+        return parsed_errors
 
 
 # used in deprecated Graph

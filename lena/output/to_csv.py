@@ -222,7 +222,8 @@ class ToCSV(object):
                 yield val
                 continue
 
-            ### todo: add structure's context.
+            ### todo: add histogram context here
+            # (now it is added in hist_functions).
 
             ## histogram
             if isinstance(data, lena.structures.histogram):
@@ -247,6 +248,17 @@ class ToCSV(object):
                 csv = "\n".join(lines_iter)
                 lena.context.update_recursively(context, "output.filetype.csv")
                 yield (csv, context)
+                continue
+
+            # strings can be produced by previous elements
+            # (for example, they can contain file names).
+            # It is an important exception for iterables, when the user
+            # doesn't have to set to_csv to False explicitly.
+            # There is no way to convert a string to csv
+            # (even with explicit to_csv set to True),
+            # because if really needed, this could be done elsewhere.
+            if isinstance(data, str):
+                yield val
                 continue
 
             ## iterable
