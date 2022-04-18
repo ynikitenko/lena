@@ -40,7 +40,7 @@ class graph():
         as *coords* and each field name must be unique.
         Otherwise field names are arbitrary.
         Error fields must go after all other coordinates.
-        Name of a coordinate error is "error\_"
+        Name of a coordinate error is "error\\_"
         appended by coordinate name. Further error details
         are appended after '_'. They could be arbitrary depending
         on the problem: "low", "high", "low_90%_cl", etc. Example:
@@ -311,6 +311,50 @@ class graph():
             parsed_errors.append(("error", err_coords[0], err_tail))
 
         return parsed_errors
+
+    def _update_context(self, context):
+        """Update *context* with the properties of this graph.
+
+        *context.error* is appended with indices of errors.
+        Example subcontext for a graph with fields "E,t,error_E_low":
+        {"error": {"x_low": {"index": 2}}}.
+        Note that error names are called "x", "y" and "z"
+        (this corresponds to first three coordinates,
+        if they are present), which allows to simplify plotting.
+        Existing values are not removed
+        from *context.value* and its subcontexts.
+
+        Called on destruction of the graph (for example,
+        in :class:`.ToCSV`).
+        """
+        # this method is private, because we encourage users to yield
+        # graphs into the flow and process them with ToCSV element
+        # (not manually).
+
+        if not self._parsed_error_names:
+            # no error fields present
+            return
+
+        dim = self.dim
+
+        xyz_coord_names = self._coord_names[:3]
+        for name, coord_name in zip(["x", "y", "z"], xyz_coord_names):
+            for ind, err in enumerate(self._parsed_error_names):
+                if err[1] == coord_name:
+                    error_ind = dim + ind
+                    if err[2]:
+                        # add error suffix
+                        error_name = name + "_" + err[2]
+                    else:
+                        error_name = name
+                    lena.context.update_recursively(
+                        context,
+                        "error.{}.index".format(error_name),
+                        # error can correspond both to variable and
+                        # value, so we put it outside value.
+                        # "value.error.{}.index".format(error_name),
+                        error_ind
+                    )
 
 
 # used in deprecated Graph

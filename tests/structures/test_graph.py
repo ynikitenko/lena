@@ -114,6 +114,33 @@ def test_graph_error_fields():
     assert str(exc.value) == "no coordinate corresponding to error_z given"
 
 
+def test_update_context():
+    xs = [0, 1]
+    ys = [2, 3]
+    zs = [1, 2]
+
+    # no error fields works
+    gr0 = graph(copy.deepcopy([xs, ys]), field_names="x, y", scale=2)
+    context = {}
+    gr0._update_context(context)
+    assert context == {}
+
+    gr1 = graph([xs, ys, zs], field_names="E,t,error_E_low", scale=2)
+    gr1._update_context(context)
+    assert context == {'error': {'x_low': {'index': 2}}}
+
+    # 4 coordinates, arbitrary error sequence work
+    gr2 = graph([xs]*8,
+                field_names="a,b,c,d,error_b,error_a_low,error_d,error_d_low")
+    gr2._update_context(context)
+    assert context == {
+        'error': {
+            'x_low': {'index': 5},
+            'y': {'index': 4}
+        }
+    }
+
+
 # Graph is deprecated, but we keep its tests at the moment.
 @pytest.mark.filterwarnings('ignore::DeprecationWarning')
 def test_Graph():
