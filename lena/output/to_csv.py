@@ -200,6 +200,8 @@ class ToCSV(object):
         """Convert values from *flow* to CSV text.
 
         *context.output* is updated with {"filetype": "csv"}.
+        If a data structure has a method *\\_update_context(context)*,
+        it also updates the current context during the transform.
         All not converted data is yielded unchanged.
 
         If *context.output.to_csv* is ``False``, the value is skipped.
@@ -209,11 +211,6 @@ class ToCSV(object):
         use :func:`hist1d_to_csv`, :func:`hist2d_to_csv`
         or :func:`iterable_to_table`.
         """
-        def is_writable_hist(val):
-            """Test whether a value from flow can be converted to CSV."""
-            data, context = lena.flow.get_data_context(val)
-            return isinstance(data, lena.structures.histogram)
-
         for val in flow:
             data, context = lena.flow.get_data_context(val)
 
@@ -271,6 +268,9 @@ class ToCSV(object):
                     data, row_separator=self._separator, header=self._header
                 )
                 csv = "\n".join(rows)
+                if (hasattr(data, "_update_context") and
+                        callable(data._update_context)):
+                    data._update_context(context)
                 lena.context.update_recursively(context, "output.filetype.csv")
                 yield (csv, context)
                 continue

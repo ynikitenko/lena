@@ -19,20 +19,36 @@ def test_iterable_to_table():
 
 def test_to_csv():
     hist = histogram(edges=[0, 1, 2], bins=[1, 2])
-    gr = graph([[0, 1], [2.5, 3]])
+    gr0 = graph([[0, 1], [2.5, 3]])
     to_csv = ToCSV(separator=",", header=None, duplicate_last_bin=True)
 
     ## histogram and iterables work, other values passed unchanged
     # no context works fine
-    res1 = list(to_csv.run([hist, gr, 3]))
+    res0 = list(to_csv.run([hist, gr0, 3, "a string"]))
     # data parts are correct
-    data_1 = [res1[0][0], res1[1][0], res1[2]]
+    data_0 = [res0[0][0], res0[1][0]]
     # assert list(to_csv.run([hist, gr, 3])) == []
-    assert data_1 == [
+    assert data_0 == [
         '0.000000,1.000000\n1.000000,2.000000\n2.000000,2.000000',
         '0,2.5\n1,3',
-        3
     ]
+    assert res0[2:] == [3, "a string"]
+
+    # no error fields
+    assert res0[1][1] == {'output': {'filetype': 'csv'}}
+
+    # data._update_context is called
+    gr1 = graph([[0, 1], [2.5, 3], [0.1, 0.1]], field_names="x,y,error_y")
+    res1 = list(to_csv.run([gr1]))[0]
+    assert res1[1] == {
+        'output': {'filetype': 'csv'},
+        'error': {'y': {'index': 2}}
+    }
+
+    # context.to_csv.False forbids the transform
+    no_to_csv_context = {"output": {"to_csv": False}}
+    res2 = list(to_csv.run([(gr0, no_to_csv_context)]))[0]
+    assert res2 == (gr0, no_to_csv_context)
 
 
 def test_hist_to_csv():

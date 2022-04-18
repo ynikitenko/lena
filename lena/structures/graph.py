@@ -324,8 +324,10 @@ class graph():
         Existing values are not removed
         from *context.value* and its subcontexts.
 
-        Called on destruction of the graph (for example,
-        in :class:`.ToCSV`).
+        Called on "destruction" of the graph (for example,
+        in :class:`.ToCSV`). By destruction we mean conversion
+        to another structure (like text) in the flow.
+        The graph object is not really destroyed in this process.
         """
         # this method is private, because we encourage users to yield
         # graphs into the flow and process them with ToCSV element
