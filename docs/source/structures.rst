@@ -17,6 +17,12 @@ Structures
     graph
     Graph
 
+.. currentmodule:: lena.structures.root_graphs
+.. autosummary::
+
+    root_graph_errors
+    ROOTGraphErrors
+
 .. currentmodule:: lena.structures.elements
 .. autosummary::
 
@@ -90,6 +96,13 @@ Graph
     :members:
 
 .. autoclass:: Graph
+    :members:
+
+.. module:: lena.structures.root_graphs
+.. autoclass:: root_graph_errors
+    :members:
+
+.. autoclass:: ROOTGraphErrors
     :members:
 
 .. module:: lena.structures.elements

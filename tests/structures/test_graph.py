@@ -96,7 +96,7 @@ def test_graph_error_fields():
     # one error field works
     gr1 = graph(copy.deepcopy([xs, ys, [1, 2]]),
                 field_names="x, y, error_x", scale=2)
-    assert gr1._parsed_error_names == [('error', 'x', '')]
+    assert gr1._parsed_error_names == [('error', 'x', '', 2)]
 
     # wrong order of fields raises
     with pytest.raises(lena.core.LenaValueError) as exc:

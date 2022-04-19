@@ -280,7 +280,7 @@ class graph():
         for ind, field in enumerate(field_names):
             if field.startswith("error_"):
                 in_error_fields = True
-                errors.append(field)
+                errors.append((field, ind))
             else:
                 last_coord_ind = ind
                 if in_error_fields:
@@ -291,7 +291,7 @@ class graph():
         coords = set(field_names[:last_coord_ind+1])
         parsed_errors = []
 
-        for err in errors:
+        for err, ind in errors:
             err_coords = []
             for coord in coords:
                 err_main = err[6:]  # all after "error_"
@@ -308,7 +308,7 @@ class graph():
                     " corresponding to several coordinates given"
                 )
             # "error" may be redundant, but it is explicit.
-            parsed_errors.append(("error", err_coords[0], err_tail))
+            parsed_errors.append(("error", err_coords[0], err_tail, ind))
 
         return parsed_errors
 
@@ -341,9 +341,9 @@ class graph():
 
         xyz_coord_names = self._coord_names[:3]
         for name, coord_name in zip(["x", "y", "z"], xyz_coord_names):
-            for ind, err in enumerate(self._parsed_error_names):
+            for err in self._parsed_error_names:
                 if err[1] == coord_name:
-                    error_ind = dim + ind
+                    error_ind = err[3]
                     if err[2]:
                         # add error suffix
                         error_name = name + "_" + err[2]

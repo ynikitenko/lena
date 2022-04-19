@@ -18,6 +18,7 @@ from .hist_functions import (
     unify_1_md
 )
 from .numpy_histogram import NumpyHistogram
+from .root_graphs import root_graph_errors, ROOTGraphErrors
 from .split_into_bins import (
     IterateBins,
     MapBins,
@@ -33,6 +34,8 @@ __all__ = [
     'Histogram',
     'HistToGraph',
     'NumpyHistogram',
+    'root_graph_errors',
+    'ROOTGraphErrors',
     # hist functions
     'check_edges_increasing',
     'cell_to_string',
