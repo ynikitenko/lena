@@ -141,7 +141,7 @@ class MapBins(object):
     corresponding to the vector's components.
     """
 
-    def __init__(self, seq, select_bins=True, drop_bins_context=True):
+    def __init__(self, seq, select_bins=lambda _: True, drop_bins_context=True):
         """*seq* is a sequence or an element applied to bin contents.
         If *seq* is not a :class:`.Sequence`
         or an element with *run* method, it is converted to a

@@ -124,12 +124,13 @@ def test_iterate_bins():
 
 def test_map_bins():
     ## test init
+    # wrong sequence raises
     with pytest.raises(lena.core.LenaTypeError):
-        MapBins((), 1)
-    # this works
-    MapBins(lambda _: True, ())
+        MapBins(1)
+
+    # wrong selector raises
     with pytest.raises(lena.core.LenaTypeError):
-        MapBins(1, select_bins=lambda _: True)
+        MapBins((), select_bins=1)
 
     # not selected flow passes unchanged
     data = [1, (2, {}), (histogram([0, 1], [1]), {})]
