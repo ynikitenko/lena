@@ -51,17 +51,21 @@ def test_map_group():
         list(mg2.run([([1], {"group": []})]))
 
     ## test initialization
-    # Run element works
-    mgr = MapGroup(lena.core.Run(el), map_scalars=True)
-    assert list(mgr.run([1])) == [2]
+    # Several elements work
+    mg4 = MapGroup(el, el, map_scalars=True)
+    assert list(mg4.run([1])) == [3]
 
-    # Sequence works
-    mgs = MapGroup(lena.core.Sequence(el), map_scalars=True)
-    assert list(mgs.run([1])) == [2]
+    # same without explicit map_scalars
+    mg4 = MapGroup(el, el)
+    assert list(mg4.run([1])) == [3]
 
-    # tuple works
-    mgtup = MapGroup((el,), map_scalars=True)
-    assert list(mgtup.run([1])) == [2]
+    # map_scalars must be explicit
+    with pytest.raises(lena.core.LenaTypeError):
+        MapGroup(el, True)
+
+    # wrong keyword arguments raise
+    with pytest.raises(lena.core.LenaTypeError):
+        MapGroup(el, wrong_kwarg=True)
 
     # unconvertible element raises
     with pytest.raises(lena.core.LenaTypeError):

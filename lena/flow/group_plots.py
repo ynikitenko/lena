@@ -71,28 +71,26 @@ import lena.flow
 class MapGroup(object):
     """Apply a sequence to groups."""
 
-    def __init__(self, seq, map_scalars=True):
-        """*seq* must be a *Sequence*, a *Run* element
-        or a tuple (which will be converted to a *Sequence*).
+    def __init__(self, *seq, **map_scalars):
+        """Arguments *seq* must form a *Sequence*.
         
-        Set *map_scalars* to ``False`` to ignore scalar
-        values (not groups).
+        Set a keyword argument *map_scalars* to ``False``
+        to ignore scalar values (those that are not groups).
         """
         # todo: could be made a FillCompute element, depending on *seq*
-        if lena.core.is_run_el(seq):
-            self._seq = seq
-        elif isinstance(seq, tuple):
-            self._seq = lena.core.Sequence(*seq)
-        else:
-            # cast to a Run element
-            try:
-                self._seq = lena.core.Run(seq)
-            except lena.core.LenaTypeError:
-                raise lena.core.LenaTypeError(
-                    "seq must be a Run element, a tuple or should be "
-                    "able to be converted to a Run element"
-                )
-        self._map_scalars = map_scalars
+        try:
+            seq = lena.core.Sequence(*seq)
+        except lena.core.LenaTypeError as err:
+            raise err
+
+        self._seq = seq
+        # in Python 2 we can't put a kwarg after args
+        ms = map_scalars.pop("map_scalars", True)
+        if map_scalars:
+            raise lena.core.LenaTypeError(
+                "unknown keyword arguments {}".format(map_scalars)
+            )
+        self._map_scalars = bool(ms)
 
     def run(self, flow):
         """Map *seq* to every group from *flow*.
