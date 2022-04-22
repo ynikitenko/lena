@@ -1,6 +1,5 @@
 """:class:`Context` provides a better representation for context."""
-from __future__ import print_function
-
+import functools
 import json
 
 import lena.core
@@ -27,20 +26,19 @@ class Context(dict):
         """Initialize from a dictionary *d* (empty by default).
 
         Representation is defined by the *formatter*.
-        That must be a callable,
-        which should accept a dictionary and return a string.
-        The default is ``json.dumps``.
+        That must be a callable accepting a dictionary
+        and returning a string. The default is ``json.dumps``.
 
         All public attributes of a :class:`Context`
         can be got or set using dot notation
         (for example, *context["data_path"]*
         is equal to *context.data_path*).
-        Only one level of nesting is accessible
-        using dot notation.
+        Only one level of nesting is accessible using dot notation.
 
         Tip
         ---
-            JSON and Python representations are different.
+            `JSON <https://docs.python.org/3/library/json.html>`_
+            and Python representations are different.
             In particular, JSON *True* is written as lowercase *true*.
             To convert JSON back to Python, use ``json.loads(string)``.
 
@@ -51,7 +49,6 @@ class Context(dict):
         An attempt to get a private attribute raises
         :exc:`AttributeError`.
         """
-        # todo: maybe add intersphinx reference to json
         if d is None:
             d = {}
         super(Context, self).__init__(d)
@@ -63,10 +60,13 @@ class Context(dict):
                 )
             self._formatter = formatter
         else:
-            self._formatter = lambda s: json.dumps(s, sort_keys=True, indent=4)
-        # formatter should better be private,
+            self._formatter = functools.partial(json.dumps,
+                                                sort_keys=True, indent=4)
+            # same, but doesn't allow pickling
+            # lambda s: json.dumps(s, sort_keys=True, indent=4)
+        # formatter should be private,
         # otherwise it'll mess with other attributes
-        # self.formatter = pprint.PrettyPrinter(indent=1)
+        # self._formatter = pprint.PrettyPrinter(indent=1)
 
     def __call__(self, value):
         """Convert *value*'s context to :class:`Context` on the fly.
@@ -86,12 +86,12 @@ class Context(dict):
     def __getattr__(self, name):
         # we don't implement getting nested attributes,
         # because that would require creating proxy objects
-        # - maybe in the future if needed.
+        # -- maybe in the future if needed.
         if name.startswith('_'):
             # this is not LenaAttributeError,
             # as it wouldn't be so for other Lena classes
-            # that don't implement __getattr__
-            # see comment for Variable
+            # that don't implement __getattr__ .
+            # See comment for Variable.
             raise AttributeError(name)
         try:
             return self[name]

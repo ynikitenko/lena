@@ -1,7 +1,7 @@
-from __future__ import print_function
-
 import copy
 import json
+import pickle
+
 import pytest
 
 import lena.core
@@ -45,3 +45,9 @@ def test_context():
         c._aaa = 3
     with pytest.raises(AttributeError):
         c._aaa
+
+    ## Context can be pickled
+    d2 = {"a": "b"}
+    c2 = Context(d2)
+    picklestring = pickle.dumps(c2)
+    assert pickle.loads(picklestring) == c2
