@@ -141,7 +141,7 @@ class MapBins(object):
     corresponding to the vector's components.
     """
 
-    def __init__(self, seq, select_bins, drop_bins_context=True):
+    def __init__(self, seq, select_bins=True, drop_bins_context=True):
         """*seq* is a sequence or an element applied to bin contents.
         If *seq* is not a :class:`.Sequence`
         or an element with *run* method, it is converted to a
@@ -149,11 +149,13 @@ class MapBins(object):
         Example: ``seq=Split([X(), Y(), Z()])``
         (provided that you have X, Y, Z variables).
 
-        If *select_bins* is ``True`` for histogram's bins
+        If *select_bins* applied to histogram bins is ``True``
         (tested on an arbitrary bin), the histogram is transformed.
         Bin types can be given in a ``list``
         or as a general :class:`.Selector`.
-        Example: ``select_bins=[lena.math.vector3, list]``.
+        For example, ``select_bins=[lena.math.vector3, list]``
+        selects histograms where bins are vectors or lists.
+        By default all histograms are accepted.
 
         :class:`.MapBins` creates histograms
         that may be plotted, because their bins contain only data

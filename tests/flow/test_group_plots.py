@@ -69,7 +69,7 @@ def test_map_group():
 
     # unconvertible element raises
     with pytest.raises(lena.core.LenaTypeError):
-        mgtup = MapGroup(1)
+        MapGroup(1)
 
     ## different number of resulting values raises
     class RunN():
