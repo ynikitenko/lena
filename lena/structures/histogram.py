@@ -1,4 +1,6 @@
 """Histogram structure *histogram* and element *Histogram*."""
+import copy
+
 import lena.core
 import lena.flow
 from . import hist_functions as hf
@@ -219,59 +221,46 @@ class histogram():
 class Histogram():
     """An element to produce histograms."""
 
-    def __init__(self, edges, bins=None, make_bins=None, initial_value=0, context=None):
+    def __init__(self, edges, bins=None, make_bins=None, initial_value=0):
         """*edges*, *bins* and *initial_value* have the same meaning
         as during creation of a :class:`histogram`.
 
         *make_bins* is a function without arguments
         that creates new bins
         (it will be called during :meth:`__init__` and :meth:`reset`).
-        *initial_value* in this case is ignored,
-        but bin check is being done.
+        *initial_value* in this case is ignored, but bin check is made.
         If both *bins* and *make_bins* are provided,
         :exc:`.LenaTypeError` is raised.
         """
         self._hist = histogram(edges, bins)
 
-        self._make_bins = make_bins
         if make_bins is not None and bins is not None:
             raise lena.core.LenaTypeError(
                 "either initial bins or make_bins must be provided, "
                 "not both: {} and {}".format(bins, make_bins)
             )
+
+        # may be None
+        self._initial_bins = copy.deepcopy(bins)
+
+        # todo: bins, make_bins, initial_value look redundant
+        # and may be reconsidered.
         if make_bins:
             bins = make_bins()
-        if context is None:
-            self._cur_context = {} # context from flow
-        else:
-            if not isinstance(context, dict):
-                raise lena.core.LenaTypeError(
-                    "context must be a dict, {} provided".format(context)
-                )
-            self._cur_context = context
+        self._make_bins = make_bins
 
-        # temporarily retain these attributes for more gradual changes
-        _h = self._hist
-        self.dim   = _h.dim
-        self.bins  = _h.bins
-        self.edges = _h.edges
-        self.nbins = _h.nbins
-        self.ranges = _h.ranges
-        self._scale = None
-        # todo: maybe move it out of "histogram"
-        self._hist_context = {
-            "histogram": hf._make_hist_context(_h)
-        }
+        self._cur_context = {}
 
-    def fill(self, value, weight=1):
-        """Fill the histogram with *value* with given *weight*.
+    def fill(self, value):
+        """Fill the histogram with *value*.
 
         *value* can be a *(data, context)* pair. 
         Values outside the histogram edges are ignored.
         """
-        # self.fill_called = True
         data, self._cur_context = lena.flow.get_data_context(value)
-        self._hist.fill(data, weight)
+        self._hist.fill(data)
+        # filling with weight is only allowed in histogram structure
+        # self._hist.fill(data, weight)
 
     def compute(self):
         """Yield histogram with context.
@@ -283,25 +272,19 @@ class Histogram():
         # if not self.fill_called:
         #     # no data filled, no histogram is returned.
         #     raise StopIteration
-        yield (self._hist, hf.make_hist_context(self, self._cur_context))
+        yield (self._hist, hf.make_hist_context(self._hist, self._cur_context))
 
     def reset(self):
         """Reset the histogram.
 
         Current context is reset to an empty dict.
         Bins are reinitialized with the *initial_value*
-        or with *make_bins* (depending on the initialization).
-
-        If bins were set explicitly during the initialization,
-        :exc:`.LenaRuntimeError` is raised.
+        or with *make_bins()* (depending on the initialization).
         """
         self._cur_context = {}
         if self._make_bins is not None:
             self.bins = self._make_bins()
-        elif self._initial_bins is None:
-            self.bins = hf.init_bins(self.edges, self._initial_value)
+        elif self._initial_bins is not None:
+            self.bins = copy.deepcopy(self._initial_bins)
         else:
-            raise lena.core.LenaRuntimeError(
-                "Histogram.reset() is called, but no make_bins is provided, "
-                "because bins were set explicitly during the initialization"
-            )
+            self.bins = hf.init_bins(self.edges, self._initial_value)

@@ -2,11 +2,14 @@ Structures
 ==========
 **Histograms:**
 
-.. currentmodule:: lena.structures
+.. currentmodule:: lena.structures.histogram
 .. autosummary::
 
     histogram
     Histogram
+
+.. currentmodule:: lena.structures.numpy_histogram
+.. autosummary::
     NumpyHistogram
 
 **Graph:**
