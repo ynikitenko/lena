@@ -362,14 +362,11 @@ class SplitIntoBins():
         Computational context is preserved in histogram's bins.
 
         :class:`.SplitIntoBins` adds context
-        as *histogram* (corresponding to :attr:`edges`)
-        and *variable* (corresponding to *arg_var*) subcontexts.
+        as a subcontext *variable* (corresponding to *arg_var*).
         This allows unification of :class:`.SplitIntoBins`
-        with common analysis using histograms and variables
+        with common analysis using variables
         (useful when creating plots from one template).
-        Old contexts, if exist,
-        are preserved in nested subcontexts
-        (that is *histogram.histogram* or *variable.variable*).
+        Existing context values are preserved.
 
         Note
         ----
@@ -384,13 +381,6 @@ class SplitIntoBins():
         # update context.variable
         self._arg_var._update_context(cur_context,
                                       copy.deepcopy(self._arg_var.var_context))
-
-        # update histogram context
-        _hist = lena.structures.histogram(self.edges, self.bins)
-        # histogram context depends only on edges, not on data,
-        # and is thus same for all results
-        hist_context = lena.structures.hist_functions._make_hist_context(_hist)
-        lena.context.update_nested("histogram", cur_context, hist_context)
 
         generators = _MdSeqMap(lambda cell: cell.compute(), self.bins)
         # generators = lena.math.md_map(lambda cell: cell.compute(), self.bins)

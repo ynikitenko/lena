@@ -24,6 +24,8 @@ class root_graph_errors():
         See Python module
         `array <https://docs.python.org/3/library/array.html>`_
         for more options.
+
+        .. versionadded:: 0.5
         """
 
         import ROOT
@@ -136,6 +138,8 @@ class ROOTGraphErrors():
         """Convert data part of the value
         (which must be a :class:`.graph`)
         to :class:`.root_graph_errors`.
+
+        .. versionadded:: 0.5
         """
         graph, context = lena.flow.get_data_context(value)
         return (root_graph_errors(graph), context)

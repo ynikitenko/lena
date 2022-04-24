@@ -219,9 +219,6 @@ class ToCSV(object):
                 yield val
                 continue
 
-            ### todo: add histogram context here
-            # (now it is added in hist_functions).
-
             ## histogram
             if isinstance(data, lena.structures.histogram):
                 if data.dim == 1:
@@ -243,6 +240,7 @@ class ToCSV(object):
                     continue
 
                 csv = "\n".join(lines_iter)
+                data._update_context(context)
                 lena.context.update_recursively(context, "output.filetype.csv")
                 yield (csv, context)
                 continue

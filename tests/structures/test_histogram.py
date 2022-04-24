@@ -154,7 +154,29 @@ def test_histogram_1d():
 
     hist = histogram([0, 0.5, 1])
     hist.fill(0.5)
+
+    # _update_context without scale works
+    context = {}
+    hist._update_context(context)
+    assert context == {"histogram":
+        {"dim": 1, "nbins": [2], "ranges": [(0, 1)]}
+    }
+
+    ## scale works
+    # not initialized scale is set to None
+    assert hist._scale is None
+
+    # scale is computed correctly
     assert hist.scale() == 0.5
+
+    # computed scale is saved
+    assert hist._scale == 0.5
+
+    # _update_context works with scale
+    hist._update_context(context)
+    assert context == {"histogram":
+        {"dim": 1, "nbins": [2], "ranges": [(0, 1)], "scale": hist.scale()}
+    }
 
 
 if __name__ == "__main__":

@@ -202,12 +202,7 @@ def test_split_into_bins():
     # we don't check whether variable composition
     # creates a correct context.
     # We only delegate that explicitly in code.
-    assert context == {
-        'histogram': {
-            'dim': 1, 'nbins': [4], 'ranges': [(0, 4)]
-        },
-        'variable': {'name': 'x'}
-    }
+    assert context == {'variable': {'name': 'x'}}
     assert hist.edges == edges
     assert hist.bins == [2, 1, 1, 1]
 
@@ -243,14 +238,8 @@ def test_split_into_bins():
     # proper deep copies were made.
     # context.value is missing because it is empty.
     assert [r[1] for r in res] == [
-        {'histogram': {'dim': 1,
-                       'nbins': [4],
-                       'ranges': [(0, 4)]},
-         'variable': {'name': 'x'}},
-        {'histogram': {'dim': 1,
-                       'nbins': [4],
-                       'ranges': [(0, 4)]},
-         'variable': {'name': 'x'}},
+        {'variable': {'name': 'x'}},
+        {'variable': {'name': 'x'}},
     ]
 
     map_with_context = MapBins(Variable("add1", lambda x: x+1), select_bins=int)
@@ -259,11 +248,12 @@ def test_split_into_bins():
     # data doesn't change
     assert [r[0] for r in res_c] == [r[0] for r in res]
     # context is updated correctly
-    new_context = {'histogram': {'dim': 1,
-                                 'nbins': [4],
-                                 'ranges': [(0, 4)]},
-                   'value': {'variable': {'name': 'add1'}},
-                   'variable': {'name': 'x'}}
+    new_context = {
+        'value': {
+            'variable': {'name': 'add1'}
+        },
+        'variable': {'name': 'x'}
+    }
     assert [r[1] for r in res_c] == [new_context, new_context]
 
     # 2d histogram

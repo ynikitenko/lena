@@ -1,8 +1,10 @@
 """Histogram structure *histogram* and element *Histogram*."""
 import copy
 
+import lena.context
 import lena.core
 import lena.flow
+import lena.math
 from . import hist_functions as hf
 
 
@@ -198,12 +200,14 @@ class histogram():
         Histograms with scale equal to zero can't be rescaled.
         :exc:`.LenaValueError` is raised if one tries to do that.
         """
-        # todo: reconsider this method. Probably get_scale
-        # and set_scale would be much better!
+        # see graph.scale comments why this is called simply "scale"
+        # (not set_scale, get_scale, etc.)
         if other is None:
             # return scale
             if self._scale is None or recompute:
-                return hf.integral(*hf.unify_1_md(self.bins, self.edges))
+                self._scale = hf.integral(
+                    *hf.unify_1_md(self.bins, self.edges)
+                )
             return self._scale
         else:
             # rescale from other
@@ -212,10 +216,33 @@ class histogram():
                 raise lena.core.LenaValueError(
                     "can not rescale histogram with zero scale"
                 )
-            self.bins = lena.math.md_map(lambda binc: binc * float(other) / scale,
+            self.bins = lena.math.md_map(lambda binc: binc*float(other) / scale,
                                          self.bins)
             self._scale = other
             return None
+
+    def _update_context(self, context):
+        """Update *context* with the properties of this histogram.
+
+        *context.histogram* is updated with "dim", "nbins"
+        and "ranges" with values for this histogram.
+        If this histogram has a computed scale, it is also added
+        to the context.
+
+        Called on "destruction" of the histogram structure (for example,
+        in :class:`.ToCSV`). See graph._update_context for more details.
+        """
+
+        hist_context = {
+            "dim": self.dim,
+            "nbins": self.nbins,
+            "ranges": self.ranges
+        }
+
+        if self._scale is not None:
+            hist_context["scale"] = self._scale
+
+        lena.context.update_recursively(context, {"histogram": hist_context})
 
 
 class Histogram():
@@ -244,7 +271,7 @@ class Histogram():
         self._initial_bins = copy.deepcopy(bins)
 
         # todo: bins, make_bins, initial_value look redundant
-        # and may be reconsidered.
+        # and may be reconsidered when really using reset().
         if make_bins:
             bins = make_bins()
         self._make_bins = make_bins
@@ -263,16 +290,8 @@ class Histogram():
         # self._hist.fill(data, weight)
 
     def compute(self):
-        """Yield histogram with context.
-
-        *context.histogram* is updated with histogram's attributes."""
-        ## When used in split_into_bins, some cells might not be filled.
-        ## This should not be an error.
-        ## If your code really requires filled histograms, check it yourself.
-        # if not self.fill_called:
-        #     # no data filled, no histogram is returned.
-        #     raise StopIteration
-        yield (self._hist, hf.make_hist_context(self._hist, self._cur_context))
+        """Yield histogram with context."""
+        yield (self._hist, self._cur_context)
 
     def reset(self):
         """Reset the histogram.
@@ -281,10 +300,11 @@ class Histogram():
         Bins are reinitialized with the *initial_value*
         or with *make_bins()* (depending on the initialization).
         """
-        self._cur_context = {}
         if self._make_bins is not None:
             self.bins = self._make_bins()
         elif self._initial_bins is not None:
             self.bins = copy.deepcopy(self._initial_bins)
         else:
             self.bins = hf.init_bins(self.edges, self._initial_value)
+
+        self._cur_context = {}

@@ -612,28 +612,18 @@ def iter_cells(hist, ranges=None, coord_ranges=None):
                        ind)
 
 
-def _make_hist_context(hist):
-    hc = {
-        "dim": hist.dim,
-        "nbins": hist.nbins,
-        "ranges": hist.ranges
-    }
-    # do we really add scale to context?
-    # If that is important, we must always calculate that.
-    # If that is not important, then why adding that?
-    # if hist._scale is not None:
-    #     hc["scale"] = hist._scale
-    return hc
-
-
-# todo: make private and completely refactor this function.
 def make_hist_context(hist, context):
-    """Update *context* with the context
+    """Update a deep copy of *context* with the context
     of a :class:`.histogram` *hist*.
 
-    Deep copy of updated context is returned.
+    .. deprecated:: 0.5
+       histogram context is updated automatically
+       during conversion in :class:`~.output.ToCSV`.
+       Use histogram._update_context explicitly if needed.
     """
-    all_context = copy.deepcopy(context)
+    # absolutely unnecessary.
+    context = copy.deepcopy(context)
+
     hist_context = {
         "histogram": {
             "dim": hist.dim,
@@ -641,9 +631,9 @@ def make_hist_context(hist, context):
             "ranges": hist.ranges
         }
     }
-    all_context.update(hist_context)
-    return all_context
-    # return copy.deepcopy(all_context)
+    context.update(hist_context)
+    # just bad.
+    return context
 
 
 def unify_1_md(bins, edges):
