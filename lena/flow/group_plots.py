@@ -215,14 +215,16 @@ class GroupPlots(object):
 
         Plots are grouped by *group_by*, which returns
         different keys for different groups.
-        If it is not an instance of :class:`.GroupBy`,
-        it is converted to that class.
-        Use :class:`.GroupBy` for more options.
+        It can be a function of a value or a formatting string
+        for its context (see :class:`.GroupBy`).
+        Example: *group_by="{{value.variable.name}}_{{variable.name}}"*.
 
-        *transform* is a sequence, which processes individual plots
-        before yielding.
-        For example, set ``transform=(ToCSV(), write)``.
+        *transform* is a sequence that processes individual plots
+        before yielding. Example: ``transform=(ToCSV(), write)``.
         *transform* is called after *scale*.
+
+        .. deprecated:: 0.5
+           use :class:`MapGroup` instead of *transform*.
 
         *scale* is a number or a string.
         A number means the scale, to which plots must be normalized.
@@ -255,6 +257,7 @@ class GroupPlots(object):
         else:
             self._scale = lena.flow.group_scale.GroupScale(scale)
 
+        # deprecated. To be removed.
         if isinstance(transform, lena.core.LenaSequence):
             self._transform = transform
         else:

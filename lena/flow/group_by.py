@@ -1,6 +1,4 @@
 """Group data using :class:`.GroupBy` class."""
-from __future__ import print_function
-
 import lena.core
 import lena.flow
 
@@ -15,22 +13,29 @@ class GroupBy(object):
     """
 
     def __init__(self, group_by):
-        """*group_by* is a function, which returns
-        distinct hashable results for items from different groups.
-        It can be a dot-separated string,
-        which corresponds to a subcontext
-        (see :func:`context.get_recursively <.get_recursively>`).
+        """*group_by* is a function that returns
+        distinct hashable results for values from different groups.
+        It can be also a dot-separated formatting string.
+        In that case only the context part of the value is used
+        (see :func:`context.format_context <.format_context>`).
 
         If *group_by* is not a callable or a string,
         :exc:`.LenaTypeError` is raised.
         """
         self.groups = dict()
         if callable(group_by):
+            # callable(value) is allowed for generality.
+            # I use group_by exclusively with context,
+            # and the only example I can imagine when it can probe value
+            # is histograms with same variables
+            # but with different ranges (one wouldn't be able
+            # to plot graphs with them without changing context though).
+            # This is a weak example, because this information
+            # could be added to context.
             self._group_by = group_by
         elif isinstance(group_by, str):
-            self._group_by = lambda val: lena.context.get_recursively(
-                lena.flow.get_context(val), group_by
-            )
+            fc = lena.context.format_context(group_by)
+            self._group_by = lambda val: fc(lena.flow.get_context(val))
         else:
             raise lena.core.LenaTypeError(
                 "group_by must be a callable or a string, "
@@ -42,8 +47,17 @@ class GroupBy(object):
 
         A group key is calculated by *group_by*.
         If no such key exists, a new group is created.
+
+        If a formatting key was not found for *val*,
+        :exc:`~LenaValueError` is raised.
         """
-        key = self._group_by(val)
+        try:
+            key = self._group_by(val)
+        except lena.core.LenaKeyError:
+            raise lena.core.LenaValueError(
+                "could not find a key for {}".format(val)
+            )
+
         if key in self.groups:
             self.groups[key].append(val)
         else:
