@@ -205,13 +205,17 @@ class MapGroup(object):
 class GroupPlots(object):
     """Group several plots."""
 
-    def __init__(self, group_by, select, transform=(), scale=None,
+    def __init__(self, group_by, select=None, transform=(), scale=None,
                  yield_selected=False):
         """Plots to be grouped are chosen by *select*,
         which acts as a boolean function.
+        By default everything is selected.
         If *select* is not a :class:`.Selector`, it is converted
         to that class.
         Use :class:`.Selector` for more options.
+
+        .. deprecated:: 0.5
+           use :class:`RunIf` instead of *select*.
 
         Plots are grouped by *group_by*, which returns
         different keys for different groups.
@@ -241,7 +245,13 @@ class GroupPlots(object):
         By default it is ``False``: if we used a variable in a combined
         plot, we don't create a separate plot of that.
         """
-        if isinstance(select, lena.flow.Selector):
+        # deprecated
+        # we don't have an object "all", so we use None for all.
+        # This doesn't interfere with Selector semantics,
+        # because None is not a type.
+        if select is None:
+            self._selector = lambda _: True
+        elif isinstance(select, lena.flow.Selector):
             self._selector = select
         else:
             self._selector = lena.flow.Selector(select)
@@ -257,7 +267,7 @@ class GroupPlots(object):
         else:
             self._scale = lena.flow.group_scale.GroupScale(scale)
 
-        # deprecated. To be removed.
+        # deprecated
         if isinstance(transform, lena.core.LenaSequence):
             self._transform = transform
         else:

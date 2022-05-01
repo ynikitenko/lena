@@ -167,7 +167,8 @@ def test_group_plots():
 
     ## yield_selected works
     data2 = copy.deepcopy([h1, h2])
-    gp = GroupPlots(tp, lambda _: True, yield_selected=True)
+    # selector is None (all is selected)
+    gp = GroupPlots(tp, yield_selected=True)
     results = list(gp.run(data2))
     # grouped data
     assert results[-1] == (
