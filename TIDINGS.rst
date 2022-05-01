@@ -1,4 +1,113 @@
 ====================
+  Lena release 0.5
+====================
+
+Lena v0.5 was released on 1st May 2022.
+
+What's new
+----------
+
+Adds graphs (Lena graph structure and adapters for ROOT graphs with error bars).
+
+Improves GroupPlots and facilitates analysis (user's sequences)
+separation between different modules.
+
+* lena.context changes:
+
+  * Context allows pickling.
+  * difference adds a keyword argument *level*.
+
+* lena.core changes:
+
+  * FillRequest element no longer yields in case of empty flow.
+    Adds a keyword argument *yield_on_remainder*.
+    Adds keyword arguments *buffer_input* and *buffer_output*
+    (both obligatory, same for FillRequestSeq),
+    *reset_name*.
+    FillRequest requires explicit *reset* for FillCompute elements.
+    Fixes/improves *run, fill, request* methods of FillRequest.
+
+* lena.flow changes:
+
+  * GroupBy accepts formatting strings.
+  * GroupPlots selects all values by default.
+  * GroupScale modifies scale of a group in place
+    (that is mutates its members and not produces their scaled copies).
+  * Adds MapGroup to simultaneously modify a group of values
+    (produced by GroupPlots).
+  * RunIf accepts a variable number of arguments.
+
+* lena.output changes:
+
+  * Adds iterable_to_table.
+  * ToCSV no longer requires *to_csv* method (and does not use that).
+    Now to be written as a table, it is sufficient for a structure to be iterable.
+    ToCSV ignores strings (passes them unchanged).
+    ToCSV updates context when data has a method *_update_context(context)*
+    (used during the "destruction" of structures).
+  * Write doesn't require *context.output* to be present.
+    Write accepts objects with *write(filename)* method as writable data.
+    Write doesn't write values where data part is equal to *context.output.filename*
+    (this means that it was already written by another Write element).
+
+* lena.structures changes:
+
+  * Adds a graph structure.
+  * histogram adds a method *_update_context* (like graph).
+  * HistToGraph accepts a keyword argument *scale*
+    and works with multidimensional histograms.
+  * hist_to_graph adds a keyword argument *scale*.
+  * HistToGraph and hist_to_graph add a keyword argument *field_names*.
+  * Adds iter_bins_with_edges (in fact, makes that public).
+  * MapBins sets default *select_bins* keyword argument selecting everything.
+  * Add root_graph_errors structure and ROOTGraphErrors element.
+
+Bug fixes
+---------
+
+* Fixes structures.histogram.scale method,
+  which did not store a computed scale.
+
+Deprecations and backward incompatible changes
+----------------------------------------------
+
+* lena.context.difference recurses infinitely by default.
+
+* lena.flow changes:
+
+  * Deprecates GroupPlots initialization keyword arguments *transform*
+    and *select* (use flow.MapGroup and flow.RunIf instead).
+  * Move SplitIntoBins, MapBins, IterateBins, get_example_bin, cell_to_string
+    to lena.structures.
+
+* lena.structures changes:
+
+  * Histogram element no longer accepts an initialization keyword argument
+    *context* and no longer has histogram public fields
+    (they remain only in the histogram structure).
+    *fill* method no longer accepts a weight
+    (this is not needed in a Sequence or will require a different interface).
+    *reset* algorithm is fixed and no longer throws an error.
+    Histogram no longer updates context during *compute*.
+  * Graph is deprecated.
+  * hist_to_graph drops a keyword argument *context*.
+  * hist_to_graph produces graphs (not Graphs).
+  * HistToGraph requires *make_value* to be a Variable (not a function).
+    *context.value* is updated with the context of the graph's value.
+  * make_hist_context is deprecated.
+
+* lena.output.ToCSV no longer uses *to_csv* method (see changes).
+
+Technical changes
+-----------------
+
+* Adds performance measurement scripts.
+* Fixes hypothesis error in Python 3.10 for extremely small ("subnormal") histogram weights.
+* Improves docs, adds new Sphinx directives (*deprecated* and *versionadded*).
+* Update Sphinx conf.py for *napoleon*. Add sphinx to requirements.txt.
+* Adds tests. Test coverage is 92% (287/3604 missing vs total).
+
+====================
   Lena release 0.4
 ====================
 

@@ -5,3 +5,4 @@ except ImportError:
     # otherwise will have problems either with tox,
     # or when executing pytest directly
     collect_ignore_glob += ["root/*"]
+    collect_ignore_glob += ["*/*_root_*"]

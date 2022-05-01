@@ -76,6 +76,9 @@ class MapGroup(object):
         
         Set a keyword argument *map_scalars* to ``False``
         to ignore scalar values (those that are not groups).
+        Other keyword arguments raise :exc:`.LenaTypeError`.
+
+        .. versionadded:: 0.5
         """
         # todo: could be made a FillCompute element, depending on *seq*
         try:
