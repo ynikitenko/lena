@@ -1,24 +1,18 @@
-from __future__ import print_function
-
-import os
 import os
 
 import pytest
 
-from lena.flow import Cache
 from lena.core import Sequence, Source, LenaTypeError, LenaValueError
 from tests.example_sequences import (
     ASCIILowercase, ASCIIUppercase, ascii_lowercase, ascii_uppercase,
     lowercase_cached_filename, lowercase_cached_seq, id_
 )
-from lena.core import Source
 from lena.flow.cache import Cache
 from lena.flow.iterators import Slice
 from tests.shortcuts import cnt1, cnt1c
 
 
 def test_cache():
-    lowercase_cached_seq[0].drop_cache()
     s = Source(ascii_lowercase, lowercase_cached_seq)
     assert "".join(s()) == "abcdefghijklmnopqrstuvwxyz"
     # cache is actually used
@@ -27,30 +21,32 @@ def test_cache():
     lowercase_cached_seq[0].drop_cache()
 
 
-# it's shame, but I had two tests in different files
-def test_cache_2():
+# it's a shame, but I had two tests in different files
+def test_cache_2(tmp_path):
+    cache1 = str(tmp_path / "cache.pkl")
     # works well in sequence
     s1 = Source(
             cnt1,
             Slice(2),
-            Cache("cache.tmp"),
+            Cache(cache1),
          )
-    res1 = [result for result in s1()]
-    assert len(res1) == 2
+    res1 = [res for res in s1()]
     assert res1 == [1, 2]
 
     # works well after cached
     s2 = Source(
             cnt1,
-            Cache("cache.tmp"),
+            Slice(10),
+            Cache(cache1),
          )
-    res2 = [result for result in s2()]
+    res2 = list(s2())
+    print(cache1, res2)
     assert res1 == res2
 
     # works well with later elements in sequence
     s3 = Source(
             cnt1,
-            Cache("cache.tmp"),
+            Cache(cache1),
             Slice(1),
          )
     res3 = [result for result in s3()]
@@ -58,17 +54,14 @@ def test_cache_2():
     assert res2 == res3 + [2]
 
     # works well for flow with context
+    cache_c = str(tmp_path / "cache_c")
     s4c = Source(
             cnt1c,
             Slice(2),
-            Cache("cache_c.tmp"),
+            Cache(cache_c),
          )
     res4 = [result for result in s4c()]
     assert res4 == [(1, {'1': 1}), (2, {'2': 2})]
-
-    # clean up
-    os.remove("cache.tmp")
-    os.remove("cache_c.tmp")
 
 
 def test_alter_sequence():

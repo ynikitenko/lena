@@ -1,7 +1,7 @@
 """Cache (pickle) flow."""
-import sys
 import os
 import pickle
+import sys
 
 import lena.core 
 
@@ -10,11 +10,11 @@ if sys.version_info.major == 2:
 
 
 class Cache(object):
-    """Cache flow passing through.
+    """Cache the flow passing through.
 
-    On the first run, dump all flow to file
+    On the first run, dump the whole flow to a file
     (and yield the flow unaltered).
-    On subsequent runs, load all flow from that file
+    On subsequent runs, load the flow from that file
     in the original order.
 
     Example::
@@ -29,16 +29,16 @@ class Cache(object):
               )
 
     If *stats.pkl* exists,
-    :class:`Cache` will read data flow from that file
+    :class:`Cache` will read the data from that file
     and no other processing will be done.
     If the *stats.pkl* cache doesn't exist,
-    but the cache for histograms exist, it will be used
+    but the cache for histograms exists, it will be used
     and no previous processing (from *ReadFiles* to *MakeHistograms*)
     will occur.
-    If both caches are not filled yet, processing will run as usually.
+    If both caches were not filled yet, processing will go as usual.
 
     Only pickleable objects can be cached
-    (otherwise a *pickle.PickleError* is raised).
+    (otherwise a *pickle.PickleError* will be raised).
 
     Warning
     -------
@@ -90,12 +90,13 @@ class Cache(object):
         :exc:`.LenaEnvironmentError` is raised."""
         try:
             os.remove(self._filename)
-        except OSError:
+        except OSError as err:
             if self.cache_exists():
                 raise lena.core.LenaEnvironmentError(
                     "Cache {}".format(self._filename) +
                     " exists and readable, but can't be removed"
                 )
+            raise err
 
     def run(self, flow):
         """Load cache or fill it.
@@ -105,11 +106,14 @@ class Cache(object):
         All loaded or passing items are yielded.
         """
         if self.cache_exists():
-            # race condition in this implementation
-            # (if file is changed or deleted right after the check)
+            # Load cache, ignore flow.
+            # Race condition
+            # (if file is changed or deleted right after the check),
+            # but it will be always present because of lazy evaluation.
             return self._load_flow()
-        else:
-            return self._pass_and_dump_flow(flow)
+
+        # can't copy code here due to unknown reasons (stops working)
+        return self._dump_flow_and_yield(flow)
 
     @staticmethod
     def alter_sequence(seq):
@@ -146,6 +150,16 @@ class Cache(object):
 
         return orig_seq
 
+    def _dump_flow_and_yield(self, flow):
+        # fill cache and yield values
+        with open(self._filename, "wb") as f:
+            dump = lambda val: self._dump(val, f, self._protocol)
+            for val in flow:
+                # if there were an error in a next element,
+                # our value will be saved first (before yielding)
+                dump(val)
+                yield val
+
 
     def _load_flow(self):
         """Load flow from self.filename."""
@@ -156,14 +170,3 @@ class Cache(object):
                     yield val
                 except EOFError:
                     break
-
-    def _pass_and_dump_flow(self, flow):
-        """Dump flow into self.filename.
-
-        Flow is simultaneously yielded.
-        """
-        with open(self._filename, "wb") as f:
-            dump = lambda val: self._dump(val, f, self._protocol)
-            for val in flow:
-                dump(val)
-                yield val
