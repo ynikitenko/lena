@@ -1,4 +1,4 @@
-"""Cache (pickle) flow."""
+"""Cache (pickle) the flow."""
 import os
 import pickle
 import sys
@@ -76,8 +76,9 @@ class Cache(object):
             )
 
         self._filename = filename
-        self._method = method
-        self._protocol = protocol
+        self.protocol = protocol
+        # used by meta elements
+        self.is_cache = True
 
     def cache_exists(self):
         """Return ``True`` if file with cache exists and is readable."""
@@ -127,8 +128,8 @@ class Cache(object):
         import lena.flow, lena.core
         orig_seq = seq
         seq = lena.core.flatten(seq)
-        last_cache_filled_ind = None
         if hasattr(seq, '__iter__'):
+            last_cache_filled_ind = None
             for ind in reversed(range(len(seq))):
                 el = seq[ind]
                 if isinstance(el, lena.flow.Cache):
@@ -153,7 +154,7 @@ class Cache(object):
     def _dump_flow_and_yield(self, flow):
         # fill cache and yield values
         with open(self._filename, "wb") as f:
-            dump = lambda val: self._dump(val, f, self._protocol)
+            dump = lambda val: self._dump(val, f, self.protocol)
             for val in flow:
                 # if there were an error in a next element,
                 # our value will be saved first (before yielding)
