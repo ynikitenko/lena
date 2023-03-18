@@ -4,7 +4,7 @@ from .elements import Count, End, RunIf
 from .functions import get_data, get_context, get_data_context, seq_map
 from .group_by import GroupBy
 from .group_plots import group_plots, GroupPlots, MapGroup
-from .group_scale import GroupScale
+from .group_scale import scale_to, GroupScale
 from .iterators import Chain, CountFrom, Slice, ISlice, Reverse
 from .print_ import Print
 from .progress import Progress
@@ -34,7 +34,7 @@ __all__ = [
     # groups
     'GroupBy',
     'group_plots', 'GroupPlots',
-    'GroupScale',
+    'scale_to', 'GroupScale',
     'MapGroup',
     'Not',
     'Selector',

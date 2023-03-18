@@ -2,7 +2,7 @@ import copy
 import pytest
 
 from lena.core import LenaTypeError, LenaValueError
-from lena.flow import GroupBy, GroupScale
+from lena.flow import GroupBy, GroupScale, scale_to
 from lena.structures import histogram, graph
 
 
@@ -17,29 +17,29 @@ def test_group_scale():
     # too many items selected
     gs = GroupScale(lambda _: True)
     with pytest.raises(LenaValueError):
-        gs.scale(data)
+        gs(data)
 
     # no items selected
     gs = GroupScale(lambda _: False)
     with pytest.raises(LenaValueError):
-        gs.scale(data)
+        gs(data)
 
     # graph without a scale can't be rescaled
     h2sel = lambda h: h.edges[1] == 2
     gs = GroupScale(h2sel)
     with pytest.raises(LenaValueError):
-        gs.scale(data)
+        gs(data)
 
     # histogram h0 with a zero scale can't be rescaled
     gs = GroupScale(h2sel, allow_unknown_scale=True)
     with pytest.raises(LenaValueError):
-        gs.scale(data)
+        gs(data)
 
     # values without a scale method can't be rescaled
     gs = GroupScale(h2sel)
     data1 = [h1, h2, 1]
     with pytest.raises(LenaValueError):
-        gs.scale(data1)
+        gs(data1)
 
     # finally, GroupScale works
     # h2 scale is 4, so they should be equal.
@@ -47,10 +47,14 @@ def test_group_scale():
     gsnum = GroupScale(4, allow_zero_scale=True, allow_unknown_scale=True)
     data1 = copy.deepcopy(data)
     data2 = copy.deepcopy(data)
-    gs.scale(data1)
-    gsnum.scale(data2)
+    gs(data1)
+    gsnum(data2)
     assert data1 == data2
 
     # note that no context is added when we modify data in place!
     get_scale = lambda val: val.scale()
     assert list(map(get_scale, data1)) == [0, 4, 4, None]
+
+    # a single value instead of a group raises
+    with pytest.raises(LenaValueError):
+        gs(1)

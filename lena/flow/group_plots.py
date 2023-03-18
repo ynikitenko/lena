@@ -205,14 +205,16 @@ class MapGroup(object):
             yield (results[-1][0], context)
 
 
-def group_plots(grp):
-    """Return data parts of the group and set context["group"]
+def group_plots(group):
+    """Return data parts of the *group* and set context["group"]
     to their intersection.
 
     If any of values has been changed,
     *context.output.changed* of the group is set to ``True``.
     """
-    contexts = [lena.flow.get_context(val) for val in grp]
+    # todo: in this function only output.changed refers to plots.
+    # Could be made more general, if needed.
+    contexts = [lena.flow.get_context(val) for val in group]
     # if we wrongly assumed that a plot was unchanged,
     # that will still be overwritten by Write
     changed = any((lena.context.get_recursively(c, "output.changed", False)
@@ -222,8 +224,8 @@ def group_plots(grp):
     context.update({"group": contexts})
     # data list contains only data part
     # todo: maybe optimize to get_data_context
-    grp = [lena.flow.get_data(val) for val in grp]
-    return (grp, context)
+    group = [lena.flow.get_data(val) for val in group]
+    return (group, context)
 
 
 class GroupPlots(object):
@@ -336,7 +338,7 @@ class GroupPlots(object):
         for group_name in groups:
             grp = groups[group_name]
             if self._scale is not None:
-                self._scale.scale(grp)
+                self._scale(grp)
             # transform group items
             grp = lena.flow.functions.seq_map(self._transform, grp)
             # we must apply update after transform,

@@ -49,10 +49,20 @@ class LenaStopFill(LenaException):
 
 
 class LenaTypeError(LenaException, TypeError):
+    """Incorrect type.
+
+    Typically used during initialization of Lena elements.
+    Use :exc:`LenaValueError` for errors from values from the flow.
+    """
     pass
 
 
 class LenaValueError(LenaException, ValueError):
+    """Wrong value.
+
+    It is also used for values from the flow,
+    even when they have a wrong type.
+    """
     pass
 
 

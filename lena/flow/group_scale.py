@@ -5,6 +5,57 @@ import lena.core
 import lena.flow
 
 
+def scale_to(scale_to, group,
+             allow_zero_scale=False, allow_unknown_scale=False):
+    """Scale each structure in a *group*.
+
+    The *group* can contain *(structure, context)* pairs.
+    The original group is rescaled in place.
+
+    If any item could not be rescaled and
+    the options were not set to ignore that,
+    :exc:`.LenaValueError` is raised.
+    See the documentation for :class:`GroupScale` for details
+    on *allow_zero_scale* and *allow_unknown_scale*.
+    """
+    if isinstance(scale_to, numbers.Number):
+        scale = scale_to
+    else:
+        # get scale to be used
+        scale_to = lena.flow.Selector(scale_to)
+        cands = [val for val in group if scale_to(val)]
+        if len(cands) > 1:
+            raise lena.core.LenaValueError(
+                "only one candidate to provide scale must be selected, "
+                "{} found".format(cands)
+            )
+        elif not cands:
+            raise lena.core.LenaValueError(
+                "at least one item to get scale from must be selected"
+            )
+        else:
+            cand = cands[0]
+        scale = lena.flow.get_data(cand).scale()
+
+    # rescale
+    for val in group:
+        data, context = lena.flow.get_data_context(val)
+        try:
+            data.scale(scale)
+        except AttributeError as err:
+            # scale was not set and can't be determined
+            if not allow_unknown_scale:
+                raise lena.core.LenaValueError(
+                    "could not determine the scale of {}"
+                    .format(val)
+                )
+        except lena.core.LenaValueError as err:
+            # scale is zero and can't be changed
+            if not allow_zero_scale:
+                raise err
+    return None
+
+
 class GroupScale(object):
     """Scale a group of data."""
 
@@ -22,55 +73,20 @@ class GroupScale(object):
         the corresponding errors are ignored
         and the structure remains unscaled.
         """
-        if isinstance(scale_to, numbers.Number):
-            self._scale_to = scale_to
-        else:
-            self._scale_to = lena.flow.Selector(scale_to)
+        self._scale_to = scale_to
         self._allow_zero_scale = allow_zero_scale
         self._allow_unknown_scale = allow_unknown_scale
 
-    def scale(self, group):
-        """Scale each structure in a *group*.
+    def __call__(self, group):
+        """Scale the group. See :func:`scale_to` for details.
 
-        The *group* can contain *(structure, context)* pairs.
-        The original group is rescaled in place.
-
-        If any item could not be rescaled and
-        options were not set to ignore that,
-        :exc:`.LenaValueError` is raised.
+        If *group* is not iterable, :exc:`.LenaValueError` is raised.
         """
-        # get scale to be used
-        if isinstance(self._scale_to, numbers.Number):
-            scale = self._scale_to
-        else:
-            cands = [val for val in group if self._scale_to(val)]
-            if len(cands) > 1:
-                raise lena.core.LenaValueError(
-                    "only one candidate to provide scale must be selected, "
-                    "{} found".format(cands)
-                )
-            elif not cands:
-                raise lena.core.LenaValueError(
-                    "at least one item to get scale from must be selected"
-                )
-            else:
-                cand = cands[0]
-            scale = lena.flow.get_data(cand).scale()
-
-        # rescale
-        for val in group:
-            data, context = lena.flow.get_data_context(val)
-            try:
-                data.scale(scale)
-            except AttributeError as err:
-                # scale was not set and can't be determined
-                if not self._allow_unknown_scale:
-                    raise lena.core.LenaValueError(
-                        "could not determine the scale of {}"
-                        .format(val)
-                    )
-            except lena.core.LenaValueError as err:
-                # scale is zero and can't be changed
-                if not self._allow_zero_scale:
-                    raise err
-        return None
+        try:
+            scale_to(self._scale_to, group,
+                     self._allow_zero_scale, self._allow_unknown_scale)
+        except TypeError:
+            raise lena.core.LenaValueError(
+                "value must be a list or other materialized iterable"
+            )
+        return group
