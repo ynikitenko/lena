@@ -5,20 +5,29 @@ import pytest
 from lena.core import Sequence, Source, LenaTypeError, LenaValueError
 from tests.example_sequences import (
     ASCIILowercase, ASCIIUppercase, ascii_lowercase, ascii_uppercase,
-    lowercase_cached_filename, lowercase_cached_seq, id_
+    lowercase_cached_filename, lowercase_cached_seq, id_,
 )
 from lena.flow.cache import Cache
 from lena.flow.iterators import Slice
 from tests.shortcuts import cnt1, cnt1c
 
 
-def test_cache():
-    s = Source(ascii_lowercase, lowercase_cached_seq)
-    assert "".join(s()) == "abcdefghijklmnopqrstuvwxyz"
-    # cache is actually used
-    s = Source(ascii_uppercase, lowercase_cached_seq)
-    assert "".join(s()) == "abcdefghijklmnopqrstuvwxyz"
-    lowercase_cached_seq[0].drop_cache()
+def test_cache(tmpdir):
+    low_letters = "abcdefghijklmnopqrstuvwxyz"
+    os.chdir(tmpdir)
+
+    # empty cache makes no problems
+    s1 = Source(ascii_lowercase, lowercase_cached_seq)
+    assert "".join(s1()) == low_letters
+
+    # filled cache is actually used
+    s2 = Source(ascii_uppercase, lowercase_cached_seq)
+    assert "".join(s2()) == low_letters
+
+    # recompute works
+    c3 = Cache(lowercase_cached_filename, recompute=True)
+    s3 = Source(ascii_uppercase, c3)
+    assert "".join(s3()) == "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
 
 # it's a shame, but I had two tests in different files
@@ -64,13 +73,10 @@ def test_cache_2(tmp_path):
     assert res4 == [(1, {'1': 1}), (2, {'2': 2})]
 
 
-def test_alter_sequence():
+def test_alter_sequence(tmpdir):
+    os.chdir(tmpdir)
     cached_to_source = Cache.alter_sequence
-    # remove cache
-    try:
-        os.remove(lowercase_cached_filename)
-    except Exception:
-        pass
+
     lowercase_cache_el = Cache(lowercase_cached_filename)
     el = lowercase_cache_el 
     s0 = Sequence(el)
@@ -93,5 +99,3 @@ def test_alter_sequence():
     # this fails for nested Sequences. To be done.
     assert cached_to_source(s) != s
     assert isinstance(cached_to_source(s), Source)
-
-    lowercase_cache_el.drop_cache()

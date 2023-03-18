@@ -47,9 +47,15 @@ class Cache(object):
         Never unpickle data from an untrusted source.
     """
 
-    def __init__(self, filename, method="cPickle", protocol=2):
+    def __init__(self, filename, recompute=False,
+                 method="cPickle", protocol=2):
         """*filename* is the name of file where to store the cache.
         You can give it *.pkl* extension.
+
+        If *recompute* is ``True``,
+        an existing cache will always be overwritten.
+        This option is typically used if one wants to define
+        cache behaviour from the command line.
 
         *method* can be *pickle* or *cPickle* (faster pickle).
         For Python 3 they are same.
@@ -77,11 +83,18 @@ class Cache(object):
 
         self._filename = filename
         self.protocol = protocol
+        self._recompute = recompute
         # used by meta elements
         self.is_cache = True
 
     def cache_exists(self):
-        """Return ``True`` if file with cache exists and is readable."""
+        """Return ``True`` if file with cache exists and is readable.
+
+        If *recompute* was ``True`` during the initialization,
+        pretend that cache does not exist (return ``False``).
+        """
+        if self._recompute:
+            return False
         return os.access(self._filename, os.R_OK)
 
     def drop_cache(self):
@@ -138,7 +151,8 @@ class Cache(object):
                         break
             if last_cache_filled_ind is not None:
                 return lena.core.Source(
-                    lena.core.SourceEl(seq[last_cache_filled_ind], call="_load_flow"),
+                    lena.core.SourceEl(seq[last_cache_filled_ind],
+                                       call="_load_flow"),
                     *seq[last_cache_filled_ind+1:]
                 )
         else:
