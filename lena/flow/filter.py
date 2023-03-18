@@ -36,9 +36,7 @@ class Filter():
 
         .. versionadded:: 0.4
         """
-        if not callable(selector):
-            selector = _Selector(selector)
-        self._selector = selector
+        self._selector = _Selector(selector)
 
     def fill_into(self, element, value):
         """Fill *value* into an *element* if

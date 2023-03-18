@@ -2,6 +2,7 @@ import pytest
 import lena
 
 from lena.flow import Filter, Selector
+from lena.structures import histogram
 
 from tests.examples.fill import StoreFilled
 
@@ -33,3 +34,8 @@ def test_filter():
     for val in data:
         f1.fill_into(sf1, val)
     assert sf1.list == res_data
+
+    # Lena classes work in filters
+    data3 = [histogram([1, 2])]
+    f3 = Filter(histogram)
+    assert list(f3.run(data3)) == data3
