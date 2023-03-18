@@ -3,7 +3,8 @@ import pytest
 
 import lena.core
 from lena.core import LenaTypeError, LenaValueError
-from lena.flow import GroupBy, GroupScale, Selector, GroupPlots, MapGroup
+from lena.flow import GroupBy, GroupScale, Selector, MapGroup
+from lena.flow.group_plots import group_plots, GroupPlots
 from lena.structures import histogram, graph
 
 
@@ -96,6 +97,29 @@ def test_map_group():
 
 
 def test_group_plots():
+    data = [1, 2]
+    contexts = ({"a": "a", "b": {}}, {"a": "a"})
+    vals = list(zip(data, contexts))
+    res = (
+        [1, 2],
+        {'a': 'a',
+         'group': [{'a': 'a',
+                    'b': {}},
+                   {'a': 'a'}],
+         'output': {'changed': False}},
+    )
+    assert group_plots(vals) == res
+
+    vals = data
+    assert group_plots(vals) == (
+        [1, 2],
+        # there is a group context, even if it was empty.
+        # It is better for generality.
+        {'group': [{}, {}], 'output': {'changed': False}}
+    )
+
+
+def test_GroupPlots():
     h0 = histogram([0, 1], [0])
     h1 = histogram([0, 1], [1])
     h2 = histogram([0, 2], [2])

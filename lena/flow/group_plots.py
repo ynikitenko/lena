@@ -205,6 +205,27 @@ class MapGroup(object):
             yield (results[-1][0], context)
 
 
+def group_plots(grp):
+    """Return data parts of the group and set context["group"]
+    to their intersection.
+
+    If any of values has been changed,
+    *context.output.changed* of the group is set to ``True``.
+    """
+    contexts = [lena.flow.get_context(val) for val in grp]
+    # if we wrongly assumed that a plot was unchanged,
+    # that will still be overwritten by Write
+    changed = any((lena.context.get_recursively(c, "output.changed", False)
+                   for c in contexts))
+    context = lena.context.intersection(*contexts)
+    lena.context.update_recursively(context, "output.changed", changed)
+    context.update({"group": contexts})
+    # data list contains only data part
+    # todo: maybe optimize to get_data_context
+    grp = [lena.flow.get_data(val) for val in grp]
+    return (grp, context)
+
+
 class GroupPlots(object):
     """Group several plots."""
 
@@ -310,22 +331,6 @@ class GroupPlots(object):
             else:
                 yield val
 
-        # flow finished
-
-        def update_group_with_context(grp):
-            # get common context
-            contexts = [lena.flow.get_context(val) for val in grp]
-            changed = any((lena.context.get_recursively(c, "output.changed", False)
-                           for c in contexts))
-            context = lena.context.intersection(*contexts)
-            lena.context.update_recursively(context, "output.changed", changed)
-            # add "group" to context
-            context.update({"group": contexts})
-            # data list contains only data part
-            # todo: maybe optimize to get_data_context
-            grp = [lena.flow.get_data(val) for val in grp]
-            return (grp, context)
-
         # yield groups of selected plots
         groups = self._group_by.groups
         for group_name in groups:
@@ -336,4 +341,4 @@ class GroupPlots(object):
             grp = lena.flow.functions.seq_map(self._transform, grp)
             # we must apply update after transform,
             # because otherwise output.changed logic may fail.
-            yield update_group_with_context(grp)
+            yield group_plots(grp)
