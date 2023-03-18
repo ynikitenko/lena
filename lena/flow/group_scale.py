@@ -9,7 +9,9 @@ def scale_to(scale_to, group,
              allow_zero_scale=False, allow_unknown_scale=False):
     """Scale each structure in a *group*.
 
-    The *group* can contain *(structure, context)* pairs.
+    The group is a sequence of *(structure, context)* pairs
+    (not the result of :func:`group_plots`!).
+    Each structure must have a method *scale*.
     The original group is rescaled in place.
 
     If any item could not be rescaled and

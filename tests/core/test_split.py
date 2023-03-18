@@ -1,4 +1,6 @@
 import copy
+import os
+
 import pytest
 
 import lena.core
@@ -87,8 +89,8 @@ def test_split_buffer():
     assert "".join(s()) == "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
 
 
-def test_split_sequence_with_cache():
-    lowercase_cached_seq[0].drop_cache()
+def test_split_sequence_with_cache(tmpdir):
+    os.chdir(tmpdir)
     s = Source(ascii_lowercase, Split([lambda s: s.upper(), lowercase_cached_seq]))
     # print(list(Cache(lowercase_cached_filename)._load_flow()))
     # print(Call(Cache(lowercase_cached_filename), call="_load_flow")())
@@ -111,7 +113,6 @@ def test_split_sequence_with_cache():
         )
     assert "".join(s()) == \
         "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-    lowercase_cached_seq[0].drop_cache()
 
 
 def test_split_with_fill_computes():

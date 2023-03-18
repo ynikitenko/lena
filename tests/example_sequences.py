@@ -1,5 +1,3 @@
-from __future__ import print_function
-
 import string
 
 from lena.core import Source, Sequence
@@ -17,6 +15,7 @@ class ASCIIUppercase(object):
     def __call__(self):
         for s in string.ascii_uppercase:
             yield s
+
 
 ascii_lowercase = Source(ASCIILowercase())
 ascii_uppercase = Source(ASCIIUppercase())

@@ -145,7 +145,7 @@ class vector3(object):
     # make set_ and get_ functions private. What's the use of them?
 
     @classmethod
-    def fromspherical(cls, r, phi, theta):
+    def from_spherical(cls, r, phi, theta):
         r"""Construct vector3 from spherical coordinates.
 
         *r* is magnitude, *phi* is azimuth angle
@@ -153,15 +153,15 @@ class vector3(object):
         *theta* is polar angle from 0 (z = 1) to :math:`\pi` (z = -1).
 
         >>> from math import pi
-        >>> vector3.fromspherical(1, 0, 0)
+        >>> vector3.from_spherical(1, 0, 0)
         vector3(0.0, 0.0, 1.0)
-        >>> vector3.fromspherical(1, 0, pi).isclose(vector3(0, 0, -1))
+        >>> vector3.from_spherical(1, 0, pi).isclose(vector3(0, 0, -1))
         True
-        >>> vector3(1, 0, 0).isclose(vector3.fromspherical(1, 0, pi/2))
+        >>> vector3(1, 0, 0).isclose(vector3.from_spherical(1, 0, pi/2))
         True
-        >>> vector3.fromspherical(1, pi, 0).isclose(vector3(0.0, 0.0, 1.0))
+        >>> vector3.from_spherical(1, pi, 0).isclose(vector3(0.0, 0.0, 1.0))
         True
-        >>> vector3.fromspherical(1, pi/2, pi/2).isclose(vector3(0.0, 1.0, 0.0))
+        >>> vector3.from_spherical(1, pi/2, pi/2).isclose(vector3(0.0, 1.0, 0.0))
         True
         """
         x = r * cos(phi) * sin(theta)
@@ -220,18 +220,18 @@ class vector3(object):
 
         >>> from math import pi
         >>> from lena.math import isclose
-        >>> v3 = vector3.fromspherical(1, pi/2, pi/2)
+        >>> v3 = vector3.from_spherical(1, pi/2, pi/2)
         >>> isclose(v3.getphi(), pi/2)
         True
         >>> v3.isclose(vector3(0, 1, 0))
         True
-        >>> v3 = vector3.fromspherical(1, 3 * pi/2, pi/2)
+        >>> v3 = vector3.from_spherical(1, 3 * pi/2, pi/2)
         >>> isclose(v3.getphi(), 3 * pi/2)
         True
         >>> v3 = vector3(-1., 0, 0)
         >>> isclose(v3.getphi(), pi)
         True
-        >>> v3 = vector3.fromspherical(10, 2 * pi - 1e-6, pi/2)
+        >>> v3 = vector3.from_spherical(10, 2 * pi - 1e-6, pi/2)
         >>> isclose(v3.getphi(), 2 * pi - 1e-6)
         True
         """
@@ -243,7 +243,7 @@ class vector3(object):
 
         >>> from math import pi
         >>> from lena.math import isclose
-        >>> isclose(vector3.fromspherical(1, pi/2, pi/2).gettheta(), pi/2)
+        >>> isclose(vector3.from_spherical(1, pi/2, pi/2).gettheta(), pi/2)
         True
         """
         return acos(self.getcostheta())
@@ -274,7 +274,7 @@ class vector3(object):
         >>> v.isclose(vector3(4, 0, 3))
         True
         """
-        self._v = vector3.fromspherical(self.r, phi, self.theta)._v
+        self._v = vector3.from_spherical(self.r, phi, self.theta)._v
 
     def settheta(self, theta):
         """Set the polar angle to theta.
@@ -291,7 +291,7 @@ class vector3(object):
         >>> v.isclose(vector3(0, 0, -1))
         True
         """
-        self._v = vector3.fromspherical(self.r, self.phi, theta)._v
+        self._v = vector3.from_spherical(self.r, self.phi, theta)._v
 
     r = property(getr, setr)
     phi = property(getphi, setphi)
@@ -326,7 +326,7 @@ class vector3(object):
 
         >>> from math import pi
         >>> from lena.math import isclose
-        >>> isclose(vector3.fromspherical(1, pi/2, pi/2).getcostheta(), 0, abs_tol=1e-10)
+        >>> isclose(vector3.from_spherical(1, pi/2, pi/2).getcostheta(), 0, abs_tol=1e-10)
         True
         """
         # return self.cosine(vector3(0, 0, 1))

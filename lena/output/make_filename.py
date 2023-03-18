@@ -1,5 +1,3 @@
-from __future__ import print_function
-
 import lena.core
 import lena.context
 import lena.flow
@@ -7,6 +5,8 @@ import lena.flow
 
 class MakeFilename(object):
     """Make file name, file extension and directory name."""
+    # We don't treat groups of plots specially, because
+    # one would have to create file name for them from the start.
 
     def __init__(self, filename=None, dirname=None, fileext=None,
                  prefix=None, suffix=None, overwrite=False):
