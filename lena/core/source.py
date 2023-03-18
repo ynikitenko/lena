@@ -30,6 +30,10 @@ class Source(lena_sequence.LenaSequence):
             raise exceptions.LenaTypeError(
                 "Source must be initialized with 1 argument or more (0 given)"
             )
+        if len(args) == 1 and isinstance(args[0], tuple):
+            # unpack one nesting level.
+            # Deeper nesting ((el,),) is not allowed.
+            args = args[0]
         if not callable(args[0]):
             raise exceptions.LenaTypeError(
                 "first element {} ".format(args[0])

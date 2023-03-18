@@ -39,3 +39,11 @@ def test_source():
         s = Source()
     with pytest.raises(lena.core.LenaTypeError):
         s = Source(1)
+
+    # can initialize from tuple
+    s3 = Source((cnt0, Slice(1)))
+    assert list(s3()) == [0]
+
+    # nested tuples are not allowed (see no reason to do that)
+    with pytest.raises(lena.core.LenaTypeError):
+        Source(((cnt0,),))
