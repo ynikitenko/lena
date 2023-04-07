@@ -8,6 +8,7 @@ jinja2 >= 2.11.0  # >=2.11.0 needed for UpdateContext (ChainableUndefined)
 pylint
 
 ## testing ##
+pytest
 pytest-mock
 hypothesis
 coverage

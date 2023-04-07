@@ -336,18 +336,15 @@ class vector3(object):
 
     def __eq__(self, B):
         if not isinstance(B, vector3):
-            raise lena.core.LenaTypeError(
-                "'==' argument should be vector3, "
-                "{} provided".format(B)
-            )
+            # return NotImplemented if unsure about B,
+            # https://stackoverflow.com/a/879005/952234
+            # In this case B.__eq__ will be tried.
+            return NotImplemented
         return self._v == B._v
 
     def __ne__(self, B):
         if not isinstance(B, vector3):
-            raise lena.core.LenaTypeError(
-                "'!=' argument should be vector3, "
-                "{} provided".format(B)
-            )
+            return NotImplemented
         return self._v != B._v
 
     ## Prohibit comparison methods <, <=, >, >=, __cmp__

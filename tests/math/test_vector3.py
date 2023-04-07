@@ -15,11 +15,7 @@ def test_eq():
     v4 = vector3(1.5, 2, 3)
     assert v1 != v4
 
-    with pytest.raises(LenaTypeError):
-        v1 == [1, 2, 3]
-    with pytest.raises(TypeError):
-        # LenaTypeError, to be precise
-        v1 == [1, 2, 3]
+    assert (v1 == [1, 2, 3]) is False
     with pytest.raises(LenaTypeError):
         v1 < 0
     with pytest.raises(LenaTypeError):
@@ -52,10 +48,8 @@ def test_operations():
 
     # != works
     assert v1 != v2
-
-    # != with a wrong type raises
-    with pytest.raises(lena.core.LenaTypeError):
-        v1 != 0
+    # != for different types is True
+    assert (v1 != 0) is True
 
     # comparison with a wrong type raises
     with pytest.raises(lena.core.LenaTypeError):

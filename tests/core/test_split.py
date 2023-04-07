@@ -90,7 +90,7 @@ def test_split_buffer():
 
 
 def test_split_sequence_with_cache(tmpdir):
-    os.chdir(tmpdir)
+    os.chdir(str(tmpdir))
     s = Source(ascii_lowercase, Split([lambda s: s.upper(), lowercase_cached_seq]))
     # print(list(Cache(lowercase_cached_filename)._load_flow()))
     # print(Call(Cache(lowercase_cached_filename), call="_load_flow")())

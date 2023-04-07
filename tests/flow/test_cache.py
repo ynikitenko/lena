@@ -14,7 +14,7 @@ from tests.shortcuts import cnt1, cnt1c
 
 def test_cache(tmpdir):
     low_letters = "abcdefghijklmnopqrstuvwxyz"
-    os.chdir(tmpdir)
+    os.chdir(str(tmpdir))
 
     # empty cache makes no problems
     s1 = Source(ascii_lowercase, lowercase_cached_seq)
@@ -74,7 +74,7 @@ def test_cache_2(tmp_path):
 
 
 def test_alter_sequence(tmpdir):
-    os.chdir(tmpdir)
+    os.chdir(str(tmpdir))
     cached_to_source = Cache.alter_sequence
 
     lowercase_cache_el = Cache(lowercase_cached_filename)
