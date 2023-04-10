@@ -22,6 +22,9 @@ def setup(app):
     # otherwise another custom.css will overwrite it.
     app.add_css_file('custom.css')
     app.add_js_file('custom.js')
+    # This is a popular repository, so it's safe to use it by a link,
+    # but in case of its removal, check https://github.com/zenorocha/clipboard.js
+    # It is 10 Kb, so we won't make its local copy for now.
     app.add_js_file('https://cdn.jsdelivr.net/npm/clipboard@1/dist/clipboard.min.js')
 
 highlight_language = 'python'

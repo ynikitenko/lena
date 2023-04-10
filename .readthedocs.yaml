@@ -5,3 +5,7 @@ version: 2
 python:
    install:
    - requirements: docs/requirements.txt
+
+# have to explicitly enable that,
+# https://docs.readthedocs.io/en/stable/config-file/v2.html#formats
+formats: all
