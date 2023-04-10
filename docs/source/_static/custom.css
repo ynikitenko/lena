@@ -35,3 +35,8 @@ div.highlight {
     -webkit-box-shadow: 1px 1px 1px #d8d8d8;
     -moz-box-shadow: 1px 1px 1px #d8d8d8;
 }
+/* fix new ugly table alignment from Sphinx */
+table.align-default {
+    margin-right: auto;
+    margin-left: 0px;
+}

@@ -14,8 +14,8 @@ Flow
     Progress
     RunIf
 
-..     Count
 ..    Transform
+    Count
 
 **Functions:**
 
@@ -63,7 +63,7 @@ which didn't fit other categories.
 .. module:: lena.flow
 .. autoclass:: Cache
     :members:
-.. .. autoclass:: Count
+.. autoclass:: Count
     :members:
 .. autoclass:: DropContext
     :members:

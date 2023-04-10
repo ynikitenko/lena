@@ -63,6 +63,7 @@ Elements
         angle, 
         cosine, cross, 
         dot,
+        from_spherical,
         isclose,
         norm,
         proj,
@@ -74,4 +75,4 @@ Elements
         setphi, setr, settheta,
         getcostheta, getr2,
     
-    .. automethod:: fromspherical
+..    .. automethod:: from_spherical

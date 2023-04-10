@@ -74,8 +74,16 @@ def test_run_if():
 
 
 def test_end():
+    # run works correctly
     flow = [1, 2, 3]
     flit = iter(flow)
     res = list(End().run(flit))
     assert res == []
     assert list(flit) == []
+
+    # equality and representation work
+    e1 = End()
+    e2 = End()
+    assert e1 == e2
+    assert e1 != []
+    assert repr(e1) == "End()"

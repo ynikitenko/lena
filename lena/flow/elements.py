@@ -195,3 +195,9 @@ class End(object):
         return
         # otherwise it won't be a generator
         yield "unreachable"
+
+    def __eq__(self, other):
+        return isinstance(other, End)
+
+    def __repr__(self):
+        return "End()"

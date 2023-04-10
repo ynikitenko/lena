@@ -146,11 +146,11 @@ class vector3(object):
 
     @classmethod
     def from_spherical(cls, r, phi, theta):
-        r"""Construct vector3 from spherical coordinates.
+        r"""Construct a new *vector3* from spherical coordinates.
 
-        *r* is magnitude, *phi* is azimuth angle
-        from 0 to :math:`2 * \pi`,
-        *theta* is polar angle from 0 (z = 1) to :math:`\pi` (z = -1).
+        *r* is its magnitude, *phi* is the azimuth angle
+        from 0 to :math:`2 * \pi` and *theta* is the polar angle
+        from 0 (z = 1) to :math:`\pi` (z = -1).
 
         >>> from math import pi
         >>> vector3.from_spherical(1, 0, 0)
@@ -163,6 +163,9 @@ class vector3(object):
         True
         >>> vector3.from_spherical(1, pi/2, pi/2).isclose(vector3(0.0, 1.0, 0.0))
         True
+
+        .. versionchanged:: 0.6
+            Renamed from *fromspherical*.
         """
         x = r * cos(phi) * sin(theta)
         y = r * sin(phi) * sin(theta)

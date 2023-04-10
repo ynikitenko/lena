@@ -18,6 +18,8 @@ sys.path.insert(0, os.path.abspath('../../'))
 
 def setup(app):
     app.add_js_file('copybutton.js')
+    # add all custom css to this file,
+    # otherwise another custom.css will overwrite it.
     app.add_css_file('custom.css')
     app.add_js_file('custom.js')
     app.add_js_file('https://cdn.jsdelivr.net/npm/clipboard@1/dist/clipboard.min.js')
@@ -27,7 +29,7 @@ highlight_language = 'python'
 # -- Project information -----------------------------------------------------
 
 project = u'Lena'
-copyright = u'2020-2022, Yaroslav Nikitenko'
+copyright = u'2020-2023, Yaroslav Nikitenko'
 author = u'Yaroslav Nikitenko'
 
 # The short X.Y version
@@ -100,7 +102,7 @@ master_doc = 'index'
 #
 # This is also used if you do content translation via gettext catalogs.
 # Usually you set "language" from the command line for these cases.
-language = None
+language = "en"
 locale_dirs = ['locale/']
 gettext_compact = False
 gettext_uuid = False
@@ -144,6 +146,8 @@ html_theme = "nature"
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
+# Hint: use only the existing source/_static;
+# all new "custom.css" will overwrite the other ones.
 html_static_path = ['_static']
 
 # Custom sidebar templates, must be a dictionary that maps document names
