@@ -2,6 +2,8 @@ Reference
 =========
 
 .. toctree::
+   :maxdepth: 2
+
     context <context>
     core <core>
     flow <flow>

@@ -80,7 +80,7 @@ autodoc_default_options = {
     # 'undoc-members': True,
     # 'exclude-members': '__weakref__'
 }
-autosummary_generate = True
+# autosummary_generate = True
 
 # Both the class' and the __init__ method's docstring are concatenated and inserted.
 autoclass_content = "both"
@@ -126,25 +126,16 @@ pygments_style = None
 # a list of builtin themes.
 #
 
-# html_theme = 'alabaster'
-# html_theme = 'classic'
-# html_theme = "sphinx_rtd_theme"
-# basic theme is minimalistic.
-# solar-theme has menus on the right
 html_theme = "nature"
-# extensions = [
-#     'hachibee_sphinx_theme',
-# ]
-
-# html_theme = 'hachibee'
-# import hachibee_sphinx_theme
-# html_theme_path = [hachibee_sphinx_theme.get_html_themes_path()]
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
-# documentation.
-#
-# html_theme_options = {}
+# documentation:
+# https://www.sphinx-doc.org/en/master/usage/theming.html#builtin-themes
+
+# html_theme_options = {
+#     globaltoc_maxdepth: 2,  # unavaliable for the nature theme
+# }
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
