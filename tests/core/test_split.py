@@ -122,7 +122,7 @@ def test_split_with_fill_computes():
     flow = [0, 1, 2, 3, 4, 0]
     context = {'type': 'extended histogram'}
     orig_context = copy.deepcopy(context)
-    counter_context = {'type': 'extended histogram', 'counter': 6}
+    counter_context = {'type': 'extended histogram', 'count': 6}
     # otherwise context is updated by the last sequence.
     flowc = [(val, copy.deepcopy(context)) for val in flow]
     seq_res = list(seq.run(flowc))

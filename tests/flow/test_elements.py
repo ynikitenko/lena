@@ -5,40 +5,55 @@ from lena.flow import Count, RunIf, End, Selector
 from tests.examples.fill import StoreFilled
 
 
-def test_count():
-    # test run
+@pytest.mark.parametrize("initial_count", [0, 3])
+def test_count(initial_count):
     flow = [1, 2, 3, "foo"]
-    c = Count(name="counter")
-    assert list(c.run(iter(flow))) == [
-        1, 2, 3, ('foo', {'counter': 4})
+    c1 = Count(name="counter", count=initial_count)
+
+    # run works
+    assert list(c1.run(iter(flow))) == [
+        1, 2, 3, ('foo', {'counter': 4 + initial_count})
     ]
-    assert list(c.run(iter([]))) == []
+    assert list(c1.run(iter([]))) == []
 
-    # test FillCompute
-    c = Count(name="counter")
+    # fill and compute work
+    c2 = Count(name="counter", count=initial_count)
     for val in flow:
-        c.fill(val)
-    result = [(4, {'type': 'count', 'name': 'counter'})]
-    # # don't change during request
-    # assert list(c.request()) == result
-    # assert list(c.request()) == result
-    # assert list(c.compute()) == [(4, {'type': 'count', 'name': 'counter'})]
-    assert list(c.compute()) == [(4, {'counter': 4})]
-    # reset after compute
-    assert list(c.compute()) == [(0, {'counter': 0})]
-    # context is updated correctly
-    # c.fill(("foo", {"bar": "baz"}))
-    # assert list(c.request()) == [
-    #     (1, {'type': 'count', 'bar': 'baz', 'name': 'counter'})
-    # ]
+        c2.fill(val)
+    # didn't change, though not sure why it is needed.
+    assert list(c2.compute()) == [(4+initial_count, {'counter': 4+initial_count})]
 
-    ## test fill_into
+    # reset works
+    c2.reset()
+    assert list(c2.compute()) == [(0, {'counter': 0})]
+
+    # fill_into works
     store = StoreFilled()
     for val in flow:
-        c.fill_into(store, val)
+        c2.fill_into(store, val)
     results = store.list
     assert len(results) == 4
     assert results[3] == ("foo", {'counter': 4})
+
+
+def test_count_eq_repr():
+    # empty counter
+    c0 = Count("cnt")
+    assert c0.count == 0
+    assert repr(c0) == """Count(name="cnt", count=0)"""
+
+    # non-trivial value
+    c1 = Count("counter", count=4)
+    assert repr(c1) == """Count(name="counter", count=4)"""
+
+    c2 = Count(name=c1.name)
+    c2.count = c1.count
+    assert c2 == c1
+
+    # different names and counts make counters not equal
+    assert c1 != c0
+    # different types return False
+    assert c1 != 0
 
 
 def test_run_if():

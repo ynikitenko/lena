@@ -7,6 +7,7 @@ Flow
 .. autosummary::
 
     Cache
+    Count
     DropContext
     End
     Filter
@@ -15,7 +16,6 @@ Flow
     RunIf
 
 ..    Transform
-    Count
 
 **Functions:**
 

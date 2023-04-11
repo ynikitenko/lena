@@ -1,4 +1,4 @@
-"""Elements which work with the flow."""
+"""Elements that work with the flow."""
 import copy
 
 import lena.core
@@ -8,57 +8,74 @@ from . import functions
 class Count(object):
     """Count items that pass through.
 
-    After the flow is exhausted, add {*name*: count} to the *context*.
-
     Example:
 
-    >>> flow = [1, 2, 3, "foo"]
-    >>> c = Count("counter")
+    >>> flow = [0, 1, 2]
+    >>> c = Count("my_counter")
     >>> list(c.run(iter(flow))) == [
-    ...     1, 2, 3, ('foo', {'counter': 4})
+    ...     0, 1, (2, {'my_counter': 3})
     ... ]
     True
     """
 
-    def __init__(self, name="counter"):
-        """*name* is this Counter's name."""
+    def __init__(self, name="count", count=0):
+        """*name* is this counter's name (added to context).
+        One can use the default name if *Count* is filled,
+        but it is recommended to provide
+        a meaningful name in a *Run* element.
 
-        self._name = name
-        self._count = 0
+        *count* is the initial counter.
+        It is added to all countings.
+        It is set to 0 during :meth:`reset`.
+
+        *name* and *count* are public attributes.
+        """
+
+        self.name = name
+        self.count = count
+        # todo: move to update_context.
         self._cur_context = {}
 
     def fill(self, value):
-        """Increase counter and set context from *value*."""
-        self._count += 1
+        """Increase *count* and set current context from *value*."""
+        self.count += 1
         self._cur_context = lena.flow.get_context(value)
 
     def compute(self):
-        """Yield *(count, context)* and reset self."""
-        self._cur_context.update({self._name: self._count})
-        yield (self._count, copy.deepcopy(self._cur_context))
-        # reset
-        self._count = 0
-        self._cur_context = {}
+        """Yield *(count, context)*.
+
+        *context* is taken from the last filled value and 
+        is updated with *{self.name: self.count}*.
+        """
+        # compute is idempotent
+        self._cur_context.update({self.name: self.count})
+        yield (self.count, copy.deepcopy(self._cur_context))
 
     def fill_into(self, element, value):
-        """Fill *element* with *value* and increase counter.
+        """Fill *element* with *value* and increase *count*.
 
-        *value* context is updated with the counter.
+        *value* context is updated with *{self.name: self.count}*.
 
-        Element must have a ``fill(value)`` method.
+        *element* must have a ``fill(value)`` method.
         """
-        self._count += 1
+        self.count += 1
         data, context = lena.flow.get_data_context(value)
-        context.update({self._name: self._count})
+        context.update({self.name: self.count})
         element.fill((data, context))
 
+    def reset(self):
+        """Set *count* to zero. Clear current context."""
+        # note that we reset not to the initialized count.
+        self.count = 0
+        self._cur_context = {}
+
     def run(self, flow):
-        """Yield incoming values and increase counter.
+        """Yield incoming values and increase *count*.
 
-        When the incoming flow is exhausted,
-        update last value's context with *(count, context)*.
+        After the flow is exhausted,
+        update last value's context with *{self.name: self.count}*.
 
-        If the flow was empty, nothing is yielded
+        If the *flow* was empty, nothing is yielded
         (so *count* can be zero only from :meth:`compute`).
         """
         try:
@@ -69,16 +86,31 @@ class Count(object):
             return
             # raise StopIteration
         # todo: add an option to update context with every count,
-        # not only last
+        # not only last. But it may be better with a sort of zip.
         count = 1
         for val in flow:
             yield prev_val
             count += 1
             prev_val = val
+        # we don't overwrite the count field, in case of a simultaneous
+        # filling in another place.
+        self.count += count
+
         val = prev_val
         data, context = lena.flow.get_data_context(val)
-        context.update({self._name: count})
+        # we yield the total count from all threads.
+        # This is the same result (mod context) as for compute.
+        context.update({self.name: self.count})
         yield (data, context)
+
+    def __eq__(self, other):
+        if not isinstance(other, Count):
+            return NotImplemented
+        return (self.name == other.name and self.count == other.count
+                and self._cur_context == other._cur_context)
+
+    def __repr__(self):
+        return "Count(name=\"{}\", count={})".format(self.name, self.count)
 
 
 class RunIf(object):
