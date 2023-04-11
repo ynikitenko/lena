@@ -16,7 +16,8 @@ def test_selector():
         s = Selector((1,))
 
     data = [1, "s", []]
-    # class works
+
+    ## Class works ##
     s0 = Selector(int)
     assert list(map(bool, map(s0, data))) == [True, False, False]
     # *And* works
@@ -25,7 +26,17 @@ def test_selector():
     # *Or* works
     sor = Selector([int, str])
     assert list(map(bool, map(sor, data))) == [True, True, False]
-    # callable And works
+
+    # equality tests work
+    assert s0 == Selector(int)
+    assert s0 != sand
+    # representation works
+    # or int.__name__ for better cross-platformity
+    assert repr(s0) == "Selector(int)"
+    assert repr(sand) == "Selector((Selector(int), Selector(str)))"
+    assert repr(sor) == "Selector([Selector(int), Selector(str)])"
+
+    ## callable And works
     scal = Selector((int, lambda val: val < 2))
     assert list(map(bool, map(scal, data))) == [True, False, False]
     # callable Or works
@@ -39,16 +50,24 @@ def test_selector():
     assert list(map(bool, [sccal(dt) for dt in data])) == [True, True, False]
     assert list(map(bool, map(sccal, data))) == [True, True, False]
 
-    # string initializer works
+    ## string initializer works
     data = [(1, {"name": "x"}), (2, {"name": "y"})]
     dsel = Selector("name.x")
     assert [dsel(val) for val in data] == [True, False]
+    assert repr(dsel) == """Selector("name.x")"""
+    assert dsel == Selector("name.x")
+    assert dsel != Selector("other")
 
     ## And and Or with initialized selectors work.
     sel_and = Selector([Selector(len)])
     assert [sel_and(dt[0]) for dt in data] == [False]*2
     sel_or = Selector((Selector(len),))
     assert [sel_or(dt[0]) for dt in data] == [False]*2
+
+    # eq works
+    assert sel_and == Selector([Selector(len)])
+    assert sel_and != sel_or
+    assert sel_and != 0
 
 
 def test_raise_on_error():
@@ -92,14 +111,23 @@ def test_raise_on_error():
 def test_not():
     # simple type
     ns1 = Not(int)
+    # equality works
+    assert ns1 == Not(int)
+    assert ns1 != Selector(int)
+    assert ns1 != int
+
+    # representation works
+    assert repr(ns1) == """Not(int)"""
+
     data = [1, "s", []]
     assert list(map(ns1, data)) == [False, True, True]
 
     # missing value, raises an exception
     ns2 = Not("context")
+    assert repr(ns2) == """Not("context")"""
     assert list(map(ns2, data)) == [True, True, True]
 
     # pure exception
     f = lambda x: x/0.
-    ns2 = Not(f)
-    assert list(map(ns2, data)) == [True, True, True]
+    ns3 = Not(f)
+    assert list(map(ns3, data)) == [True, True, True]

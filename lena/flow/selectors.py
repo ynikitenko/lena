@@ -1,6 +1,4 @@
 """Select specific items."""
-from __future__ import print_function
-
 import inspect
 
 import lena.context
@@ -8,10 +6,10 @@ import lena.core
 import lena.flow
 
 
-# may be made public if there appears a reason
-# to prohibit nested ()s and []s and force user
-# to define type explicitly.
+# see no reason to make them public.
+# This is more like an internal implementation of Selector.
 class _SelectorOr(object):
+
     def __init__(self, args, raise_on_error=False):
         self._selectors = []
         for arg in args:
@@ -26,8 +24,20 @@ class _SelectorOr(object):
     def __call__(self, val):
         return any((f(val) for f in self._selectors))
 
+    def __eq__(self, other):
+        # this is a strict comparison,
+        # because _SelectorOr with one element will give same results
+        # as _SelectorAnd or a Selector.
+        if not isinstance(other, _SelectorOr):
+            return NotImplemented
+        return self._selectors == other._selectors
+
+    def __repr__(self):
+        return "[{}]".format(", ".join([repr(s) for s in self._selectors]))
+
 
 class _SelectorAnd(object):
+
     def __init__(self, args, raise_on_error=False):
         self._selectors = []
         for arg in args:
@@ -41,6 +51,14 @@ class _SelectorAnd(object):
 
     def __call__(self, val):
         return all((f(val) for f in self._selectors))
+
+    def __eq__(self, other):
+        if not isinstance(other, _SelectorAnd):
+            return NotImplemented
+        return self._selectors == other._selectors
+
+    def __repr__(self):
+        return "({})".format(", ".join([repr(s) for s in self._selectors]))
 
 
 class Selector(object):
@@ -79,16 +97,33 @@ class Selector(object):
         :exc:`.LenaTypeError` is raised.
         """
         # Callable classes are treated as classes, not callables
+        self._selector_repr = ""
         if inspect.isclass(selector):
             self._selector = lambda val: isinstance(
                 lena.flow.get_data(val), selector
             )
+            try:
+                # warning: this will give a false positive
+                # for different classes with the same name
+                # todo, bug: string and class initialization
+                # may give false positives.
+                # Shall be fixed after I skip context
+                # and use builtins instead of lambdas.
+                self._selector_repr = selector.__name__
+            except AttributeError:
+                pass
         elif callable(selector):
             self._selector = selector
+            try:
+                # __name__ works better for builtin functions
+                self._selector_repr = selector.__name__
+            except AttributeError:
+                pass  # will use __repr__
         elif isinstance(selector, str):
             self._selector = lambda val: lena.context.contains(
                 lena.flow.get_context(val), selector
             )
+            self._selector_repr = "\"{}\"".format(selector)
         elif isinstance(selector, list):
             try:
                 self._selector = _SelectorOr(selector, raise_on_error)
@@ -105,6 +140,11 @@ class Selector(object):
                 "{} provided".format(selector)
             )
         self._raise_on_error = bool(raise_on_error)
+
+        if not self._selector_repr:
+            # we set it here, because
+            # _selector is not initialized in the beginning
+            self._selector_repr = repr(self._selector)
 
     def __call__(self, value):
         """Check whether *value* is selected.
@@ -126,6 +166,25 @@ class Selector(object):
             return False
         else:
             return sel
+
+    def __eq__(self, other):
+        if not isinstance(other, Selector):
+            return NotImplemented
+        # if the functions are at different addresses,
+        # then we have same representation (good for creation),
+        # but unequal objects. It is against false positives.
+        if self._selector_repr:
+            # since we use lambdas for types and strings,
+            # their initial representations
+            # will provide a better comparison.
+            return self._selector_repr == other._selector_repr
+        return self._selector == other._selector
+
+    def __repr__(self):
+        # this representation does not include the address,
+        # but can be used for initialization, see
+        # https://stackoverflow.com/a/1436756/952234
+        return "Selector({})".format(self._selector_repr)
 
 
 class Not(Selector):
@@ -157,3 +216,11 @@ class Not(Selector):
         then any occurred exception will be raised here.
         """
         return not self._selector(value)
+
+    def __eq__(self, other):
+        if not isinstance(other, Not):
+            return NotImplemented
+        return self._selector == other._selector
+
+    def __repr__(self):
+        return "Not({})".format(self._selector._selector_repr)
