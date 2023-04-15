@@ -7,7 +7,13 @@ from . import sequence
 
 
 class FillRequestSeq(lena_sequence.LenaSequence):
-    """Sequence with one *FillRequest* element.
+    """
+    .. deprecated:: 0.6
+       inside a :class:`.Split` element
+       this sequence is a subtype of a simple
+       :class:`Sequence`.
+
+    Sequence with one *FillRequest* element.
 
     Input flow is preprocessed with the sequence
     before the *FillRequest* element,

@@ -212,7 +212,13 @@ class FillInto(object):
 
 
 class FillRequest(object):
-    """Adapter for a *FillRequest* element.
+    """
+    .. deprecated:: 0.6
+       inside :class:`.Split`
+       this element can be implemented by a simple
+       :class:`Run` element.
+
+    Adapter for a *FillRequest* element.
 
     A *FillRequest* element slices the flow during *fill*
     and yields results for each chunk during *request*.
