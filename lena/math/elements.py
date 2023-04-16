@@ -3,6 +3,11 @@ import copy
 import decimal
 from decimal import getcontext, Decimal, Inexact
 
+if sys.version[0] == 2:
+    from itertools import izip_longest as _zip_longest
+else:
+    from itertools import zip_longest as _zip_longest
+
 import lena.core
 import lena.flow
 
@@ -178,3 +183,100 @@ class Sum(object):
         """
         self._sum = copy.deepcopy(self._start)
         self._cur_context = {}
+
+
+class Vectorize(object):
+    """Apply a scalar algorithm to a vector component-wise."""
+
+    def __init__(self, seq, construct=None, dim=0):
+        """*seq* will be converted to a :class:`.FillComputeSeq`.
+
+        Return type during :meth:`compute` will be know from the first
+        filled element.
+        *construct* is needed in case the flow was empty.
+        It will provide the needed dimension and data type.
+        However, often an object constructor can allow
+        an arbitrary dimension (like ``tuple``).
+        In that case, provide *dim*.
+        """
+        # todo: if needed, a list *seq* could mean
+        # a list of sequences of the needed dimension.
+        try:
+            self._seq = FillComputeSeq(seq)
+        except TypeError:
+            raise LenaTypeError("seq must be convertible to FillComputeSeq")
+
+        if dim == 0 and construct is not None:
+            try:
+                _tmp = construct()
+                dim = len(_tmp)
+            except TypeError:
+                # we have a chance to get data dimension from flow
+                pass
+
+        if dim:
+            if not construct:
+                raise LenaTypeError(
+                    "non-zero dim requires construct"
+                )
+            self._seqs = [self._seq]
+            self._seqs.extend([copy.deepcopy(self._seq) for _ in range(dim)])
+            self.fill = self._fill_others
+        else:
+            self.fill = self._fill_first
+
+        self._construct = construct
+        self._dim = dim
+    
+    def fill(self, val):
+        """Fill sequences for each component of the data vector."""
+        raise NotImplementedError
+
+    def _fill_first(self, val):
+        # fill the first element. Will learn data type from that,
+        # dimension and organise sequences.
+        data, context = lena.flow.get_data_context(val)
+        try:
+            dim = len(data)
+        except TypeError:
+            raise LenaValueError(
+                "no way to find out data dimension. "
+                "type of the data does not support len"
+            )
+
+        if not self._construct:
+            self._construct = type(data)
+            # will be used like _construct(*result),
+            # that is data.__init__ must support such arguments.
+
+        self._seqs = [self._seq]
+        self._seqs.extend([copy.deepcopy(self._seq) for _ in range(dim)])
+        self.fill = self._fill_others
+        self._cur_context = context
+
+    def _fill_others(self, val):
+        data, context = lena.flow.get_data_context(val)
+        for ind, seq in enumerate(self._seqs):
+            # can raise if data is not of a sufficient length
+            # or of a not sufficient type for filling into *seq*
+            seq.fill(data[ind])
+        self._cur_context = context
+
+    def compute(self):
+        # we allow for not equal length of results in the output;
+        # the user could deal with that themselves
+        it = _zip_longest((seq.compute() for seq in self._seqs))
+        while True:
+            try:
+                data = next(it)
+            except StopIteration:
+                # can also be any exception raised in seq.compute()
+                break
+            context = copy.deepcopy(self._cur_context)
+            try:
+                yield (self._construct(*data), context)
+            except TypeError:
+                # we allow for special (not convertible to the needed type)
+                # dataues in the output (e.g. those containing context);
+                # we use standard tuples for them.
+                yield (data, context)
