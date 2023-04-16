@@ -1,15 +1,22 @@
 import pytest
 
+from decimal import getcontext, Decimal, Inexact
+from math import frexp
+
 from lena.core import LenaZeroDivisionError
-from lena.math import Mean, Sum
+from lena.math import Mean, Sum, DSum
 
 
 def test_mean():
+    # no filled entries raise
     m0 = Mean()
     with pytest.raises(LenaZeroDivisionError):
         list(m0.compute())
+
+    # pass_on_empty works
     m1 = Mean(pass_on_empty=True)
     assert list(m1.compute()) == []
+
     # fill with context
     empty_context = {"context": "empty"}
     m1.fill((1, empty_context))
@@ -18,10 +25,30 @@ def test_mean():
     m1.fill(3)
     assert list(m1.compute()) == [2]
 
+    # special sums work
+    m2 = Mean(DSum())
+    m2.fill(1)
+    m2.fill(2)
+    assert list(m2.compute()) == [1.5]
 
-from decimal import getcontext, Decimal, Inexact
-from math import frexp
-getcontext().traps[Inexact] = True
+    m2.reset()
+    with pytest.raises(LenaZeroDivisionError):
+        assert list(m2.compute()) == [1.5]
+
+    class SumWOReset():
+        pass
+
+    m3 = Mean(SumWOReset())
+    # no reset in the sum element leads to no reset in Mean
+    with pytest.raises(AttributeError):
+        m3.reset()
+
+    # sum_element is actually reset
+    ds = DSum(3)
+    m4 = Mean(ds)
+    m4.reset()
+    assert ds.total == 0.
+
 
 def dsum(iterable):
     "Full precision summation using Decimal objects for intermediate values"
@@ -29,6 +56,7 @@ def dsum(iterable):
     # Convert (mant, exp) to a Decimal and add to the cumulative sum.
     # If the precision is too small for exact conversion and addition,
     # then retry with a larger precision.
+    getcontext().traps[Inexact] = True
 
     total = Decimal(0)
     for x in iterable:
@@ -62,9 +90,23 @@ def test_sum():
     s0 = Sum()
     assert list(s0.compute()) == [0]
     # fill with context
+
     empty_context = {"context": "empty"}
     s0.fill((1, empty_context))
     assert list(s0.compute()) == [(1, empty_context)]
+
     # math is correct
     s0.fill(3)
     assert list(s0.compute()) == [4]
+
+    # reset works
+    s0.reset()
+    assert s0.total == 0
+    # empty context is not yielded
+    # todo: maybe we would need to store the context for reset...
+    assert list(s0.compute()) == [0]
+
+    # starting value
+    s1 = Sum(1)
+    s1.fill(2)
+    assert s1.total == 3

@@ -9,6 +9,7 @@ if sys.version[0] == 2:
 else:
     from itertools import zip_longest as _zip_longest
 
+import lena.context
 import lena.core
 import lena.flow
 
@@ -16,19 +17,28 @@ import lena.flow
 class Mean(object):
     """Calculate mean (average) of input values."""
 
-    def __init__(self, start=0, pass_on_empty=False):
-        """*start* is the initial value of sum.
+    def __init__(self, sum_=None, pass_on_empty=False):
+        """*sum_* is the algorithm to calculate the sum.
+        It must be a *FillCompute* element.
+        If it is not provided, ordinary Python summation is used.
 
         If *pass_on_empty* is True, then if nothing was filled,
         don't yield anything.
         By default it raises an error (see :meth:`compute`)."""
-        # Initialization resets this object.
-        # start is similar to Python's builtin *sum* start.
-        # a special keyword would be needed
-        # if we want default context of other type
-        self._start = start
+        # sum *start* similar to Python's builtin *sum* star
+        # is meaningless for this object, because we don't set
+        # starting count (todo).
+        self._sum_el = sum_
+        if sum_:
+            if not hasattr(sum_, "reset") or not callable(sum_.reset):
+                self.reset = self._reset_missing
+                # can't do it, because reset seems to not be present
+                # del self.reset
+        # will be used only without a summation element
+        self._sum = 0
         self._pass_on_empty = pass_on_empty
-        self.reset()
+        self._count = 0
+        self._cur_context = {}
 
     def fill(self, value):
         """Fill *self* with *value*.
@@ -38,7 +48,12 @@ class Mean(object):
         is saved for output.
         """
         data, context = lena.flow.get_data_context(value)
-        self._sum += data
+        # could skip this check having two methods,
+        # but all the other code looks too large to copy.
+        if self._sum_el:
+            self._sum_el.fill(data)
+        else:
+            self._sum += data
         self._count += 1
         self._cur_context = context
 
@@ -60,20 +75,52 @@ class Mean(object):
             raise lena.core.LenaZeroDivisionError(
                 "can't calculate average. No values were filled"
             )
-        mean = self._sum / float(self._count)
-        if not self._cur_context:
-            yield mean
+        if self._sum_el:
+            sums = list(self._sum_el.compute())
+            assert sums
+            # in principle, we allow for other values to be yielded
+            sum_, scont = lena.flow.get_data_context(sums[0])
         else:
-            yield (mean, copy.deepcopy(self._cur_context))
+            sum_ = self._sum
+            sums = []
+
+        mean = sum_ / float(self._count)
+
+        def maybe_with_context(data, context):
+            if not context:
+                return data
+            else:
+                return (data, context)
+
+        context = copy.deepcopy(self._cur_context)
+        if sums:
+            lena.context.update_recursively(context, scont)
+            yield maybe_with_context(mean, context)
+            for sval in sums[1:]:
+                context = copy.deepcopy(self._cur_context)
+                sdata, scont = lena.flow.get_data_context(sval)
+                lena.context.update_recursively(context, scont)
+                yield maybe_with_context(data, context)
+        else:
+            yield maybe_with_context(mean, context)
 
     def reset(self):
         """Reset sum, count and context.
 
-        Sum is reset to *start* value, count to zero and context to {}.
+        Sum is reset zero (or the *reset* method of *sum_* is called),
+        count to zero and context to {}.
         """
-        self._sum = copy.deepcopy(self._start)
+        if self._sum_el is not None:
+            self._sum_el.reset()
+        else:
+            self._sum = 0
         self._count = 0
         self._cur_context = {}
+
+    def _reset_missing(self):
+        raise lena.core.LenaAttributeError(
+            "the sum element has no reset method"
+        )
 
 
 class DSum(object):
@@ -82,7 +129,7 @@ class DSum(object):
     def __init__(self, total=0):
         """*total* is the initial value of the sum."""
         self._total = Decimal(total)
-        self._dcontext = decimals.Context(traps=Inexact)
+        self._dcontext = decimal.Context(traps=[Inexact])
         self._cur_context = {}
 
     def fill(self, value):
@@ -126,7 +173,7 @@ class DSum(object):
         # we set it to zero, because the total in the initialization
         # is for creation of a copy of an existing object
         # (not for some magic constant to be added to the result).
-        self._sum = Decimal(0)
+        self._total = Decimal(0)
         self._cur_context = {}
 
     @property
