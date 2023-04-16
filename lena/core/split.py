@@ -95,6 +95,7 @@ class Split(object):
             if *copy_buf* is True), and *compute*
             yields values from all sequences in turn
             (as would also do *request* or *Source.__call__*).
+            Common type is not implemented for *Call* element.
 
         In case of wrong initialization arguments, :exc:`.LenaTypeError`
         or :exc:`.LenaValueError` is raised.

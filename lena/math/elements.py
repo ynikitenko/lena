@@ -1,6 +1,7 @@
 """Elements for mathematical calculations."""
 import copy
 import decimal
+import sys
 from decimal import getcontext, Decimal, Inexact
 
 if sys.version[0] == 2:
@@ -145,14 +146,11 @@ class DSum(object):
 class Sum(object):
     """Calculate sum of input values."""
 
-    def __init__(self, start=0):
-        """*start* is the initial value of sum."""
-        # todo: buggy class. To fix.
-        # start is similar to Python's builtin *sum* start.
-        # a special keyword would be needed
-        # if we want default context of other type
-        self._start = start
-        self.reset()
+    def __init__(self, total=0):
+        """*total* is the initial value of the sum."""
+        # total is similar to Python's builtin *sum* start.
+        self._total = total
+        self._cur_context = {}
 
     def fill(self, value):
         """Fill *self* with *value*.
@@ -162,7 +160,7 @@ class Sum(object):
         sets the current context.
         """
         data, context = lena.flow.get_data_context(value)
-        self._sum += data
+        self._total += data
         self._cur_context = context
 
     def compute(self):
@@ -172,16 +170,20 @@ class Sum(object):
         Otherwise yield only *sum*.
         """
         if not self._cur_context:
-            yield self._sum
+            yield self._total
         else:
-            yield (self._sum, copy.deepcopy(self._cur_context))
+            yield (self._total, copy.deepcopy(self._cur_context))
+
+    @property
+    def total(self):
+        return self._total
 
     def reset(self):
-        """Reset sum and context.
+        """Reset total and context.
 
-        Sum is reset to *start* value and context to {}.
+        total is reset to 0 (not *start*) and context to {}.
         """
-        self._sum = copy.deepcopy(self._start)
+        self._total = 0
         self._cur_context = {}
 
 
