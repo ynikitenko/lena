@@ -25,7 +25,7 @@ def test_fill_request_seq():
     s1 = Source(
         ones,
         FillRequestSeq(
-            FillRequest(Sum(start=0), reset=False, buffer_input=True),
+            FillRequest(Sum(), reset=False, buffer_input=True),
             reset=False,
             buffer_input=True,
             bufsize=1
@@ -46,7 +46,7 @@ def test_fill_request_seq_old():
         FillRequest(
             FillRequestSeq(
                 lambda x: x-1,
-                FillRequest(Sum(start=0), reset=False, buffer_input=True),
+                FillRequest(Sum(), reset=False, buffer_input=True),
                 reset=False,
                 buffer_input=True,
             ),
@@ -61,7 +61,7 @@ def test_fill_request_seq_old():
     s2 = Source(
         cnt1,
         FillRequestSeq(
-            FillRequest(Sum(start=0), reset=False, buffer_input=True),
+            FillRequest(Sum(), reset=False, buffer_input=True),
             lambda x: x-1,
             reset=False, buffer_input=True
         ),

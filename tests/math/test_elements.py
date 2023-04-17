@@ -4,7 +4,7 @@ from decimal import getcontext, Decimal, Inexact
 from math import frexp
 
 from lena.core import LenaZeroDivisionError
-from lena.math import Mean, Sum, DSum
+from lena.math import vector3, Mean, Sum, DSum, Vectorize
 
 
 def test_mean():
@@ -45,6 +45,7 @@ def test_mean():
 
     # sum_element is actually reset
     ds = DSum(3)
+    assert ds.total == 3.
     m4 = Mean(ds)
     m4.reset()
     assert ds.total == 0.
@@ -87,10 +88,11 @@ def _test_dsum():
 
 
 def test_sum():
+    # empty Sum is zero
     s0 = Sum()
     assert list(s0.compute()) == [0]
-    # fill with context
 
+    # fill with context works
     empty_context = {"context": "empty"}
     s0.fill((1, empty_context))
     assert list(s0.compute()) == [(1, empty_context)]
@@ -98,15 +100,32 @@ def test_sum():
     # math is correct
     s0.fill(3)
     assert list(s0.compute()) == [4]
+    # total property works
+    assert s0.total == 4
 
     # reset works
     s0.reset()
     assert s0.total == 0
+
     # empty context is not yielded
     # todo: maybe we would need to store the context for reset...
     assert list(s0.compute()) == [0]
 
-    # starting value
+    # starting value is counted
     s1 = Sum(1)
     s1.fill(2)
     assert s1.total == 3
+
+
+def test_vectorize():
+    data = [vector3(1, 1, 1), vector3(1, 2, 3)]
+
+    v1 = Vectorize(Sum())
+    # todo: use inspect.isclass to forbid this:
+    # v1 = Vectorize(Sum)
+    for val in data:
+        v1.fill(val)
+    assert list(v1.compute()) == [vector3(2, 3, 4)]
+    context = {"context": True}
+    v1.fill((vector3(0, 0, 0), context))
+    assert list(v1.compute()) == [(vector3(2, 3, 4), context)]

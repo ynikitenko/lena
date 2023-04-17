@@ -89,7 +89,7 @@ def test_render_latex():
         rendered = "".join(fil.readlines())
         # same:
         # rendered = "".join([line for line in fil])
-    if sys.version[0] == "2":
+    if sys.version_info.major == 2:
         rendered = unicode(rendered)
     # Warning: print can't show non-printed characters,
     # you won't see if there is a space at the end of the line!

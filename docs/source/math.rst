@@ -21,8 +21,10 @@ Math
 
 .. currentmodule:: lena.math.elements
 .. autosummary::
+    DSum
     Mean
     Sum
+    Vectorize
 
 **3-dimensional vector:**
 

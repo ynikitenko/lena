@@ -73,7 +73,7 @@ class WriteROOTTree():
                     )
         elif isinstance(root_file, str):
             self._root_file_name = root_file
-        elif sys.version[0] == 2 and isinstance(root_file, unicode):
+        elif sys.version_info.major == 2 and isinstance(root_file, unicode):
             self._root_file_name = root_file
         else:
             raise lena.core.LenaValueError(

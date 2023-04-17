@@ -51,9 +51,9 @@ class ReadROOTFile():
                     "keys must be a list of strings"
                 )
             # ROOT keys can have unicode names
-            if (sys.version[0] == 2 and
+            if (sys.version_info.major == 2 and
                 any((not isinstance(key, basestring) for key in keys))) or \
-               (sys.version[0] > 2 and
+               (sys.version_info.major > 2 and
                 any((not isinstance(key, str) for key in keys))):
                 raise lena.core.LenaTypeError(
                     "keys must contain only strings"
@@ -117,7 +117,7 @@ class ReadROOTFile():
             data, context = get_data_context(val)
 
             # skip not ROOT files
-            if sys.version[0] == 2:
+            if sys.version_info.major == 2:
                 str_type = basestring
             else:
                 str_type = str
