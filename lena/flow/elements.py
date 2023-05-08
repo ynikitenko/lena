@@ -1,5 +1,7 @@
 """Elements that work with the flow."""
+import collections
 import copy
+import itertools
 
 import lena.core
 from . import functions
@@ -213,6 +215,64 @@ class RunIf(object):
                     yield result
             else:
                 yield val
+
+
+class RunningChunkBy(object):
+    """Split the flow into shifting intersecting chunks."""
+
+    def __init__(self, chunk_size, container=tuple, from_iterable=False):
+        """*container* is a callable constructor for new chunks.
+
+        If *container* initialization requires an iterable,
+        set *from_iterable* to ``True``.
+
+        Example::
+
+        >>> rcb = RunningChunkBy(2)
+        >>> flow = range(5)
+        >>> list(rcb.run(flow))
+        >>> [(0, 1), (1, 2), (2, 3), (3, 4)]
+        """
+        # todo: add example of event selection
+        self._cs = chunk_size
+        if not callable(container):
+            raise LenaTypeError(
+                "container must be a callable constructor for new chunks"
+            )
+        self._container = container
+        self._from_iterable = bool(from_iterable)
+        # todo: create FillInto
+
+    def run(self, flow):
+        """If the *flow* contains fewer than *chunk_size* values,
+        nothing is yielded.
+        Prepend or append the *flow* with default elements
+        to change this.
+        """
+        chunk_size = self._cs
+        container = self._container
+        # if flow appears to be a container, this will work correctly
+        flow = iter(flow)
+
+        chunk = collections.deque(itertools.islice(flow, chunk_size),
+                                  maxlen=chunk_size)
+
+        # we can't use isinstance(tuple), because
+        # container is its constructor, not an object
+        if (container == tuple) or self._from_iterable:
+            for val in flow:
+                yield container(chunk)
+                chunk.append(val)  # head is popped automatically
+            # flow contained enough elements
+            if len(chunk) == chunk_size:
+                yield container(chunk)
+        else:
+            # e.g. namedtuple
+            for val in flow:
+                yield container(*chunk)
+                chunk.append(val)
+            if len(chunk) == chunk_size:
+                yield container(*chunk)
 
 
 class End(object):

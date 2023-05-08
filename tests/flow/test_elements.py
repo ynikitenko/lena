@@ -1,7 +1,9 @@
+from collections import namedtuple
+
 import pytest
 
 import lena.core
-from lena.flow import Count, RunIf, End, Selector
+from lena.flow import Count, RunIf, End, Selector, RunningChunkBy
 from tests.examples.fill import StoreFilled
 
 
@@ -86,6 +88,26 @@ def test_run_if():
     # not a sequence raises
     with pytest.raises(lena.core.LenaTypeError):
         RunIf(select_all, 0)
+
+
+def test_running_chunk_by():
+    rcb = RunningChunkBy(2)
+    flow = range(5)
+
+    ## default container (tuple) works
+    assert list(rcb.run(flow)) == [(0, 1), (1, 2), (2, 3), (3, 4)]
+    # not large enough flow yields no elements
+    assert list(rcb.run((1,))) == []
+
+    nt = namedtuple("xy", "x,y")
+    rcb2 = RunningChunkBy(2, nt)
+    res2 = list(rcb.run(flow))
+    assert res2 == [(0, 1), (1, 2), (2, 3), (3, 4)]
+    assert res2[0] == nt(0, 1)
+
+    # step 1 works
+    rcb3 = RunningChunkBy(1)
+    assert list(rcb3.run(range(3))) == [(0,), (1,), (2,)]
 
 
 def test_end():
