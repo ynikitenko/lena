@@ -231,7 +231,7 @@ class RunningChunkBy(object):
         >>> rcb = RunningChunkBy(2)
         >>> flow = range(5)
         >>> list(rcb.run(flow))
-        >>> [(0, 1), (1, 2), (2, 3), (3, 4)]
+        [(0, 1), (1, 2), (2, 3), (3, 4)]
         """
         # todo: add example of event selection
         self._cs = chunk_size

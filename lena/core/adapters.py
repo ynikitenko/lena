@@ -44,7 +44,7 @@ def _init_callable(self, el, call):
     if call is _SENTINEL:
         # try to find call in el
         if callable(el):
-            self._call = el # pylint: disable=protected-access
+            self._call = el  # pylint: disable=protected-access
         else:
             raise exceptions.LenaTypeError(
                 "provide a callable method or a callable element, "
@@ -54,7 +54,7 @@ def _init_callable(self, el, call):
         # get call by its name
         el_call = getattr(el, call, None)
         if callable(el_call):
-            self._call = el_call # pylint: disable=protected-access
+            self._call = el_call  # pylint: disable=protected-access
         else:
             raise exceptions.LenaTypeError(
                 "call method {} of {} must exist and be callable"
@@ -90,7 +90,7 @@ class Call(object):
         # This fix is needed only for a special method,
         # https://docs.python.org/3/reference/datamodel.html#special-lookup
         # Methods with other names will be monkey-patched correctly.
-        return self._call(value) # pylint: disable=no-member
+        return self._call(value)  # pylint: disable=no-member
 
 
 class FillCompute(object):
@@ -564,7 +564,7 @@ class FillRequest(object):
 
         class slice_iterated_with_count():
 
-            def __init__(self, size, seq): 
+            def __init__(self, size, seq):
                 self.count = 0
                 self._size = size
                 self._seq = seq
@@ -706,20 +706,39 @@ class SourceEl(object):
     """
 
     def __init__(self, el, call=_SENTINEL):
-        """Element *el* must contain a callable method *__call__*
-        or be callable itself.
-
-        If *call* function or method name is not provided,
-        it is checked whether *el* is callable itself.
+        """Element *el* must be callable or iterable, or
+        contain a callable method *call*.
 
         If :class:`SourceEl` failed to instantiate with *el* and *call*,
         :exc:`.LenaTypeError` is raised.
         """
-        _init_callable(self, el, call)
+        if call is _SENTINEL:
+            # try to find call in el
+            if callable(el):
+                self._call = el
+            elif hasattr(el, "__iter__"):
+                # works for iterators and range
+                self._call = lambda: el
+            else:
+                raise exceptions.LenaTypeError(
+                    "provide a callable method or a callable element, "
+                    "{} given".format(el)
+                )
+        else:
+            # get call by its name
+            el_call = getattr(el, call, None)
+            if callable(el_call):
+                self._call = el_call  # pylint: disable=protected-access
+            else:
+                raise exceptions.LenaTypeError(
+                    "call method {} of {} must exist and be callable"
+                    .format(call, el)
+                )
+        self._el = el
 
     def __call__(self):
         """Yield generated values."""
         # This fix is needed only for a special method,
         # https://docs.python.org/3/reference/datamodel.html#special-lookup
         # Methods with other names will be monkey-patched correctly.
-        return self._call() # pylint: disable=no-member
+        return self._call()  # pylint: disable=no-member
