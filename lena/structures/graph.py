@@ -358,6 +358,56 @@ class graph():
                         error_ind
                     )
 
+    # emulating numeric types
+    def __add__(self, other):
+        """Add last (highest) coordinates of two graphs.
+
+        A new graph is returned. Error fields are ignored.
+        """
+        # todo: make it method add(.., calculate_error=...)
+        if not isinstance(other, graph):
+            return NotImplemented
+        # but their errors may be different
+        assert self.dim == other.dim
+        dim = self.dim
+        # copied from scale
+        last_coord_ind = self.dim - 1
+        last_coord_name = self.field_names[last_coord_ind]
+
+        last_coord_indices = (
+            [last_coord_ind] + self._get_err_indices(last_coord_name)
+        )
+
+        all_same = all(((len(self.coords[i]) == len(other.coords[i]))
+                        for i in range(dim - 1)))
+        assert all_same
+        new_coords = [copy.copy(self.coords[i]) for i in range(dim - 1)]
+        new_vals = [
+            self.coords[last_coord_ind][i] + other.coords[last_coord_ind][i]
+            for i in range(len(self.coords[last_coord_ind]))
+        ]
+        # add can't use zipped values
+        # new_vals = list(map(operator.add, zip(self.coords[last_coord_ind], 
+        #                                       other.coords[last_coord_ind])))
+        new_coords.append(new_vals)
+        try:
+            scale0 = self.scale()
+            scale1 = other.scale()
+        except lena.core.LenaValueError:
+            scale = None
+        else:
+            if scale0 is not None and scale1 is not None:
+                scale = scale0 + scale1
+            else:
+                scale = None
+        return graph(coords=new_coords, field_names=self.field_names,
+                     scale=scale)
+
+        # for ind, arr in enumerate(self.coords):
+        #     if ind in last_coord_indices:
+        #         self.coords[ind] = list(map(partial(mul, rescale),
+        #                                     arr))
+
 
 # used in deprecated Graph
 def _rescale_value(rescale, value):

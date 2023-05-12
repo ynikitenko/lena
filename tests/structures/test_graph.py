@@ -84,6 +84,18 @@ def test_graph():
     assert gr4.coords == [xs, [1, 1.5], [0.5, 1]]
 
 
+def test_graph_add():
+    xs = [0, 1]
+    ys = [2, 3]
+
+    # sum of 1-dimensional graphs work
+    gr0 = graph([xs, ys])
+    gr1 = graph([xs, ys])
+    gradd1 = gr0 + gr1
+    assert gradd1 == graph([[0, 1], [4, 6]],
+                           field_names=('x', 'y'), scale=None)
+
+
 def test_graph_error_fields():
     xs = [0, 1]
     ys = [2, 3]
