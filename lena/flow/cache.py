@@ -87,6 +87,17 @@ class Cache(object):
         # used by meta elements
         self.is_cache = True
 
+        cache_dir = os.path.dirname(self._filename)
+        if cache_dir:
+            # could be empty for files in current directory
+            if sys.version_info.major == 2:
+                # race condition, no good solution in Python 2.
+                if not os.path.exists(cache_dir):
+                    os.makedirs(cache_dir)
+            else:
+                # Python 3 optimal way
+                os.makedirs(cache_dir, exist_ok=True)
+
     def cache_exists(self):
         """Return ``True`` if file with cache exists and is readable.
 
