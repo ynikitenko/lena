@@ -85,6 +85,7 @@ class FillComputeSeq(lena_sequence.LenaSequence):
             check_sequence_type.is_fill_compute_el,
             el_name="FillCompute", seq_name="FillComputeSeq"
         )
+        self._name = "FillComputeSeq"
 
     def fill(self, value):
         """Fill *self* with *value*.

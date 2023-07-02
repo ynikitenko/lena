@@ -49,6 +49,9 @@ class Context(dict):
         An attempt to get a private attribute raises
         :exc:`AttributeError`.
         """
+        # todo: this looks a bit messy. A cleaner approach would be
+        # to create a separate class for the dict wrapper,
+        # and a separate class as a Lena element (as in histogram).
         if d is None:
             d = {}
         super(Context, self).__init__(d)
@@ -99,6 +102,12 @@ class Context(dict):
             raise lena.core.LenaAttributeError(
                 "{} missing".format(name)
             )
+
+    def _repr_nested(self, base_indent="", indent=" "*4, el_separ=",\n"):
+        # representation within a Lena Sequence
+        # todo: it doesn't print initialization arguments,
+        # see comment in __init__
+        return base_indent + "Context()"
 
     def __repr__(self):
         return self._formatter(self)

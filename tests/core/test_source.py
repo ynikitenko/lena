@@ -1,18 +1,11 @@
-from __future__ import print_function
-
 import pytest
 from itertools import islice
 
 import lena.core
 from lena.core import Source, Sequence
-from lena.flow import Slice
+from lena.flow import Slice, CountFrom
 
-
-def cnt0(): 
-    i = 0
-    while True:
-        yield i
-        i = i + 1
+from tests.shortcuts import cnt0
 
 
 def test_source():

@@ -183,3 +183,15 @@ def test_split_with_fill_request():
     assert res4 == [0, 1]
     # now we call request for each bufsize values.
     # assert res4 == [1]
+
+
+def test_repr():
+    s01 = Split([])
+    assert repr(s01) == "Split([])"
+
+    s02 = Split([Split([])])
+    assert repr(s02) == """Split([
+    Sequence(
+        Split([])
+    )
+])"""

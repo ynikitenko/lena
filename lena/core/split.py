@@ -327,3 +327,31 @@ class Split(object):
                 if flow_was_empty:
                     for val in seq.run([]):
                         yield val
+
+    def _repr_nested(self, base_indent="", indent=" "*4, el_separ=",\n"):
+        # copied from LenaSequence, see the diffs
+        def repr_maybe_nested(el, base_indent, indent):
+            if hasattr(el, "_repr_nested"):
+                return el._repr_nested(base_indent=base_indent+indent, indent=indent)
+            else:
+                return base_indent + indent + repr(el)
+
+        elems = el_separ.join((repr_maybe_nested(el, base_indent=base_indent,
+                                                 indent=indent)
+                               # diff here
+                               for el in self._sequences))
+
+        if "\n" in el_separ and self._sequences:
+            # maybe new line
+            mnl = "\n"
+            # maybe base indent
+            mbi = base_indent
+        else:
+            mnl = ""
+            mbi = ""
+        # diff here in name and brackets
+        return "".join([base_indent, "Split",
+                        "([", mnl, elems, mnl, mbi, "])"])
+
+    def __repr__(self):
+        return self._repr_nested()

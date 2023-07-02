@@ -1,6 +1,4 @@
 """Sequence class."""
-from __future__ import print_function
-
 import sys
 
 from . import lena_sequence
@@ -49,6 +47,7 @@ class Sequence(lena_sequence.LenaSequence):
                     )
                 else:
                     self._seq.append(run_elem)
+        self._name = "Sequence"
         # we don't call super init (yet),
         # because it has no variables (and no init)
         # https://softwareengineering.stackexchange.com/a/318171/42050

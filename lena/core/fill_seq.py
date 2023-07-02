@@ -43,6 +43,7 @@ class FillSeq(lena_sequence.LenaSequence):
         :exc:`.LenaTypeError` is raised.
         """
         self._seq = []
+        self._name = "FillSeq"
 
         if not args:
             raise exceptions.LenaTypeError(

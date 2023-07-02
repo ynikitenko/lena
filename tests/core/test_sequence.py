@@ -1,3 +1,5 @@
+# todo: remove this doctest completely!
+# then remove printsseq...
 """args is a list of functions or executable classes.
 
 >>> it2 = Slice(2)
@@ -8,21 +10,21 @@
 >>>
 >>> from lena.flow import Count, Print, Slice
 >>> it5  = Slice(5)
->>> seq = Source(cnt0, Sequence(it5))
->>> res = seq()
+>>> src = Source(cnt0, Sequence(it5))
+>>> res = src()
 >>> for val in res:
 ...        print(val, end=" ")
 0 1 2 3 4 
 >>>
 >>> # Test chained sequences.
->>> printsseq(seq)
-0 1 2 3 4
+>>> " ".join((str(val) for val in src()))
+'0 1 2 3 4'
 >>> seq2 = Sequence(mul2)
->>> printsseq(seq)
+>>> printsseq(src)
 0 1 2 3 4
 >>>
 >>> pseq = Print(end=' ')
->>> seq3 = Source(seq, pseq, seq2)
+>>> seq3 = Source(src, pseq, seq2)
 >>> printsseq(seq3)
 0 1 2 3 4 0 2 4 6 8
 >>>
@@ -39,12 +41,7 @@ from lena.flow import Print
 from itertools import islice
 from tests.core.test_fill_compute_seq import mul2
 
-
-def cnt0(): 
-    i = 0
-    while True:
-        yield i
-        i = i + 1
+from tests.shortcuts import cnt0
 
 
 def test_sequence_init():
@@ -79,13 +76,7 @@ def test_sequence():
     with pytest.raises(TypeError):
         seq2[0] = 0
 
+
 def printsseq(sseq):
     res = sseq()
-    # for val in res:
-    #     print(val, end=" ")
     print(*[val for val in res], sep=" ")
-    # print()
-
-
-# test_sequence()
-
