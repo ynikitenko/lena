@@ -1,5 +1,3 @@
-from __future__ import print_function
-
 import sys
 from itertools import count, islice
 
@@ -55,21 +53,29 @@ def test_count_from():
     assert list(islice(it(), 5)) == list(range(10, 20, 2))
 
 
-def test_islice_run():
+def test_slice_run():
     c = count()
-    ### test __init__ and run ###
+    ## __init__ and run work
     # stop works
-    isl = Slice(10)
-    list(isl.run(c)) == list(range(0, 10))
-    # start, stop works
-    isl = Slice(10, 10)
-    list(isl.run(c)) == []
+    sl1 = Slice(10)
+    assert repr(sl1) == "Slice(10)"
+    list(sl1.run(c)) == list(range(0, 10))
+
+    ## start, stop work
+    # empty slice works
+    sl2 = Slice(10, 10)
+    assert repr(sl2) == "Slice(10, 10)"
+    list(sl2.run(c)) == []
+
     c = count()
-    isl = Slice(10, 15)
-    list(isl.run(c)) == list(range(10, 15))
+    # non-empty slice works
+    sl3 = Slice(10, 15)
+    list(sl3.run(c)) == list(range(10, 15))
+
     # start, stop, step work
-    isl = Slice(0, 10, 2)
-    list(isl.run(count())) == list(range(0, 10, 2))
+    sl4 = Slice(0, 10, 2)
+    assert repr(sl4) == "Slice(0, 10, 2)"
+    list(sl4.run(count())) == list(range(0, 10, 2))
 
 
 def test_negative_islice():

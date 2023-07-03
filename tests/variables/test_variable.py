@@ -1,5 +1,3 @@
-from __future__ import print_function
-
 import copy
 import pytest
 
@@ -184,20 +182,29 @@ def test_compose():
 
 
 def test_variable():
-    # test init
-    sq_m = Variable("sq", getter = lambda x: x*x, type="function")
-    # getter is None
+    ## test initialization
+    # init works
+    sq_m = Variable("sq_m", getter = lambda x: x*x, type="function")
+
+    # repr works
+    assert repr(sq_m) == "Variable(sq_m)"
+
+    # getter=None raises
     with pytest.raises(LenaTypeError):
         sq_m = Variable("sq", getter=None, type="function")
-    # getter is not callable
+
+    # not callable getter raises
     with pytest.raises(LenaTypeError):
         sq_m = Variable("sq", getter=5, type="function")
-    # getter must be not a variable
+
+    # getter Variable raises
     with pytest.raises(LenaTypeError):
         Variable(sq_m, getter=sq_m)
-    mm = Variable("mm", unit="mm", getter=lambda x: x*10, type="length")
 
+    ## test actual work
+    mm = Variable("mm", unit="mm", getter=lambda x: x*10, type="length")
     sq_m = Variable("sq", getter = lambda x: x*x, type="function")
+
     data = [1, 2, 3]
     data = list(map(lambda v: (v, {str(v): v}), data))
     results = map(sq_m, copy.deepcopy(data))
@@ -214,7 +221,7 @@ def test_variable():
         }
     )
 
-    # test Compose
+    # Compose works
     mm = Variable("mm", unit="mm", getter=lambda x: x*10, type="length")
     square = Variable("square", type="area", getter=lambda x: x*x, unit="mm^2")
     sq_mm = Compose(mm, square)
@@ -241,7 +248,7 @@ def test_variable():
         }
     )
 
-    # test Combine
+    # Combine works
     sq_m_mm = Combine(sq_m, sq_mm, name="sq_m_mm")
     assert list(map(get_data, map(sq_m_mm, copy.deepcopy(data)))) == [
         (1, 100), (4, 400), (9, 900)

@@ -44,11 +44,16 @@ class CountFrom(object):
     """
     def __init__(self, start=0, step=1):
         self._it = itertools.count(start, step)
+        self._start = start
+        self._step = step
 
     def __call__(self):
         """Yield values from *start* to infinity with *step*."""
         for val in self._it:
             yield val
+
+    def __repr__(self):
+        return "CountFrom(start={}, step={})".format(self._start, self._step)
 
 
 def ISlice(*args, **kwargs):
@@ -82,6 +87,9 @@ class Reverse():
                 yield all_huge_flow.pop()
             except IndexError:
                 return
+
+    def __repr__(self):
+        return "Reverse()"
 
 
 class Slice(object):
@@ -156,6 +164,8 @@ class Slice(object):
             else:
                 self.run = lambda flow: self._run_negative_islice(flow)
             self._step = step
+        # for repr
+        self._args = args
 
     def fill_into(self, element, value):
         """Fill *element* with *value*.
@@ -261,6 +271,9 @@ class Slice(object):
                             return
                         ind += 1
 
+    def __repr__(self):
+        args_str = ", ".join((repr(arg) for arg in self._args))
+        return "Slice({})".format(args_str)
 
     def run(self, flow):
         """Yield values from *flow* from *start* to *stop* with *step*.

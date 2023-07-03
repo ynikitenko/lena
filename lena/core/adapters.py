@@ -192,6 +192,7 @@ class FillInto(object):
                 format(fill_into, el)
             )
         self._el = el
+        self._explicit = explicit
 
     def fill_into(self, element, value):
         """Fill *value* into an *element*.
@@ -209,6 +210,12 @@ class FillInto(object):
         """
         for result in self._el.run([value]):
             element.fill(result)
+
+    def __repr__(self):
+        if self._explicit:
+            return "FillInto({})".format(repr(self._el))
+        else:
+            return repr(self._el)
 
 
 class FillRequest(object):

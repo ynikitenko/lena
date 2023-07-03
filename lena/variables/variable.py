@@ -199,6 +199,15 @@ class Variable(object):
         # https://en.wikipedia.org/wiki/Command%E2%80%93query_separation
         # return context
 
+    def __repr__(self):
+        # We don't print all options to save space.
+        # Complete getter address is meaningless.
+        # This is repr, one can always get these options
+        # directly if needed.
+        # We don't enclose name in quotes,
+        # because this repr doesn't allow object creation.
+        return """Variable({})""".format(self.name)
+
 
 class Combine(Variable):
     r"""Combine variables into a tuple.
