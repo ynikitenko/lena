@@ -39,3 +39,11 @@ def test_filter():
     data3 = [histogram([1, 2])]
     f3 = Filter(histogram)
     assert list(f3.run(data3)) == data3
+
+    # representation works
+    assert repr(f3) == "Filter(Selector(histogram))"
+
+    # equality works
+    f4 = Filter(fun)
+    assert f4 == f2
+    assert f3 != f4

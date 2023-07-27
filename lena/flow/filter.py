@@ -56,3 +56,14 @@ class Filter():
         # for val in flow:
         #     if self._selector(val):
         #         yield event
+
+    def __eq__(self, other):
+        if isinstance(other, Filter):
+            return self._selector == other._selector
+        return NotImplemented
+
+    def __ne__(self, other):
+        return not (self == other)
+
+    def __repr__(self):
+        return "Filter({})".format(repr(self._selector))
