@@ -178,11 +178,18 @@ def test_vectorize_init():
         min_size=1,
     )
 )
-def test_vectorize_hypothesis(data):
+@pytest.mark.parametrize("from_seq", [True, False])
+def test_vectorize_hypothesis(from_seq, data):
     # Vectorize doesn't mess with its input data.
     # If we filled values, they will be properly handled
     # by the nested sequence.
-    v = Vectorize(StoreFilled())
+    if from_seq:
+        # initializing each sequence explicitly
+        v = Vectorize([StoreFilled() for _ in range(3)])
+    else:
+        # copied automatically when getting dimension from data
+        v = Vectorize(StoreFilled())
+
     for val in data:
         v.fill(val)
     result = list(v.compute())

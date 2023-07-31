@@ -263,38 +263,60 @@ class Vectorize(object):
         However, often an object constructor can allow
         an arbitrary dimension (like ``tuple``).
         In that case, provide *dim*.
+
+        *seq* can be a list of :class:`.FillComputeSeq`-s.
+        In that case dimension should not be provided.
         """
+        default_dim = -1
         # todo: if needed, a list *seq* could mean
         # a list of sequences of the needed dimension.
-        try:
-            self._seq = lena.core.FillComputeSeq(seq)
-        except TypeError:
-            raise lena.core.LenaTypeError(
-                "seq must be convertible to FillComputeSeq"
-            )
-
-        if dim == -1 and construct is not None:
-            try:
-                _tmp = construct()
-                dim = len(_tmp)
-            except TypeError:
-                # we have a chance to get data dimension from flow
-                pass
-
-        if dim != -1:
-            self._seqs = [self._seq]
-            self._seqs.extend([copy.deepcopy(self._seq) for _ in range(dim-1)])
+        if isinstance(seq, list):
+            # Vectorize should be a rigid element
+            # (we don't change its dimension easily),
+            # but list is associated with parellelism in Lena
+            # seq must consist of FillComputeSeq-s,
+            # we don't init them automatically here
+            self._seqs = seq
+            assert dim == default_dim
+            dim = len(seq)
             self.fill = self._fill_others
         else:
-            self.fill = self._fill_first
+            try:
+                self._seq = lena.core.FillComputeSeq(seq)
+            except TypeError:
+                raise lena.core.LenaTypeError(
+                    "seq must be convertible to FillComputeSeq"
+                )
+            if dim == default_dim:
+                pass
+                # self.fill = self._fill_first
+            else:
+                self._seqs = [self._seq]
+                self._seqs.extend([copy.deepcopy(self._seq) for _ in range(dim-1)])
+                # self.fill = self._fill_others
+
+        ## No need to get dim from here. Explicit dim would never hurt.
+        # if dim == default_dim and construct is not None:
+        #     try:
+        #         _tmp = construct()
+        #         dim = len(_tmp)
+        #     except TypeError:
+        #         # we have a chance to get data dimension from flow
+        #         pass
+
 
         self._construct = construct
         self._dim = dim
         self._cur_context = {}
+        self._filled_once = False
     
     def fill(self, val):
         """Fill sequences for each component of the data vector."""
-        raise NotImplementedError
+        # this may be not efficient, but I could not change the method runtime
+        if self._filled_once:
+            self._fill_others(val)
+        else:
+            self._fill_first(val)
 
     def _fill_first(self, val):
         # fill the first element. Will learn data type from that,
@@ -315,8 +337,10 @@ class Vectorize(object):
 
         self._seqs = [self._seq]
         self._seqs.extend([copy.deepcopy(self._seq) for _ in range(dim-1)])
+        # doesn't work. _fill_first is always called (then _fill_others below)
         self.fill = self._fill_others
-        self.fill(val)
+        self._fill_others(val)
+        self._filled_once = True
 
     def _fill_others(self, val):
         data, context = lena.flow.get_data_context(val)
