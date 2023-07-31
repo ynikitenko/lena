@@ -2,17 +2,13 @@ import copy
 import math
 import random
 
-import hypothesis
 import pytest
-import hypothesis.strategies as s
-from hypothesis import given
 
 import lena.flow
 from lena.core import LenaValueError
 from lena.structures import Histogram
 from lena.math import refine_mesh, isclose
 from lena.structures.graph import graph, Graph
-# from histogram_strategy import generate_increasing_list, generate_data_in_range
 
 
 def test_graph():

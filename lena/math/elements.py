@@ -11,15 +11,15 @@ else:
 
 import lena.context
 import lena.core
+from lena.core import LenaTypeError, LenaRuntimeError, LenaZeroDivisionError
 import lena.flow
 
 
 # a helper class, shall be removed in 0.7
 def _maybe_with_context(data, context):
-    if not context:
-        return data
-    else:
+    if context:
         return (data, context)
+    return data
 
 
 class Mean(object):
@@ -81,7 +81,7 @@ class Mean(object):
         if not self._count:
             if self._pass_on_empty:
                 return
-            raise lena.core.LenaZeroDivisionError(
+            raise LenaZeroDivisionError(
                 "can't calculate average. No values were filled"
             )
         if self._sum_seq:
@@ -93,7 +93,9 @@ class Mean(object):
             sum_ = self._sum
             sums = []
 
-        mean = sum_ / float(self._count)
+        # sum_ needs to become float, otherwise
+        # one can't divide Decimal by a float (in DSum)
+        mean = float(sum_) / float(self._count)
 
         context = copy.deepcopy(self._cur_context)
         if sums:
@@ -170,9 +172,9 @@ class DSum(object):
         Otherwise yield only the *sum*.
         """
         if not self._cur_context:
-            yield float(self._total)
+            yield self._total
         else:
-            yield (float(self._total), copy.deepcopy(self._cur_context))
+            yield (self._total, copy.deepcopy(self._cur_context))
 
     def reset(self):
         """Reset the sum to 0.
@@ -187,7 +189,7 @@ class DSum(object):
 
     @property
     def total(self):
-        return float(self._total)
+        return self._total
 
     def __eq__(self, other):
         if not isinstance(other, DSum):
@@ -251,7 +253,7 @@ class Sum(object):
 class Vectorize(object):
     """Apply an algorithm to a vector component-wise."""
 
-    def __init__(self, seq, construct=None, dim=0):
+    def __init__(self, seq, construct=None, dim=-1):
         """*seq* is converted to a :class:`.FillComputeSeq`.
 
         Return type during :meth:`compute` will be know from the first
@@ -267,9 +269,11 @@ class Vectorize(object):
         try:
             self._seq = lena.core.FillComputeSeq(seq)
         except TypeError:
-            raise LenaTypeError("seq must be convertible to FillComputeSeq")
+            raise lena.core.LenaTypeError(
+                "seq must be convertible to FillComputeSeq"
+            )
 
-        if dim == 0 and construct is not None:
+        if dim == -1 and construct is not None:
             try:
                 _tmp = construct()
                 dim = len(_tmp)
@@ -277,15 +281,16 @@ class Vectorize(object):
                 # we have a chance to get data dimension from flow
                 pass
 
-        if dim:
+        if dim != -1:
             self._seqs = [self._seq]
-            self._seqs.extend([copy.deepcopy(self._seq) for _ in range(dim)])
+            self._seqs.extend([copy.deepcopy(self._seq) for _ in range(dim-1)])
             self.fill = self._fill_others
         else:
             self.fill = self._fill_first
 
         self._construct = construct
         self._dim = dim
+        self._cur_context = {}
     
     def fill(self, val):
         """Fill sequences for each component of the data vector."""
@@ -293,7 +298,7 @@ class Vectorize(object):
 
     def _fill_first(self, val):
         # fill the first element. Will learn data type from that,
-        # dimension and organise sequences.
+        # its dimension and organise sequences.
         data, context = lena.flow.get_data_context(val)
         try:
             dim = len(data)
@@ -303,7 +308,7 @@ class Vectorize(object):
                 "type of the data does not support len"
             )
 
-        if not self._construct:
+        if self._construct is None:
             self._construct = type(data)
             # will be used like _construct(*result),
             # that is data.__init__ must support such arguments.
@@ -335,6 +340,10 @@ class Vectorize(object):
         """
         # we allow for not equal length of results in the output;
         # the user could deal with that themselves
+        if not hasattr(self, "_seqs"):
+            raise LenaRuntimeError(
+                "data dimension is unknown and no values were filled"
+            )
         it = _zip_longest(*(seq.compute() for seq in self._seqs))
         while True:
             try:

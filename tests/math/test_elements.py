@@ -1,10 +1,16 @@
-import pytest
-
 from decimal import getcontext, Decimal, Inexact
 from math import frexp
 
-from lena.core import LenaZeroDivisionError
+import pytest
+import hypothesis
+from hypothesis import given
+from hypothesis.strategies import integers
+import hypothesis.strategies as st
+
+import lena
+from lena.core import LenaZeroDivisionError, LenaTypeError, LenaRuntimeError
 from lena.math import vector3, Mean, Sum, DSum, Vectorize
+from tests.examples.fill import StoreFilled
 
 
 def test_mean():
@@ -117,7 +123,42 @@ def test_sum():
     assert s1.total == 3
 
 
-def test_vectorize():
+@pytest.mark.parametrize("stype", [Sum, DSum])
+@given(st.lists(integers()))
+def test_sums_hypothesis(stype, data):
+    # since Sum uses simple addition,
+    # there is no need to check for floats etc.
+    # Different numbers are treated uniformly in its code.
+    # Need to initialize anew, otherwise same object will be used
+    # between different test calls
+    s = stype()
+    for val in data:
+        s.fill(val)
+    assert list(s.compute()) == [sum(data)]
+
+
+def test_vectorize_init():
+    ## init works ##
+    # not FillCompute sequence raises
+    with pytest.raises(lena.core.LenaTypeError):
+        Vectorize(lambda x: x)
+
+    # construct works
+    vi1 = Vectorize(Sum(), construct=lambda _: vector3)
+    # when we can't find dimension without flow,
+    # LenaRuntimeError is raised.
+    with pytest.raises(LenaRuntimeError):
+        assert list(vi1.compute())
+
+    # construct with dim work
+    vi2 = Vectorize(Sum(), construct=vector3, dim=3)
+    assert list(vi2.compute()) == [vector3(0, 0, 0)]
+    vi2.fill(vector3(1, 2, 3))
+    assert list(vi2.compute()) == [vector3(1, 2, 3)]
+
+    vi3 = Vectorize(Sum(), construct=int, dim=1)
+    assert list(vi3.compute()) == [0]
+
     data = [vector3(1, 1, 1), vector3(1, 2, 3)]
 
     v1 = Vectorize(Sum())
@@ -129,3 +170,25 @@ def test_vectorize():
     context = {"context": True}
     v1.fill((vector3(0, 0, 0), context))
     assert list(v1.compute()) == [(vector3(2, 3, 4), context)]
+
+
+@given(
+    st.lists(
+        st.tuples(integers(), integers(), integers()),
+        min_size=1,
+    )
+)
+def test_vectorize_hypothesis(data):
+    # Vectorize doesn't mess with its input data.
+    # If we filled values, they will be properly handled
+    # by the nested sequence.
+    v = Vectorize(StoreFilled())
+    for val in data:
+        v.fill(val)
+    result = list(v.compute())
+    assert len(result) == 1
+    # 3-tuple of lists
+    res = result[0]
+    for ind, tup in enumerate(data):
+        for dim in range(3):
+            assert res[dim][ind] == tup[dim]
