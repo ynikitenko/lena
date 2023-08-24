@@ -38,20 +38,10 @@ def abs(var, name=None, latex_name=None):
     >>> list(map(x, data))[1] == (
     ...    -1,
     ...    {'variable': 
-    ...        {'coordinate': 'x',
+    ...        {'coordinate': {'name': 'x'},
     ...         'name': 'x',
     ...         'type': 'coordinate'}
     ...    }
-    ... )
-    True
-    >>> abs_x = lena.variables.abs(x)
-    >>> list(map(abs_x, data))[1] == (
-    ...     1, {
-    ...        'variable': {
-    ...          'name': 'abs_x', 'coordinate': 'x',
-    ...          'type': 'coordinate', 'latex_name': '|x|'
-    ...         }
-    ...     }
     ... )
     True
     """

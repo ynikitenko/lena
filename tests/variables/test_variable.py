@@ -3,7 +3,7 @@ import pytest
 
 import lena.core
 import lena.context
-from lena.core import LenaTypeError
+from lena.core import LenaTypeError, Sequence
 from lena.flow import get_data
 from lena.variables.variable import Combine, Compose, Variable
 
@@ -22,15 +22,16 @@ def test_combine():
     assert c[0] == mm
 
     # range creation works
-    assert c.range == [mm.range]
+    # assert c.range == [mm.range]
     cm = Variable("cm", unit="cm", getter=lambda x: x, type="coordinate", range=[0, 10])
     c2 = Combine(mm, cm)
-    assert c2.range == [mm.range, cm.range]
+    # assert c2.range == [mm.range, cm.range]
     # same explicitly
-    assert c2.range == [[0, 100], [0, 10]]
+    # assert c2.range == [[0, 100], [0, 10]]
     # has no range
     eV = Variable("cm", unit="cm", getter=lambda x: x, type="coordinate")
     c3 = Combine(mm, eV)
+    # missing attribute raises
     with pytest.raises(lena.core.LenaAttributeError):
         c3.range
 
@@ -53,30 +54,59 @@ def test_combine():
     assert rescont == {
         'variable': {
             'combine': (
-                {'coordinate': 'mm',
-                         'name': 'mm',
-                         'type': 'coordinate',
-                         'unit': 'mm'},
-                {'combine': (
-                    {'coordinate': 'mm',
-                     'name': 'mm',
-                     'type': 'coordinate',
-                     'unit': 'mm'},
-                    {'coordinate': 'm',
-                     'name': 'm',
-                     'type': 'coordinate',
-                     'unit': 'm'}
-                ),
-                'dim': 2,
-                'name': 'mm_m'}
+                {
+                    'coordinate': {'name': 'mm', 'unit': 'mm'},
+                    'name': 'mm',
+                    'type': 'coordinate',
+                    'unit': 'mm'
+                },
+                {
+                    'combine': (
+                        {
+                            'coordinate': {'name': 'mm',
+                                           'unit': 'mm'},
+                            'name': 'mm',
+                            'type': 'coordinate',
+                            'unit': 'mm'
+                        },
+                        {
+                            'coordinate': {'name': 'm',
+                                            'unit': 'm'},
+                            'name': 'm',
+                            'type': 'coordinate',
+                            'unit': 'm'
+                        }
+                    ),
+                    'dim': 2,
+                    'name': 'mm_m'
+                }
             ),
             'dim': 2,
             'name': 'mm_mm_m'
         }
     }
 
+    mm = Variable("mm", unit="mm", getter=lambda x: x*10, type="length")
+    square = Variable("square", type="area", getter=lambda x: x*x, unit="mm^2")
+    sq_m = Variable("sq_m", getter = lambda x: x*x, type="function")
+    sq_mm = Compose(mm, square)
+    sq_m_mm = Combine(sq_m, sq_mm, name="sq_m_mm")
+    assert list(map(get_data, map(sq_m_mm, copy.deepcopy(data)))) == [
+        (1, 100), (4, 400), (9, 900)
+    ]
+    res = sq_m_mm(copy.deepcopy(data[0]))
+    assert res[0] == (1, 100)
+    assert res[1] == {
+        'variable': {
+            'dim': 2,
+            'name': 'sq_m_mm',
+            'combine': (sq_m.var_context, sq_mm.var_context)
+        }
+    }
+
 
 def test_compose():
+    data = [((1.05, 0.98, 0.8), (1.1, 1.1, 1.3))]
     ## test initialization
     with pytest.raises(LenaTypeError):
         # empty Compose is prohibited,
@@ -90,50 +120,72 @@ def test_compose():
     assert c.name == "mm"
     positron = Variable("positron", getter=lambda x: x*10, type="particle")
     c = Compose(positron, mm)
-    assert c.name == "positron_mm"
-    # in this implementation c has latex_name.
-    # with pytest.raises(AttributeError):
-    # # with pytest.raises(lena.core.LenaAttributeError):
-    #     c.latex_name
-    assert c.latex_name == "mm_{positron}"
+    # actually it is stupid to name a variable "mm".
+    assert c.name == "mm"
+    # no more hard-coded LaTeX names.
+    with pytest.raises(lena.core.LenaAttributeError):
+        c.latex_name
     x = Variable("x", unit="mm", getter=lambda coord: coord[0]*10,
-                 latex_name="x", type="coordinate")
+                 type="coordinate")
     positron = Variable("positron", getter=lambda event: event[0],
                         latex_name="e^+", type="particle")
+    res = list(Sequence(positron, x).run(data))[0]
+    seq_res = (
+        10.5,
+        {'variable': {'coordinate': {'name': 'x',
+                                     'unit': 'mm'},
+                      'compose': ['particle', 'coordinate'],
+                      'name': 'x',
+                      'particle': {'latex_name': 'e^+',
+                                   'name': 'positron'},
+                      'type': 'coordinate',
+                      'unit': 'mm'}},
+    )
+    assert res == seq_res
     c = Compose(positron, x)
-    assert c.name == "positron_x"
-    assert c.latex_name == "x_{e^+}"
+    assert c.name == "x"
+    # sequence and Compose produce same results
+    assert c(data[0]) == seq_res
+    print(c.var_context)
+    assert c.compose == ["particle", "coordinate"]
     # all args must be variables
     with pytest.raises(LenaTypeError):
         c = Compose(lambda x: x)
     # latex_name taken from kwargs
     c = Compose(positron, x, latex_name="x_{pos}")
     assert c.latex_name == "x_{pos}"
+
+    # omg, how could it be...
     reversed_join = lambda args: "_".join(reversed(args))
     c = Compose(positron, x, latex_name=reversed_join)
-    assert c.latex_name == "x_e^+"
-    with pytest.raises(lena.core.LenaAttributeError):
-        c = Compose(positron, mm, latex_name=reversed_join)
-    c = Compose(positron, x, name=reversed_join)
-    assert c.name == "x_positron"
+    # meaningless, but why not to check?..
+    assert c.latex_name == reversed_join
+    # this logic is too complicated. I even forgot about that.
+    # This should not work, also because
+    # 1) it's different in sequences.
+    #    It's hard to maintain this logic then.
+    # 2) it's really easy to implement having all variables at hand.
+    # 3) the future is in self creation
+    #    (in MakeFilename or jinja filters).
+    # assert c.latex_name == "x_e^+"
 
     ## test call
-    data = [((1.05, 0.98, 0.8), (1.1, 1.1, 1.3))]
+    c = Compose(positron, x)
     assert c(data[0])[0] == 10.5
     # second time application gives the same
     assert c(data[0])[0] == 10.5
     res1 = {
         'variable': {
-            'compose': {
-                'latex_name': 'e^+',
-                'name': 'positron',
-                'particle': 'positron',
-                'type': 'particle'
+            'compose': ['particle', 'coordinate'],
+            'coordinate': {
+                'name': 'x',
+                'unit': 'mm'
             },
-            'coordinate': 'x',
-            'latex_name': 'x_{e^+}',
-            'name': 'x_positron',
-            'particle': 'positron',
+            'particle': {
+                'name': 'positron',
+                'latex_name': 'e^+',
+            },
+            'name': 'x',
             'type': 'coordinate',
             'unit': 'mm'
         }
@@ -142,43 +194,30 @@ def test_compose():
     del x.var_context["type"]
     c = Compose(positron, x)
     assert "type" not in c(data[0])[1]["variable"]
-    abs_ = Variable("abs", getter = abs)
 
-    ## This test was done with a general idea,
-    # but without much thought. Many tunings here
-    # were made ad hoc. Rewrite that completely or remove.
-    c1 = Compose(positron, Compose(x, abs_))
-    del c1.var_context["latex_name"]
-    # res1["variable"]["name"] = "positron_x"
-    # del res1["variable"]["type"]
-    # assert c(data[0])[1] == res1
-    c2 = Compose(positron, x, abs_)
-    res1 = c1(data[0])
-    res2 = c2(data[0])
-    # fix res1
-    for update_str in [
-        "variable.compose.compose.latex_name.e^+",
-        "variable.compose.compose.name.positron",
-        "variable.compose.compose.particle.positron",
-        "variable.compose.compose.type.particle",
-        # "variable.compose.type.particle",
-        "variable.compose.latex_name.x",
-        "variable.compose.name.x",
-        ]:
-        cont = lena.context.str_to_dict(update_str)
-        lena.context.update_recursively(res1[1], cont)
-    # fix res1 more
-    del res1[1]["variable"]["compose"]["particle"]
-    del res1[1]["variable"]["compose"]["type"]
-    del res1[1]["variable"]["compose"]["compose"]["coordinate"]
-    del res1[1]["variable"]["compose"]["compose"]["unit"]
-    # fix res2
-    del res2[1]["variable"]["compose"]["coordinate"]
-    del res2[1]["variable"]["compose"]["unit"]
-    # data is equal
-    assert res1[0] == res2[0]
-    # context is almost equal (mod previous fixes)
-    assert res1[1] == res2[1]
+    data = [1, 2, 3]
+    # Compose works same as composition in a sequence
+    mm = Variable("mm", unit="mm", getter=lambda x: x*10, type="length")
+    square = Variable("square", type="area", getter=lambda x: x*x, unit="mm^2")
+    sq_mm = Compose(mm, square)
+    res1 = list(lena.core.Sequence(mm, square).run(copy.deepcopy(data)))[0]
+    res2 = sq_mm(copy.deepcopy(data[0]))
+    # res1[1]["variable"]["name"] = 'mm_square'
+    # res1[1]["variable"]["latex_name"] = 'square_{mm}'
+    # assert res1 == res2
+    assert list(map(get_data, map(sq_mm, copy.deepcopy(data)))) == [100, 400, 900]
+    assert sq_mm(copy.deepcopy(data[0])) == (
+        100, {
+            'variable': {
+                'length': {'name': 'mm', 'unit': 'mm'},
+                'compose': ['length', 'area'],
+                'name': 'square',
+                'area': {'name': 'square', 'unit': 'mm^2'},
+                'type': 'area',
+                'unit': 'mm^2'
+            }
+        }
+    )
 
 
 def test_variable():
@@ -209,58 +248,17 @@ def test_variable():
     data = list(map(lambda v: (v, {str(v): v}), data))
     results = map(sq_m, copy.deepcopy(data))
     assert list(map(get_data, results)) == [1, 4, 9]
-    assert sq_m.var_context == {'function': 'sq', 'name': 'sq', 'type': 'function'}
+    assert sq_m.var_context == {
+        'function': {
+            'name': 'sq',
+            # 'type': 'function'
+        },
+        'name': 'sq',
+        'type': 'function'
+    }
     assert sq_m(copy.deepcopy(data[0])) == (
-        1, {
-            '1': 1, 
-            'variable': {
-                'function': 'sq',
-                'name': 'sq',
-                'type': 'function'
-            }
-        }
-    )
-
-    # Compose works
-    mm = Variable("mm", unit="mm", getter=lambda x: x*10, type="length")
-    square = Variable("square", type="area", getter=lambda x: x*x, unit="mm^2")
-    sq_mm = Compose(mm, square)
-    res1 = list(lena.core.Sequence(mm, square).run(copy.deepcopy(data)))[0]
-    res2 = sq_mm(copy.deepcopy(copy.deepcopy(data[0])))
-    res1[1]["variable"]["name"] = 'mm_square'
-    res1[1]["variable"]["latex_name"] = 'square_{mm}'
-    assert res1 == res2
-    assert list(map(get_data, map(sq_mm, copy.deepcopy(data)))) == [100, 400, 900]
-    assert sq_mm(copy.deepcopy(data[0])) == (
-        100, {
-            '1': 1, 
-            'variable': {
-                'length': 'mm', 
-                'compose': {
-                    'length': 'mm', 'type': 'length',
-                    'name': 'mm', 'unit': 'mm'
-                }, 
-                'latex_name': 'square_{mm}',
-                'name': 'mm_square',
-                'area': 'square',
-                'type': 'area', 'unit': 'mm^2'
-            }
-        }
-    )
-
-    # Combine works
-    sq_m_mm = Combine(sq_m, sq_mm, name="sq_m_mm")
-    assert list(map(get_data, map(sq_m_mm, copy.deepcopy(data)))) == [
-        (1, 100), (4, 400), (9, 900)
-    ]
-    assert sq_m_mm(copy.deepcopy(data[0])) == (
-        (1, 100), {
-            '1': 1, 
-            'variable': {
-                'dim': 2, 'name': 'sq_m_mm',
-                'combine': (sq_m.var_context, sq_mm.var_context)
-            }
-        }
+        1, {'1': 1,
+            'variable': sq_m.var_context}
     )
 
 

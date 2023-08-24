@@ -19,22 +19,21 @@ Examples:
 >>> x = Variable(
 ...    "x", lambda coord: coord[0], type="coordinate"
 ... )
->>> neutron = Variable(
-...    "neutron", latex_name="n",
-...    getter=lambda double_ev: double_ev[1], type="particle"
+>>> positron = Variable(
+...    "positron", latex_name="e^+",
+...    getter=lambda double_ev: double_ev[0], type="particle"
 ... )
->>> x_n = Compose(neutron, x)
->>> x_n(data[0])[0]
-1.1
->>> x_n(data[0])[1] == {
-...     'variable': {
-...         'name': 'neutron_x', 'particle': 'neutron',
-...         'latex_name': 'x_{n}', 'coordinate': 'x', 'type': 'coordinate',
-...         'compose': {
-...             'type': 'particle', 'latex_name': 'n',
-...             'name': 'neutron', 'particle': 'neutron'
-...         },
-...     }
+>>> x_e = Compose(positron, x)
+>>> x_e(data[0])[0]
+1.05
+>>> x_e(data[0])[1] == {
+...    'variable': {
+...        'name': 'x',
+...        'coordinate': {'name': 'x'},
+...        'type': 'coordinate',
+...        'compose': ['particle', 'coordinate'],
+...        'particle': {'name': 'positron', 'latex_name': 'e^+'}
+...    }
 ... }
 True
 
@@ -42,6 +41,7 @@ True
 of a :class:`Variable`.
 """
 import copy
+from copy import deepcopy
 
 import lena.core
 import lena.context
@@ -51,7 +51,7 @@ import lena.flow
 class Variable(object):
     """Function of data with context."""
 
-    def __init__(self, name, getter, **kwargs):
+    def __init__(self, name, getter, type="", **kwargs):
         """*name* is variable's name.
 
         *getter* is a Python function (not a :class:`Variable`)
@@ -63,14 +63,15 @@ class Variable(object):
         *range*, etc.
 
         *type* is the type of the variable.
-        It depends on your application, examples are
-        "coordinate" or "particle_type".
+        It depends on your application, examples could be
+        "coordinate" or "particle".
         It has a special meaning: if present,
         its value is added to variable's
-        context as a key with variable's name
-        (see example for this module).
-        Thus variable type's data is preserved during composition
-        of different types.
+        context as a key with the context of this variable
+        (see the example for this module).
+        It is recommended to set the type,
+        otherwise variable's data will be lost after composition
+        of variables.
 
         **Attributes**
 
@@ -109,9 +110,17 @@ class Variable(object):
         self.var_context = {
             "name": self.name,
         }
-        if "type" in kwargs:
-            self.var_context.update({kwargs["type"]: self.name})
         self.var_context.update(**kwargs)
+        if type:
+            # to take less space in context; this is obvious.
+            # self.var_context["type"] = type
+            varc = self.var_context
+            varc.update(
+                {type: deepcopy(varc)}
+            )
+            # we store type in this variable context,
+            # but not in its type subcontext.
+            varc["type"] = type
 
     def __call__(self, value):
         """Transform a *value*.
@@ -176,21 +185,35 @@ class Variable(object):
 
         # no deep copy of var_context is made
         # (do it in user code if needed)
-        context_var = context.get("variable")
-        if context_var:
-            # preserve variable.compose if that is present
-            # This is variable.compose (not variable.variable),
-            # because it underlines that variable composition
-            # is not simply update_nested.
-            context["variable"]["compose"] = copy.deepcopy(context_var)
-            # deep copy, because otherwise
-            # it will be updated during update_recursively
+        cvar = context.get("variable")
+        # preserve variable composition information if that is present
+        composed = []
+        if cvar and ("type" in var_context) and ("type" in cvar):
+            # If cvar has no "type",
+            # then no types were in the recent variable or earlier
+            cur_type = var_context["type"]
+            if "compose" in cvar:
+                assert isinstance(cvar["compose"], list)
+            else:
+                cvar["compose"] = [cvar["type"]]
+            if "compose" in var_context:
+                assert isinstance(var_context["compose"], list)
+                cvar["compose"].extend(cur_type)
+            else:
+                cvar["compose"].append(cur_type)
+            composed = cvar["compose"]
 
-        # update recursively, because we need to preserve "type"
-        # and other not overwritten data
-        lena.context.update_recursively(
-            context, {"variable": var_context}
-        )
+        old_cvar = context.get("variable", {})
+        context["variable"] = var_context
+        cvar = context["variable"]
+        if composed:
+            # we need to overwrite it,
+            # because current variable context has set it wrong
+            context["variable"]["compose"] = composed
+            # preserve old types, but nothing more.
+            for type_ in composed:
+                if type_ not in cvar and type_ in old_cvar:
+                    cvar[type_] = old_cvar[type_]
 
         # could be useful as a chainable method,
         # but in general it doesn't return anything.
@@ -224,14 +247,11 @@ class Combine(Variable):
         If not provided, it is its variables' names joined with '_'.
 
         *context.variable* is updated with *combine*, which is a tuple
-        of each variable's context.
+        containing each variable's context.
 
         **Attributes**:
 
         *dim* is the number of variables.
-
-        *range*. If all variables have an attribute *range*,
-        the *range* of this variable is set to a list of them.
 
         All *args* must be *Variables*
         and there must be at least one of them,
@@ -264,11 +284,6 @@ class Combine(Variable):
             copy.deepcopy(var.var_context) for var in self._vars
         )
 
-        # set range of the combined variables
-        if all(hasattr(var, "range") for var in self._vars):
-            range_ = [var.range for var in self._vars]
-            var_context["range"] = range_
-
         super(Combine, self).__init__(name=name, getter=getter, **var_context)
 
     def __getitem__(self, index):
@@ -282,32 +297,15 @@ class Compose(Variable):
     def __init__(self, *args, **kwargs):
         """*args* are the variables to be composed.
 
-        Keyword arguments:
-
-        *name* is the name of the composed variable.
-        If that is missing, it is composed from variables
-        names joined with underscore.
-
-        *latex_name* is LaTeX name of the composed variable.
-        If that is missing and if there are only two variables,
-        it is composed from variables' names
-        (or their LaTeX names if present)
-        as a subscript in the reverse order *(latex2_{latex1})*.
+        A keyword argument *name* can set
+        the name of the composed variable.
+        If that is missing, it the name of the last variable is used.
 
         *context.variable.compose* contains contexts
         of the composed variables
         (the first composed variable is most nested).
 
-        If any keyword argument is a callable,
-        it is used to create the corresponding variable attribute.
-        In this case, all variables must have this attribute,
-        and the callable is applied to the list of these attributes.
-        If any attribute is missing,
-        :exc:`.LenaAttributeError` is raised.
-        This can be used to create composed attributes
-        other than *latex_name*.
-
-        If there are no variables or if *kwargs* contain *getter*,
+        If there are no variables or if *kwargs* contains *getter*,
         :exc:`.LenaTypeError` is raised.
         """
         if not all(isinstance(arg, Variable) for arg in args):
@@ -328,67 +326,29 @@ class Compose(Variable):
                 value = var.getter(value)
             return value
         self._vars = args
-        if "latex_name" not in kwargs and len(args) == 2:
-            latex_name_1 = args[0].get("latex_name", args[0].name)
-            latex_name_2 = args[1].get("latex_name", args[1].name)
-            if latex_name_1 and latex_name_2:
-                latex_name = "{}_{{{}}}".format(latex_name_2, latex_name_1)
-                kwargs["latex_name"] = latex_name
-        for kw in kwargs:
-            kwarg = kwargs[kw]
-            if callable(kwarg):
-                try:
-                    var_args = [getattr(var, kw) for var in args]
-                except AttributeError:
-                    raise lena.core.LenaAttributeError(
-                        "all variables must contain {}, ".format(kw) +
-                        "{} given".format(args)
-                    )
-                else:
-                    kwargs[kw] = kwarg(var_args)
 
         # composition of functions must be almost the same
         # as those functions in a sequence.
-        # The only difference seems to be that only type is copied here,
-        # and in Variable.__call__ other keys are copied as well
-        compose = copy.deepcopy(self._vars[0].var_context)
-        # def get_lowest_compose(d):
-        #     while True:
-        #         if isinstance(d, dict) and "compose" in d:
-        #             d = d["compose"]
-        #         else:
-        #             return d
-        def collect_types(d):
-            types = {}
-            def collect_type_this_level(d):
-                if "type" in d and d["type"] in d:
-                    return {d["type"]: d[d["type"]]}
-                else:
-                    return {}
-            composes = [d]
-            while "compose" in d:
-                d = d["compose"]
-                composes.append(d)
-            for d in reversed(composes):
-                types.update(collect_type_this_level(d))
-            return types
+        compose = {"variable": copy.deepcopy(self._vars[0].var_context)}
+
         for var in self._vars[1:]:
             varc = copy.deepcopy(var.var_context)
-            lena.context.update_nested("compose", varc, compose)
-            # get_lowest_compose(varc).update({"compose": compose})
-            compose = varc
-        # one Composed variable must be same as a simple variable
-        var_context = compose
-        types = collect_types(var_context)
-        var_context.update(types)
-        var_context.pop("name")
+            Variable._update_context(compose, varc)
+
+        var_context = compose["variable"]
+        # otherwise *name* will be given twice in super.__init__
+        # var_context.pop("name")
 
         if "name" in kwargs:
             name = kwargs.pop("name")
         else:
-            name = "_".join(var.name for var in args)
+            name = self._vars[-1].name
+            # name = "_".join(var.name for var in args)
         var_context.update(kwargs)
 
         super(Compose, self).__init__(
-            name=name, getter=getter, **var_context
+            name=name, getter=getter
         )
+        # we can't set it in super.__init__,
+        # since we've done all work here
+        self.var_context = var_context
