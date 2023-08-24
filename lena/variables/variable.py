@@ -188,10 +188,13 @@ class Variable(object):
         cvar = context.get("variable")
         # preserve variable composition information if that is present
         composed = []
-        if cvar and ("type" in var_context) and ("type" in cvar):
+        if cvar and ("type" in cvar):
             # If cvar has no "type",
             # then no types were in the recent variable or earlier
-            cur_type = var_context["type"]
+            if "type" in var_context:
+                cur_type = var_context["type"]
+            else:
+                cur_type = []
             if "compose" in cvar:
                 assert isinstance(cvar["compose"], list)
             else:
@@ -200,7 +203,8 @@ class Variable(object):
                 assert isinstance(var_context["compose"], list)
                 cvar["compose"].extend(cur_type)
             else:
-                cvar["compose"].append(cur_type)
+                if cur_type:
+                    cvar["compose"].append(cur_type)
             composed = cvar["compose"]
 
         old_cvar = context.get("variable", {})
@@ -276,7 +280,15 @@ class Combine(Variable):
         name = kwargs.pop("name", None)
         if name is None:
             name = "_".join([var.name for var in self._vars])
+
         var_context = {}
+        # we don't preserve types of combined variables,
+        # because they will take too much space in context (visually).
+        # types = [var.var_context.get("type", None) for var in args]
+        # type1 = types[0]
+        # # preserve type it is same for all variables
+        # if all((tp == type1 for tp in types[1:])):
+        #     var_context["type"] = type1
         var_context.update(kwargs)
         assert "dim" not in kwargs  # to set it manually is meaningless
         var_context.update({"dim": self.dim})

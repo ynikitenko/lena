@@ -1,11 +1,16 @@
 import copy
 import pytest
+from copy import deepcopy
 
 import lena.core
 import lena.context
 from lena.core import LenaTypeError, Sequence
 from lena.flow import get_data
 from lena.variables.variable import Combine, Compose, Variable
+
+
+# "double events"
+dev_data = [((1, 2.2, 3), (1.5, 2., 3))]
 
 
 def test_combine():
@@ -45,6 +50,7 @@ def test_combine():
     results = map(c, data)
     assert c.name == "mm_m"
     assert [res[0] for res in results]  == [(10,0.01), (20,0.02), (30,0.03)]
+
     # combination of Combines works
     c = Combine(mm, Combine(mm, m))
     results = [c(dt) for dt in data]
@@ -101,6 +107,32 @@ def test_combine():
             'dim': 2,
             'name': 'sq_m_mm',
             'combine': (sq_m.var_context, sq_mm.var_context)
+        }
+    }
+
+    # composition of variables works with Combine
+    positron = Variable("positron", getter=lambda dev: dev[0], type="particle")
+    x = Variable("x", getter=lambda coord: coord[0], type="coordinate")
+    y = Variable("y", getter=lambda coord: coord[1], type="coordinate")
+    xy = Combine(x, y)
+    seq = Sequence(positron, xy)
+    res = list(seq.run(deepcopy(dev_data)))
+    assert len(res) == 1
+    assert res[0][0] == (1, 2.2)
+    assert res[0][1] == {
+        'variable': {
+            'combine': (
+                {
+                    'coordinate': {'name': 'x'}, 'name': 'x', 'type': 'coordinate'
+                },
+                {
+                    'coordinate': {'name': 'y'}, 'name': 'y', 'type': 'coordinate'
+                }
+            ),
+            'compose': ['particle'],
+            'dim': 2,
+            'name': 'x_y',
+            'particle': {'name': 'positron'},
         }
     }
 
