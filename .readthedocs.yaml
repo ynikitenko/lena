@@ -6,6 +6,11 @@ python:
    install:
    - requirements: docs/requirements.txt
 
+# OMG, and this is what they do with a cross-platform language!
+# from https://docs.readthedocs.io/en/stable/config-file/v2.html#build-os
+build:
+  os: ubuntu-22.04
+
 # have to explicitly enable that,
 # https://docs.readthedocs.io/en/stable/config-file/v2.html#formats
 formats: all
