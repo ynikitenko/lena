@@ -11,7 +11,9 @@ python:
 build:
     os: ubuntu-22.04
     tools:
-        python: "3.11"
+        # outdated Sphinx used by RTD uses collections.Callable,
+        # which was removed in Python 3.10
+        python: "3.9"
 
 sphinx:
     configuration: docs/source/conf.py
