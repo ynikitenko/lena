@@ -667,6 +667,7 @@ class Run(object):
                     "element {} must implement run method ".format(el) +
                     "be callable, or be a FillCompute element"
                 )
+            self._run_name = None
         else:
             # explicit method name given
             if el is None:
@@ -678,6 +679,8 @@ class Run(object):
                 raise exceptions.LenaTypeError(
                     "no callable method {} of {} found".format(run, el)
                 )
+            self._run_name = run
+
         self._el = el
 
     def _call_run(self, flow):
@@ -701,6 +704,12 @@ class Run(object):
             self._el.fill(arg)
         results = self._el.compute()
         return results
+
+    def __repr__(self):
+        if self._run_name:
+            return "Run({}, run={})".format(repr(self._el), self._run_name)
+        else:
+            return "Run({})".format(repr(self._el))
 
 
 class SourceEl(object):
@@ -749,3 +758,6 @@ class SourceEl(object):
         # https://docs.python.org/3/reference/datamodel.html#special-lookup
         # Methods with other names will be monkey-patched correctly.
         return self._call()  # pylint: disable=no-member
+
+    def __repr__(self):
+        return "SourceEl({})".format(repr(self._el))

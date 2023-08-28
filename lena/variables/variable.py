@@ -90,7 +90,6 @@ class Variable(object):
         If *getter* is a :class:`Variable` or is not callable,
         :exc:`.LenaTypeError` is raised.
         """
-        self.name = name
         if isinstance(getter, Variable):
             raise lena.core.LenaTypeError(
                 "getter should be a function on data, not a Variable "
@@ -104,12 +103,13 @@ class Variable(object):
         # (without context)
         # But probably for unification with other "performance" features
         # its name may be changed in the future.
-        self.getter = getter
+        object.__setattr__(self, "getter", getter)
+        # getter doesn't go into var_context.
+        # since we have setattr, we must use this syntax here.
+        # self.getter = getter
 
         # var_context is public, so that one can get all attributes
-        self.var_context = {
-            "name": self.name,
-        }
+        object.__setattr__(self, "var_context", {"name": name,})
         self.var_context.update(**kwargs)
         if type:
             # to take less space in context; this is obvious.
@@ -151,26 +151,31 @@ class Variable(object):
         # https://stackoverflow.com/a/34950256/952234
         if name.startswith('_'):
             raise AttributeError(name)
+        var_context = object.__getattribute__(self, "var_context")
         try:
-            return self.var_context[name]
+            return var_context[name]
         except KeyError:
             raise lena.core.LenaAttributeError(
                 "{} missing in {}".format(name, self.name)
             )
 
+    def __setattr__(self, name, value):
+        # otherwise updated attributes won't affect the context
+        self.var_context[name] = value
+
     # todo: is this function really needed? Shall we delete that?
-    def get(self, key, default=None):
-        """Return the attribute *key* if present, else default.
+    # def get(self, key, default=None):
+    #     """Return the attribute *key* if present, else default.
 
-        *key* can be a dot-separated string, a list or a dictionary
-        (see :func:`context.get_recursively <.get_recursively>`).
+    #     *key* can be a dot-separated string, a list or a dictionary
+    #     (see :func:`context.get_recursively <.get_recursively>`).
 
-        If default is not given, it defaults to ``None``,
-        so that this method never raises a :exc:`KeyError`.
-        """
-        return lena.context.get_recursively(
-            self.var_context, key, default=default
-        )
+    #     If default is not given, it defaults to ``None``,
+    #     so that this method never raises a :exc:`KeyError`.
+    #     """
+    #     return lena.context.get_recursively(
+    #         self.var_context, key, default=default
+    #     )
 
     @staticmethod
     def _update_context(context, var_context):
@@ -272,7 +277,8 @@ class Combine(Variable):
                 "All arguments to be combined must be Variables, "
                 "{} provided".format(args)
             )
-        self._vars = args
+        object.__setattr__(self, "_vars", args)
+        object.__setattr__(self, "var_context", {})
         self.dim = len(args)
         getter = lambda val: tuple(var.getter(val) for var in self._vars)
 
@@ -337,7 +343,7 @@ class Compose(Variable):
             for var in self._vars:
                 value = var.getter(value)
             return value
-        self._vars = args
+        object.__setattr__(self, "_vars", args)
 
         # composition of functions must be almost the same
         # as those functions in a sequence.
@@ -363,4 +369,4 @@ class Compose(Variable):
         )
         # we can't set it in super.__init__,
         # since we've done all work here
-        self.var_context = var_context
+        object.__setattr__(self, "var_context", var_context)

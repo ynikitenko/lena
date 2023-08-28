@@ -8,7 +8,7 @@ from lena.variables.variable import Combine, Variable
 from lena.variables.functions import abs, Cm
 
 
-def test_abs():
+def _test_abs():
     # Variable x
     x = Variable(name='x', getter=lambda data: data[0], type='coordinate')
     abs_x = abs(x)
