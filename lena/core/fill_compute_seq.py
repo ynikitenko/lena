@@ -1,5 +1,4 @@
 """Sequence with a FillCompute element."""
-from __future__ import print_function
 
 from . import lena_sequence
 from . import sequence
@@ -107,3 +106,8 @@ class FillComputeSeq(lena_sequence.LenaSequence):
 
         results = self._after.run(vals)
         return results
+
+    def __eq__(self, other):
+        if not isinstance(other, FillComputeSeq):
+            return NotImplemented
+        return self._seq == other._seq

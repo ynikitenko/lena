@@ -107,7 +107,7 @@ class Split(object):
                 "{} provided".format(seqs)
             )
         seqs = [meta.alter_sequence(seq) for seq in seqs]
-        self._sequences = []
+        self._seqs = []
         self._seq_types = []
 
         for sequence in seqs:
@@ -119,7 +119,7 @@ class Split(object):
                     "FillComputeSeq, FillRequestSeq or Source, "
                     "{} provided".format(sequence)
                 )
-            self._sequences.append(seq)
+            self._seqs.append(seq)
             self._seq_types.append(seq_type)
 
         different_seq_types = set(self._seq_types)
@@ -156,31 +156,31 @@ class Split(object):
         :class:`.Source`,
         otherwise runtime :exc:`.LenaAttributeError` is raised.
         """
-        if self._n_seq_types != 1 or not ct.is_source(self._sequences[0]):
+        if self._n_seq_types != 1 or not ct.is_source(self._seqs[0]):
             raise exceptions.LenaAttributeError(
                 "Split has no method '__call__'. It should contain "
                 "only Source sequences to be callable"
             )
         # todo: use itertools.chain and check performance difference
-        for seq in self._sequences:
+        for seq in self._seqs:
             for result in seq():
                 yield result
 
     def _fill(self, val):
-        for seq in self._sequences[:-1]:
+        for seq in self._seqs[:-1]:
             if self._copy_buf:
                 seq.fill(copy.deepcopy(val))
             else:
                 seq.fill(val)
-        self._sequences[-1].fill(val)
+        self._seqs[-1].fill(val)
 
     def _compute(self):
-        for seq in self._sequences:
+        for seq in self._seqs:
             for val in seq.compute():
                 yield val
 
     def _request(self):
-        for seq in self._sequences:
+        for seq in self._seqs:
             for val in seq.request():
                 yield val
 
@@ -222,7 +222,7 @@ class Split(object):
         then the buffer for each sequence except the last one is a deep copy
         of the current buffer.
         """
-        active_seqs = self._sequences[:]
+        active_seqs = self._seqs[:]
         active_seq_types = self._seq_types[:]
 
         n_of_active_seqs = len(active_seqs)
@@ -339,9 +339,9 @@ class Split(object):
         elems = el_separ.join((repr_maybe_nested(el, base_indent=base_indent,
                                                  indent=indent)
                                # diff here
-                               for el in self._sequences))
+                               for el in self._seqs))
 
-        if "\n" in el_separ and self._sequences:
+        if "\n" in el_separ and self._seqs:
             # maybe new line
             mnl = "\n"
             # maybe base indent
@@ -352,6 +352,11 @@ class Split(object):
         # diff here in name and brackets
         return "".join([base_indent, "Split",
                         "([", mnl, elems, mnl, mbi, "])"])
+
+    def __eq__(self, other):
+        if not isinstance(other, Split):
+            return NotImplemented
+        return self._seqs == other._seqs
 
     def __repr__(self):
         return self._repr_nested()

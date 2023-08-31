@@ -15,13 +15,17 @@ class Source(lena_sequence.LenaSequence):
         Following arguments (if present) form a sequence of elements,
         each accepting computational flow from the previous element.
 
-        >>> from lena.flow import CountFrom
-        >>> s = Source(CountFrom())
+        >>> from lena.flow import CountFrom, Slice
+        >>> s = Source(CountFrom(), Slice(5))
+        >>> # iterate in a cycle
         >>> for i in s():
         ...     if i == 5:
         ...         break
         ...     print(i, end=" ")
         0 1 2 3 4 
+        >>> # if called twice, results depend on the generator
+        >>> list(s()) == list(range(5, 10))
+        True
 
         For a *sequence* which transforms the incoming flow,
         use :class:`Sequence`.
@@ -56,3 +60,8 @@ class Source(lena_sequence.LenaSequence):
             return self._sequence.run(arg)
         else:
             return functions.flow_to_iter(arg)
+
+    def __eq__(self, other):
+        if not isinstance(other, Source):
+            return NotImplemented
+        return self._seq == other._seq

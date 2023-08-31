@@ -1,5 +1,4 @@
 """FillSeq sequence and its helpers."""
-from __future__ import print_function
 
 from . import lena_sequence
 from . import adapters
@@ -89,3 +88,8 @@ class FillSeq(lena_sequence.LenaSequence):
         this sequence, and after that fills the last element.
         """
         raise exceptions.LenaNotImplementedError
+
+    def __eq__(self, other):
+        if not isinstance(other, FillSeq):
+            return NotImplemented
+        return self._seq == other._seq

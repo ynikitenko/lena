@@ -705,6 +705,16 @@ class Run(object):
         results = self._el.compute()
         return results
 
+    def __eq__(self, other):
+        if not isinstance(other, Run):
+            # Run(el) != el
+            return NotImplemented
+        if self._run_name == "run":
+            if other._run_name not in (None, "run"):
+                return False
+        return (self._el == other._el and
+                self._run_name == other._run_name)
+
     def __repr__(self):
         if self._run_name:
             return "Run({}, run={})".format(repr(self._el), self._run_name)

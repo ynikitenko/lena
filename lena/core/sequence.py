@@ -75,3 +75,8 @@ class Sequence(lena_sequence.LenaSequence):
         # Most important is that the function is evaluated immediately,
         # and raises in case of errors.
         return flow
+
+    def __eq__(self, other):
+        if not isinstance(other, Sequence):
+            return NotImplemented
+        return self._seq == other._seq
