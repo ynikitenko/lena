@@ -10,6 +10,7 @@ from . import check_sequence_type
 
 def _init_sequence_with_el(self, args, el_attr, check_el_type,
                            el_name, seq_name):
+    # todo: remove after we remove FillRequestSeq
     before = []
     after = []
     el = None
@@ -78,13 +79,46 @@ class FillComputeSeq(lena_sequence.LenaSequence):
         could not be correctly initialized,
         :exc:`.LenaTypeError` is raised.
         """
-        # *args* can consist of one tuple, which is in that case expanded.
-        _init_sequence_with_el(
-            self, args, "_fill_compute",
-            check_sequence_type.is_fill_compute_el,
-            el_name="FillCompute", seq_name="FillComputeSeq"
-        )
+        before = []
+        fc_el = None
+        after = []
+
+        # same as for Sequence
+        if len(args) == 1 and isinstance(args[0], tuple):
+            args = args[0]
+
+        for ind, el in enumerate(args):
+            if not check_sequence_type.is_fill_compute_el(el):
+                before.append(el)
+            else:
+                fc_el = el
+                break
+
+        if fc_el is None:
+            raise exceptions.LenaTypeError(
+                "FillComputeSeq must contain a FillCompute element, "
+                "none provided: {}".format(args)
+            )
+        self._fill_compute = fc_el
+
+        for el in args[ind+1:]:
+            after.append(el)
+
+        before.append(fc_el)
+        try:
+            before_seq = fill_seq.FillSeq(*before)
+        except exceptions.LenaTypeError as err:
+            raise err
+        self._fill_seq = before_seq
+        self.fill = self._fill_seq.fill
+        # to do: do we check for exceptions like above
+        # or skip like here?
+        self._after = sequence.Sequence(*after)
+
         self._name = "FillComputeSeq"
+        seq = list(before_seq)
+        seq.extend(self._after._seq)
+        super(FillComputeSeq, self).__init__(*seq)
 
     def fill(self, value):
         """Fill *self* with *value*.
@@ -102,9 +136,8 @@ class FillComputeSeq(lena_sequence.LenaSequence):
         it postprocesses the results yielded
         from *FillCompute* element.
         """
-        vals = self._fill_compute.compute()
-
-        results = self._after.run(vals)
+        flow = self._fill_compute.compute()
+        results = self._after.run(flow)
         return results
 
     def __eq__(self, other):

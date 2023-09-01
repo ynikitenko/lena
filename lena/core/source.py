@@ -44,22 +44,24 @@ class Source(lena_sequence.LenaSequence):
                 + "must be callable"
             )
         self._first = args[0]
-        # _seq is an attribute of LenaSequence
-        self._seq = [self._first]
+
+        seq = [self._first]
         if len(args) > 1:
             self._sequence = sequence.Sequence(*args[1:])
-            self._seq.extend(args[1:])
+            seq.extend(args[1:])
         else:
             self._sequence = ()
-        self._name = "Source"
+
+        self._name = "Source"  # for repr
+        super(Source, self).__init__(*seq)
 
     def __call__(self):
         """Generate flow."""
-        arg = self._first()
+        flow = self._first()
         if self._sequence:
-            return self._sequence.run(arg)
+            return self._sequence.run(flow)
         else:
-            return functions.flow_to_iter(arg)
+            return functions.flow_to_iter(flow)
 
     def __eq__(self, other):
         if not isinstance(other, Source):

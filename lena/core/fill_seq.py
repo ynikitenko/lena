@@ -41,8 +41,7 @@ class FillSeq(lena_sequence.LenaSequence):
         or if an *args* is empty,
         :exc:`.LenaTypeError` is raised.
         """
-        self._seq = []
-        self._name = "FillSeq"
+        seq = []
 
         if not args:
             raise exceptions.LenaTypeError(
@@ -54,32 +53,33 @@ class FillSeq(lena_sequence.LenaSequence):
                 "{} given".format(args[-1])
             )
         # convert all elements except last to FillInto (if needed)
-        for elem in args[:-1]:
-            fill_into = getattr(elem, "fill_into", None)
-            if callable(fill_into):
-                # default method found
-                self._seq.append(elem)
+        for el in args[:-1]:
+            if hasattr(el, "fill_into") and callable(el.fill_into):
+                seq.append(el)
             else:
-                # try to convert to FillInto
+                # try to convert to FillInto (e.g. Call)
                 try:
-                    fill_into_elem = adapters.FillInto(elem, explicit=False)
+                    fill_into_el = adapters.FillInto(el, explicit=False)
                 except exceptions.LenaTypeError:
                     raise exceptions.LenaTypeError(
                         "arguments must implement fill_into method, "
                         "or be convertible to FillInto, "
-                        "{} given".format(elem)
+                        "{} given".format(el)
                     )
                 else:
-                    self._seq.append(fill_into_elem)
-        self._seq.append(args[-1])
-        # transform FillInto elements to _Fill
+                    seq.append(fill_into_el)
+        seq.append(args[-1])
+        # transform FillInto elements into _Fill
         fill_el = args[-1]
-        for el in reversed(self._seq[:-1]):
+        for el in reversed(seq[:-1]):
             fill_el = _Fill(el, fill_el)
         # note that self._seq consists of original FillInto elements.
         self._fill_el = fill_el
         # self for these methods is different
         self.fill = fill_el.fill
+
+        self._name = "FillSeq"  # for repr
+        super(FillSeq, self).__init__(*seq)
 
     def fill(self, value):
         """Fill *value* into an *element*.

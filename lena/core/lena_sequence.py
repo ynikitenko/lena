@@ -1,9 +1,6 @@
 """LenaSequence abstract base class."""
 
 
-# pylint: disable=no-member
-# this is an abstract base class and _seq will be defined in subclasses
-
 class LenaSequence(object):
     """Abstract base class for all Lena sequences.
 
@@ -11,6 +8,8 @@ class LenaSequence(object):
     *LenaSequence* provides methods to iterate over a sequence,
     get its length and get an item at the given index.
     """
+    def __init__(self, *args):
+        self._seq = args
 
     def __iter__(self):
         return self._seq.__iter__()

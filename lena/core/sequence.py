@@ -26,31 +26,33 @@ class Sequence(lena_sequence.LenaSequence):
         For more information about the *run* method and callables,
         see :class:`Run`.
         """
-        self._seq = []
+        seq = []
 
         # Sequence can be initialized from a single tuple
         if len(args) == 1 and isinstance(args[0], tuple):
             args = args[0]
 
-        for elem in args:
-            run = getattr(elem, "run", None)
-            if callable(run):
-                self._seq.append(elem)
+        for el in args:
+            if hasattr(el, "run") and callable(el.run):
+                seq.append(el)
             else:
                 try:
-                    run_elem = adapters.Run(elem)
+                    # convert to a Run element
+                    # (for example, el could be a Call)
+                    run_el = adapters.Run(el)
                 except exceptions.LenaTypeError:
                     raise exceptions.LenaTypeError(
                         "arguments must implement run method, "
                         "or be callable generators (convertible to Run), "
-                        "{} given".format(elem)
+                        "{} given".format(el)
                     )
                 else:
-                    self._seq.append(run_elem)
+                    seq.append(run_el)
+        # _name is used for representation.
+        # Subclass must set its own name or provide a different repr
         self._name = "Sequence"
-        # we don't call super init (yet),
-        # because it has no variables (and no init)
-        # https://softwareengineering.stackexchange.com/a/318171/42050
+
+        super(Sequence, self).__init__(*seq)
 
     def run(self, flow):
         """Generator, which transforms the incoming flow.
@@ -65,8 +67,8 @@ class Sequence(lena_sequence.LenaSequence):
         """
         flow = functions.flow_to_iter(flow)
 
-        for elem in self._seq:
-            flow = elem.run(flow)
+        for el in self:
+            flow = el.run(flow)
 
         flow = functions.flow_to_iter(flow)
 
