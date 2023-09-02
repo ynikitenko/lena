@@ -28,10 +28,6 @@ class Sequence(lena_sequence.LenaSequence):
         """
         seq = []
 
-        # Sequence can be initialized from a single tuple
-        if len(args) == 1 and isinstance(args[0], tuple):
-            args = args[0]
-
         for el in args:
             if hasattr(el, "run") and callable(el.run):
                 seq.append(el)

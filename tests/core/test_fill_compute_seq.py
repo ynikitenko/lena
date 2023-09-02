@@ -1,5 +1,3 @@
-from __future__ import print_function
-
 import pytest
 
 from lena.core import Sequence, Source, FillCompute, FillComputeSeq, Run
@@ -39,11 +37,7 @@ def test_fill_compute_seq():
     assert next(s3()) == 11.0
 
     s4 = Source(cnt1, Slice(10), FillComputeSeq(mul2, FillCompute(Mean()), Print()))
-    # tuple initialization works
-    s41 = Source(cnt1, Slice(10), FillComputeSeq((mul2, FillCompute(Mean()), Print())))
     assert next(s4()) == 11.0
-    assert next(s41()) == 11.0
-    # 11.0
 
     s5 = FillComputeSeq(mul2, FillCompute(Mean()), Print())
 

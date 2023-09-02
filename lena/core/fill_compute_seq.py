@@ -83,10 +83,6 @@ class FillComputeSeq(lena_sequence.LenaSequence):
         fc_el = None
         after = []
 
-        # same as for Sequence
-        if len(args) == 1 and isinstance(args[0], tuple):
-            args = args[0]
-
         for ind, el in enumerate(args):
             if not check_sequence_type.is_fill_compute_el(el):
                 before.append(el)

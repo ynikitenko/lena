@@ -297,7 +297,7 @@ class GroupPlots(object):
         if isinstance(transform, lena.core.LenaSequence):
             self._transform = transform
         else:
-            self._transform = lena.core.Sequence(transform)
+            self._transform = lena.core.Sequence(*transform)
 
         self._yield_selected = yield_selected
 
