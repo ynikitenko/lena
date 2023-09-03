@@ -26,9 +26,15 @@ class Sequence(lena_sequence.LenaSequence):
         For more information about the *run* method and callables,
         see :class:`Run`.
         """
+        # _name is used for representation.
+        # Subclass must set its own name or provide a different repr
+        self._name = "Sequence"
+        super(Sequence, self).__init__(*args)
+
         seq = []
 
-        for el in args:
+        # todo: we could change self._seq in place
+        for el in self._seq:
             if hasattr(el, "run") and callable(el.run):
                 seq.append(el)
             else:
@@ -44,17 +50,14 @@ class Sequence(lena_sequence.LenaSequence):
                     )
                 else:
                     seq.append(run_el)
-        # _name is used for representation.
-        # Subclass must set its own name or provide a different repr
-        self._name = "Sequence"
 
-        super(Sequence, self).__init__(*seq)
+        self._seq = seq
 
     def run(self, flow):
-        """Generator, which transforms the incoming flow.
+        """Generator that transforms the incoming flow.
 
         If this :class:`Sequence` is empty,
-        the flow passes untransformed,
+        the flow passes unaltered, but
         with a small change.
         This function converts input flow to an iterator,
         so that it always contains both *iter* and *next* methods.
@@ -63,7 +66,7 @@ class Sequence(lena_sequence.LenaSequence):
         """
         flow = functions.flow_to_iter(flow)
 
-        for el in self:
+        for el in self._seq:
             flow = el.run(flow)
 
         flow = functions.flow_to_iter(flow)

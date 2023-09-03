@@ -4,7 +4,7 @@ import re
 
 import lena.core
 import lena.context
-import lena.flow
+# import lena.flow
 
 
 _sentinel = object()
@@ -173,7 +173,8 @@ class UpdateContext():
         the update argument is missing in *value*'s context.
         """
         import jinja2
-        data, context = lena.flow.get_data_context(value)
+        data, context = value
+        # data, context = lena.flow.get_data_context(value)
         if isinstance(self._update, (str, jinja2.Template)):
             if self._context_value:
                 if not self._has_default:

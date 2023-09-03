@@ -3,7 +3,7 @@ import functools
 import json
 
 import lena.core
-import lena.flow
+# import lena.flow
 
 
 class Context(dict):
@@ -83,7 +83,8 @@ class Context(dict):
         its initialization argument *d*
         has no effect on the produced values.
         """
-        data, context = lena.flow.get_data_context(value)
+        data, context = value
+        # data, context = lena.flow.get_data_context(value)
         return (data, Context(context))
 
     def __getattr__(self, name):

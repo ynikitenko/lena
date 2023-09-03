@@ -181,7 +181,7 @@ def test_update_context_exception_strings():
     # test exception strings
     uc = UpdateContext("var", "{{data}}", raise_on_missing=True)
     with pytest.raises(lena.core.LenaKeyError, match="'data' is undefined, context={}"):
-        uc({})
+        uc((None, {}))
     with pytest.raises(
         lena.core.LenaValueError,
         match="fix braces for template string '{{{data}}' or set value to False"
