@@ -65,7 +65,6 @@ class Write(object):
                 output_directory
             )
 
-
         # verbose is boolean, because for more detailed information
         # one can use a Print element.
         self._verbose = verbose

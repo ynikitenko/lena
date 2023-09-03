@@ -3,12 +3,14 @@ import os
 import pytest
 
 from lena.core import Sequence, Source, LenaTypeError, LenaValueError
+from lena.flow.cache import Cache
+from lena.flow.iterators import Slice
+from lena.meta import SetContext
+
 from tests.example_sequences import (
     ASCIILowercase, ASCIIUppercase, ascii_lowercase, ascii_uppercase,
     lowercase_cached_filename, lowercase_cached_seq, id_,
 )
-from lena.flow.cache import Cache
-from lena.flow.iterators import Slice
 from tests.shortcuts import cnt1, cnt1c
 
 
@@ -99,3 +101,10 @@ def test_alter_sequence(tmpdir):
     # this fails for nested Sequences. To be done.
     assert cached_to_source(s) != s
     assert isinstance(cached_to_source(s), Source)
+
+def test_set_context():
+    orig_filename = "{{detector}}_detector.pkl"
+    cache = Cache(orig_filename)
+    s = Sequence(SetContext("detector", "far"), cache)
+    assert cache._orig_filename == orig_filename
+    assert cache._filename == "far_detector.pkl"

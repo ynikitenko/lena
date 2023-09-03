@@ -4,6 +4,7 @@ import pickle
 import sys
 
 import lena.core 
+import lena.context
 
 if sys.version_info.major == 2:
     import cPickle
@@ -50,7 +51,7 @@ class Cache(object):
     def __init__(self, filename, recompute=False,
                  method="cPickle", protocol=2):
         """*filename* is the name of file where to store the cache.
-        You can give it *.pkl* extension.
+        It can be given *.pkl* extension.
 
         If *recompute* is ``True``,
         an existing cache will always be overwritten.
@@ -82,6 +83,10 @@ class Cache(object):
             )
 
         self._filename = filename
+        self._orig_filename = filename
+        if '{' in filename:
+            self._format_context = lena.context.format_context(filename)
+
         self.protocol = protocol
         self._recompute = recompute
         # used by meta elements
@@ -139,6 +144,17 @@ class Cache(object):
 
         # can't copy code here due to unknown reasons (stops working)
         return self._dump_flow_and_yield(flow)
+
+    def _set_context(self, context):
+        # copied from output.Write
+        if '{' not in self._orig_filename:
+            return
+        try:
+            filename = self._format_context(context)
+        except LenaKeyError:
+            pass
+        else:
+            self._filename = filename
 
     @staticmethod
     def alter_sequence(seq):
