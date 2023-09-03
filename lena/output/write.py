@@ -21,7 +21,7 @@ def Writer(*args, **kwargs):
 class Write(object):
     """Write text data to filesystem."""
 
-    def __init__(self, output_directory="", output_filename="output",
+    def __init__(self, output_directory, output_filename="output",
                  verbose=True,
                  existing_unchanged=False, overwrite=False):
         """*output_directory* is the base output directory.
@@ -49,14 +49,22 @@ class Write(object):
         These options are mutually exclusive:
         their simultaneous use raises :exc:`.LenaValueError`.
         """
-        self.output_directory = output_directory
-        self._output_filename = output_filename
         if (not isinstance(output_directory, str)
             or not isinstance(output_filename, str)):
             raise lena.core.LenaTypeError(
                 "output_directory and output_filename must be strings, "
                 "{} and {} given".format(output_directory, output_filename)
             )
+
+        self._output_filename = output_filename
+
+        self._orig_outdir = output_directory
+        self.output_directory = output_directory
+        if '{' in output_directory:
+            self._format_context = lena.context.format_context(
+                output_directory
+            )
+
 
         # verbose is boolean, because for more detailed information
         # one can use a Print element.
@@ -275,6 +283,20 @@ class Write(object):
                 self._write_data(filepath, data)
 
             yield (filepath, context)
+
+    def _set_context(self, context):
+        # we add this method to all Write objects for uniformity.
+        # Advised by Aaron Hall,
+        # https://stackoverflow.com/a/28060251/952234
+        if '{' not in self._orig_outdir:
+            return
+        # set static context to format the output directory name
+        try:
+            outdir = self._format_context(context)
+        except LenaKeyError:
+            pass
+        else:
+            self.output_directory = outdir
 
     def _write_data(self, filepath, data):
         # write output to filesystem
