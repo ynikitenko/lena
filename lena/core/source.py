@@ -34,22 +34,22 @@ class Source(lena_sequence.LenaSequence):
             raise exceptions.LenaTypeError(
                 "Source must be initialized with 1 argument or more (0 given)"
             )
-        if not callable(args[0]):
-            raise exceptions.LenaTypeError(
-                "first element {} ".format(args[0])
-                + "must be callable"
-            )
-        self._first = args[0]
-
-        seq = [self._first]
-        if len(args) > 1:
-            self._sequence = sequence.Sequence(*args[1:])
-            seq.extend(args[1:])
-        else:
-            self._sequence = ()
 
         self._name = "Source"  # for repr
-        super(Source, self).__init__(*seq)
+        super(Source, self).__init__(*args)
+
+        first = self._seq[0]
+        if not callable(first):
+            raise exceptions.LenaTypeError(
+                "first element {} ".format(first)
+                + "must be callable"
+            )
+        self._first = first
+
+        if len(args) > 1:
+            self._sequence = sequence.Sequence(*(self._seq[1:]))
+        else:
+            self._sequence = ()
 
     def __call__(self):
         """Generate flow."""

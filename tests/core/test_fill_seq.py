@@ -17,7 +17,7 @@ def test_lena_sequence_fill():
     assert len(s1) == 1
     assert len(s2) == 2
     # can get item
-    assert isinstance(s2[0], FillInto)
+    assert isinstance(s2._seq[0], FillInto)
     # deletion is prohibited
     with pytest.raises(TypeError):
         del s2[0]

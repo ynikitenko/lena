@@ -12,9 +12,9 @@ class LenaSequence(object):
     get its length and get an item at the given index.
     """
     def __init__(self, *args):
+        from lena.context import update_recursively
         # todo: this doesn't require jinja2,
         # but we may want it to support template strings soon
-        from lena.context import update_recursively
         self._full_seq = args
         seq = []
 
@@ -88,10 +88,15 @@ class LenaSequence(object):
         return self._repr_nested()
 
     def _set_context(self, context):
+        from lena.context import update_recursively
+        # parent context doesn't necessarily has our context
+        # (for example, when we are inside Split)
+        update_recursively(self._context, context)
+        cont = self._context
         for el in self._need_context:
             # we don't use self._context,
             # because it was already set in this seq.
-            el._set_context(context)
+            el._set_context(cont)
 
     def _get_context(self):
         return deepcopy(self._context)

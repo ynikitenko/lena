@@ -2,6 +2,7 @@
 import copy
 import itertools
 
+import lena.context
 from . import fill_compute_seq
 from . import check_sequence_type as ct
 from . import fill_request_seq
@@ -352,6 +353,22 @@ class Split(object):
         # diff here in name and brackets
         return "".join([base_indent, "Split",
                         "([", mnl, elems, mnl, mbi, "])"])
+
+    def _get_context(self):
+        # we don't set context during initialisation,
+        # because we may need it at most once
+        # (during its parent sequence initialisation)
+        contexts = []
+        # the order of sequences is not important
+        for seq in self._seqs:
+            if hasattr(seq, "_get_context"):
+                contexts.append(seq._get_context())
+        return lena.context.intersection(*contexts)
+
+    def _set_context(self, context):
+        for seq in self._seqs:
+            if hasattr(seq, "_set_context"):
+                seq._set_context(context)
 
     def __eq__(self, other):
         if not isinstance(other, Split):

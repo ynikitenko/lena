@@ -41,19 +41,24 @@ class FillSeq(lena_sequence.LenaSequence):
         or if an *args* is empty,
         :exc:`.LenaTypeError` is raised.
         """
-        seq = []
-
         if not args:
             raise exceptions.LenaTypeError(
                 "FillSeq must have at least one element"
             )
-        if not callable(getattr(args[-1], "fill", None)):
+
+        self._name = "FillSeq"  # for repr
+        super(FillSeq, self).__init__(*args)
+
+        seq = []
+        last = self._seq[-1]
+
+        if not callable(getattr(last, "fill", None)):
             raise exceptions.LenaTypeError(
                 "the last argument must implement fill method, "
-                "{} given".format(args[-1])
+                "{} given".format(last)
             )
         # convert all elements except last to FillInto (if needed)
-        for el in args[:-1]:
+        for el in self._seq[:-1]:
             if hasattr(el, "fill_into") and callable(el.fill_into):
                 seq.append(el)
             else:
@@ -68,18 +73,16 @@ class FillSeq(lena_sequence.LenaSequence):
                     )
                 else:
                     seq.append(fill_into_el)
-        seq.append(args[-1])
+        seq.append(last)
         # transform FillInto elements into _Fill
-        fill_el = args[-1]
+        fill_el = last
         for el in reversed(seq[:-1]):
             fill_el = _Fill(el, fill_el)
         # note that self._seq consists of original FillInto elements.
         self._fill_el = fill_el
         # self for these methods is different
         self.fill = fill_el.fill
-
-        self._name = "FillSeq"  # for repr
-        super(FillSeq, self).__init__(*seq)
+        self._seq = seq
 
     def fill(self, value):
         """Fill *value* into an *element*.

@@ -79,11 +79,15 @@ class FillComputeSeq(lena_sequence.LenaSequence):
         could not be correctly initialized,
         :exc:`.LenaTypeError` is raised.
         """
+        self._name = "FillComputeSeq"
+        super(FillComputeSeq, self).__init__(*args)
+        seq = self._seq
+
         before = []
         fc_el = None
         after = []
 
-        for ind, el in enumerate(args):
+        for ind, el in enumerate(seq):
             if not check_sequence_type.is_fill_compute_el(el):
                 before.append(el)
             else:
@@ -97,7 +101,7 @@ class FillComputeSeq(lena_sequence.LenaSequence):
             )
         self._fill_compute = fc_el
 
-        for el in args[ind+1:]:
+        for el in seq[ind+1:]:
             after.append(el)
 
         before.append(fc_el)
@@ -110,11 +114,6 @@ class FillComputeSeq(lena_sequence.LenaSequence):
         # to do: do we check for exceptions like above
         # or skip like here?
         self._after = sequence.Sequence(*after)
-
-        self._name = "FillComputeSeq"
-        seq = list(before_seq)
-        seq.extend(self._after._seq)
-        super(FillComputeSeq, self).__init__(*seq)
 
     def fill(self, value):
         """Fill *self* with *value*.
