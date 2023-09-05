@@ -105,8 +105,8 @@ def test_set_template_context_split():
         # todo: this is too complicated for now
         # # this will be overwritten
         # SetContext("cycle", "{{cycle}}_indeed"),
-        SetContext("detector", "{{data.detector}}"),
         SetContext("detector", "maybe_{{detector}}"),
+        SetContext("detector", "{{data.detector}}"),
     )
     # print(seq[-1]._context)
     assert seq._get_context()["detector"] == "maybe_near"
@@ -132,7 +132,10 @@ def test_set_template_context_split():
         split,
         store4
     )
-    assert store1._context == {'data': {'cycle': 1, 'lost': True}}
+    assert store1._context == {
+        'data': {'cycle': 1, 'lost': True},
+        'cycle': '1',
+    }
     assert store2._context == {
         'data': {'cycle': 1, 'detector': 'far', 'lost': True},
         'cycle': '1',
@@ -140,8 +143,7 @@ def test_set_template_context_split():
     assert store3._context == {
         'data': {'cycle': 1, 'detector': 'near', 'lost': True},
         'detector': 'maybe_near',
-        # todo: maybe this is indended?..
-        'cycle': '2',
+        'cycle': '1',
         # 'cycle': '2_indeed',
     }
     # static context is the same for the same level of nesting

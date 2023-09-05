@@ -151,7 +151,7 @@ class Cache(object):
             return
         try:
             filename = self._format_context(context)
-        except LenaKeyError:
+        except lena.core.LenaKeyError:
             pass
         else:
             self._filename = filename

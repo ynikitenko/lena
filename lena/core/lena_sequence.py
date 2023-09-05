@@ -65,7 +65,10 @@ class LenaSequence(object):
                 update_recursively(context, el_context)
 
         # Render that context that we can. Context is updated.
-        unknown_contexts = _update_unknown_contexts(unknown_contexts, context)
+        _update_unknown_contexts(unknown_contexts, context)
+        # unknown_contexts of this sequence are left as they are.
+        # We shall set them every time we update context.
+        # unknown_contexts = _update_unknown_contexts(unknown_contexts, context)
         # There is no way to check (during init)
         # that all static context was set,
         # because sequences are allowed to separate/wrap any elements.
@@ -75,13 +78,13 @@ class LenaSequence(object):
             # context is same for the whole sequence
             # (and external ones, but not for Split)
             if hasattr(el, "_set_context"):
-                if not unknown_contexts:
-                    # we set context after all unknowns are known.
-                    # el can't have unknown contexts
-                    # (except subsequences of Split);
-                    # at least not contexts
-                    # that shall update the current context
-                    el._set_context(context)
+                # if not unknown_contexts:
+                # we set context after all unknowns are known.
+                # el can't have unknown contexts
+                # (except subsequences of Split);
+                # at least not contexts
+                # that shall update the current context
+                el._set_context(context)
                 need_context.append(el)
 
             # todo 0.7: or has context
