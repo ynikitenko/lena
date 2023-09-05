@@ -26,7 +26,13 @@ class SetContext(object):
         # self._value = value
         self._key = key
         self._value = value
-        self._context = lena.context.str_to_dict(key, value)
+        context = lena.context.str_to_dict(key, value)
+        if isinstance(value, str) and '{{' in value:
+            # need to know other context to render this one
+            self._unknown_contexts = [(key, value)]
+            self._context = {}
+        else:
+            self._context = context
         self._has_no_data = True
 
     def _get_context(self):

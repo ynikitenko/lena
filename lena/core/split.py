@@ -1,6 +1,8 @@
 """Split data flow and run analysis in parallel."""
+import collections
 import copy
 import itertools
+from copy import deepcopy
 
 import lena.context
 from . import fill_compute_seq
@@ -67,6 +69,48 @@ def _get_seq_with_type(seq, bufsize=None):
     return (seq, seq_type)
 
 
+def _get_uc_intersection(unknown_contexts_seq):
+    from copy import copy as copy_
+    # deque to preserve the order, and because it may be faster
+    # to delete elements from start (if all sequences are different)
+    intersection = collections.deque(unknown_contexts_seq[0])
+
+    def remove_from_deque(ucs, context):
+        # index does not help in deque, it's O(n) (or maybe not at 0?)
+        # https://stackoverflow.com/questions/58152201/time-complexity-deleting-element-of-deque
+        while True:
+            try:
+                ucs.remove(context)
+            except ValueError:
+                break
+
+    for unknown_contexts in unknown_contexts_seq[1:]:
+        # we can't iterate a mutated deque
+        for context in copy_(intersection):
+            remove = False
+            if context not in unknown_contexts:
+                remove = True
+                # todo: if a local (known) context sets the same key,
+                # the result will be different (no intersection here!)
+                # Also need to check cardinality
+                # and other unknown contexts setting the same key.
+                # we could have several copies of this context
+            # elif ...
+            if remove:
+                remove_from_deque(intersection, context)
+
+    return list(intersection)
+
+
+def _remove_uc_intersection(unknown_contexts_seq, intersection):
+    for cont in intersection:
+        # cont can be several times (N) in the intersection,
+        # in that case it will be present in unknown_contexts
+        # N times as well
+        for unknown_contexts in unknown_contexts_seq:
+            unknown_contexts.remove(cont)
+
+
 class Split(object):
     """Split data flow and run analysis in parallel."""
 
@@ -107,6 +151,7 @@ class Split(object):
                 "seqs must be a list of sequences, "
                 "{} provided".format(seqs)
             )
+
         seqs = [meta.alter_sequence(seq) for seq in seqs]
         self._seqs = []
         self._seq_types = []
@@ -148,6 +193,32 @@ class Split(object):
                     "or None, {} provided".format(bufsize)
                 )
         self._bufsize = bufsize
+
+        contexts = []
+        unknown_contexts_seq = []
+        # the order of sequences is not important
+        for seq in self._seqs:
+            # first we get all known contexts, then unknown ones
+            if hasattr(seq, "_get_context"):
+                contexts.append(seq._get_context())
+            if hasattr(seq, "_unknown_contexts"):
+                # it is important that we have links to actual lists
+                unknown_contexts_seq.append(seq._unknown_contexts)
+
+        if unknown_contexts_seq and len(unknown_contexts_seq) == len(self._seqs):
+            # otherwise ignore them (the intersection is empty):
+            # they will be set from external context.
+            intersection = _get_uc_intersection(unknown_contexts_seq)
+            self._unknown_contexts = intersection
+            # never update template contexts twice.
+            _remove_uc_intersection(unknown_contexts_seq, intersection)
+
+        # todo: if a template context updates an existing context,
+        # this will be wrong. But what if it is a feature?
+        # Don't do that if you are not sure what you are doing (I'm not)
+        # Maybe we shall remove some keys from the intersection
+        # if this ever becomes a problem.
+        self._context = lena.context.intersection(*contexts)
 
     def __call__(self):
         """Each initialization sequence generates flow.
@@ -355,17 +426,14 @@ class Split(object):
                         "([", mnl, elems, mnl, mbi, "])"])
 
     def _get_context(self):
-        # we don't set context during initialisation,
-        # because we may need it at most once
-        # (during its parent sequence initialisation)
-        contexts = []
-        # the order of sequences is not important
-        for seq in self._seqs:
-            if hasattr(seq, "_get_context"):
-                contexts.append(seq._get_context())
-        return lena.context.intersection(*contexts)
+        return deepcopy(self._context)
 
     def _set_context(self, context):
+        # we don't update current context here,
+        # because Split is always within a sequence.
+        # todo
+        # If it is not, it has no external context,
+        # or one must first copy its context before setting a new one.
         for seq in self._seqs:
             if hasattr(seq, "_set_context"):
                 seq._set_context(context)

@@ -11,7 +11,9 @@ else:
 
 import lena.context
 import lena.core
-from lena.core import LenaTypeError, LenaRuntimeError, LenaZeroDivisionError
+from lena.core import (
+    LenaTypeError, LenaRuntimeError, LenaZeroDivisionError, LenaValueError
+)
 import lena.flow
 
 
