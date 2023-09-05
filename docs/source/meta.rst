@@ -6,10 +6,12 @@ Meta
 .. autosummary::
 
     SetContext
+    StoreContext
     UpdateContextFromStatic
 
 Elements
 --------
 
 .. autoclass:: SetContext
+.. autoclass:: StoreContext
 .. autoclass:: UpdateContextFromStatic

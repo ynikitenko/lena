@@ -292,7 +292,7 @@ class Write(object):
         # set static context to format the output directory name
         try:
             outdir = self._format_context(context)
-        except LenaKeyError:
+        except lena.core.LenaKeyError:
             pass
         else:
             self.output_directory = outdir

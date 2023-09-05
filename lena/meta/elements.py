@@ -45,6 +45,25 @@ class SetContext(object):
         return 'SetContext("{}", {})'.format(self._key, val)
 
 
+class StoreContext():
+    """Store static context. Use for debugging."""
+
+    def __init__(self, name="", verbose=False):
+        """*name* and *verbose* affect output and representation."""
+        self._name = name
+        self._context = {}
+        self._verbose = verbose
+        self._has_no_data = True
+
+    def _set_context(self, context):
+        if self._verbose:
+            print("StoreContext({}): storing {}".format(self._name, context))
+        self._context = context
+
+    def __repr__(self):
+        return "StoreContext({})".format(repr(self._context))
+
+
 class UpdateContextFromStatic(object):
     """Update runtime context with the static one.
 

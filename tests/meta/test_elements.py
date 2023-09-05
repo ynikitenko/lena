@@ -4,18 +4,7 @@ import pytest
 
 from lena.core import Sequence, Source, Split
 
-from lena.meta.elements import SetContext, UpdateContextFromStatic
-
-
-class StoreContext():
-
-    def __init__(self, name=""):
-        self._name = name
-        self._has_no_data = True
-
-    def _set_context(self, context):
-        print("StoreContext({}), {}".format(self._name, context))
-        self.context = context
+from lena.meta.elements import SetContext, UpdateContextFromStatic, StoreContext
 
 
 def test_set_context():
@@ -86,15 +75,15 @@ def test_set_context_split():
         split,
         store4
     )
-    assert store1.context == {'data': {'cycle': 1, 'lost': True}}
-    assert store2.context == {
+    assert store1._context == {'data': {'cycle': 1, 'lost': True}}
+    assert store2._context == {
         'data': {'cycle': 1, 'detector': 'far', 'lost': True}
     }
-    assert store3.context == {
+    assert store3._context == {
         'data': {'cycle': 1, 'detector': 'near', 'lost': True}
     }
     # static context is the same for the same level of nesting
-    assert store4.context == store1.context
+    assert store4._context == store1._context
 
 
 def test_set_template_context_split():
@@ -143,12 +132,12 @@ def test_set_template_context_split():
         split,
         store4
     )
-    assert store1.context == {'data': {'cycle': 1, 'lost': True}}
-    assert store2.context == {
+    assert store1._context == {'data': {'cycle': 1, 'lost': True}}
+    assert store2._context == {
         'data': {'cycle': 1, 'detector': 'far', 'lost': True},
         'cycle': '1',
     }
-    assert store3.context == {
+    assert store3._context == {
         'data': {'cycle': 1, 'detector': 'near', 'lost': True},
         'detector': 'maybe_near',
         # todo: maybe this is indended?..
@@ -156,4 +145,4 @@ def test_set_template_context_split():
         # 'cycle': '2_indeed',
     }
     # static context is the same for the same level of nesting
-    assert store4.context == store1.context
+    assert store4._context == store1._context
