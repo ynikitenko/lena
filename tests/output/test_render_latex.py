@@ -12,6 +12,9 @@ from lena.output.render_latex import (
 )
 from lena.context import get_recursively, update_recursively
 
+curpath = os.path.dirname(inspect.getfile(inspect.currentframe()))
+template_dir = os.path.join(curpath, "templates")
+
 
 def test_template():
     # Check that old template syntax (like {{ var }}) doesn't work. 
@@ -74,9 +77,6 @@ def test_environment():
 
 
 def test_render_latex():
-    curpath = os.path.dirname(inspect.getfile(inspect.currentframe()))
-    # may also need os.path.abspath(curpath)
-    template_dir = curpath
     renderer = RenderLaTeX("hist1.tex", template_dir)
 
     ## Template inheritance works ##
@@ -106,6 +106,16 @@ def test_render_latex():
 
     # not selected data passes unchanged
     assert list(renderer.run([("output.csv", {})])) == [("output.csv", {})]
+
+    # filters work
+    def fancy(s):
+        return "fancy({})".format(s)
+    filters = {"fancy": fancy}
+    renderf = RenderLaTeX("with_filter.tex", template_dir, filters=filters,
+                          select_data=lambda _: True)
+    data = [(0, {"val": "value"})]
+    results = list(renderf.run(data))
+    assert results[0][0] == "fancy(value)"
 
 
 def test_select_template():
@@ -143,7 +153,6 @@ def test_select_data():
 
 
 def test_verbose(capsys):
-    template_dir = os.path.dirname(inspect.getfile(inspect.currentframe()))
     renderer = RenderLaTeX("hist1.tex", template_dir)
     val = (None, {})
     # verbose=1: selected values are printed

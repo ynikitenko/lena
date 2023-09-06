@@ -3,9 +3,9 @@ from __future__ import print_function
 
 import jinja2
 
+import lena.context
 import lena.core
 import lena.flow
-import lena.context
 from lena.context import get_recursively as _get_recursively
 
 
@@ -29,9 +29,10 @@ class _Template(jinja2.Template):
     """Adapt jijna2 template to LaTeX.
 
     Working with not completely rendered environments may be a problem. 
-    For example, undefined variable's attributes are not processed correctly,
-    https://github.com/pallets/jinja/issues/811
-    New class was suggested to be written for that.
+    For example, undefined variable's attributes
+    were not processed correctly before Jinja 2.11
+    (https://github.com/pallets/jinja/issues/811)
+    ChainableUndefined (2.11) was suggested for that.
     """
 
     def __new__(cls, *args, **jkws):
@@ -80,7 +81,7 @@ class RenderLaTeX(object):
     """Create LaTeX from templates and data."""
 
     def __init__(self, select_template="", template_dir=".", select_data=None,
-                 verbose=0):
+                 filters={}, verbose=0):
         """*select_template* is a string or a callable.
         If a string, it is the name of the template to be used
         (unless *context.output.template* overwrites that).
@@ -98,10 +99,17 @@ class RenderLaTeX(object):
         It should accept a value from flow and return boolean.
         By default CSV files are selected (see :meth:`run`).
 
+        *filters* allow adding user-defined filters.
+        See jinja
+        `custom filters <https://jinja.palletsprojects.com/en/latest/api/#writing-filters>`_
+        for more details.
+
         *verbose* controls the verbosity of output.
         If it is 1, selected values are printed during :meth:`run`.
         If it is 2 or higher, not selected values are printed as well.
         """
+        # todo: verbose play role of debug, maybe rename that?
+        # See other verbose elements as well.
         if isinstance(select_template, str):
             self._select_template = lambda _: \
                 _select_template_or_default(_, default=select_template)
@@ -124,6 +132,9 @@ class RenderLaTeX(object):
             )
         self._loader = jinja2.FileSystemLoader(template_dir)
         self._environment = _Environment(loader=self._loader)
+        if filters:
+            # since we don't modify filters, a mutable kwarg is fine
+            self._environment.filters.update(filters)
         self._verbose = verbose
         # print("templates:", self._environment.list_templates())
 
@@ -152,6 +163,10 @@ class RenderLaTeX(object):
                 _update_recursively(context, {"output": {"filetype": "tex"}})
                 _update_recursively(context, {"output": {"fileext": "tex"}})
 
+                # data filename is rendered from context,
+                # e.g. item.output.filepath.
+                # data part is not used during rendering,
+                # but can be used for selection.
                 data = template.render(context)
                 yield (data, context)
             else:
