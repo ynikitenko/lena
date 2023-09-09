@@ -17,7 +17,8 @@ def raise_on_usage(clsname, modname):
 # (in classes' parents)
 try:
     # will raise if jinja2 is not installed
-    from lena.output.render_latex import RenderLaTeX  #, Template, Environment
+    from lena.output.render_latex import RenderLaTeX, jinja_syntax_latex
+    #, Template, Environment
 except ImportError:
     RenderLaTeX = raise_on_usage("RenderLaTeX", "jinja2")
 

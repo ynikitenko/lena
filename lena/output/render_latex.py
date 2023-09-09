@@ -9,18 +9,18 @@ import lena.flow
 from lena.context import get_recursively as _get_recursively
 
 
-_ljinja_env = {
-        "block_start_string": r'\BLOCK{',
-        "block_end_string": '}',
-        "variable_start_string": r'\VAR{',
-        "variable_end_string": '}',
-        "comment_start_string": r'\#{',
-        "comment_end_string": '}',
-        "line_statement_prefix": '%-',
-        "line_comment_prefix": '%#',
-        "trim_blocks": True,
-        "lstrip_blocks": True,
-        "autoescape": False,
+jinja_syntax_latex = {
+    "block_start_string": r'\BLOCK{',
+    "block_end_string": '}',
+    "variable_start_string": r'\VAR{',
+    "variable_end_string": '}',
+    "comment_start_string": r'\#{',
+    "comment_end_string": '}',
+    "line_statement_prefix": '%-',
+    "line_comment_prefix": '%#',
+    "trim_blocks": True,
+    "lstrip_blocks": True,
+    "autoescape": False,
 }
 
 
@@ -38,7 +38,9 @@ class _Template(jinja2.Template):
     def __new__(cls, *args, **jkws):
         # Jinja Template uses not __init__(), but __new__().
         kws = jkws.copy()
-        kws.update(_ljinja_env)
+        # todo: maybe remove this class,
+        # or update jinja env with kwargs here (see _Environment)
+        kws.update(jinja_syntax_latex)
         # how to efficiently merge two dicts: https://stackoverflow.com/a/26853961/952234
         # print kws
         sucls = super(_Template, cls)
@@ -49,8 +51,10 @@ class _Environment(jinja2.Environment):
     """Jinja environment."""
 
     def __init__(self, *args, **jkws):
-        kws = jkws.copy()
-        kws.update(_ljinja_env)
+        # kws = jkws.copy()
+        # kws.update(_ljinja_env)
+        kws = jinja_syntax_latex.copy()
+        kws.update(jkws)
         super(_Environment, self).__init__(*args, **kws)
         # Python 3
         # super().__init__(*args, **kws)
@@ -81,7 +85,7 @@ class RenderLaTeX(object):
     """Create LaTeX from templates and data."""
 
     def __init__(self, select_template="", template_dir=".", select_data=None,
-                 filters={}, verbose=0):
+                 environment=None, verbose=0):
         """*select_template* is a string or a callable.
         If a string, it is the name of the template to be used
         (unless *context.output.template* overwrites that).
@@ -99,10 +103,34 @@ class RenderLaTeX(object):
         It should accept a value from flow and return boolean.
         By default CSV files are selected (see :meth:`run`).
 
-        *filters* allow adding user-defined filters.
-        See jinja
-        `custom filters <https://jinja.palletsprojects.com/en/latest/api/#writing-filters>`_
-        for more details.
+        *environment* allows user-defined initialisation of
+        jinja Environment. One can use that to add custom
+        `filters <https://jinja.palletsprojects.com/en/latest/api/#writing-filters>`_,
+        tests, global functions, etc.
+        In that case one must set *template_dir*
+        for that environment manually. Example user initialisation:
+
+        .. code-block:: python
+
+            import jinja2
+            from lena.output import RenderLaTeX, jinja_syntax_latex
+
+            # import user settings, filters and globals
+
+
+            def render_latex():
+                \"\"\"Construct RenderLaTeX to be used in analysis sequences.\"\"\"
+                loader = jinja2.FileSystemLoader(TEMPLATE_PATH)
+                environment = jinja2.Environment(
+                    loader=loader,
+                    **jinja_syntax_latex
+                )
+                environment.filters.update(FILTERS)
+                environment.globals.update(GLOBALS)
+                return RenderLaTeX(
+                    select_template=select_template,
+                    environment=environment
+                )
 
         *verbose* controls the verbosity of output.
         If it is 1, selected values are printed during :meth:`run`.
@@ -130,13 +158,18 @@ class RenderLaTeX(object):
                 "select_template must be a string or a callable, "
                 "{} provided".format(select_template)
             )
-        self._loader = jinja2.FileSystemLoader(template_dir)
-        self._environment = _Environment(loader=self._loader)
-        if filters:
-            # since we don't modify filters, a mutable kwarg is fine
-            self._environment.filters.update(filters)
+        if environment is None:
+            loader = jinja2.FileSystemLoader(template_dir)
+            self._environment = _Environment(loader=loader)
+        else:
+            if template_dir != '.':
+                raise lena.core.LenaValueError(
+                    "only one of template_dir or environment "
+                    "must be provided, not both"
+                )
+            self._environment = environment
+
         self._verbose = verbose
-        # print("templates:", self._environment.list_templates())
 
     def run(self, flow):
         """Render values from *flow* to LaTeX.

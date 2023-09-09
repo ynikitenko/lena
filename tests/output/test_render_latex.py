@@ -8,7 +8,8 @@ import sys
 
 import lena
 from lena.output.render_latex import (
-    RenderLaTeX, _Template, _Environment, _select_template_or_default
+    RenderLaTeX, jinja_syntax_latex,
+    _Template, _Environment, _select_template_or_default,
 )
 from lena.context import get_recursively, update_recursively
 
@@ -107,11 +108,22 @@ def test_render_latex():
     # not selected data passes unchanged
     assert list(renderer.run([("output.csv", {})])) == [("output.csv", {})]
 
-    # filters work
+
+def test_custom_environment():
+    # custom environment works in RenderLaTeX
     def fancy(s):
         return "fancy({})".format(s)
     filters = {"fancy": fancy}
-    renderf = RenderLaTeX("with_filter.tex", template_dir, filters=filters,
+
+    loader = jinja2.FileSystemLoader(template_dir)
+    environment = jinja2.Environment(
+        loader=loader,
+        **jinja_syntax_latex
+    )
+    environment.filters.update(filters)
+
+    renderf = RenderLaTeX("with_filter.tex",
+                          environment=environment,
                           select_data=lambda _: True)
     data = [(0, {"val": "value"})]
     results = list(renderf.run(data))
