@@ -12,7 +12,8 @@ else:
 import lena.context
 import lena.core
 from lena.core import (
-    LenaTypeError, LenaRuntimeError, LenaZeroDivisionError, LenaValueError
+    LenaTypeError, LenaRuntimeError, LenaZeroDivisionError, LenaValueError,
+    is_fill_compute_el
 )
 import lena.flow
 
@@ -255,96 +256,48 @@ class Sum(object):
 class Vectorize(object):
     """Apply an algorithm to a vector component-wise."""
 
-    def __init__(self, seq, construct=None, dim=-1):
-        """*seq* is converted to a :class:`.FillComputeSeq`.
+    def __init__(self, seq, dim=-1, construct=None):
+        """*seq* must be a *FillCompute* element or sequence.
 
-        Return type during :meth:`compute` will be know from the first
-        filled element.
-        *construct* is needed in case the flow was empty.
-        It will provide the needed dimension and data type.
-        However, often an object constructor can allow
-        an arbitrary dimension (like ``tuple``).
-        In that case, provide *dim*.
+        *dim* is the dimension of the input data
+        (and of the constructed structure).
+        *seq* may also be a list of sequences, in that case
+        *dim* may be omitted.
 
-        *seq* can be a list of :class:`.FillComputeSeq`-s.
-        In that case dimension should not be provided.
+        *construct* allows one to create an arbitrary object
+        (by default the resulting values are tuples of dimension *dim*).
         """
-        default_dim = -1
-        # todo: if needed, a list *seq* could mean
-        # a list of sequences of the needed dimension.
+        # Vectorize should be a rigid element
+        # (we don't change its dimension easily),
+        # therefore its dimension is set during initialisation.
+        # if isinstance(seq, list):
         if isinstance(seq, list):
-            # Vectorize should be a rigid element
-            # (we don't change its dimension easily),
-            # but list is associated with parellelism in Lena
-            # seq must consist of FillComputeSeq-s,
-            # we don't init them automatically here
-            self._seqs = seq
-            assert dim == default_dim
-            dim = len(seq)
-            self.fill = self._fill_others
-        else:
-            try:
-                self._seq = lena.core.FillComputeSeq(seq)
-            except TypeError:
-                raise lena.core.LenaTypeError(
-                    "seq must be convertible to FillComputeSeq"
+            if dim != -1:
+                raise LenaTypeError(
+                    "no dimension should be provided with a list"
                 )
-            if dim == default_dim:
-                pass
-                # self.fill = self._fill_first
-            else:
-                self._seqs = [self._seq]
-                self._seqs.extend([copy.deepcopy(self._seq) for _ in range(dim-1)])
-                # self.fill = self._fill_others
+            self._seqs = seq
+        else:
+            if dim == -1:
+                raise LenaTypeError(
+                    "dim must be provided with a sequence"
+                )
+            if not is_fill_compute_el(seq):
+                raise lena.core.LenaTypeError(
+                    "seq must be a FillCompute element or sequence"
+                )
+            self._seqs = [seq]
+            self._seqs.extend([copy.deepcopy(seq) for _ in range(dim-1)])
 
-        ## No need to get dim from here. Explicit dim would never hurt.
-        # if dim == default_dim and construct is not None:
-        #     try:
-        #         _tmp = construct()
-        #         dim = len(_tmp)
-        #     except TypeError:
-        #         # we have a chance to get data dimension from flow
-        #         pass
-
-
+        # todo: get rid of construct,
+        # a separate Lena element may be better.
         self._construct = construct
-        self._dim = dim
+        self._dim = len(self._seqs)
         self._cur_context = {}
         self._filled_once = False
     
     def fill(self, val):
         """Fill sequences for each component of the data vector."""
-        # this may be not efficient, but I could not change the method runtime
-        if self._filled_once:
-            self._fill_others(val)
-        else:
-            self._fill_first(val)
-
-    def _fill_first(self, val):
-        # fill the first element. Will learn data type from that,
-        # its dimension and organise sequences.
-        data, context = lena.flow.get_data_context(val)
-        try:
-            dim = len(data)
-        except TypeError:
-            raise LenaValueError(
-                "no way to find out data dimension. "
-                "type of the data does not support len"
-            )
-
-        if self._construct is None:
-            self._construct = type(data)
-            # will be used like _construct(*result),
-            # that is data.__init__ must support such arguments.
-
-        self._seqs = [self._seq]
-        self._seqs.extend([copy.deepcopy(self._seq) for _ in range(dim-1)])
-        # doesn't work. _fill_first is always called (then _fill_others below)
-        self.fill = self._fill_others
-        self._fill_others(val)
-        self._filled_once = True
-
-    def _fill_others(self, val):
         data, context = lena.flow.get_data_context(val)
         for ind, seq in enumerate(self._seqs):
             # can raise if data is not of a sufficient length

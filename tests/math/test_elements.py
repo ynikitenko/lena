@@ -141,14 +141,7 @@ def test_vectorize_init():
     ## init works ##
     # not FillCompute sequence raises
     with pytest.raises(lena.core.LenaTypeError):
-        Vectorize(lambda x: x)
-
-    # construct works
-    vi1 = Vectorize(Sum(), construct=lambda _: vector3)
-    # when we can't find dimension without flow,
-    # LenaRuntimeError is raised.
-    with pytest.raises(LenaRuntimeError):
-        assert list(vi1.compute())
+        Vectorize(lambda x: x, dim=1)
 
     # construct with dim work
     vi2 = Vectorize(Sum(), construct=vector3, dim=3)
@@ -161,15 +154,15 @@ def test_vectorize_init():
 
     data = [vector3(1, 1, 1), vector3(1, 2, 3)]
 
-    v1 = Vectorize(Sum())
+    v1 = Vectorize(Sum(), dim=3)
     # todo: use inspect.isclass to forbid this:
     # v1 = Vectorize(Sum)
     for val in data:
         v1.fill(val)
-    assert list(v1.compute()) == [vector3(2, 3, 4)]
+    assert list(v1.compute()) == [(2, 3, 4)]
     context = {"context": True}
     v1.fill((vector3(0, 0, 0), context))
-    assert list(v1.compute()) == [(vector3(2, 3, 4), context)]
+    assert list(v1.compute()) == [((2, 3, 4), context)]
 
 
 @given(
@@ -178,17 +171,11 @@ def test_vectorize_init():
         min_size=1,
     )
 )
-@pytest.mark.parametrize("from_seq", [True, False])
-def test_vectorize_hypothesis(from_seq, data):
+def test_vectorize_hypothesis(data):
     # Vectorize doesn't mess with its input data.
     # If we filled values, they will be properly handled
     # by the nested sequence.
-    if from_seq:
-        # initializing each sequence explicitly
-        v = Vectorize([StoreFilled() for _ in range(3)])
-    else:
-        # copied automatically when getting dimension from data
-        v = Vectorize(StoreFilled())
+    v = Vectorize(StoreFilled(), dim=3)
 
     for val in data:
         v.fill(val)
