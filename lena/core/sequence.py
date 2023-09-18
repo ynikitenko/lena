@@ -1,13 +1,13 @@
 """Sequence class."""
 import sys
 
-from . import lena_sequence
+from .lena_sequence import LenaSequence
 from . import adapters
 from . import exceptions
 from . import functions
 
 
-class Sequence(lena_sequence.LenaSequence):
+class Sequence(LenaSequence):
     """Sequence of elements, such that next takes input
     from the previous during *run*.
 
@@ -33,8 +33,9 @@ class Sequence(lena_sequence.LenaSequence):
 
         seq = []
 
-        # todo: we could change self._seq in place
-        for el in self._seq:
+        # todo: we could change self._seq in place,
+        # check performance (replacement + index access)
+        for el in self._data_seq:
             if hasattr(el, "run") and callable(el.run):
                 seq.append(el)
             else:
@@ -51,7 +52,7 @@ class Sequence(lena_sequence.LenaSequence):
                 else:
                     seq.append(run_el)
 
-        self._seq = seq
+        self._data_seq = seq
 
     def run(self, flow):
         """Generator that transforms the incoming flow.
@@ -66,7 +67,7 @@ class Sequence(lena_sequence.LenaSequence):
         """
         flow = functions.flow_to_iter(flow)
 
-        for el in self._seq:
+        for el in self._data_seq:
             flow = el.run(flow)
 
         flow = functions.flow_to_iter(flow)

@@ -42,7 +42,7 @@ class LenaSequence(object):
         from lena.context import update_recursively
         # todo: this doesn't require jinja2,
         # but we may want it to support template strings soon
-        self._full_seq = args
+        self._seq = args
         seq = []
 
         # for static (sequence initialisation time) context
@@ -95,16 +95,16 @@ class LenaSequence(object):
         self._unknown_contexts = unknown_contexts
         self._need_context = need_context
 
-        self._seq = seq
+        self._data_seq = seq
 
     def __iter__(self):
-        return self._full_seq.__iter__()
+        return self._seq.__iter__()
 
     def __len__(self):
-        return self._full_seq.__len__()
+        return self._seq.__len__()
 
     def __getitem__(self, ind):
-        return self._full_seq[ind]
+        return self._seq[ind]
 
     def _repr_nested(self, base_indent="", indent=" "*4, el_separ=",\n"):
         # to get a one-line representation, use el_separ=", ", indent=""
@@ -117,9 +117,9 @@ class LenaSequence(object):
 
         elems = el_separ.join((repr_maybe_nested(el, base_indent=base_indent,
                                                  indent=indent)
-                               for el in self._full_seq))
+                               for el in self._seq))
 
-        if "\n" in el_separ and self._full_seq:
+        if "\n" in el_separ and self._seq:
             # maybe new line
             mnl = "\n"
             # maybe base indent

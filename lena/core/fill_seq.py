@@ -1,6 +1,6 @@
 """FillSeq sequence and its helpers."""
 
-from . import lena_sequence
+from .lena_sequence import LenaSequence
 from . import adapters
 from . import exceptions
 
@@ -20,7 +20,7 @@ class _Fill(object):
         self._fill_into_el.fill_into(self._fill_el, value)
 
 
-class FillSeq(lena_sequence.LenaSequence):
+class FillSeq(LenaSequence):
     """Sequence with :meth:`fill` method.
 
     Sequence of :class:`.FillInto` elements,
@@ -50,7 +50,7 @@ class FillSeq(lena_sequence.LenaSequence):
         super(FillSeq, self).__init__(*args)
 
         seq = []
-        last = self._seq[-1]
+        last = self._data_seq[-1]
 
         if not callable(getattr(last, "fill", None)):
             raise exceptions.LenaTypeError(
@@ -58,7 +58,7 @@ class FillSeq(lena_sequence.LenaSequence):
                 "{} given".format(last)
             )
         # convert all elements except last to FillInto (if needed)
-        for el in self._seq[:-1]:
+        for el in self._data_seq[:-1]:
             if hasattr(el, "fill_into") and callable(el.fill_into):
                 seq.append(el)
             else:
@@ -78,11 +78,11 @@ class FillSeq(lena_sequence.LenaSequence):
         fill_el = last
         for el in reversed(seq[:-1]):
             fill_el = _Fill(el, fill_el)
-        # note that self._seq consists of original FillInto elements.
+        # note that self._data_seq consists of original FillInto elements.
         self._fill_el = fill_el
         # self for these methods is different
         self.fill = fill_el.fill
-        self._seq = seq
+        self._data_seq = seq
 
     def fill(self, value):
         """Fill *value* into an *element*.

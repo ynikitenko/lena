@@ -1,10 +1,6 @@
-from __future__ import print_function
-
 import pytest
 
-import lena.core 
-from lena.core import Sequence, Source
-from lena.core import FillSeq, FillInto
+from lena.core import Sequence, Source, FillSeq, FillInto
 from tests.examples.fill import StoreFilled
 from tests.examples.numeric import Add
 
@@ -17,7 +13,10 @@ def test_lena_sequence_fill():
     assert len(s1) == 1
     assert len(s2) == 2
     # can get item
-    assert isinstance(s2._seq[0], FillInto)
+    # data_seq wraps an element in an adapter
+    assert isinstance(s2._data_seq[0], FillInto)
+    # original sequence stores the element as it was
+    assert isinstance(s2._seq[0], Add)
     # deletion is prohibited
     with pytest.raises(TypeError):
         del s2[0]

@@ -74,7 +74,7 @@ class FillRequestSeq(lena_sequence.LenaSequence):
         # fr = adapters.FillRequest(self, reset=reset, bufsize=self._bufsize)
         self.run = fr.run
         # todo: we will abandon FillRequestSeq in the next release
-        super(FillRequestSeq, self).__init__(*self._seq)
+        super(FillRequestSeq, self).__init__(*self._data_seq)
 
     def fill(self, value):
         """Fill *self* with *value*.

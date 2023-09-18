@@ -1,13 +1,13 @@
 """Source sequence."""
 from __future__ import print_function
 
-from . import lena_sequence
-from . import sequence
-from . import exceptions
-from . import functions
+from .lena_sequence import LenaSequence
+from .sequence import Sequence
+from .exceptions import LenaTypeError
+from .functions import flow_to_iter
 
 
-class Source(lena_sequence.LenaSequence):
+class Source(LenaSequence):
     """Sequence with no input flow."""
 
     def __init__(self, *args):
@@ -31,33 +31,33 @@ class Source(lena_sequence.LenaSequence):
         use :class:`Sequence`.
         """
         if not args:
-            raise exceptions.LenaTypeError(
+            raise LenaTypeError(
                 "Source must be initialized with 1 argument or more (0 given)"
             )
 
         self._name = "Source"  # for repr
         super(Source, self).__init__(*args)
 
-        first = self._seq[0]
+        first = self._data_seq[0]
         if not callable(first):
-            raise exceptions.LenaTypeError(
+            raise LenaTypeError(
                 "first element {} ".format(first)
                 + "must be callable"
             )
         self._first = first
 
         if len(args) > 1:
-            self._sequence = sequence.Sequence(*(self._seq[1:]))
+            self._tail = Sequence(*(self._data_seq[1:]))
         else:
-            self._sequence = ()
+            self._tail = ()
 
     def __call__(self):
         """Generate flow."""
         flow = self._first()
-        if self._sequence:
-            return self._sequence.run(flow)
+        if self._tail:
+            return self._tail.run(flow)
         else:
-            return functions.flow_to_iter(flow)
+            return flow_to_iter(flow)
 
     def __eq__(self, other):
         if not isinstance(other, Source):

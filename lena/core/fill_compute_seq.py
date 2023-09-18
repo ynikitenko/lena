@@ -3,7 +3,7 @@
 from . import lena_sequence
 from . import sequence
 from . import adapters
-from . import fill_seq
+from .fill_seq import FillSeq
 from . import exceptions
 from . import check_sequence_type
 
@@ -38,7 +38,7 @@ def _init_sequence_with_el(self, args, el_attr, check_el_type,
     # for syntactical reasons; otherwise (*before, el) is impossible
     before.append(el)
     try:
-        before_seq = fill_seq.FillSeq(*before)
+        before_seq = FillSeq(*before)
     except exceptions.LenaTypeError as err:
         raise err
     self._fill_seq = before_seq
@@ -46,11 +46,11 @@ def _init_sequence_with_el(self, args, el_attr, check_el_type,
     # to do: add exception handling here.
     self._after = sequence.Sequence(*after)
 
-    # _seq is an attribute of LenaSequence
-    self._seq = []
-    self._seq.extend(self._fill_seq)
-    # self._seq.append(el)
-    self._seq.extend(self._after)
+    # data_seq is an attribute of LenaSequence
+    self._data_seq = []
+    self._data_seq.extend(self._fill_seq)
+    # self._data_seq.append(el)
+    self._data_seq.extend(self._after)
 
 
 class FillComputeSeq(lena_sequence.LenaSequence):
@@ -81,7 +81,7 @@ class FillComputeSeq(lena_sequence.LenaSequence):
         """
         self._name = "FillComputeSeq"
         super(FillComputeSeq, self).__init__(*args)
-        seq = self._seq
+        seq = self._data_seq
 
         before = []
         fc_el = None
@@ -106,7 +106,7 @@ class FillComputeSeq(lena_sequence.LenaSequence):
 
         before.append(fc_el)
         try:
-            before_seq = fill_seq.FillSeq(*before)
+            before_seq = FillSeq(*before)
         except exceptions.LenaTypeError as err:
             raise err
         self._fill_seq = before_seq
