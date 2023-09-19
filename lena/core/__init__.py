@@ -19,7 +19,7 @@ from .source import Source
 from .fill_compute_seq import FillComputeSeq
 from .fill_seq import FillSeq
 from .fill_request_seq import FillRequestSeq
-from .split import Split
+from .split import Split, LenaSplit
 from .meta import alter_sequence, flatten
 from .check_sequence_type import (
     is_source,
@@ -31,7 +31,7 @@ from .check_sequence_type import (
 
 __all__ = [
     'Call', 'FillCompute', 'FillInto', 'FillRequest', 'Run', 'SourceEl',
-    'LenaSequence', 'Sequence', 'Source', 'Split',
+    'LenaSequence', 'Sequence', 'Source', 'Split', 'LenaSplit',
     'FillSeq',
     'FillComputeSeq', 'FillRequestSeq',
     'LenaException',
