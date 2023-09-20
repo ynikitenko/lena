@@ -165,7 +165,7 @@ class LenaSplit(object):
             mnl = ""
             mbi = ""
         # diff here in name and brackets
-        return "".join([base_indent, "Split",
+        return "".join([base_indent, self._name,
                         "([", mnl, elems, mnl, mbi, "])"])
 
     def _get_context(self):
@@ -272,6 +272,7 @@ class Split(LenaSplit):
                     "or None, {} provided".format(bufsize)
                 )
         self._bufsize = bufsize
+        self._name = "Split"
 
         super(Split, self).__init__(new_seqs)
 

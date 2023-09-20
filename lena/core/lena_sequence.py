@@ -130,6 +130,11 @@ class LenaSequence(object):
         return "".join([base_indent, self._name,
                         "(", mnl, elems, mnl, mbi, ")"])
 
+    def __eq__(self, other):
+        if not isinstance(other, LenaSequence):
+            return NotImplemented
+        return self._seq == other._seq
+
     def __repr__(self):
         # maybe: make a compact representation with repr
         # and nested with str
