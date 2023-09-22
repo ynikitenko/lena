@@ -1,6 +1,6 @@
 import pytest
 
-import lena.core
+from lena.core import LenaTypeError, LenaValueError
 from lena.flow import GroupBy
 
 
@@ -21,7 +21,7 @@ def test_group_by():
     assert len(g0.groups) == 0
 
     ## wrong initialization parameter raises
-    with pytest.raises(lena.core.LenaTypeError):
+    with pytest.raises(LenaTypeError):
         GroupBy(1)
 
     ## context string works
@@ -48,7 +48,7 @@ def test_group_by():
     )
 
     # missing context raises
-    with pytest.raises(lena.core.LenaValueError):
+    with pytest.raises(LenaValueError):
         GroupBy("{{non_existent}}").update(data2)
 
     # several subcontexts work
@@ -61,3 +61,17 @@ def test_group_by():
               'variable': {'name': 'mean'}})
         ]
     }
+
+    # tuple works
+    g3 = GroupBy(("{{value.variable.name}}", "{{variable.name}}"))
+    assert g3._group_by(data2) == ('x', 'mean')
+    assert g3._group_by((None, {"variable": {"name": "mean"}})) == ('', 'mean')
+    # all empty keys raise
+    with pytest.raises(LenaValueError) as err:
+        g3._group_by(data1)
+    assert "no key found" in str(err.value)
+
+    # equality testing works
+    g4 = GroupBy(("{{value.variable.name}}", "{{variable.name}}"))
+    assert g4 == g3
+    assert g4 != g2
