@@ -85,7 +85,7 @@ class RenderLaTeX(object):
     """Create LaTeX from templates and data."""
 
     def __init__(self, select_template="", template_dir=".", select_data=None,
-                 environment=None, verbose=0):
+                 environment=None, from_data=False, verbose=0):
         """*select_template* is a string or a callable.
         If a string, it is the name of the template to be used
         (unless *context.output.template* overwrites that).
@@ -132,6 +132,11 @@ class RenderLaTeX(object):
                     environment=environment
                 )
 
+        Usually template context is stored in the context part
+        of values. Sometimes, however, the data part contains
+        the needed information (for example, during creation of tables).
+        Set *from_data* to ``True`` to render the data part.
+
         *verbose* controls the verbosity of output.
         If it is 1, selected values are printed during :meth:`run`.
         If it is 2 or higher, not selected values are printed as well.
@@ -169,6 +174,10 @@ class RenderLaTeX(object):
                 )
             self._environment = environment
 
+        # this could be useful, but it can be done
+        # simply by nesting context in the flow.
+        # self._context_name = context_name
+        self._from_data = from_data
         self._verbose = verbose
 
     def run(self, flow):
@@ -193,6 +202,10 @@ class RenderLaTeX(object):
                     print("# RenderLaTeX: selected", val)
                 template = self._environment.get_template(self._select_template(val))
                 context = lena.flow.get_context(val)
+                if not self._from_data:
+                    render_context = context
+                else:
+                    render_context = lena.flow.get_data(val)
                 _update_recursively(context, {"output": {"filetype": "tex"}})
                 _update_recursively(context, {"output": {"fileext": "tex"}})
 
@@ -200,7 +213,10 @@ class RenderLaTeX(object):
                 # e.g. item.output.filepath.
                 # data part is not used during rendering,
                 # but can be used for selection.
-                data = template.render(context)
+                # if not self._context_name:
+                data = template.render(render_context)
+                # else:
+                #     data = template.render({self._context_name: render_context})
                 yield (data, context)
             else:
                 if verbose >= 2:
