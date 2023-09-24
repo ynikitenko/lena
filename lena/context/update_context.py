@@ -100,6 +100,7 @@ class UpdateContext():
             raise lena.core.LenaValueError(
                 "subcontext must be non-empty"
             )
+        self._init_subcontext = subcontext
         self._subcontext = lena.context.str_to_list(subcontext)
 
         self._has_default = default is not _sentinel
@@ -150,9 +151,12 @@ class UpdateContext():
                     )
                 else:
                     # ChainableUndefined appeared in jinja2 2.11.0
-                    self._update = jinja2.Template(
-                        update, undefined=jinja2.ChainableUndefined
-                    )
+                    if '{' in update:
+                        self._update = jinja2.Template(
+                            update, undefined=jinja2.ChainableUndefined
+                        )
+                    else:
+                        self._update = update
             except jinja2.exceptions.TemplateSyntaxError as err:
                 raise lena.core.LenaValueError(
                     "template syntax error, {}".format(err.message)
@@ -197,7 +201,10 @@ class UpdateContext():
             else:
                 # context format update
                 try:
-                    update = self._update.render(context)
+                    if isinstance(self._update, str):
+                        update = self._update
+                    else:
+                        update = self._update.render(context)
                 except jinja2.exceptions.UndefinedError as err:
                     if self._raise_on_missing:
                         raise lena.core.LenaKeyError(
@@ -223,3 +230,38 @@ class UpdateContext():
         else:
             subdict[keys[-1]] = update
         return (data, context)
+
+    def __eq__(self, other):
+        if not isinstance(other, UpdateContext):
+            return NotImplemented
+        if self._has_default != other._has_default:
+            return False
+        if self._has_default:
+            # we don't compare sentinels,
+            # which hypothetically could be different
+            if self._default != other._default:
+                return False
+        return (
+            self._init_subcontext == other._init_subcontext and
+            self._update == other._update and
+            self._value == other._value and
+            self._skip_on_missing == other._skip_on_missing and
+            self._raise_on_missing == other._raise_on_missing and
+            self._recursively == other._recursively
+        )
+
+    def __repr__(self):
+        args = ['UpdateContext("{}"'.format(self._init_subcontext)]
+        if isinstance(self._update, str):
+            args.append('"{}"'.format(self._update))
+        else:
+            args.append(str(self._update))
+        if self._value:
+            args += "value={}".format(self._value)
+        if self._skip_on_missing:
+            args += "skip_on_missing={}".format(self._skip_on_missing)
+        if self._raise_on_missing:
+            args += "raise_on_missing={}".format(self._raise_on_missing)
+        if not self._recursively:
+            args += "recursively={}".format(self._recursively)
+        return ", ".join(args) + ")"

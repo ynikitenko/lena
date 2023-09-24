@@ -34,6 +34,13 @@ def test_update_context_update_not_str():
     # update can be not a dict or a string
     uc13 = UpdateContext("data", 0)
 
+    # representation works
+    assert repr(uc13) == 'UpdateContext("data", 0)'
+
+    # equality testing works
+    assert uc13 == UpdateContext("data", 0)
+    assert uc13 != UpdateContext("data", 1)
+
     # for simple value default, skip_on_missing and raise_on_missing
     # can't be set
     with pytest.raises(LenaValueError):
