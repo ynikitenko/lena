@@ -95,6 +95,16 @@ def test_map_group():
     with pytest.raises(lena.core.LenaRuntimeError):
         assert list(mg4.run([([1, 2], {"group": [{}, {}]})]))
 
+    class RunBadly():
+
+        def run(self, flow):
+            if False:
+                yield "smth"
+
+    mg5 = MapGroup(RunBadly())
+    with pytest.warns(RuntimeWarning):
+        assert list(mg5.run([grp2])) == []
+
 
 def test_group_plots():
     data = [1, 2]
@@ -138,7 +148,6 @@ def test_GroupPlots():
     gp = GroupPlots(tp, lambda _: True, transform=(), yield_selected=False)
     # groups are yielded in arbitrary order (because they are in a dict)
     results = list(gp.run(data))
-    print(results)
     expected_results = [
         (
             [

@@ -63,9 +63,46 @@ Example from a real analysis:
 """
 
 import copy
+import warnings
 
 import lena.core
 import lena.flow
+
+
+# group common context transform should update value context
+def _update_with_group(context, new_grp_context, old_inter_context):
+    # can context.output.changed be any different value?
+    context_changed = lena.context.get_recursively(
+        context, "output.changed", None
+    )
+    # copied from GroupPlots
+    all_changed = set(
+        (lena.context.get_recursively(c, "output.changed", None)
+             for c in new_grp_context)
+    )
+    all_changed.add(context_changed)
+    if any(all_changed):
+        changed = True
+    elif False in all_changed:
+        # at least one is not changed
+        # (this is known, not None)
+        changed = False
+    else:
+        changed = None
+    # output.changed is unlikely in the intersection,
+    # but it will work if so.
+    if changed is not None:
+        lena.context.update_recursively(
+            context, "output.changed", changed
+        )
+
+    new_inter_context = lena.context.intersection(*new_grp_context)
+    context_update = lena.context.difference(new_inter_context,
+                                             old_inter_context)
+    # hopefully there is no "group" in these context intersection.
+    lena.context.update_recursively(context,
+                                    copy.deepcopy(context_update))
+    context["group"] = new_grp_context
 
 
 class MapGroup(object):
@@ -122,11 +159,10 @@ class MapGroup(object):
             if "group" not in context or not hasattr(data, "__iter__"):
                 if not self._map_scalars:
                     yield val
-                    continue
-
-                # process scalars
-                for res in self._seq.run([val]):
-                    yield res
+                else:
+                    # process scalars
+                    for res in self._seq.run([val]):
+                        yield res
                 continue
 
             if len(data) != len(context["group"]):
@@ -139,8 +175,8 @@ class MapGroup(object):
 
             # apply seq to each value from group
             new_vals = []
-            for i in range(len(data)):
-                res_i = list(self._seq.run([(data[i], context["group"][i])]))
+            for i, dt in enumerate(data):
+                res_i = list(self._seq.run([(dt, context["group"][i])]))
                 new_vals.append(res_i)
 
             # check that new values have same length
@@ -160,48 +196,21 @@ class MapGroup(object):
                 new_group_context = [get_context(val[i]) for val in new_vals]
                 results.append((new_data, new_group_context))
 
-            # group common context transform should update value context
-            def update_with_group(context, new_grp_context, old_inter_context):
-                # can context.output.changed be any different value?
-                context_changed = lena.context.get_recursively(
-                    context, "output.changed", None
-                )
-                # copied from GroupPlots
-                all_changed = set(
-                    (lena.context.get_recursively(c, "output.changed", None)
-                         for c in new_grp_context)
-                )
-                all_changed.add(context_changed)
-                if any(all_changed):
-                    changed = True
-                elif False in all_changed:
-                    # at least one is not changed
-                    # (this is known, not None)
-                    changed = False
-                else:
-                    changed = None
-                # output.changed is unlikely in the intersection,
-                # but it will work if so.
-                if changed is not None:
-                    lena.context.update_recursively(
-                        context, "output.changed", changed
-                    )
-
-                new_inter_context = lena.context.intersection(*new_grp_context)
-                context_update = lena.context.difference(new_inter_context,
-                                                         old_inter_context)
-                # hopefully there is no "group" in these context intersection.
-                lena.context.update_recursively(context,
-                                                copy.deepcopy(context_update))
-                context["group"] = new_grp_context
-
             for new_val in results[:-1]:
                 newc = copy.deepcopy(context)
-                update_with_group(newc, new_val[1], old_inter_context)
+                _update_with_group(newc, new_val[1], old_inter_context)
                 yield (new_val[0], newc)
 
+            if not results:
+                warnings.warn(
+                    "empty results produced in MapGroup({}) for {}"\
+                     .format(self._seq, context),
+                    RuntimeWarning, stacklevel=2
+                )
+                continue
+
             # save one deep copy if there is only one resulting value
-            update_with_group(context, results[-1][1], old_inter_context)
+            _update_with_group(context, results[-1][1], old_inter_context)
             yield (results[-1][0], context)
 
 
