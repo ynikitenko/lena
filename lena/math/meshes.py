@@ -1,4 +1,5 @@
 """mesh, md_map, flatten work with multidimensional data."""
+from lena.core import LenaTypeError
 from itertools import count, islice
 
 
@@ -30,17 +31,18 @@ def flatten(array):
             yield el
 
 
-def md_map(f, array):
+def md_map(f, *arrays):
     """Multidimensional map.
 
     Return function *f* mapped to contents
-    of a multidimensional *array*.
+    of multidimensional *arrays*.
     *f* is a function of one argument.
 
-    *Array* must be a list of (possibly nested) lists.
+    An item of *arrays* must be a list of (possibly nested) lists.
     Its contents remain unchanged.
-    Returned array has same dimensions as the initial one.
-    If *array* is not a list, :exc:`.LenaTypeError`
+    Returned array has same dimensions as those of the initial ones
+    (they are all assumed equal).
+    If any of *arrays* is not a list, :exc:`.LenaTypeError`
     is raised.
 
     >>> from lena.math import md_map
@@ -50,13 +52,16 @@ def md_map(f, array):
     >>> arr = [[0, -1], [2, 3]]
     >>> md_map(abs, arr)
     [[0, 1], [2, 3]]
+    >>> # multiple arrays
+    >>> md_map(lambda x, y: x+y, [0, 1], [2, 3])
+    [2, 4]
     """
     # multidimensional map with iterables is pretty useless,
     # because it iterables can be used in a simple 1-dimensional map.
     # All containers must be materialized.
 
     # This idea abandoned, because Lena vector3 has len.
-    # if hasattr(arr_0, '__len__'):
+    # if hasattr(arr0, '__len__'):
     ## numpy.array has length, but not always:
     ## >>> len(numpy.array(0))
     ## Traceback (most recent call last):
@@ -69,26 +74,37 @@ def md_map(f, array):
     ## we don't check for those types explicitly.
     ## Python complex numbers don't have len, fortunately.
 
-    if not isinstance(array, list):
-        raise lena.core.LenaTypeError(
-            "array must be a list, {} provided".format(array)
-        )
-    # If *array* was empty, empty list is returned.
-    # In this implementation we explicitly check that array is a list.
-    ## We don't check for exception here, because it will be raised
-    ## in case of any problems, and it will be simple to understand.
-    if not len(array):
-        return []
+    for array in arrays:
+        if not isinstance(array, list):
+            raise LenaTypeError(
+                "array must be a list, {} provided".format(array)
+            )
+        # If *array* was empty, empty list is returned.
+        # In this implementation we explicitly check that array is a list.
+        ## We don't check for exception here, because it will be raised
+        ## in case of any problems, and it will be simple to understand.
+        if not len(array):
+            # we assume that all other arrays are empty as well.
+            # we assume that f is a scalar function here.
+            return []
+            # for a vector function. Not implemented.
+            # return [[]] * len(arrays)
 
-    arr_0 = array[0]
+    arr0 = arrays[0][0]
     # Tuples can be (data, context) pairs,
-    # they should not be expanded in MapBins
-    # if isinstance(arr_0, (list, tuple)):
-    if isinstance(arr_0, list):
-        return [md_map(f, ar) for ar in array]
+    # therefore they should not be expanded in MapBins.
+    # if isinstance(arr0, (list, tuple)):
+    if isinstance(arr0, list):
+        tuples = [[arr[i] for arr in arrays] for i in range(len(arrays[0]))]
+        return [md_map(f, *tup) for tup in tuples]
     else:
-        # return list(map(f, array))
-        return [f(val) for val in array]
+        if len(arrays) == 1:
+            return [f(val) for val in arrays[0]]
+            # otherwise get unknown problems with generators,
+            # tests fail for test_split_into_bins.py:
+            # return list(map(f, *arrays))
+        tuples = [[arr[i] for arr in arrays] for i in range(len(arrays[0]))]
+        return [f(*tup) for tup in tuples]
 
 
 def mesh(ranges, nbins):

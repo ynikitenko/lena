@@ -16,7 +16,37 @@ from __future__ import print_function
 
 import pytest
 
-from lena.math import refine_mesh, mesh
+from lena.math import md_map, mesh, refine_mesh
+
+from tests.examples.fill_compute import Count
+
+
+def test_md_map():
+    # one array works
+    arr0 = [0, 1]
+    add_one = lambda x: x + 1
+    assert md_map(add_one, arr0) == [1, 2]
+
+    # two arrays work
+    arr1 = [0, 1]
+    sum_two = lambda a, b: a + b
+    assert md_map(sum_two, arr0, arr1) == [0, 2]
+
+    # one nested array works
+    assert md_map(add_one, [arr0]) == [[1, 2]]
+
+    # two nested arrays work
+    assert md_map(sum_two, [arr0], [arr1]) == [[0, 2]]
+
+    # generators work
+    arr2 = [Count(), Count()]
+    arr2[1].fill(1)
+    seq_map = lambda cell: list(cell.compute())[0]
+    assert md_map(seq_map, arr2) == [0, 1]
+
+    # example from doctest
+    arr3 = [[0, -1], [2, 3]]
+    assert md_map(abs, arr3) == [[0, 1], [2, 3]]
 
 
 def test_refine_mesh():
