@@ -1,10 +1,12 @@
 """Histogram structure *histogram* and element *Histogram*."""
 import copy
+from operator import add
 
 import lena.context
-import lena.core
+from lena.core import LenaValueError, LenaTypeError
 import lena.flow
 import lena.math
+from lena.math import md_map
 from . import hist_functions as hf
 
 
@@ -124,7 +126,7 @@ class histogram():
             # We can't make scale for an arbitrary histogram,
             # because it may contain compound values.
             # self._scale = self.make_scale()
-            wrong_bins_error = lena.core.LenaValueError(
+            wrong_bins_error = LenaValueError(
                 "bins of incorrect shape given, {}".format(bins)
             )
             if self.dim == 1:
@@ -139,6 +141,36 @@ class histogram():
         else:
             self.ranges = [(edges[0], edges[-1])]
             self.nbins = [len(edges)-1]
+
+    def add(self, other, weight=1):
+        """Add a histogram *other* to this one.
+
+        For each bin, the corresponding bin of *other*
+        is added. It can be multiplied with *weight*.
+        For example, to subtract *other*, use *weight* -1.
+
+        Histograms must have the same edges.
+        Note that floating numbers should be compared
+        approximately (using :func:`math.isclose`).
+        """
+        if not isinstance(other, histogram):
+            raise LenaTypeError("other must be a histogram")
+        # For now we make a complete check.
+        # # A simple check on their edges range and shape is performed.
+        # # More sophisticated tests can be implemented by user.
+        if self.edges != other.edges:
+            raise LenaValueError("can't add histograms with different edges")
+
+        if weight != 1:
+            obins = md_map(lambda val: val*weight, other.bins)
+        else:
+            obins = other.bins
+        new_bins = md_map(add, self.bins, obins)
+        # self.bins = new_bins
+        # functional approach, easier testing
+        # (we have produced new bins anyway)
+        return histogram(edges=copy.deepcopy(self.edges), bins=new_bins)
+
 
     def __eq__(self, other):
         """Two histograms are equal, if and only if they have
@@ -213,7 +245,7 @@ class histogram():
             # rescale from other
             scale = self.scale()
             if scale == 0:
-                raise lena.core.LenaValueError(
+                raise LenaValueError(
                     "can not rescale histogram with zero scale"
                 )
             self.bins = lena.math.md_map(lambda binc: binc*float(other) / scale,
@@ -262,7 +294,7 @@ class Histogram():
         self._hist = histogram(edges, bins)
 
         if make_bins is not None and bins is not None:
-            raise lena.core.LenaTypeError(
+            raise LenaTypeError(
                 "either initial bins or make_bins must be provided, "
                 "not both: {} and {}".format(bins, make_bins)
             )

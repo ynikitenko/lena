@@ -92,6 +92,38 @@ def test_scale_linear_on_weight(edges, weight, refinement, data_samples):
     assert isclose(h1_scale, refinement * hr.scale())
 
 
+def test_add():
+    # one-dimensional histograms work
+    hist1 = histogram([0., 1, 2.])
+    hist2 = histogram([0., 1, 2.])
+    hist1.fill(0)
+    hist2.fill(1)
+    hadd = hist1.add(hist2)
+    assert hadd.edges == hist1.edges
+    assert hadd.bins == [1, 1]
+
+    # addition is commutative
+    assert hist1.add(hist2) == hist2.add(hist1)
+
+    # weights work
+    hsub = hist1.add(hist2, weight=-1)
+    assert hsub.bins == [1, -1]
+
+    hist2f = histogram([-1, 1, 2.])
+    with pytest.raises(LenaValueError):
+        hist1.add(hist2f)
+
+    # 3-dimensional histograms work
+    hist3 = histogram([[1, 2, 3], [1, 2, 3], [1, 2, 3]])
+    hist4 = histogram([[1, 2, 3], [1, 2, 3], [1, 2, 3]])
+    hist3.fill([1, 1, 1])
+    # adding a zero histogram changes nothing
+    assert hist3.add(hist4) == hist3
+
+    hist4.fill([1, 2, 1], weight=2)
+    assert hist3.add(hist4).bins == [[[1, 0], [2, 0]], [[0, 0], [0, 0]]]
+
+
 def test_histogram_3d():
     # new 3-dimensional histogram
     hist = histogram([[1, 2, 3], [1, 2, 3], [1, 2, 3]])
