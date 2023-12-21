@@ -81,6 +81,7 @@ class Cache(object):
             raise lena.core.LenaValueError(
                 "Cache method should be one of pickle of cPickle."
             )
+        self._method = method
 
         self._filename = filename
         self._orig_filename = filename
@@ -127,6 +128,16 @@ class Cache(object):
                     " exists and readable, but can't be removed"
                 )
             raise err
+
+    def __repr__(self):
+        if self.cache_exists():
+            cache_exists = "[cache exists]"
+        else:
+            cache_exists = "[cache does not exist or will be recomputed]"
+        return (
+            """Cache("{}" + "{}"*0, recompute={}, method="{}", protocol={})""".
+            format(self._filename, cache_exists, self._recompute, self._method, self.protocol)
+        )
 
     def run(self, flow):
         """Load cache or fill it.

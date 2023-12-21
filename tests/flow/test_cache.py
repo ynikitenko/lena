@@ -31,6 +31,14 @@ def test_cache(tmpdir):
     s3 = Source(ascii_uppercase, c3)
     assert "".join(s3()) == "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
+    assert repr(c3) == 'Cache("lowercase_cached.pkl"'\
+        ' + "[cache does not exist or will be recomputed]"*0, '\
+        'recompute=True, method="cPickle", protocol=2)'
+
+    c4 = Cache(lowercase_cached_filename)
+    assert repr(c4) == 'Cache("lowercase_cached.pkl"'\
+        ' + "[cache exists]"*0, recompute=False, method="cPickle", protocol=2)'
+
 
 # it's a shame, but I had two tests in different files
 def test_cache_2(tmp_path):
