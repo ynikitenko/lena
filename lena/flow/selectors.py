@@ -6,61 +6,6 @@ import lena.core
 import lena.flow
 
 
-# see no reason to make them public.
-# This is more like an internal implementation of Selector.
-class _SelectorOr(object):
-
-    def __init__(self, args, raise_on_error=True):
-        self._selectors = []
-        for arg in args:
-            if isinstance(arg, Selector):
-                self._selectors.append(arg)
-            else:
-                # may raise
-                self._selectors.append(
-                    Selector(arg, raise_on_error=raise_on_error)
-                )
-
-    def __call__(self, val):
-        return any((f(val) for f in self._selectors))
-
-    def __eq__(self, other):
-        # this is a strict comparison,
-        # because _SelectorOr with one element will give same results
-        # as _SelectorAnd or a Selector.
-        if not isinstance(other, _SelectorOr):
-            return NotImplemented
-        return self._selectors == other._selectors
-
-    def __repr__(self):
-        return "[{}]".format(", ".join([repr(s) for s in self._selectors]))
-
-
-class _SelectorAnd(object):
-
-    def __init__(self, args, raise_on_error=True):
-        self._selectors = []
-        for arg in args:
-            if isinstance(arg, Selector):
-                self._selectors.append(arg)
-            else:
-                # may raise
-                self._selectors.append(
-                    Selector(arg, raise_on_error=raise_on_error)
-                )
-
-    def __call__(self, val):
-        return all((f(val) for f in self._selectors))
-
-    def __eq__(self, other):
-        if not isinstance(other, _SelectorAnd):
-            return NotImplemented
-        return self._selectors == other._selectors
-
-    def __repr__(self):
-        return "({})".format(", ".join([repr(s) for s in self._selectors]))
-
-
 class Selector(object):
     """A boolean function on values."""
 
@@ -105,6 +50,7 @@ class Selector(object):
             try:
                 self._selector_repr = selector.__name__
             except AttributeError:
+                # todo: add a test where that can happen.
                 pass
             self._orig_class = selector
         elif callable(selector):
@@ -123,12 +69,12 @@ class Selector(object):
             self._orig_str = selector
         elif isinstance(selector, list):
             try:
-                self._selector = _SelectorOr(selector, raise_on_error)
+                self._selector = Or(selector, raise_on_error)
             except lena.core.LenaTypeError as err:
                 raise err
         elif isinstance(selector, tuple):
             try:
-                self._selector = _SelectorAnd(selector, raise_on_error)
+                self._selector = And(selector, raise_on_error)
             except lena.core.LenaTypeError as err:
                 raise err
         else:
@@ -185,6 +131,85 @@ class Selector(object):
         return "Selector({})".format(self._selector_repr)
 
 
+class And(Selector):
+    """And-test of multiple selectors."""
+
+    def __init__(self, selectors, raise_on_error=True):
+        """*selectors* is a tuple of items, each of which
+        is a :class:`Selector` or will be converted to that.
+
+        *raise_on_error* has the same meaning as in :class:`Selector`,
+        and will be applied to each newly initialized subselector.
+        """
+        self._selectors = []
+        for sel in selectors:
+            if isinstance(sel, Selector):
+                self._selectors.append(sel)
+            else:
+                # may raise
+                self._selectors.append(
+                    Selector(sel, raise_on_error=raise_on_error)
+                )
+        super(And, self).__init__(self, raise_on_error)
+
+    def __call__(self, val):
+        return all((f(val) for f in self._selectors))
+
+    def __eq__(self, other):
+        if not isinstance(other, And):
+            return NotImplemented
+        return self._selectors == other._selectors
+
+    def __repr__(self):
+        args_repr = "{}".format(", ".join([repr(s) for s in self._selectors]))
+        if not self._raise_on_error:
+            return "And(({}), raise_on_error=False)".format(args_repr)
+        return "And(({}))".format(args_repr)
+
+
+class Or(Selector):
+    """Or-test of multiple selectors."""
+
+    def __init__(self, selectors, raise_on_error=True):
+        """*selectors* is a list of items, each of which
+        is a :class:`Selector` or will be converted to that.
+        Evaluation is short-circuit, that is if a selector was
+        true, further ones are not applied.
+
+        *raise_on_error* has the same meaning as in :class:`Selector`,
+        and will be applied to each newly initialized subselector.
+        """
+        self._selectors = []
+        for sel in selectors:
+            if isinstance(sel, Selector):
+                self._selectors.append(sel)
+            else:
+                # may raise
+                self._selectors.append(
+                    Selector(sel, raise_on_error=raise_on_error)
+                )
+        # Or will be a callable in the super class
+        super(Or, self).__init__(self, raise_on_error)
+
+    def __call__(self, val):
+        return any((f(val) for f in self._selectors))
+
+    def __eq__(self, other):
+        # we compare classes.
+        # Note that selection results of Or with one element
+        # will be the same as for And or a Selector.
+        # todo: could optimise.
+        if not isinstance(other, Or):
+            return NotImplemented
+        return self._selectors == other._selectors
+
+    def __repr__(self):
+        args_repr = "{}".format(", ".join([repr(s) for s in self._selectors]))
+        if not self._raise_on_error:
+            return "Or([{}], raise_on_error=False)".format(args_repr)
+        return "Or([{}])".format(args_repr)
+
+
 class Not(Selector):
     """Negate a selector."""
 
@@ -206,6 +231,8 @@ class Not(Selector):
         If *raise_on_error* is ``True``,
         then any occurred exception will be re-raised here.
         """
+        # todo: is it dangerous that self.__call__
+        # and super.__call__ give different results?
         return not super(Not, self).__call__(value)
 
     def __eq__(self, other):

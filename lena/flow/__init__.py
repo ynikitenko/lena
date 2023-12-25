@@ -8,7 +8,7 @@ from .group_scale import scale_to, GroupScale
 from .iterators import Chain, CountFrom, Slice, ISlice, Reverse
 from .print_ import Print
 from .progress import Progress
-from .selectors import Not, Selector
+from .selectors import Not, Selector, And, Or
 from .zip import Zip
 from .filter import Filter
 
@@ -39,6 +39,8 @@ __all__ = [
     'Not',
     'RunningChunkBy',
     'Selector',
+    'And',
+    'Or',
     'seq_map',
     'RunIf',
 ]

@@ -36,8 +36,10 @@ Flow
     GroupPlots
     GroupScale
     MapGroup
-    Not
     Selector
+    And
+    Or
+    Not
 
 **Iterators:**
 
@@ -97,9 +99,13 @@ Group plots
 .. autoclass:: GroupScale
 .. autoclass:: MapGroup
 
+.. autoclass:: Selector
+.. autoclass:: And
+    :show-inheritance:
+.. autoclass:: Or
+    :show-inheritance:
 .. autoclass:: Not
     :show-inheritance:
-.. autoclass:: Selector
 
 Iterators
 ---------

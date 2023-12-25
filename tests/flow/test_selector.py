@@ -1,7 +1,7 @@
 import pytest
 
 from lena.core import LenaTypeError
-from lena.flow import Selector, Not
+from lena.flow import Selector, Not, And, Or
 
 
 def test_selector():
@@ -34,8 +34,15 @@ def test_selector():
     # representation works
     # or int.__name__ for better cross-platformity
     assert repr(s0) == "Selector(int)"
-    assert repr(sand) == "Selector((Selector(int), Selector(str)))"
-    assert repr(sor) == "Selector([Selector(int), Selector(str)])"
+    assert repr(sand) == "Selector(And((Selector(int), Selector(str))))"
+    sand1 = Selector((int, str), raise_on_error=False)
+    sand2 = And((int, str), raise_on_error=False)
+    assert sand2 == And((int, str), raise_on_error=False)
+    assert sand != sand1
+    assert repr(sand1) == "Selector(And((Selector(int, raise_on_error=False), " +\
+        "Selector(str, raise_on_error=False)), raise_on_error=False), " +\
+        "raise_on_error=False)"
+    assert repr(sor) == "Selector(Or([Selector(int), Selector(str)]))"
 
     ## callable And works
     scal = Selector((int, lambda val: val < 2))
