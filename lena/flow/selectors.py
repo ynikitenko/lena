@@ -10,7 +10,7 @@ import lena.flow
 # This is more like an internal implementation of Selector.
 class _SelectorOr(object):
 
-    def __init__(self, args, raise_on_error=False):
+    def __init__(self, args, raise_on_error=True):
         self._selectors = []
         for arg in args:
             if isinstance(arg, Selector):
@@ -38,7 +38,7 @@ class _SelectorOr(object):
 
 class _SelectorAnd(object):
 
-    def __init__(self, args, raise_on_error=False):
+    def __init__(self, args, raise_on_error=True):
         self._selectors = []
         for arg in args:
             if isinstance(arg, Selector):
@@ -68,7 +68,7 @@ class Selector(object):
     but other values can be used as well.
     """
 
-    def __init__(self, selector, raise_on_error=False):
+    def __init__(self, selector, raise_on_error=True):
         """The usage of *selector* depends on its type.
 
         If *selector* is a class,
@@ -190,7 +190,7 @@ class Selector(object):
 class Not(Selector):
     """Negate a selector."""
 
-    def __init__(self, selector, raise_on_error=False):
+    def __init__(self, selector, raise_on_error=True):
         """*selector* is an instance of :class:`.Selector`
         or will be used to initialize that.
 
@@ -198,10 +198,7 @@ class Not(Selector):
         *selector* and has the same meaning as in :class:`.Selector`.
         It has no effect if *selector* is already initialized.
         """
-        if not isinstance(selector, Selector):
-            selector = Selector(selector, raise_on_error)
-        self._selector = selector
-        super(Not, self).__init__(self._selector)
+        super(Not, self).__init__(selector, raise_on_error)
 
     def __call__(self, value):
         """Negate the result of the initialized *selector*.
@@ -209,18 +206,20 @@ class Not(Selector):
         If *raise_on_error* is ``False``, then this
         is a complete negation (including the case of an error
         encountered in the *selector*).
-        For example, if the *selector* is *variable.name*,
-        and *value*'s context contains no *"variable"*,
-        *Not("variable.name")(value)* will be ``True``.
         If *raise_on_error* is ``True``,
         then any occurred exception will be raised here.
         """
-        return not self._selector(value)
+        return not super(Not, self).__call__(value)
 
     def __eq__(self, other):
         if not isinstance(other, Not):
+            if isinstance(other, Selector):
+                # otherwise will falsely compare them
+                return False
             return NotImplemented
-        return self._selector == other._selector
+        return super(Not, self).__eq__(other)
 
     def __repr__(self):
-        return "Not({})".format(self._selector._selector_repr)
+        if self._raise_on_error is False:
+            return "Not({}, raise_on_error=False)".format(self._selector_repr)
+        return "Not({})".format(self._selector_repr)

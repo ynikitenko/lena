@@ -21,8 +21,8 @@ def test_filter():
     f1 = Filter([int, str])
     data = [1, 2, "s", [], (), (3, {})]
     res_data = [1, 2, "s", (3, {})]
-    assert list(f0.run(data)) == res_data  # list(f1.run(data))
-    assert list(f1.run(data)) == [1, 2, "s", (3, {})]
+    assert list(f0.run(data)) == res_data
+    assert list(f1.run(data)) == res_data
 
     # filter with a function works
     fun = lambda val: val
@@ -47,3 +47,21 @@ def test_filter():
     f4 = Filter(fun)
     assert f4 == f2
     assert f3 != f4
+    # NotImplemented
+    assert f3 != 0
+
+    ## errors are handled correctly
+
+    # simple lambda raises correctly
+    f5 = Filter(lambda val: len(val) > 0)
+    data2 = [1, "s"]
+    with pytest.raises(TypeError):
+        list(f5.run(data2))
+    # Selector raises correctly
+    f6 = Filter(Selector(lambda val: len(val) > 0))
+    with pytest.raises(TypeError):
+        list(f6.run(data2))
+
+    # raise_on_error set to False does not raise
+    f7 = Filter(Selector(lambda val: len(val) > 0, raise_on_error=False))
+    assert list(f7.run(data2)) == ["s"]

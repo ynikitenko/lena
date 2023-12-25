@@ -5,13 +5,13 @@ from lena.flow import Selector, Not
 
 
 def test_selector():
-    ## wrong selector raises
+    ## wrong initialiser raises
     with pytest.raises(LenaTypeError):
         s = Selector(1)
-    # wrong type inside 'or'
+    # wrong type inside of 'or' raises
     with pytest.raises(LenaTypeError):
         s = Selector([1])
-    # wrong type inside 'and'
+    # wrong type inside of 'and' raises
     with pytest.raises(LenaTypeError):
         s = Selector((1,))
 
@@ -27,9 +27,10 @@ def test_selector():
     sor = Selector([int, str])
     assert list(map(bool, map(sor, data))) == [True, True, False]
 
-    # equality tests work
+    # equality works
     assert s0 == Selector(int)
     assert s0 != sand
+
     # representation works
     # or int.__name__ for better cross-platformity
     assert repr(s0) == "Selector(int)"
@@ -38,31 +39,34 @@ def test_selector():
 
     ## callable And works
     scal = Selector((int, lambda val: val < 2))
-    assert list(map(bool, map(scal, data))) == [True, False, False]
+    assert list(map(scal, data)) == [True, False, False]
+    # assert list(map(bool, map(scal, data))) == [True, False, False]
     # callable Or works
-    scal = Selector([str, lambda val: val < 2])
-    assert [bool(scal(val)) for val in data] == [True, True, False]
+    scal = Selector([str, lambda val: val < 2], raise_on_error=False)
+    assert [scal(val) for val in data] == [True, True, False]
     # first check lamda (which may raise), then str
-    scal = Selector([lambda val: val < 2, str])
+    scal = Selector([lambda val: val < 2, str], raise_on_error=False)
     assert [bool(scal(val)) for val in data] == [True, True, False]
-    # nested and, or works
+
+    # nested and, or work
     sccal = Selector([str, (int, lambda val: val < 2)])
-    assert list(map(bool, [sccal(dt) for dt in data])) == [True, True, False]
-    assert list(map(bool, map(sccal, data))) == [True, True, False]
+    assert [sccal(dt) for dt in data] == [True, True, False]
+    assert list(map(sccal, data)) == [True, True, False]
 
     ## string initializer works
-    data = [(1, {"name": "x"}), (2, {"name": "y"})]
+    data = [(1, {"name": "x"}), ((2, 3), {"name": "y"})]
     dsel = Selector("name.x")
     assert [dsel(val) for val in data] == [True, False]
     assert repr(dsel) == """Selector("name.x")"""
+    # equality with strings works
     assert dsel == Selector("name.x")
     assert dsel != Selector("other")
 
     ## And and Or with initialized selectors work.
-    sel_and = Selector([Selector(len)])
-    assert [sel_and(dt[0]) for dt in data] == [False]*2
-    sel_or = Selector((Selector(len),))
-    assert [sel_or(dt[0]) for dt in data] == [False]*2
+    sel_and = Selector([Selector(len, raise_on_error=False)])
+    assert [sel_and(dt[0]) for dt in data] == [False, True]
+    sel_or = Selector((Selector(len, raise_on_error=False),))
+    assert [sel_or(dt[0]) for dt in data] == [False, True]
 
     # eq works
     assert sel_and == Selector([Selector(len)])
@@ -72,7 +76,7 @@ def test_selector():
 
 def test_raise_on_error():
     data = [1, "s", []]
-    sel1 = Selector(lambda x: len(x))
+    sel1 = Selector(lambda x: len(x), raise_on_error=False)
     # no errors is raised
     assert list(map(sel1, data)) == [False, True, False]
 
@@ -84,7 +88,7 @@ def test_raise_on_error():
 
     ## Not works
     # raise on error has no effect here
-    sel3 = Not(sel2, raise_on_error=False)
+    sel3 = Not(sel2, raise_on_error=True)
     with pytest.raises(TypeError):
         sel3(1)
     # raise on error has no effect here
@@ -114,15 +118,18 @@ def test_not():
     # equality works
     assert ns1 == Not(int)
     assert ns1 != Selector(int)
+    assert Selector(int) != ns1
     assert ns1 != int
 
     # representation works
     assert repr(ns1) == """Not(int)"""
+    ns11 = Not(int, raise_on_error=False)
+    assert repr(ns11) == """Not(int, raise_on_error=False)"""
 
     data = [1, "s", []]
     assert list(map(ns1, data)) == [False, True, True]
 
-    # missing value, raises an exception
+    # missing value in context.contains does not raise an exception
     ns2 = Not("context")
     assert repr(ns2) == """Not("context")"""
     assert list(map(ns2, data)) == [True, True, True]
@@ -130,4 +137,8 @@ def test_not():
     # pure exception
     f = lambda x: x/0.
     ns3 = Not(f)
-    assert list(map(ns3, data)) == [True, True, True]
+    with pytest.raises(ZeroDivisionError):
+        list(map(ns3, data))
+
+    ns4 = Not(f, raise_on_error=False)
+    assert list(map(ns4, data)) == [True, True, True]

@@ -1,4 +1,4 @@
-from .selectors import Selector as _Selector
+from .selectors import Selector
 
 
 class Filter():
@@ -36,7 +36,9 @@ class Filter():
 
         .. versionadded:: 0.4
         """
-        self._selector = _Selector(selector)
+        if not isinstance(selector, Selector):
+            selector = Selector(selector)
+        self._selector = selector
 
     def fill_into(self, element, value):
         """Fill *value* into an *element* if
@@ -52,7 +54,7 @@ class Filter():
         the *selector* is ``True``.
         """
         return (val for val in flow if self._selector(val))
-        # or
+        # todo, if need to have explicit generators.
         # for val in flow:
         #     if self._selector(val):
         #         yield event
