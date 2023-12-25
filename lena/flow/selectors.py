@@ -62,11 +62,7 @@ class _SelectorAnd(object):
 
 
 class Selector(object):
-    """Determine whether an item should be selected.
-
-    Generally, *selected* means the result is convertible to ``True``,
-    but other values can be used as well.
-    """
+    """A boolean function on values."""
 
     def __init__(self, selector, raise_on_error=True):
         """The usage of *selector* depends on its type.
@@ -75,7 +71,7 @@ class Selector(object):
         :meth:`__call__` checks that data part of the value
         is subclassed from that.
 
-        A callable is used as is.
+        A callable is used as it is.
 
         A string means that value's context must conform to that
         (as in :func:`context.contains <.contains>`).
@@ -91,27 +87,26 @@ class Selector(object):
         the selector raises that exception
         or returns ``False``.
         If *selector* is a container, *raise_on_error*
-        will be used during its items initialization (recursively).
-
-        If incorrect arguments are provided,
-        :exc:`.LenaTypeError` is raised.
+        will be used recursively during the initialization of its items.
         """
         # Callable classes are treated as classes, not callables
         self._selector_repr = ""
+        # callables should be compared as they are
+        self._from_callable = False
+        # to avoid false positives
+        # for different classes with the same name
+        self._orig_class = None
+        self._orig_str = None
+
         if inspect.isclass(selector):
             self._selector = lambda val: isinstance(
                 lena.flow.get_data(val), selector
             )
             try:
-                # warning: this will give a false positive
-                # for different classes with the same name
-                # todo, bug: string and class initialization
-                # may give false positives.
-                # Shall be fixed after I skip context
-                # and use builtins instead of lambdas.
                 self._selector_repr = selector.__name__
             except AttributeError:
                 pass
+            self._orig_class = selector
         elif callable(selector):
             self._selector = selector
             try:
@@ -119,11 +114,13 @@ class Selector(object):
                 self._selector_repr = selector.__name__
             except AttributeError:
                 pass  # will use __repr__
+            self._from_callable = True
         elif isinstance(selector, str):
             self._selector = lambda val: lena.context.contains(
                 lena.flow.get_context(val), selector
             )
             self._selector_repr = "\"{}\"".format(selector)
+            self._orig_str = selector
         elif isinstance(selector, list):
             try:
                 self._selector = _SelectorOr(selector, raise_on_error)
@@ -136,26 +133,24 @@ class Selector(object):
                 raise err
         else:
             raise lena.core.LenaTypeError(
-                "Selector must be initialized with a callable, list or tuple, "
-                "{} provided".format(selector)
+                "Selector must be initialized from a callable, "
+                "list, tuple or string; {} provided".format(selector)
             )
         self._raise_on_error = bool(raise_on_error)
 
         if not self._selector_repr:
-            # we set it here, because
-            # _selector is not initialized in the beginning
             self._selector_repr = repr(self._selector)
 
     def __call__(self, value):
         """Check whether *value* is selected.
 
-        By default, if an exception occurs, the result is ``False``.
-        Thus it is safe to use non-existing attributes
-        or arbitrary contexts.
-        However, if *raise_on_error* was set to ``True``,
-        the exception will be raised.
-        Use it if you are confident in the data
-        and want to see any error.
+        If an exception occurs and *raise_on_error* is ``False``,
+        the result is ``False``.
+        This could be used while testing potentially
+        non-existing attributes or arbitrary contexts.
+        However, this is not recommended,
+        since it covers too many errors and some of them should be
+        raised explicitly.
         """
         try:
             sel = self._selector(value)
@@ -170,20 +165,23 @@ class Selector(object):
     def __eq__(self, other):
         if not isinstance(other, Selector):
             return NotImplemented
-        # if the functions are at different addresses,
-        # then we have same representation (good for creation),
-        # but unequal objects. It is against false positives.
-        if self._selector_repr:
-            # since we use lambdas for types and strings,
-            # their initial representations
-            # will provide a better comparison.
-            return self._selector_repr == other._selector_repr
+        if self._raise_on_error != other._raise_on_error:
+            return False
+
+        if self._orig_class is not None:
+            return self._orig_class == other._orig_class
+        if self._orig_str is not None:
+            return self._orig_str == other._orig_str
+        if self._from_callable:
+            return self._selector == other._selector
+        # for And and Or
         return self._selector == other._selector
 
     def __repr__(self):
-        # this representation does not include the address,
-        # but can be used for initialization, see
+        # see basics of repr at
         # https://stackoverflow.com/a/1436756/952234
+        if self._raise_on_error is False:
+            return "Selector({}, raise_on_error=False)".format(self._selector_repr)
         return "Selector({})".format(self._selector_repr)
 
 
@@ -191,23 +189,22 @@ class Not(Selector):
     """Negate a selector."""
 
     def __init__(self, selector, raise_on_error=True):
-        """*selector* is an instance of :class:`.Selector`
-        or will be used to initialize that.
+        """*selector* is converted to :class:`.Selector`.
 
-        *raise_on_error* is used during the initialization of
-        *selector* and has the same meaning as in :class:`.Selector`.
-        It has no effect if *selector* is already initialized.
+        *raise_on_error* has the same meaning as in :class:`.Selector`.
         """
+        # note: if selector is a Selector with raise_on_error=False,
+        # this raise_on_error will have no effect.
         super(Not, self).__init__(selector, raise_on_error)
 
     def __call__(self, value):
-        """Negate the result of the initialized *selector*.
+        """Negate the result of the *selector*.
 
         If *raise_on_error* is ``False``, then this
-        is a complete negation (including the case of an error
+        is a full negation (including the case of an error
         encountered in the *selector*).
         If *raise_on_error* is ``True``,
-        then any occurred exception will be raised here.
+        then any occurred exception will be re-raised here.
         """
         return not super(Not, self).__call__(value)
 

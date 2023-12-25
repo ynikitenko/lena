@@ -68,10 +68,26 @@ def test_selector():
     sel_or = Selector((Selector(len, raise_on_error=False),))
     assert [sel_or(dt[0]) for dt in data] == [False, True]
 
-    # eq works
-    assert sel_and == Selector([Selector(len)])
+
+def test_eq():
+    sel_and = Selector([Selector(len, raise_on_error=False)])
+    sel_or = Selector((Selector(len, raise_on_error=False),))
+    assert sel_and == Selector([Selector(len, raise_on_error=False)])
+    assert sel_and != Selector([Selector(len)])
     assert sel_and != sel_or
     assert sel_and != 0
+    assert Selector(len) != Selector("len")
+    assert Selector(len, raise_on_error=True) != \
+        Selector(len, raise_on_error=False)
+
+    f = lambda val: len(val)
+    g = lambda val: len(val)
+    sf = Selector(f)
+    # same function address gives equal results
+    assert sf == Selector(f)
+    # different addresses give unequal results
+    assert f != g
+    assert sf != Selector(g)
 
 
 def test_raise_on_error():

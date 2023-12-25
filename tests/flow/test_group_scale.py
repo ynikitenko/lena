@@ -2,7 +2,7 @@ import copy
 import pytest
 
 from lena.core import LenaTypeError, LenaValueError
-from lena.flow import GroupBy, GroupScale, scale_to
+from lena.flow import GroupBy, GroupScale, scale_to, Selector
 from lena.structures import histogram, graph
 
 
@@ -25,7 +25,7 @@ def test_group_scale():
         gs(data)
 
     # graph without a scale can't be rescaled
-    h2sel = lambda h: h.edges[1] == 2
+    h2sel = Selector(lambda h: h.edges[1] == 2, raise_on_error=False)
     gs = GroupScale(h2sel)
     with pytest.raises(LenaValueError):
         gs(data)
@@ -33,7 +33,7 @@ def test_group_scale():
     # histogram h0 with a zero scale can't be rescaled
     gs = GroupScale(h2sel, allow_unknown_scale=True)
     with pytest.raises(LenaValueError):
-        gs(data)
+        gs(data[:3])
 
     # values without a scale method can't be rescaled
     gs = GroupScale(h2sel)
