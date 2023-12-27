@@ -203,6 +203,10 @@ class ToCSV(object):
         If a data structure has a method *\\_update_context(context)*,
         it also updates the current context during the transform.
         All not converted data is yielded unchanged.
+        If *output.duplicate_last_bin* is present in context,
+        it takes precedence over this element's value.
+        To force the common behaviour,
+        one can manually update context before this element.
 
         If *context.output.to_csv* is ``False``, the value is skipped.
 
@@ -211,6 +215,7 @@ class ToCSV(object):
         use :func:`hist1d_to_csv`, :func:`hist2d_to_csv`
         or :func:`iterable_to_table`.
         """
+        _sentinel = object()
         for val in flow:
             data, context = lena.flow.get_data_context(val)
 
@@ -221,15 +226,22 @@ class ToCSV(object):
 
             ## histogram
             if isinstance(data, lena.structures.histogram):
+                # context duplicate_last_bin has higher priority
+                # than that of ToCSV
+                duplicate_last_bin = lena.context.get_recursively(
+                    context, "output.duplicate_last_bin", _sentinel
+                )
+                if duplicate_last_bin is _sentinel:
+                    duplicate_last_bin = self._duplicate_last_bin
                 if data.dim == 1:
                     lines_iter = hist1d_to_csv(
                         data, header=self._header, separator=self._separator,
-                        duplicate_last_bin=self._duplicate_last_bin,
+                        duplicate_last_bin=duplicate_last_bin,
                     )
                 elif data.dim == 2:
                     lines_iter = hist2d_to_csv(
                         data, header=self._header, separator=self._separator,
-                        duplicate_last_bin=self._duplicate_last_bin,
+                        duplicate_last_bin=duplicate_last_bin,
                     )
                 else:
                     warnings.warn(

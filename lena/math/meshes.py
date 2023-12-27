@@ -36,7 +36,8 @@ def md_map(f, *arrays):
 
     Return function *f* mapped to contents
     of multidimensional *arrays*.
-    *f* is a function of one argument.
+    *f* is a function of that many arguments
+    as the number of arrays.
 
     An item of *arrays* must be a list of (possibly nested) lists.
     Its contents remain unchanged.
