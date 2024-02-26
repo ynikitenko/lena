@@ -141,7 +141,8 @@ class MapBins(object):
     corresponding to the vector's components.
     """
 
-    def __init__(self, seq, select_bins=lambda _: True, drop_bins_context=True):
+    def __init__(self, seq, select_bins=lambda _: True,
+                 get_example_bin=get_example_bin, drop_bins_context=True):
         """*seq* is a sequence or an element applied to bin contents.
         If *seq* is not a :class:`.Sequence`
         or an element with *run* method, it is converted to a
@@ -156,6 +157,9 @@ class MapBins(object):
         For example, ``select_bins=[lena.math.vector3, list]``
         selects histograms where bins are vectors or lists.
         By default all histograms are accepted.
+
+        The "arbitrary bin" is returned by a callable *get_example_bin*
+        (by default :func:`.get_example_bin`).
 
         :class:`.MapBins` creates histograms
         that may be plotted, because their bins contain only data
@@ -189,6 +193,9 @@ class MapBins(object):
                 )
         self._select_bins = select_bins
 
+        assert callable(get_example_bin)
+        self._get_example_bin = get_example_bin
+
         self._drop_bins_context = bool(drop_bins_context)
 
     def run(self, flow):
@@ -202,6 +209,8 @@ class MapBins(object):
 
         Not selected values pass unchanged.
         """
+        get_example_bin = self._get_example_bin
+
         for val in flow:
             hist, context = lena.flow.get_data_context(val)
             update_nested = lena.context.update_nested

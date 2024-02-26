@@ -39,8 +39,6 @@ Structures
     IterateBins
     MapBins
     SplitIntoBins
-    cell_to_string
-    get_example_bin
 
 **Histogram functions:**
 
@@ -48,11 +46,13 @@ Structures
 .. autosummary::
 
     HistCell
+    cell_to_string
     check_edges_increasing
     get_bin_edges
     get_bin_on_index
     get_bin_on_value
     get_bin_on_value_1d
+    get_example_bin
     hist_to_graph
     init_bins
     integral
