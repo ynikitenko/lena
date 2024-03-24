@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 import lena.core
 import lena.context
 import lena.flow
@@ -92,8 +94,15 @@ class MakeFilename(object):
 
         self._methods = methods
 
+    def _set_context(self, context):
+        self._context = context
+
     def __call__(self, value):
         """Add *output* keys to the *value*'s context.
+
+        Formatting context is retrieved from static context
+        and from the context part of the *value*.
+        The run-time context has higher precedence.
 
         *filename*, *dirname*, *fileext*, if initialized,
         set respectively *context.output.{filename,dirname,fileext}*
@@ -118,6 +127,7 @@ class MakeFilename(object):
         (doesn't contain all necessary keys for the format string),
         a key is not updated.
         """
+        # data, context = lena.flow.get_data_context(value)
         context = lena.flow.get_context(value)
         modified = False
 
@@ -126,8 +136,16 @@ class MakeFilename(object):
                 if "output" in context and key in context["output"]:
                     if not self._overwrite:
                         continue
+
+            if hasattr(self, "_context"):
+                full_context = deepcopy(self._context)
+                # runtime context takes precedence over the static one
+                full_context.update(context)
+            else:
+                full_context = context
+
             try:
-                res = meth(context)
+                res = meth(full_context)
             except lena.core.LenaKeyError:
                 continue
             else:
@@ -151,25 +169,26 @@ class MakeFilename(object):
                         context, "output.suffix", ""
                     )
                     res = prefix + res + suffix
-                    # todo: do I need an option *remove_used*?
-                    # I think not. This deletion is natural,
-                    # used parts are conserved in created filename.
-                    # If filename was not created,
-                    # they remain in the context.
+                    # these parts must be deleted, because they are
+                    # already conserved in the created filename,
+                    # and otherwise they would be added
+                    # during each MakeFilename.
                     if prefix:
                         del context["output"]["prefix"]
                     if suffix:
                         del context["output"]["suffix"]
+
                 update = {"output": {key: res}}
                 lena.context.update_recursively(context, update)
                 modified = True
 
-        # todo: probably write somewhere how good it was and delete.
-        # just get_data_context in the beginning
+        # todo: simplify after understanding data-context.
+        # Just get_data_context in the beginning
         # and don't check for modifications.
         if modified:
             # or created
             data = lena.flow.get_data(value)
             return (data, context)
         else:
+            # will not create a tuple if we had only the data part
             return value
