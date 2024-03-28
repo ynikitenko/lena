@@ -171,7 +171,6 @@ class histogram():
         # (we have produced new bins anyway)
         return histogram(edges=copy.deepcopy(self.edges), bins=new_bins)
 
-
     def __eq__(self, other):
         """Two histograms are equal, if and only if they have
         equal bins and equal edges.
@@ -258,12 +257,13 @@ class histogram():
 
         *context.histogram* is updated with "dim", "nbins"
         and "ranges" with values for this histogram.
-        If this histogram has a computed scale, it is also added
-        to the context.
 
-        Called on "destruction" of the histogram structure (for example,
-        in :class:`.ToCSV`). See graph._update_context for more details.
+        Called on destruction of the histogram structure (for example,
+        in when converting it to a CSV text).
+        See also graph._update_context.
         """
+        # actually this docstring is not openly published.
+        # And this method is private.
 
         hist_context = {
             "dim": self.dim,
@@ -271,8 +271,12 @@ class histogram():
             "ranges": self.ranges
         }
 
-        if self._scale is not None:
-            hist_context["scale"] = self._scale
+        # bad design. Context should not depend on
+        # whether the scale was computed before or not.
+        # A scale is important (also to be consistent with graphs),
+        # but much less so after the histogram had been destroyed.
+        # if self._scale is not None:
+        #     hist_context["scale"] = self._scale
 
         lena.context.update_recursively(context, {"histogram": hist_context})
 
