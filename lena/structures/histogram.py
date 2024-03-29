@@ -212,6 +212,40 @@ class histogram():
         except IndexError:
             return
 
+    def get_nevents(self):
+        """Return number of entries in the histogram.
+
+        If the histogram was filled N times, return N.
+        If the histogram was filled with weights w_i,
+        return the sum of w_i.
+        Note that values filled outside the histogram range
+        are not counted.
+        """
+        # An event in probability theory is a subset
+        # of all possible outcomes.
+        # For a histogram it is filling a specific bin.
+        # See Wikipedia: Outcome (probability).
+        bin_contents = (val[1] for val in hf.iter_bins(self.bins))
+        return sum(bin_contents)
+
+    def set_nevents(self, nevents):
+        """Scale histogram bins to contain *nevents*.
+
+        Rescaling a histogram with zero entries raises a
+        :exc:`.LenaValueError`.
+        """
+        old_nevents = self.get_nevents()
+        if not old_nevents:
+            raise LenaValueError(
+                "can not rescale a histogram containing zero events"
+            )
+        scale = float(nevents/old_nevents)
+        if scale == int(scale):
+            scale = int(scale)
+        self.bins = lena.math.md_map(
+            lambda binc: binc*scale, self.bins
+        )
+
     def __repr__(self):
         return "histogram({}, bins={})".format(self.edges, self.bins)
 

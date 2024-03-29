@@ -9,6 +9,7 @@
 - Histogram and NumpyHistogram should be almost same (except for the upper edge).
 """
 import copy
+from copy import deepcopy
 import math
 import sys
 
@@ -31,7 +32,6 @@ def test_init_scale_zero(edges):
     hist = histogram(edges)
     assert hist.scale() == 0
 
-
 # we disable subnormals, because in Python 3.10 sometimes (!)
 # the test failed with an error,
 #     where False = isclose((2.2216311086621543 * 5e-324), 1.5e-323)
@@ -41,6 +41,16 @@ if sys.version_info.major > 2:
 else:
     # in Python 2 allow_subnormal is not recognised
     floats_ = s.floats()
+
+
+def hypo_isclose(a, b):
+    if math.isinf(a):
+        return math.isinf(b) 
+    elif math.isnan(a):
+        return math.isnan(b) 
+    else:
+        return isclose(a, b)
+
 
 @given(edges=Edges1dStrategy, weight=floats_,
        refinement=s.integers(min_value=1, max_value=20),
@@ -53,6 +63,7 @@ def test_scale_linear_on_weight(edges, weight, refinement, data_samples):
     # print(min_edge, max_edge)
     # data can be outside of range too.
     data = generate_data_in_range(min_edge - 1, max_edge + 1, data_samples)
+    data_in_range = [val for val in data if min_edge <= val and val < max_edge]
     # print("data =", data)
     for val in data:
         hist1.fill(val)
@@ -66,18 +77,23 @@ def test_scale_linear_on_weight(edges, weight, refinement, data_samples):
         tst = h1_scale * weight
         assert isclose(tst, weight_scale) or math.isnan(tst)
     else:
-        if math.isinf(weight_scale):
-            assert math.isinf(h1_scale * weight) 
-        elif math.isnan(weight_scale):
-            assert math.isnan(h1_scale * weight) 
-        else:
-            assert isclose(h1_scale * weight, weight_scale)
+        assert hypo_isclose(weight_scale, h1_scale * weight)
 
     # scale is always non-negative if weight was not set
     assert h1_scale >= 0
     # scale doesn't change if we didn't fill
     if not math.isnan(weight_scale):
         assert histw.scale() == weight_scale
+
+    # nevents is correct
+    assert hist1.get_nevents() == len(data_in_range)
+    # nevents with weight is correct
+    # unfortunately, we don't check it for different weights
+    # to avoid 0*inf
+    if len(data_in_range) == 0:
+        assert histw.get_nevents() == 0
+    else:
+        assert hypo_isclose(histw.get_nevents(), len(data_in_range) * weight)
 
     # wrong for float edges.
     # n_of_filled_data = sum([1 for val in data if min_edge <= val < max_edge])
@@ -162,47 +178,62 @@ def test_histogram_3d():
     assert hist.scale() == 2
 
     # rescale
-    h1 = copy.deepcopy(hist)
+    h1 = deepcopy(hist)
     h1.scale(1)
     assert h1.bins[0][0] == [0.5, 0.5]
     # hist didn't change
     assert hist.bins[0][0] == [1, 1]
 
     # scale 0 can't be rescaled
-    h0 = copy.deepcopy(hist)
+    h0 = deepcopy(hist)
     h0.scale(0)
     assert h0.scale() == 0
     with pytest.raises(LenaValueError):
         h0.scale(0)
+    with pytest.raises(LenaValueError):
+        h0.set_nevents(0)
+
+    ## nevents work
+    hnev = deepcopy(hist)
+    assert hnev.get_nevents() == 2
+    hnev.set_nevents(4)
+    assert hnev.edges == hist.edges
+    assert hnev.get_nevents() == 4
+    assert [bin_[1] for bin_ in iter_bins(hnev.bins)] == [2, 2] + [0]*6
 
 
 def test_histogram_1d():
-    hist = histogram([0, 1, 2])
-    hist.fill(-10)
-    assert hist.bins == [0, 0]
-    hist.fill(10)
-    assert hist.bins == [0, 0]
-    assert repr(hist) == 'histogram([0, 1, 2], bins=[0, 0])'
+    hist1 = histogram([0, 1, 2])
+    hist1.fill(-10)
+    assert hist1.bins == [0, 0]
+    hist1.fill(10)
+    assert hist1.bins == [0, 0]
+    assert repr(hist1) == 'histogram([0, 1, 2], bins=[0, 0])'
 
-    hist = histogram([0, 0.5, 1])
-    hist.fill(0.5)
+    hist2 = histogram([0, 0.5, 1])
+    hist2.fill(0.5)
 
     # _update_context works
     context = {}
-    hist._update_context(context)
+    hist2._update_context(context)
     assert context == {"histogram":
         {"dim": 1, "nbins": [2], "ranges": [(0, 1)]}
     }
 
     ## scale works
     # not initialized scale is set to None
-    assert hist._scale is None
+    assert hist2._scale is None
 
     # scale is computed correctly
-    assert hist.scale() == 0.5
+    assert hist2.scale() == 0.5
 
     # computed scale is saved
-    assert hist._scale == 0.5
+    assert hist2._scale == 0.5
+
+    # nevents work
+    assert hist2.get_nevents() == 1
+    hist2.set_nevents(3)
+    assert hist2.bins == [0, 3]
 
 
 if __name__ == "__main__":
