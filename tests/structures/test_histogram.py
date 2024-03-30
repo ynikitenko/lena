@@ -11,6 +11,7 @@
 import copy
 from copy import deepcopy
 import math
+from math import isnan
 import sys
 
 import hypothesis
@@ -85,15 +86,30 @@ def test_scale_linear_on_weight(edges, weight, refinement, data_samples):
     if not math.isnan(weight_scale):
         assert histw.scale() == weight_scale
 
-    # nevents is correct
+    ## nevents is correct ##
+
+    # nevents without weight is correct
     assert hist1.get_nevents() == len(data_in_range)
-    # nevents with weight is correct
+    # include_out_of_range works
+    assert hist1.get_nevents(include_out_of_range=True) == len(data)
+    assert hist1.n_out_of_range == hist1.underflow + hist1.overflow
+
+    ## nevents with weight is correct
     # unfortunately, we don't check it for different weights
     # to avoid 0*inf
     if len(data_in_range) == 0:
         assert histw.get_nevents() == 0
     else:
         assert hypo_isclose(histw.get_nevents(), len(data_in_range) * weight)
+
+    ufw = histw.underflow
+    ofw = histw.overflow
+    oorw = histw.n_out_of_range
+    # can be nan if the weight was nan (thanks to hypothesis...)
+    if isnan(ufw) or isnan(ofw):
+        assert isnan(oorw)
+    else:
+        assert oorw == ufw + ofw
 
     # wrong for float edges.
     # n_of_filled_data = sum([1 for val in data if min_edge <= val < max_edge])
@@ -216,8 +232,16 @@ def test_histogram_1d():
     # _update_context works
     context = {}
     hist2._update_context(context)
-    assert context == {"histogram":
-        {"dim": 1, "nbins": [2], "ranges": [(0, 1)]}
+    assert context == {
+        "histogram":
+            {
+                "dim": 1,
+                "nbins": [2],
+                "ranges": [(0, 1)],
+                'n_out_of_range': 0,
+                'overflow': 0,
+                'underflow': 0,
+            }
     }
 
     ## scale works

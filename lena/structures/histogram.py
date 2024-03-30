@@ -91,6 +91,20 @@ class histogram():
         :attr:`dim` is the dimension of a histogram
         (length of its *edges* for a multidimensional histogram).
 
+        :attr:`n_out_of_range` is the number of entries filled
+        outside the range of the histogram.
+
+        :attr:`overflow` and :attr:`underflow` for a one-dimensional
+        histogram are numbers of events above the highest
+        (respectively, below the lowest) edges range.
+        :attr:`n_out_of_range` is equal to the sum of
+        :attr:`overflow` and :attr:`underflow` in that case.
+        All these attributes are rescaled together with histogram bins
+        during :meth:`set_nevents` and :meth:`scale`.
+        For multidimensional histograms overflows and underflows
+        are rarely used, and for efficiency reasons they are counted
+        only for the last coordinate.
+
         If subarrays of *edges* are not increasing
         or if any of them has length less than 2,
         :exc:`.LenaValueError` is raised.
@@ -112,6 +126,19 @@ class histogram():
         hf.check_edges_increasing(edges)
         self.edges = edges
         self._scale = None
+
+        # number of values filled outside of the histogram range.
+        self.n_out_of_range = 0
+        # useful only for a one-dimensional histogram.
+        # Implemented that only because people on the internet
+        # regularly ask about that (and Excel has it).
+        # NumPy histograms don't have this logic, while ROOT
+        # histograms have it too complicated (and mixed with
+        # the histogram structure): 0th bin is underflow and
+        # the last bin is overflow (now imagine those arrays
+        # for multidimensional histograms).
+        self.overflow = 0
+        self.underflow = 0
 
         if hasattr(edges[0], "__iter__"):
             self.dim = len(edges)
@@ -159,21 +186,36 @@ class histogram():
         # # A simple check on their edges range and shape is performed.
         # # More sophisticated tests can be implemented by user.
         if self.edges != other.edges:
-            raise LenaValueError("can't add histograms with different edges")
+            raise LenaValueError("can not add histograms with different edges")
 
         if weight != 1:
             obins = md_map(lambda val: val*weight, other.bins)
         else:
             obins = other.bins
         new_bins = md_map(add, self.bins, obins)
+
         # self.bins = new_bins
         # functional approach, easier testing
         # (we have produced new bins anyway)
-        return histogram(edges=copy.deepcopy(self.edges), bins=new_bins)
+        new_hist = histogram(edges=copy.deepcopy(self.edges), bins=new_bins)
+
+        # this definition might be misleading, because
+        # if *self* had N overflow and *other* had N underflow,
+        # new n_out_of_range would be zero, which does not mean
+        # that all values fell into the histogram range
+        # (in fact, 2N missed that).
+        # This should be considered a histogram *new*, such that
+        # *other* + *new* = *self* .
+        new_oorange = self.n_out_of_range + other.n_out_of_range * weight
+        new_hist.n_out_of_range = new_oorange
+        new_hist.overflow = self.overflow + other.overflow * weight
+        new_hist.underflow = self.underflow + other.underflow * weight
+
+        return new_hist
 
     def __eq__(self, other):
         """Two histograms are equal, if and only if they have
-        equal bins and equal edges.
+        equal bins, edges and number of events outside of range.
 
         If *other* is not a :class:`.histogram`, return ``False``.
 
@@ -183,7 +225,18 @@ class histogram():
         if not isinstance(other, histogram):
             # in Python comparison between different types is allowed
             return False
-        return self.bins == other.bins and self.edges == other.edges
+        return (self.bins == other.bins and self.edges == other.edges
+                and self.overflow == other.overflow
+                and self.underflow == other.underflow
+                and self.n_out_of_range == other.n_out_of_range)
+        # comparing n_out_of_range may seem redundant. However,
+        # 1) it increases histogram cohesion. All attributes
+        #    are important.
+        # 2) the probability that when we fill with different data
+        #    and get same bin content, but different n_out_of_range
+        #    is very low.
+        # For practical applications in Lena (comparing two sequences
+        # before initialization) this is not important (it should be 0).
 
     def fill(self, coord, weight=1):
         """Fill histogram at *coord* with the given *weight*.
@@ -195,51 +248,90 @@ class histogram():
         for ind in indices[:-1]:
             # underflow
             if ind < 0:
+                # we don't fill self.underflow here,
+                # because an underflow for one coordinate
+                # can be an overflow for another (later one)
+                self.n_out_of_range += weight
                 return
             try:
+                ## finding the bin ##
                 subarr = subarr[ind]
             # overflow
             except IndexError:
+                self.n_out_of_range += weight
                 return
+
         ind = indices[-1]
         # underflow
         if ind < 0:
+            self.n_out_of_range += weight
+            self.underflow += weight
             return
 
-        # fill
         try:
+            ## filling the found bin ##
             subarr[ind] += weight
         except IndexError:
+            self.n_out_of_range += weight
+            self.overflow += weight
             return
 
-    def get_nevents(self):
+    def get_nevents(self, include_out_of_range=False):
         """Return number of entries in the histogram.
 
         If the histogram was filled N times, return N.
         If the histogram was filled with weights w_i,
         return the sum of w_i.
-        Note that values filled outside the histogram range
-        are not counted.
+        Values filled outside the histogram range
+        are not counted unless *include_out_of_range* is ``True``.
         """
         # An event in probability theory is a subset
         # of all possible outcomes.
         # For a histogram it is filling a specific bin.
         # See Wikipedia: Outcome (probability).
         bin_contents = (val[1] for val in hf.iter_bins(self.bins))
-        return sum(bin_contents)
+        n_in_range = sum(bin_contents)
 
-    def set_nevents(self, nevents):
+        if include_out_of_range:
+            return n_in_range + self.n_out_of_range
+        return n_in_range
+
+    def set_nevents(self, nevents, include_out_of_range=False):
         """Scale histogram bins to contain *nevents*.
+
+        *include_out_of_range* adds :attr:`n_out_of_range`
+        to the estimated number of entries to be rescaled.
+        For example, suppose we know the estimated number of events
+        for the signal and the background, and our histograms
+        have range encompassing only a part of data.
+        Then if we want to plot these two histograms together
+        scaled to the real number of events, we should take
+        into account the efficiencies of each histogram,
+        that is set *include_out_of_range* to ``True``.
+        On the other hand, let us have two spectra in the given range
+        and the data containing both of them. We fit the signals
+        to the data and get their relative contributions in that region.
+        After that we scale the histograms to those numbers of events
+        with *include_out_of_range* set to ``False`` (default).
+        In both examples :attr:`n_out_of_range` is scaled together
+        with the histogram bins.
 
         Rescaling a histogram with zero entries raises a
         :exc:`.LenaValueError`.
         """
-        old_nevents = self.get_nevents()
+        old_nevents = self.get_nevents(
+            include_out_of_range=include_out_of_range
+        )
         if not old_nevents:
             raise LenaValueError(
                 "can not rescale a histogram containing zero events"
             )
         scale = float(nevents/old_nevents)
+
+        self.n_out_of_range *= scale
+        self.overflow  *= scale
+        self.underflow *= scale
+
         if scale == int(scale):
             scale = int(scale)
         self.bins = lena.math.md_map(
@@ -247,6 +339,8 @@ class histogram():
         )
 
     def __repr__(self):
+        # n_out_of_range is not here,
+        # because it is not used during __init__ .
         return "histogram({}, bins={})".format(self.edges, self.bins)
 
     def scale(self, other=None, recompute=False):
@@ -270,6 +364,9 @@ class histogram():
         if other is None:
             # return scale
             if self._scale is None or recompute:
+                # since scale is an integral,
+                # we can't take n_out_of_range into account
+                # (it has bins of infinite length).
                 self._scale = hf.integral(
                     *hf.unify_1_md(self.bins, self.edges)
                 )
@@ -283,6 +380,9 @@ class histogram():
                 )
             self.bins = lena.math.md_map(lambda binc: binc*float(other) / scale,
                                          self.bins)
+            self.n_out_of_range *= other/scale
+            self.overflow  *= other/scale
+            self.underflow *= other/scale
             self._scale = other
             return None
 
@@ -302,7 +402,10 @@ class histogram():
         hist_context = {
             "dim": self.dim,
             "nbins": self.nbins,
-            "ranges": self.ranges
+            "n_out_of_range": self.n_out_of_range,
+            "overflow": self.overflow,
+            "underflow": self.underflow,
+            "ranges": self.ranges,
         }
 
         # bad design. Context should not depend on

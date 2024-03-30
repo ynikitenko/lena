@@ -35,7 +35,8 @@ def test_to_csv():
     assert res0[2:] == [3, "a string"]
     # histogram context part is correct
     assert res0[0][1] == {
-        'histogram': {'dim': 1, 'nbins': [2], 'ranges': [(0, 2)]},
+        'histogram': {'dim': 1, 'nbins': [2], 'ranges': [(0, 2)],
+                      'n_out_of_range': 0, 'overflow': 0, 'underflow': 0},
         'output': {'filetype': 'csv'}
     }
     # graph context part has no error fields
@@ -85,7 +86,9 @@ def test_hist_to_csv():
     assert list(to_csv.run(hist_data)) == [(
                 '0.000000,1.000000\n1.000000,2.000000\n2.000000,2.000000',
                 {'output': {'filetype': 'csv'},
-                    'histogram': {'ranges': [(0, 2)], 'dim': 1, 'nbins': [2]}}
+                    'histogram': {'ranges': [(0, 2)], 'dim': 1, 'nbins': [2],
+                                  'n_out_of_range': 0, 'overflow': 0,
+                                  'underflow': 0}}
             )]
 
     ## maybe redundant
@@ -93,5 +96,11 @@ def test_hist_to_csv():
     hist_el = Histogram(edges=[[0, 1, 2], [0, 2, 4]], bins=[[1, 2], [3, 4]])
     hist_data = list(hist_el.compute())
     assert list(to_csv.run(hist_data)) == [(
-        '0.000000,0.000000,1.000000\n0.000000,2.000000,2.000000\n1.000000,0.000000,3.000000\n1.000000,2.000000,4.000000', {'output': {'filetype': 'csv'}, 'histogram': {'ranges': [(0, 2), (0, 4)], 'dim': 2, 'nbins': [2, 2]}}
-        )]
+        '0.000000,0.000000,1.000000\n0.000000,2.000000,2.000000\n1.000000,0.000000,3.000000\n1.000000,2.000000,4.000000',
+        {
+            'output': {'filetype': 'csv'},
+            'histogram': {'ranges': [(0, 2), (0, 4)], 'dim': 2,
+                          'nbins': [2, 2], 'n_out_of_range': 0,
+                          'overflow': 0, 'underflow': 0}
+        }
+    )]
