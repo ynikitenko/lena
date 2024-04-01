@@ -4,6 +4,8 @@ import inspect
 import lena.context
 import lena.core
 import lena.flow
+from lena.flow import get_context
+from lena.context import get_recursively
 
 
 class Selector(object):
@@ -129,6 +131,66 @@ class Selector(object):
         if self._raise_on_error is False:
             return "Selector({}, raise_on_error=False)".format(self._selector_repr)
         return "Selector({})".format(self._selector_repr)
+
+
+class SelectContext(Selector):
+    """Selector based on a subcontext."""
+
+    def __init__(self, key, predicate, raise_on_error=True):
+        # type: (str | list | dict, Callable, bool) -> None
+        # for this to work properly, put
+        # from typing import Callable
+        # This has downsides of:
+        # - importing another module,
+        # - problems with other imports (MyPy will complain
+        # that they are not annotated).
+        # Those are not problems if a) importing is quick,
+        # b) we add annotations to other Lena modules.
+        # However, in Lena type hints are mostly unneeded, because
+        # 1) types are not checked runtime. Most users won't benefit
+        # from them: scientists simply run code, not check types.
+        # It's hard to think about developers yet.
+        # 2) tests might be a more powerful and flexible tool.
+        # 3) documentation may be sufficient for many users. See also
+        # Python standard library docs: they mostly use no type hints.
+        # 4) Lena sequences are rather general. Types won't help much.
+        # 5) type comments are better than stub files (for they keep
+        # types together with their code), but they might be dropped in
+        # future Python version. https://github.com/python/mypy/issues/12947
+        # So in the long run, if we ever decide to use type comments,
+        # we shall probably use stubs. See a nice article on the topic,
+        # https://realpython.com/python-type-checking/#pros-and-cons
+        #
+        # For example, the assertions below are better than type hints,
+        # because they will help users who didn't run type hints.
+        # So unfortunately they are necessary.
+        assert isinstance(key, (str, list, dict))
+        assert callable(predicate)
+        self._key = key
+        self._predicate = predicate
+        self._raise_on_error = bool(raise_on_error)
+
+    def __call__(self, value):
+        context = get_context(value)
+        try:
+            subcontext = get_recursively(context, self._key)
+        except LenaKeyError:
+            # we don't specify a special behaviour here
+            # (like raise_on_key_error),
+            # because the result may be more complicated:
+            # a dict instead of a string, etc.
+            # A general context check would be more detailed.
+            return False
+
+        # copied from Selector
+        try:
+            res = self._predicate(subcontext)
+        except Exception as err:  # pylint: disable=broad-except
+            if self._raise_on_error:
+                raise err
+            return False
+        else:
+            return res
 
 
 class And(Selector):

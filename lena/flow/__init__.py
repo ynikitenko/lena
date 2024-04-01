@@ -8,7 +8,7 @@ from .group_scale import scale_to, GroupScale
 from .iterators import Chain, CountFrom, Slice, ISlice, Reverse
 from .print_ import Print
 from .progress import Progress
-from .selectors import Not, Selector, And, Or
+from .selectors import Not, Selector, SelectContext, And, Or
 from .zip import Zip
 from .filter import Filter
 
@@ -36,11 +36,13 @@ __all__ = [
     'group_plots', 'GroupPlots',
     'scale_to', 'GroupScale',
     'MapGroup',
-    'Not',
     'RunningChunkBy',
-    'Selector',
-    'And',
-    'Or',
     'seq_map',
     'RunIf',
+    # Selectors
+    'And',
+    'Not',
+    'Or',
+    'SelectContext',
+    'Selector',
 ]
