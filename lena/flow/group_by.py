@@ -1,4 +1,6 @@
-"""Group data using :class:`.GroupBy` class."""
+"""Group data using :class:`.GroupBy`."""
+from warnings import warn
+
 from lena.core import LenaTypeError, LenaKeyError, LenaValueError
 from lena.context import format_context
 from lena.flow import get_context
@@ -7,7 +9,7 @@ from lena.flow import get_context
 class GroupBy(object):
     """Group values.
 
-    Data is added during :meth:`update`.
+    Data is added during :meth:`fill`.
     Groups dictionary is available as :attr:`groups` attribute.
     :attr:`groups` is a mapping of *keys* (defined by *group_by*)
     to lists of items with the same key.
@@ -67,8 +69,8 @@ class GroupBy(object):
         # for equality testing
         self._init_group_by = group_by
 
-    def update(self, val):
-        """Find a group for *val* and add it there.
+    def fill(self, val):
+        """Find the corresponding group and fill it with *val*.
 
         A group key is calculated by *group_by*.
         If no such key exists, a new group is created.
@@ -90,10 +92,28 @@ class GroupBy(object):
             self.groups[key] = [val]
 
     def clear(self):
-        """Remove all groups."""
+        """
+        .. deprecated:: 0.6
+           use the standard :meth:`reset` method.
+        """
+        warn("clear is deprecated since Lena 0.6. Use reset(). In:",
+                      DeprecationWarning, stacklevel=2)
         self.groups.clear()
 
     def __eq__(self, other):
         if not isinstance(other, GroupBy):
             return NotImplemented
         return self._init_group_by == other._init_group_by
+
+    def reset(self):
+        """Remove all groups."""
+        self.groups.clear()
+
+    def update(self, val):
+        """
+        .. deprecated:: 0.6
+           use the standard :meth:`fill` method.
+        """
+        warn("update is deprecated since Lena 0.6. Use fill. In:",
+             DeprecationWarning, stacklevel=2)
+        self.fill(val)

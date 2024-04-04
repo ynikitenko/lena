@@ -9,16 +9,24 @@ def test_group_by():
     data0 = [1, "s", [], 2]
     g0 = GroupBy(type)
     for val in data0:
-        g0.update(val)
+        g0.fill(val)
     r0 = g0.groups
     assert r0[type(1)] == [1, 2]
     assert r0[type(list())] == [[]]
     assert r0[type(str())] == ['s']
     assert len(r0) == 3
 
-    ## clear works
-    g0.clear()
+    ## reset works
+    g0.reset()
     assert len(g0.groups) == 0
+
+    # clear and update are deprecated
+    with pytest.warns(DeprecationWarning):
+        g0.clear()
+    with pytest.warns(DeprecationWarning):
+        g0.update(data0[0])
+
+    del g0
 
     ## wrong initialization parameter raises
     with pytest.raises(LenaTypeError):
@@ -32,7 +40,7 @@ def test_group_by():
            ]
     g1 = GroupBy("{{detector}}")
     for val in data1:
-        g1.update(val)
+        g1.fill(val)
     assert len(g1.groups) == 2
     assert g1.groups == {
         'D1': [(1, {'detector': 'D1'}), (3, {'detector': 'D1'})],
@@ -49,11 +57,11 @@ def test_group_by():
 
     # missing context raises
     with pytest.raises(LenaValueError):
-        GroupBy("{{non_existent}}").update(data2)
+        GroupBy("{{non_existent}}").fill(data2)
 
     # several subcontexts work
     g2 = GroupBy("{{value.variable.name}}_{{variable.name}}")
-    g2.update(data2)
+    g2.fill(data2)
     assert g2.groups == {
         'x_mean': [
             (1,

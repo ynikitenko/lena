@@ -221,6 +221,9 @@ def group_plots(group):
     If any of values has been changed,
     *context.output.changed* of the group is set to ``True``.
     """
+    # todo: is it good that we have a function and a class
+    # with very similar names, but doing different things?
+    #
     # todo: in this function only output.changed refers to plots.
     # Could be made more general, if needed.
     contexts = [lena.flow.get_context(val) for val in group]
