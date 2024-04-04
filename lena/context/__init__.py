@@ -3,7 +3,7 @@ from .functions import (
     contains,
     difference, format_context, get_recursively,
     intersection,
-    str_to_dict, str_to_list, update_nested, update_recursively,
+    str_to_dict, str_to_list, to_string, update_nested, update_recursively,
 )
 # will import, but can't be used if jinja2 is missing
 from .update_context import UpdateContext
@@ -15,6 +15,6 @@ __all__ = [
     'contains', 'difference', 'format_context',
     'get_recursively',
     'intersection',
-    'str_to_dict', 'str_to_list',
+    'str_to_dict', 'str_to_list', 'to_string',
     'update_nested', 'update_recursively',
 ]

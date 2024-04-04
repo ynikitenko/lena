@@ -20,6 +20,7 @@ Context
     intersection
     str_to_dict
     str_to_list
+    to_string
     update_nested
     update_recursively
 
@@ -49,5 +50,6 @@ Functions
 .. autofunction:: intersection
 .. autofunction:: str_to_dict
 .. autofunction:: str_to_list
+.. autofunction:: to_string
 .. autofunction:: update_nested
 .. autofunction:: update_recursively

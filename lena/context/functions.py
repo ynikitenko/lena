@@ -1,8 +1,10 @@
 """Functions to work with context (dictionary)."""
 
 import copy
+from json import dumps
 
-import lena.core
+import lena
+from lena.core import LenaTypeError, LenaValueError, LenaKeyError
 
 # pylint: disable=invalid-name
 # d is a good name for dictionary,
@@ -95,7 +97,7 @@ def difference(d1, d2, level=-1):
 
 
 def format_context(format_str):
-    """Create a function that formats a given string using a context.
+    """Create a function that formats a context using the given string.
 
     It is recommended to use jinja2.Template.
     Use this function only if you don't have jinja2.
@@ -129,18 +131,16 @@ def format_context(format_str):
     Note that string formatting can also raise a :exc:`ValueError`,
     so it is recommended to test your formatters before using them.
     """
-    # This function is rightly called format_context,
-    # because in the end it formats a context, not its format string.
     if not isinstance(format_str, str):
-        raise lena.core.LenaTypeError(
+        raise LenaTypeError(
             "format_str must be a string, {} given".format(format_str)
         )
 
     # prohibit single or unbalanced braces
     if format_str.count('{') != format_str.count('}'):
-        raise lena.core.LenaValueError("unbalanced braces in '{}'".format(format_str))
+        raise LenaValueError("unbalanced braces in '{}'".format(format_str))
     if '{' in format_str and not '{{' in format_str:
-        raise lena.core.LenaValueError(
+        raise LenaValueError(
             "double braces must be used for formatting instead of '{}'"
             .format(format_str)
         )
@@ -236,7 +236,7 @@ def get_recursively(d, keys, default=_sentinel):
     """
     has_default = default is not _sentinel
     if not isinstance(d, dict):
-        raise lena.core.LenaTypeError(
+        raise LenaTypeError(
             "need a dictionary, {} provided".format(d)
         )
     if isinstance(keys, str):
@@ -247,7 +247,7 @@ def get_recursively(d, keys, default=_sentinel):
         new_keys = []
         while keys:
             if isinstance(keys, dict) and len(keys) != 1:
-                raise lena.core.LenaValueError(
+                raise LenaValueError(
                     "keys must have exactly one key at each level, "
                     "{} given".format(keys)
                 )
@@ -262,12 +262,12 @@ def get_recursively(d, keys, default=_sentinel):
         keys = new_keys
     elif isinstance(keys, list):
         if not all(isinstance(k, str) for k in keys):
-            raise lena.core.LenaTypeError(
+            raise LenaTypeError(
                 "all simple keys must be strings, "
                 "{} given".format(keys)
             )
     else:
-        raise lena.core.LenaTypeError(
+        raise LenaTypeError(
             "keys must be a dict, a string or a list of keys, "
             "{} given".format(keys)
         )
@@ -278,7 +278,7 @@ def get_recursively(d, keys, default=_sentinel):
         elif has_default:
             return default
         else:
-            raise lena.core.LenaKeyError(
+            raise LenaKeyError(
                 "nested dict {} not found in {}".format(key, d)
             )
 
@@ -289,7 +289,7 @@ def get_recursively(d, keys, default=_sentinel):
     elif has_default:
         return default
     else:
-        raise lena.core.LenaKeyError(
+        raise LenaKeyError(
             "nested key {} not found in {}".format(keys[-1], d)
         )
 
@@ -333,14 +333,14 @@ def intersection(*dicts, **kwargs):
     :exc:`.LenaTypeError` is raised.
     """
     if not all([isinstance(d, dict) for d in dicts]):
-        raise lena.core.LenaTypeError(
+        raise LenaTypeError(
             "all dicts must be dictionaries, "
             "{} given".format(dicts)
         )
 
     level = kwargs.pop("level", -1)
     if kwargs:
-        raise lena.core.LenaTypeError(
+        raise LenaTypeError(
             "unknown kwargs {}".format(kwargs)
         )
 
@@ -399,7 +399,7 @@ def str_to_dict(s, value=_sentinel):
         if value is _sentinel:
             return {}
         else:
-            raise lena.core.LenaValueError(
+            raise LenaValueError(
                 "to make a dict with a value, "
                 "provide at least one dot-separated key"
             )
@@ -417,7 +417,7 @@ def str_to_dict(s, value=_sentinel):
         if len_l == 2:
             d.update([(l[0], l[1])])
         elif len_l < 2:
-            raise lena.core.LenaValueError(
+            raise LenaValueError(
                 "to make a dict, provide at least two dot-separated values"
             )
         else:
@@ -449,6 +449,46 @@ def str_to_list(s):
     # as whole context. The variant with '' seems more understandable
     # to the user.
     return s.split(".")
+
+
+def to_string(d):
+    """Convert a dictionary *d* to a string.
+
+    Example:
+
+    >>> d = {"a": 1, "b": {"c": 3}}
+    >>> to_string(d)
+    '{"a":1,"b":{"c":3}}'
+
+    *d* can have nested subdictionaries, lists and other
+    JSON-serializable items. *d* keys are sorted.
+
+    .. note::
+        The returned representation is terse and can be used for hashing
+        (though more optimal solutions for that may exist).
+        *d* can be not only a dictionary, but for example to hash a list
+        one can simply convert it to a tuple.
+        Use :class:`.Context` for a human-friendlier formatting.
+        Use ``json.dumps`` for more flexibility.
+
+    If an item is unserializable (for example, *d* contains a *set*),
+    :exc:`.LenaValueError` is raised.
+
+    .. versionadded:: 0.6
+    """
+    # keys should be sorted, because we want dictionary representations
+    # to be invariant with respect to key order.
+    try:
+        s = dumps(d, skipkeys=False, separators=(',', ':'), sort_keys=True)
+    except (TypeError, OverflowError, ValueError) as e:
+        # JSON serialization errors.
+        # A ValueError can raise from floats like inf or nan.
+        # We don't raise a TypeError, for in general we test
+        # only contexts and it means "a wrong context".
+        raise LenaValueError(
+            "can not serialize. " + repr(e)
+        )
+    return s
 
 
 def update_nested(key, d, other):
@@ -498,7 +538,7 @@ def update_nested(key, d, other):
         while True:
             if key in d:
                 if d in nested_dicts:
-                    raise lena.core.LenaValueError(
+                    raise LenaValueError(
                         "recursive *other* is forbidden"
                     )
                 nested_dicts.append(d)
@@ -550,11 +590,11 @@ def update_recursively(d, other, value=_sentinel):
         other = str_to_dict(other, value)
     else:
         if value is not _sentinel:
-            raise lena.core.LenaValueError(
+            raise LenaValueError(
                 "explicit value is allowed only when other is a string"
             )
     if not isinstance(d, dict) or not isinstance(other, dict):
-        raise lena.core.LenaTypeError(
+        raise LenaTypeError(
             "d and other must be dicts, {} and {} provided".format(d, other)
         )
     for key, val in other.items():

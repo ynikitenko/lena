@@ -5,7 +5,7 @@ from lena.core import LenaTypeError, LenaKeyError, LenaValueError
 from lena.context import (
     contains, difference, format_context, get_recursively,
     intersection,
-    str_to_dict, str_to_list,
+    str_to_dict, str_to_list, to_string,
     update_recursively, update_nested,
 )
 
@@ -265,6 +265,24 @@ def test_str_to_list():
     # empty string produces an empty list
     assert str_to_list("") == []
     assert str_to_list(".a..") == ["", "a", "", ""]
+
+
+def test_to_string():
+    # a dictionary with a nested subdictionary can be formatted
+    d1 = {"a": 1, "b": {"c": 3}}
+    assert to_string(d1) == '{"a":1,"b":{"c":3}}'
+
+    # a dictionary with a list can be formatted
+    d2 = {"a": [1, 2, 3]}
+    assert to_string(d2) == '{"a":[1,2,3]}'
+
+    # unserializable types raise
+    with pytest.raises(LenaValueError) as err:
+        to_string({"a": set()})
+    assert str(err.value) in (
+        "can not serialize. TypeError('Object of type set is not JSON serializable')",
+        "can not serialize. TypeError('set([]) is not JSON serializable',)"
+    )
 
 
 def test_update_nested():
