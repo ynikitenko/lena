@@ -1,30 +1,29 @@
 import pytest
 
 import lena
-import lena.core
-from lena.core import LenaTypeError, LenaValueError
-import lena.context.functions as lf
+from lena.core import LenaTypeError, LenaKeyError, LenaValueError
 from lena.context import (
-    difference, format_context, get_recursively,
-    iterate_update, update_recursively, update_nested,
+    contains, difference, format_context, get_recursively,
     intersection,
+    str_to_dict, str_to_list,
+    update_recursively, update_nested,
 )
 
 
 def test_contains():
     d = {'a': {'b': 'c d'}, 'e': 1}
-    assert lena.context.contains(d, "a") is True
-    assert lena.context.contains(d, "a.b.c d") is True
-    assert lena.context.contains(d, "b.c") is False
-    assert lena.context.contains(d, "a.b") is True
+    assert contains(d, "a") is True
+    assert contains(d, "a.b.c d") is True
+    assert contains(d, "b.c") is False
+    assert contains(d, "a.b") is True
     # not string contents are cast to strings
-    assert lena.context.contains(d, "e.1") is True
+    assert contains(d, "e.1") is True
     ## test values with exception when cast to string
     class NoString():
         def __repr__(self):
             raise ValueError
     badd = {"key": NoString()}
-    assert lena.context.contains(badd, "key.1") is False
+    assert contains(badd, "key.1") is False
 
 
 def test_difference():
@@ -93,7 +92,7 @@ def test_format_context():
     assert f({"x": {"y": 10}}) == "10"
     # # special string doesn't work with keyword arguments
     # f = format_context("{}_{x.y}", "x.y")
-    # with pytest.raises(lena.core.LenaKeyError):
+    # with pytest.raises(LenaKeyError):
     #     f({"x": {"y": 10}})
 
     ## special formatting works
@@ -103,7 +102,7 @@ def test_format_context():
     assert f({"x": 10}) == "*10*"
 
     # missing values raise LenaKeyError
-    with pytest.raises(lena.core.LenaKeyError):
+    with pytest.raises(LenaKeyError):
         f({})
     f = format_context("{{x} }")
     with pytest.raises(ValueError):
@@ -123,7 +122,7 @@ def test_format_context():
     # f = format_context("{}", "x")
     # assert f({"x": 1}) == "1"
     # f = format_context("{}_{}", "x", "y")
-    # with pytest.raises(lena.core.LenaKeyError):
+    # with pytest.raises(LenaKeyError):
     #     # "y" not found in context
     #     f({"x": 1})
     # assert f({"x": 1, "y": 2}) == "1_2"
@@ -131,10 +130,10 @@ def test_format_context():
     # assert f({"x": 1, "y": 2, "z": 3}) == "1_2"
     # # missing key raises
     # f = format_context("{}", "x")
-    # with pytest.raises(lena.core.LenaKeyError):
+    # with pytest.raises(LenaKeyError):
     #     f({"u": 1})
     # f = format_context("{x}", "x")
-    # with pytest.raises(lena.core.LenaKeyError):
+    # with pytest.raises(LenaKeyError):
     #     f({"u": 1})
 
     # ## keyword arguments
@@ -144,7 +143,7 @@ def test_format_context():
     # f = format_context("{y}", y="x.y")
     # assert f({"x": {"y": 10}}) == "10"
     # assert format_context("{y}_{x}", x="y", y="x")({"x": 1, "y": 2}) == "1_2"
-    # with pytest.raises(lena.core.LenaKeyError):
+    # with pytest.raises(LenaKeyError):
     #     # keyword arguments in format string must be keywords in arguments
     #     assert format_context("{y}_{x}", "x", "y")({"x": 2, "y": 2}) == "1_2"
 
@@ -160,19 +159,19 @@ def test_format_context():
     # # assert f({"x": {"y": 10}}) == "10"
 
     # not implemented
-    # with pytest.raises(lena.core.LenaValueError):
+    # with pytest.raises(LenaValueError):
     #     format_context("{a_string")
 
 
 def test_get_recursively():
     # test wrong input parameters
-    with pytest.raises(lena.core.LenaTypeError):
+    with pytest.raises(LenaTypeError):
         get_recursively("must be a dict", "output.latex.name")
 
     context = {"output": {"latex": {"name": "x"}}}
-    with pytest.raises(lena.core.LenaTypeError):
+    with pytest.raises(LenaTypeError):
         get_recursively(context, ["output", True])
-    with pytest.raises(lena.core.LenaTypeError):
+    with pytest.raises(LenaTypeError):
         get_recursively(context, True)
 
     # empty keys return context
@@ -189,19 +188,19 @@ def test_get_recursively():
     assert get_recursively(context, ["output", "latex", "name"], default="") == "x"
     assert get_recursively(context, ["output", "latex"], default="") == {"name": "x"}
     # missing values raise
-    with pytest.raises(lena.core.LenaKeyError):
+    with pytest.raises(LenaKeyError):
         get_recursively(context, "output.lalalatex")
-    with pytest.raises(lena.core.LenaKeyError):
+    with pytest.raises(LenaKeyError):
         get_recursively(context, "out")
-    with pytest.raises(lena.core.LenaKeyError):
+    with pytest.raises(LenaKeyError):
         get_recursively(context, ["output", "latex", "name???"])
-    with pytest.raises(lena.core.LenaKeyError):
+    with pytest.raises(LenaKeyError):
         get_recursively(context, ["output", "latex??", "name???"])
 
     ## test dict as input
     assert get_recursively(context, {"output": {"latex": "name"}}) == "x"
     # only one key at a level is allowed
-    with pytest.raises(lena.core.LenaValueError):
+    with pytest.raises(LenaValueError):
         get_recursively(context, {"output": {"latex": "name"}, "a": 1})
 
 
@@ -229,8 +228,8 @@ def test_intersection():
     assert intersection(d1, d2) == d2
 
     # dicts must contain only dictionaries
-    with pytest.raises(lena.core.LenaTypeError):
-        lena.context.intersection([])
+    with pytest.raises(LenaTypeError):
+        intersection([])
 
     # test level
     assert intersection(d1, d1, level=0) == d1
@@ -239,65 +238,33 @@ def test_intersection():
     assert intersection(d1, d2, level=2) == d2
 
     # wrong keyword arguments
-    with pytest.raises(lena.core.LenaTypeError):
+    with pytest.raises(LenaTypeError):
         intersection(d1, d2, wrong_kw=True)
-
-
-def test_iterate_update():
-    context = {"output": {"latex": {"name": "x"}}}
-    updates = [{"scale": "log"}, {"scale": "normal"}]
-    assert list(iterate_update(context, updates)) == [
-        {'output': {'latex': {'name': 'x'}}, 'scale': 'log'}, 
-        {'output': {'latex': {'name': 'x'}}, 'scale': 'normal'}
-        ]
-    updates = [{"output": {"latex": {"name": "y"}}}]
-    assert list(iterate_update(context, updates)) == [
-        {'output': {'latex': {'name': 'y'}}}
-        ]
-    updates = [{"output": "latex"}]
-    assert list(iterate_update(context, updates)) == [
-        {'output': 'latex'}
-        ]
-    updates = [{}]
-    assert list(iterate_update(context, updates)) == [context]
-    assert context == {"output": {"latex": {"name": "x"}}}
-    updates = []
-    assert list(iterate_update(context, updates)) == []
-
-
-def test_make_context():
-    class Obj():
-        scale = 2
-        _dim = 1
-        foo = None
-        name = "obj"
-    assert (lf.make_context(Obj(), "scale", "_dim", "foo") ==
-            {'dim': 1, 'scale': 2})
 
 
 def test_str_to_dict():
     ## test with only one argument
     # empty string produces an empty dict
-    assert lena.context.str_to_dict("") == {}
+    assert str_to_dict("") == {}
     # otherwise s must have at least two dot-separated parts
-    with pytest.raises(lena.core.LenaValueError):
-        lena.context.str_to_dict("s")
+    with pytest.raises(LenaValueError):
+        str_to_dict("s")
     # this functionality is removed.
     # # dictionary is returned unchanged
     # d = {"d": "d"}
-    # assert lena.context.str_to_dict(d) == d
+    # assert str_to_dict(d) == d
 
     ## test with an explicit value
     # short strings are prohibited
-    with pytest.raises(lena.core.LenaValueError):
-        lena.context.str_to_dict("", 5)
-    assert lena.context.str_to_dict("s", 5) == {"s": 5}
+    with pytest.raises(LenaValueError):
+        str_to_dict("", 5)
+    assert str_to_dict("s", 5) == {"s": 5}
 
 
 def test_str_to_list():
     # empty string produces an empty list
-    assert lena.context.str_to_list("") == []
-    assert lena.context.str_to_list(".a..") == ["", "a", "", ""]
+    assert str_to_list("") == []
+    assert str_to_list(".a..") == ["", "a", "", ""]
 
 
 def test_update_nested():
@@ -319,7 +286,7 @@ def test_update_nested():
     d1 = {"d": {}}
     d2 = {}
     d2["d"] = d2
-    with pytest.raises(lena.core.LenaValueError):
+    with pytest.raises(LenaValueError):
         update_nested("d", d1, d2)
 
 
@@ -332,7 +299,7 @@ def test_update_recursively():
     assert d1 == {"a": 1, "b": 2}
     update_recursively(d1, {"e": {"f": 2}})
     assert d1 == {"a": 1, "b": 2, "e": {"f": 2}}
-    with pytest.raises(lena.core.LenaTypeError):
+    with pytest.raises(LenaTypeError):
         update_recursively(1, {})
     update_recursively(d1, {"a": {"b": "c"}})
     assert d1 == {"a": {"b": "c"}, "b": 2, "e": {"f": 2}}
@@ -341,5 +308,5 @@ def test_update_recursively():
     d_empty = {}
     update_recursively(d_empty, "output.changed", True)
     assert d_empty == {"output": {"changed": True}}
-    with pytest.raises(lena.core.LenaValueError):
+    with pytest.raises(LenaValueError):
         update_recursively(d_empty, {"a": "b"}, "fail")

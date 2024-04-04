@@ -129,6 +129,8 @@ def format_context(format_str):
     Note that string formatting can also raise a :exc:`ValueError`,
     so it is recommended to test your formatters before using them.
     """
+    # This function is rightly called format_context,
+    # because in the end it formats a context, not its format string.
     if not isinstance(format_str, str):
         raise lena.core.LenaTypeError(
             "format_str must be a string, {} given".format(format_str)
@@ -370,46 +372,6 @@ def intersection(*dicts, **kwargs):
             # res was calculated empty
             return res
     return res
-
-
-def iterate_update(d, updates):
-    """Iterate on updates of *d* with *updates*.
-
-    *d* is a dictionary. It remains unchanged.
-
-    *updates* is a list of dictionaries.
-    For each element *update*
-    a copy of *d* updated with *update* is yielded.
-
-    If *updates* is empty, nothing is yielded.
-    """
-    # todo: do I need this function?
-    for update in updates:
-        d_copy = copy.deepcopy(d)
-        update_recursively(d_copy, update)
-        yield d_copy
-
-
-def make_context(obj, *attrs):
-    """Return context for object *obj*.
-
-    *attrs* is a list of attributes of *obj* to be inserted
-    into the context.
-    If an attribute starts with an underscore '_',
-    it is inserted without the underscore.
-    If an attribute is absent or None, it is skipped.
-    """
-    # todo: rename to to_dict
-    # not used anywhere, change it freely.
-    # add examples.
-    context = {}
-    for attr in attrs:
-        val = getattr(obj, attr, None)
-        if val is not None:
-            if attr.startswith("_"):
-                attr = attr[1:]
-            context.update({attr: val})
-    return context
 
 
 def str_to_dict(s, value=_sentinel):

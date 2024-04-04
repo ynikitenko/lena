@@ -674,7 +674,6 @@ class Graph(object):
         self._context.update(self._init_context)
         # why this? Not *graph.scale*?
         self._context.update({"scale": self._scale})
-        # self._context.update(lena.context.make_context(self, "_scale"))
 
         # todo: make this check during fill. Probably initialize self._dim
         # with kwarg dim. (dim of coordinates or values?)

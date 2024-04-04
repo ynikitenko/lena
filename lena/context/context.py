@@ -30,7 +30,7 @@ class Context(dict):
         and returning a string. The default is ``json.dumps``.
 
         All public attributes of a :class:`Context`
-        can be got or set using dot notation
+        can be retrieved or set using dot notation
         (for example, *context["data_path"]*
         is equal to *context.data_path*).
         Only one level of nesting is accessible using dot notation.
@@ -42,16 +42,18 @@ class Context(dict):
             In particular, JSON *True* is written as lowercase *true*.
             To convert JSON back to Python, use ``json.loads(string)``.
 
-        If *formatter* is given but is not callable,
-        :exc:`.LenaTypeError` is raised.
-        If the attribute to be got is missing,
+        If the attribute to be retrieved is missing,
         :exc:`.LenaAttributeError` is raised.
-        An attempt to get a private attribute raises
+        An attempt to access a private attribute raises
         :exc:`AttributeError`.
         """
-        # todo: this looks a bit messy. A cleaner approach would be
-        # to create a separate class for the dict wrapper,
-        # and a separate class as a Lena element (as in histogram).
+        # This class does three different simple things:
+        # - pretty formatting for a dict.
+        # - element for pretty formatting of a dict.
+        # - object with attribute access through dot notation.
+        # A better alternative for the latter could be
+        # `types.SimpleNamespace <https://docs.python.org/3/library/types.html#types.SimpleNamespace>`_
+        # (since Python 3.3) or third-party libraries.
         if d is None:
             d = {}
         super(Context, self).__init__(d)
@@ -89,13 +91,15 @@ class Context(dict):
 
     def __getattr__(self, name):
         # we don't implement getting nested attributes,
-        # because that would require creating proxy objects
-        # -- maybe in the future if needed.
+        # because that would require creating proxy objects.
+        # Use more sophisticated libraries for that.
+        
+        # todo: should LenaAttributeError be used here at all?
         if name.startswith('_'):
             # this is not LenaAttributeError,
             # as it wouldn't be so for other Lena classes
             # that don't implement __getattr__ .
-            # See comment for Variable.
+            # Same is done for Variable.
             raise AttributeError(name)
         try:
             return self[name]
@@ -105,9 +109,9 @@ class Context(dict):
             )
 
     def _repr_nested(self, base_indent="", indent=" "*4, el_separ=",\n"):
-        # representation within a Lena Sequence
-        # todo: it doesn't print initialization arguments,
-        # see comment in __init__
+        # representation within a Lena Sequence.
+        # Initialization arguments are not printed,
+        # for they are not needed there, and the formatter is callable.
         return base_indent + "Context()"
 
     def __repr__(self):
@@ -115,7 +119,9 @@ class Context(dict):
 
     def __setattr__(self, attr, value):
         if attr in ["_formatter"]:
-            # from https://stackoverflow.com/a/17020163/952234
+            # from https://stackoverflow.com/a/17020163/952234,
+            # "How to use __setattr__ correctly,
+            # avoiding infinite recursion"
             super(Context, self).__setattr__(attr, value)
         elif attr.startswith('_'):
             raise AttributeError(attr)
