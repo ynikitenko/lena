@@ -28,11 +28,18 @@ def test_source():
     with pytest.raises(TypeError):
         seq2[0] = 0
 
+    # empty and wrong arguments raise proper errors
     with pytest.raises(lena.core.LenaTypeError):
         s = Source()
     with pytest.raises(lena.core.LenaTypeError):
         s = Source(1)
 
-    # can not initialize from a tuple
-    with pytest.raises(lena.core.LenaTypeError):
+    # can initialize from iterable
+    src3 = Source([1, 2, 3], lambda val: val+1)
+    assert list(src3()) == [2, 3, 4]
+
+    # emits a warning for a single iterable element
+    with pytest.warns(UserWarning):
+        # This really looks like an error.
+        # What would that sequence do anyway.
         Source((cnt0, Slice(1)))
