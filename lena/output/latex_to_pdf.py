@@ -4,6 +4,7 @@ from __future__ import print_function
 import collections 
 import os
 import subprocess
+import sys
 
 import lena.core 
 import lena.context
@@ -90,8 +91,12 @@ class LaTeXToPDF(object):
                     # process terminated
                     ## this part is probably unused and untested
                     if verbose > 1 or (verbose and returncode):
-                        print(stdoutdata.decode())
-                        print(stderrdata.decode())
+                        if sys.version_info.major == 2:
+                            print(proc.stdout.decode())
+                            print(proc.stderr.decode())
+                        else:
+                            print(proc.stdout)
+                            print(proc.stderr)
                     if returncode:
                         # an error occurred
                         del processes[filename]
