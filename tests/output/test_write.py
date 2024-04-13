@@ -10,6 +10,12 @@ from lena.core import Sequence
 from lena.meta import SetContext
 from lena.output import Write
 
+# (major, minor)
+SYSVERSION = (sys.version_info[0], sys.version_info[1])
+# index in calls depending on Python version.
+# See the first comment on SYSVERSION.
+SYSIND = 0 if SYSVERSION < (3, 11) else 1
+
 
 def test_write_makefilename():
     w = Write("", "x")
@@ -93,22 +99,27 @@ def test_write():
 
 
 def test_write_writes(mocker):
+    # otherwise the current directory "" would be absent
+    mocker.patch("os.path.exists", lambda val: val == "")
+
     m = mocker.mock_open()
     if sys.version[0] == "2":
         mocker.patch("__builtin__.open", m)
     else:
         mocker.patch("builtins.open", m)
-    # otherwise the current directory "" would be absent
-    mocker.patch("os.path.exists", lambda val: val == "")
 
     w1 = Write("")
     data = [("0", {"output": {"filename": "y", "filetype": "csv"}})]
     res = list(w1.run(data))
     call = mocker.call
-    assert m.mock_calls == [
+    callres = [
         call("y.csv", "w"), call().__enter__(),
         call().write("0"), call().__exit__(None, None, None)
     ]
+    # The first comment on SYSVERSION:
+    # in Python3.11 there appeared a strange new call,
+    # call.__eq__(<function test_write_changed_data.<locals>.<lambda> at ...>)
+    assert m.mock_calls == callres or m.mock_calls[1:] == callres
     assert res == [("y.csv", {"output": {"filename": "y",
                                          "fileext": "csv",
                                          "filetype": "csv",
@@ -116,9 +127,14 @@ def test_write_writes(mocker):
                              })]
 
     makedirs = mocker.patch("os.makedirs")
+    m.reset_mock()
+
     w2 = Write("output")
     res = list(w2.run(data))
-    assert makedirs.mock_calls == [call("output")]
+    if SYSVERSION < (3, 11):
+        assert makedirs.mock_calls == [call("output")]
+    else:
+        assert call("output") in makedirs.mock_calls
 
     # test one line where file name is not joined with file extension
     data_empty_ext = [("0", {"output": {"filename": "y", "fileext": ""}})]
@@ -159,10 +175,13 @@ def test_write_changed(mocker):
     ]
     # data is actually "written"
     call = mocker.call
-    assert m.mock_calls == [
+
+    mock_calls = [
         call("x.txt", "w"), call().__enter__(),
         call().write("1"), call().__exit__(None, None, None)
     ]
+    assert m.mock_calls[SYSIND:] == mock_calls
+
     # context is updated in place
     assert data[0][1]["output"]["changed"] is True
 
@@ -200,7 +219,7 @@ def test_write_cached(mocker):
                      'filepath': 'x.txt'}})
     ]
     call = mocker.call
-    assert m.mock_calls == [
+    assert m.mock_calls[SYSIND:] == [
         call("x.txt"), call().__enter__(),
         call().read(-1), call().__exit__(None, None, None)
     ]
@@ -242,7 +261,7 @@ def test_write_changed_data(mocker):
     ]
     call = mocker.call
     # file is read and then written with 1
-    assert m.mock_calls == [
+    assert m.mock_calls[SYSIND:] == [
         call("x_changed.txt"), call().__enter__(),
         call().read(-1),
         call().__exit__(None, None, None),
