@@ -5,6 +5,7 @@ from .functions import (
     intersection,
     str_to_dict, str_to_list, to_string, update_nested, update_recursively,
 )
+from .include_exclude_tree import IncludeExcludeTree
 # will import, but can't be used if jinja2 is missing
 from .update_context import UpdateContext
 
@@ -16,5 +17,5 @@ __all__ = [
     'get_recursively',
     'intersection',
     'str_to_dict', 'str_to_list', 'to_string',
-    'update_nested', 'update_recursively',
+    'update_nested', 'update_recursively', 'IncludeExcludeTree'
 ]
