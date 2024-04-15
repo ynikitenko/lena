@@ -241,7 +241,11 @@ def group_plots(group):
 
 
 class GroupPlots(object):
-    """Group several plots."""
+    """
+    .. deprecated:: 0.6
+        use :class:`.GroupBy`, :func:`group_plots`
+        and other relevant elements.
+    """
 
     def __init__(self, group_by, select=None, transform=(), scale=None,
                  yield_selected=False):
@@ -294,10 +298,10 @@ class GroupPlots(object):
         else:
             self._selector = lena.flow.Selector(select)
 
-        if isinstance(group_by, lena.flow.group_by.GroupBy):
+        if isinstance(group_by, lena.flow.group_by._GroupBy):
             self._group_by = group_by
         else:
-            self._group_by = lena.flow.group_by.GroupBy(group_by)
+            self._group_by = lena.flow.group_by._GroupBy(group_by)
 
         if (scale is None
             or isinstance(scale, lena.flow.group_scale.GroupScale)):

@@ -34,6 +34,7 @@ Flow
 
     GroupBy
     GroupPlots
+    group_plots
     GroupScale
     MapGroup
     Selector
@@ -96,6 +97,7 @@ Group plots
 .. currentmodule:: lena.flow
 .. autoclass:: GroupBy
 .. autoclass:: GroupPlots
+.. autofunction:: group_plots
 .. autoclass:: GroupScale
 .. autoclass:: MapGroup
 

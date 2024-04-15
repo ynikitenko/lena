@@ -67,7 +67,7 @@ class IncludeExcludeTree():
     def __init__(self, keys, subtrees, include):
         """*keys* is a set of flat strings.
         Their usage depends on *include*: if it is ``True``,
-        then this is tree includes by default, and the *keys*
+        then this tree includes by default and the explicit *keys*
         should be *excluded* in :meth:`get`. Otherwise the keys
         should be included.
 
@@ -77,11 +77,22 @@ class IncludeExcludeTree():
         its *include* must be different from that of this tree.
         """
         self.keys = keys
-        for st in subtrees.values():
-            if not st.subtrees:
-                assert st.include == (not include)
         self.subtrees = subtrees
         self.include = bool(include)
+
+        # to be done.
+        # For now nested substrings of the same type are checked
+        # during _make_include_exclude_tree, but this could also
+        # be checked in the tree (as its invariant).
+        # However, this invariant is hard to formulate.
+        # # check subtrees correctness
+        # for st in subtrees.values():
+        #     if st.keys:
+        #         for sst in st.subtrees.values():
+        #             # It was a key in includes or excludes.
+        #             # Change the default in its daughters.
+        #             if sst.subtrees:
+        #                 assert sst.include == (not include)
 
     def get(self, context):
         """Get parts of a dictionary *context*
@@ -116,6 +127,12 @@ class IncludeExcludeTree():
                     continue
 
         return result
+
+    def __eq__(self, other):
+        if not isinstance(other, IncludeExcludeTree):
+            return NotImplemented
+        return (self.keys == other.keys and self.subtrees == other.subtrees and
+                self.include == other.include)
 
     def __repr__(self):
         return "IncludeExcludeTree(keys={}, subtrees={}, include={})"\
@@ -157,23 +174,28 @@ def _make_include_exclude_tree(includes, excludes, is_default_include):
         subkeys = pref_incs
         subsubs = pref_excs
 
-    for key, value in subkeys.items():
-        if len(value) == 1 and key not in subsubs:
-            # if len > 1, the key will be in subsubs.
+    for key, tails in subkeys.items():
+        # (key, tails) form a full key. key is its start,
+        # and tails is the remainder of the key.
+        if tails == [[]] and key not in subsubs:
             proper_keys.add(key)
         else:
-            if min(len(subkey) for subkey in value) == 0:
-                # direct subkeys change the inclusion default
+            if min(len(subkey) for subkey in tails) == 0:
+                # A new "" encountered.
+                # Here it is important that includes/excludes
+                # are properly nested, or we would get a bug here.
+                # And this will be checked in a recursive call
+                # with a new default include.
                 new_incl = (not is_default_include)
             else:
-                # "c.d.e" won't change inclusion for "c.*".
+                # A key "c.d.e" won't change inclusion for "c.*".
                 new_incl = is_default_include
 
+            includes = [sk for sk in pref_incs.get(key, []) if sk]
+            excludes = [sk for sk in pref_excs.get(key, []) if sk]
             subtrees[key] = _make_include_exclude_tree(
-                includes=[sk for sk in pref_incs.get(key, []) if sk],
-                excludes=[sk for sk in pref_excs.get(key, []) if sk],
-                # nested subkeys with the same key, the first level
-                # of nesting will have the same default inclusion.
+                includes=includes,
+                excludes=excludes,
                 is_default_include=new_incl
             )
 
@@ -204,4 +226,3 @@ def make_include_exclude_tree(includes=tuple(), excludes=tuple()):
         includes=sincs, excludes=sexcs, is_default_include=is_default_include
     )
     return iet
-

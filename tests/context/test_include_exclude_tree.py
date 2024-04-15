@@ -30,8 +30,8 @@ def test_group_by_starting_prefixes():
         "b": [("c", "d")],
     }
 
-    # empty key raises
-    # should never happen, but just in case
+    # An empty key raises.
+    # Should never happen, but just in case.
     with pytest.raises(AssertionError):
         gsp([
             ("a", "b"),
@@ -45,6 +45,9 @@ def test_include_exclude_tree():
     # IETs can be simply including/excluding everything
     true_iet  = IET([], {}, include=True)
     false_iet = IET([], {}, include=False)
+
+    # equality testing works
+    assert true_iet != false_iet
 
     c1 = {"a": 1, "b": 2, "c": {"d": 3}}
 
@@ -62,20 +65,23 @@ def test_include_exclude_tree():
     iet2 = IET({"a", "b"}, {}, include=False)
     assert iet2.get(c1) == {"a": 1, "b": 2}
 
+    # incorrect tests don't raise.
     # incorrect subtree raises
-    with pytest.raises(AssertionError):
-        IET([],
-            {
-                "a": IET(
-                    [], 
-                    # we only need this IET to be an argument here
-                    {"dummy": true_iet},
-                    include=True
-                ),
-            },
-            # same as in its subtree
-            include=True
-        )
+    # with pytest.raises(AssertionError):
+        # IET([],
+        #     {
+        #         "a": IET(
+        #             set(),
+        #             # we only need this IET to be an argument here
+        #             {"dummy": true_iet},
+        #             include=True
+        #         ),
+        #     },
+        #     # same as in its subtree
+        #     include=True
+        # )
+        # this tree would be perfectly correct
+        # for merge="a.dummy.smth_else" .
 
     ## A real subtree works
     iet4 = IET(["d"], {}, include=False)
@@ -88,6 +94,10 @@ def test_include_exclude_tree():
     # "d" is not a dict here, so it won't be selected
     c3 = {"a": 1, "b": 2, "c": "d"}
     assert iet3.get(c3) == {"b": 2}
+
+    # equality testing works
+    assert iet3 == iet3
+    assert iet3 != iet4
 
 
 def test_make_include_exclude_tree():

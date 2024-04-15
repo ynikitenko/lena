@@ -5,6 +5,7 @@ import lena.core
 from lena.core import LenaTypeError, LenaValueError
 from lena.flow import GroupBy, GroupScale, Selector, MapGroup
 from lena.flow.group_plots import group_plots, GroupPlots
+from lena.flow.group_by import _GroupBy
 from lena.structures import histogram, graph
 
 
@@ -106,11 +107,12 @@ def test_map_group():
         assert list(mg5.run([grp2])) == []
 
 
-def test_group_plots():
+def test_group_plots_function():
     data = [1, 2]
     contexts = ({"a": "a", "b": {}}, {"a": "a"})
     vals = list(zip(data, contexts))
-    res = (
+
+    assert group_plots(vals) == (
         [1, 2],
         {'a': 'a',
          'group': [{'a': 'a',
@@ -118,10 +120,8 @@ def test_group_plots():
                    {'a': 'a'}],
          'output': {'changed': False}},
     )
-    assert group_plots(vals) == res
 
-    vals = data
-    assert group_plots(vals) == (
+    assert group_plots(data) == (
         [1, 2],
         # there is a group context, even if it was empty.
         # It is better for generality.
@@ -129,7 +129,7 @@ def test_group_plots():
     )
 
 
-def test_GroupPlots():
+def test_group_plots_cls():
     h0 = histogram([0, 1], [0])
     h1 = histogram([0, 1], [1])
     h2 = histogram([0, 2], [2])
@@ -137,7 +137,7 @@ def test_GroupPlots():
     # copy not to modify original histograms
     data = copy.deepcopy([h0, h1, h2, gr1, 1])
 
-    # in Python 2 type of histogram and graph is the same
+    # in Python 2 the type of histogram and graph is the same
     def tp(data):
         if isinstance(data, histogram):
             return "hist"
@@ -176,7 +176,7 @@ def test_GroupPlots():
     # moreover, if there are duplicates, we won't check that with set.
     # assert set(results) == set(expected_results)
 
-    gp2 = GroupPlots(GroupBy(tp), Selector(lambda _: True),
+    gp2 = GroupPlots(_GroupBy(tp), Selector(lambda _: True),
                      transform=lena.core.Sequence(), yield_selected=False)
     results2 = list(gp2.run(data))
     assert_list_contents_equal(results, results2)

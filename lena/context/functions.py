@@ -7,7 +7,7 @@ import lena
 from lena.core import LenaTypeError, LenaValueError, LenaKeyError
 
 # pylint: disable=invalid-name
-# d is a good name for dictionary,
+# d is a good name for a dictionary,
 # used in Python documentation for dict.
 
 
@@ -33,9 +33,12 @@ def contains(d, s):
     is not a string, its string representation is used for comparison.
     See also :func:`str_to_dict`.
     """
+    # This function is used in string selectors.
     # todo: s can be a list, or a dict?
+    # todo: should be rewritten through get_recursively or intersection
     levels = s.split(".")
     if len(levels) < 2:
+        # todo: an empty string should return True.
         return s in d
     subdict = d
     for key in levels[:-1]:
@@ -236,6 +239,8 @@ def get_recursively(d, keys, default=_sentinel):
     """
     has_default = default is not _sentinel
     if not isinstance(d, dict):
+        # for now we use only dictionaries, but this function
+        # could be generalised to other containers (like sets).
         raise LenaTypeError(
             "need a dictionary, {} provided".format(d)
         )
