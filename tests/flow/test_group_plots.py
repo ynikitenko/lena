@@ -8,6 +8,11 @@ from lena.flow.group_plots import group_plots, GroupPlots
 from lena.flow.group_by import _GroupBy
 from lena.structures import histogram, graph
 
+pytestmark = pytest.mark.filterwarnings(
+    "ignore:GroupPlots is deprecated:DeprecationWarning",
+    "ignore:update is deprecated:DeprecationWarning"
+)
+
 
 def test_map_group():
     el = lambda i: i+1

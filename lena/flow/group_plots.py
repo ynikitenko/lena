@@ -291,6 +291,12 @@ class GroupPlots(object):
         # we don't have an object "all", so we use None for all.
         # This doesn't interfere with Selector semantics,
         # because None is not a type.
+        warnings.warn(
+            "GroupPlots is deprecated since Lena 0.6. "
+            "Use GroupBy and group_plots. In:",
+            DeprecationWarning, stacklevel=2
+        )
+
         if select is None:
             self._selector = lambda _: True
         elif isinstance(select, lena.flow.Selector):
