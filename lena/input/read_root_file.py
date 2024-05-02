@@ -15,8 +15,8 @@ class ReadROOTFile():
 
         *types* sets the list of possible objects types.
 
-        *keys* specifies a list of allowed objects' names.
-        Only simple keys are currently allowed (no regular expressions).
+        *keys* is a list of allowed objects' names (or a single name).
+        Only simple strings are allowed (no regular expressions).
 
         If both *types* and *keys* are provided, then
         objects that satisfy any of *types* or *keys*
@@ -46,22 +46,31 @@ class ReadROOTFile():
             return
 
         if keys is not None:
-            if not isinstance(keys, list):
-                raise lena.core.LenaTypeError(
-                    "keys must be a list of strings"
-                )
-            # ROOT keys can have unicode names
-            if (sys.version_info.major == 2 and
-                any((not isinstance(key, basestring) for key in keys))) or \
-               (sys.version_info.major > 2 and
-                any((not isinstance(key, str) for key in keys))):
-                raise lena.core.LenaTypeError(
-                    "keys must contain only strings"
-                )
-                # todo: allow regular expressions
-                # todo: allow ROOT object versions
-                keys_selector = [lambda obj: obj.GetName() == key
-                                 for key in keys]
+            if isinstance(keys, str):
+                keys = [keys]
+            # a tuple or any iterable would also go.
+            # This depends on the user's preference,
+            # not our requirements.
+            # if not isinstance(keys, list):
+            #     raise lena.core.LenaTypeError(
+            #         "keys must be a list of strings"
+            #     )
+
+            key_error = lena.core.LenaTypeError(
+                "keys must contain only strings"
+            )
+            if sys.version_info.major >= 3:
+                if any((not isinstance(key, str) for key in keys)):
+                    raise key_error
+            else:
+                # ROOT keys can have unicode names
+                if any((not isinstance(key, basestring) for key in keys)):
+                    raise key_error
+
+            # todo: allow regular expressions
+            # todo: allow ROOT object versions
+            keys_selector = [lambda obj: obj.GetName() == key
+                             for key in keys]
 
         if types is not None:
             if not isinstance(types, list):

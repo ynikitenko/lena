@@ -4,10 +4,12 @@ import copy
 import sys
 
 import lena
+from lena.core import LenaTypeError, LenaValueError
 
 
 class ReadROOTTree():
     """Read ROOT trees from flow."""
+    # todo: separate into ReadROOTTreeLeaves and ReadROOTTreeEntries
 
     def __init__(self, leaves=None, get_entries=None):
         """Trees can be read in two ways.
@@ -20,7 +22,7 @@ class ReadROOTTree():
         Tree entries are yielded as named tuples
         with fields named after *leaves*.
 
-        A leaf can contain a branch name prepended
+        A leaf can contain a branch name prepended.
 
         In the second variant, *get_entries*
         is a function that accepts a ROOT tree
@@ -46,18 +48,21 @@ class ReadROOTTree():
 
         if leaves is not None:
             err_msg = ""
-            if not isinstance(leaves, list):
-                err_msg = "leaves must be a list of strings"
+            if isinstance(leaves, str):
+                # ignore a basestring.
+                leaves = [leaves]
+            # a tuple would also go.
+            # if not isinstance(leaves, list):
+            leaves_err = LenaValueError("leaves must be a list of strings")
             if sys.version_info.major == 2:
                 if any((not isinstance(br, basestring) for br in leaves)):
                     # ROOT allows unicode names.
-                    err_msg = "leaves must be a list of strings"
+                    raise leaves_err
             else:
                 if any((not isinstance(br, str) for br in leaves)):
-                    err_msg = "leaves must be a list of strings"
-            if err_msg:
-                raise lena.core.LenaTypeError(err_msg)
-            # todo: maybe allow regexps in the future.
+                    raise leaves_err
+
+            # maybe todo: allow regexps
             if any(('*' in br for br in leaves)):
                 raise lena.core.LenaValueError(
                     "leaves must be strings without regular expressions"
