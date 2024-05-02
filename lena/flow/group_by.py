@@ -18,17 +18,21 @@ class GroupBy(object):
     """
 
     def __init__(self, group_by="", merge=""):
-        """*group_by* is a function that returns
-        distinct hashable results for values from different groups.
-        It can be also a dot-separated formatting string.
-        In that case only the context part of the value is used
+        """*group_by* defines distinct hashable results
+        for values from different groups.
+        It is a dot-separated formatting string.
+        Only the context part of the value is used for grouping
         (see :func:`context.format_context <.format_context>`).
-        *group_by* can be a tuple of strings or callables.
-        In that case the hash value will be combined from each
-        part of the tuple. A tuple may be used when not all parts
-        of context can be always rendered (that would lead to an error
+        *group_by* can be a tuple of strings.
+        In that case the hash value is combined from each
+        part of the tuple.
+        A tuple may be used when not all parts
+        of context can be rendered (that would lead to an error
         or an empty string if they were combined
         into one formatting string).
+
+        Setting *group_by* to an empty string (default)
+        adds all values from the flow into one group.
 
         .. versionchanged:: 0.6
             *group_by* is no longer a function.
