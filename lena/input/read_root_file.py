@@ -80,7 +80,9 @@ class ReadROOTFile():
             # can raise an OSError
             root_file = TFile(data, "read")
             # This could be done before this element,
-            # but update it here for better default tracking
+            # but update it here for better default tracking.
+            # todo: should it be simply filepath for uniformity?
+            # However, we don't have other readers at the moment.
             update_recursively(
                 context, {"input": {"root_file_path": data}}
             )
@@ -107,6 +109,7 @@ class ReadROOTFile():
                         raise LenaKeyError(
                             "key {} not found in {}".format(key, data)
                         )
+                    continue
 
                 new_context = deepcopy(context)
                 update_recursively(

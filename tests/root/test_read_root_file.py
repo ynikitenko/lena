@@ -38,6 +38,18 @@ def test_read_root_file(rootfile):
         assert dt.GetName() == "tree"
         assert context == res_context
     assert ind == 0
+    del ind
+
+    # several keys work. A missing key is not yielded.
+    read_file_keys = ReadROOTFile(("tree", "missing"), raise_on_missing=False)
+    # explicitly cycle.
+    for ind, val in enumerate(read_file_keys.run(data)):
+        dt, context = val
+        assert dt.GetName() == "tree"
+        assert context == res_context
+    # only one value was read.
+    # "missing" was not yielded as a null value.
+    assert ind == 0
 
     # a missing key raises if needed
     read_file_missing_keys = ReadROOTFile("missing", raise_on_missing=True)
