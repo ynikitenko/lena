@@ -1,4 +1,5 @@
 import collections
+import os
 
 import pytest
 pytestmark = pytest.mark.root
@@ -49,7 +50,8 @@ def test_val_to_type_fields():
 
 
 def test_run():
-    root_tree = WriteROOTTree("tree", "file.root")
+    filename = "file.root"
+    root_tree = WriteROOTTree("tree", filename)
     x = Variable("x", lambda v: v[0])
     y = Variable("y", lambda v: v[1])
     xy = Combine(x, y)
@@ -59,7 +61,7 @@ def test_run():
         ('file.root',
             {
                 "output": {
-                    'root_file_path': 'file.root',
+                    'root_file_path': filename,
                     'root_tree_name': 'tree'
                 },
                 "variable": {
@@ -72,7 +74,8 @@ def test_run():
                 }
             })
     ]
-    return "file.root"
+
+    assert os.path.exists(filename)
 
 # # manually test that tree was written:
 # root_file = ROOT.TFile("file.root")

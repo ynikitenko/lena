@@ -1,3 +1,5 @@
+import os
+
 import pytest
 
 # can't import it here, because
@@ -23,10 +25,12 @@ def pytest_collection_modifyitems(config, items):
             item.add_marker(mark)
 """
 
+# other ROOT tests depend on the existence of this file
 @pytest.fixture(scope="session")
 def rootfile():
     from .test_write_root_tree import test_run
-    # other ROOT tests depend on the existence of this file
-    # test_run will be run twice: once here, and also when tested.
-    filename = test_run()
-    return filename  # "file.root"
+
+    filename = "file.root"
+    if not os.path.exists(filename):
+        test_run()
+    return filename

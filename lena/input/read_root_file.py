@@ -4,61 +4,38 @@ import inspect
 import sys
 
 import lena
+from lena.core import LenaKeyError, LenaTypeError
 
 
 class ReadROOTFile():
     """Read ROOT files from flow."""
 
-    def __init__(self, types=None, keys=None, selector=None):
-        """Keyword arguments specify which objects should be read
-        from ROOT files.
+    def __init__(self, keys=None, raise_on_missing=False):
+        """*keys* specify which objects should be read from ROOT files.
+        They can be a list of allowed objects' names or a single name.
+        By default, all keys are read. ROOT files can store several
+        versions of the key (cycles). Only the last cycle is yielded.
+        Regular expressions are not supported.
 
-        *types* sets the list of possible objects types.
-
-        *keys* is a list of allowed objects' names (or a single name).
-        Only simple strings are allowed (no regular expressions).
-
-        If both *types* and *keys* are provided, then
-        objects that satisfy any of *types* or *keys*
-        are read.
-
-        *selector* is a general function that accepts
-        an object from a ROOT file and returns a boolean.
-        If *selector* is given, both *types* and *keys* must
-        be omitted, or :exc:`.LenaTypeError` is raised.
+        If an explicitly given key was not found, a :exc:`.LenaKeyError`
+        is raised if *raise_on_missing* is ``True``.
+        By default missing keys are ignored.
         """
-        try:
-            import ROOT
-        except ImportError:
-            raise ImportError("ROOT not installed")
-
-        if selector is not None:
-            if keys or types:
-                raise lena.core.LenaTypeError(
-                    "if selector is provided, keys and types "
-                    "must not be passed"
-                )
-            if not callable(selector):
-                raise lena.core.LenaTypeError(
-                    "selector must be callable"
-                )
-            self._selector = selector
-            return
+        import ROOT
+        # why would we ever re-raise an ImportError?
+        # except ImportError:
+        #     raise ImportError("ROOT not installed")
 
         if keys is not None:
             if isinstance(keys, str):
                 keys = [keys]
-            # a tuple or any iterable would also go.
-            # This depends on the user's preference,
-            # not our requirements.
-            # if not isinstance(keys, list):
-            #     raise lena.core.LenaTypeError(
-            #         "keys must be a list of strings"
-            #     )
 
-            key_error = lena.core.LenaTypeError(
+            key_error = LenaTypeError(
                 "keys must contain only strings"
             )
+            if not hasattr(keys, "__iter__"):
+                raise LenaTypeError("keys must be iterable")
+
             if sys.version_info.major >= 3:
                 if any((not isinstance(key, str) for key in keys)):
                     raise key_error
@@ -67,39 +44,22 @@ class ReadROOTFile():
                 if any((not isinstance(key, basestring) for key in keys)):
                     raise key_error
 
+            # maybe
             # todo: allow regular expressions
             # todo: allow ROOT object versions
-            keys_selector = [lambda obj: obj.GetName() == key
-                             for key in keys]
+            # ROOT files can store several keys with the same name
+            # but different cycles, see TDirectoryFile::GetKey at
+            # https://root.cern.ch/doc/master/classTDirectoryFile.html#a38ec87c7afc0158ec9da694db3f7a6e6
+            # With this design it would get all cycles for all keys.
+            # keys_selector = [lambda obj: obj.GetName() == key
+            #                  for key in keys]
 
-        if types is not None:
-            if not isinstance(types, list):
-                raise lena.core.LenaTypeError(
-                    "types must be a list of types"
-                )
-            # maybe inspect is needed only for Python 2 types
-            # not derived from object. Otherwise use isinstance(_, type)
-            if any((not inspect.isclass(tp) for tp in types)):
-                raise lena.core.LenaTypeError(
-                    "types must must contain only types"
-                )
-            # in Lena "and" means a list, while "or" means a tuple.
-            # In Python isinstance requires a tuple.
-            types = tuple(types)
-            types_selector = lambda obj: isinstance(obj, types)
-
-        if types is None and keys is None:
-            self._selector = None
-        elif keys:
-            if types:
-                self._selector = lena.flow.Selector(
-                    [types_selector, keys_selector]
-                )
-            else:
-                self._selector = lena.flow.Selector(keys_selector)
+        self._keys = keys
+        self._raise_on_missing = raise_on_missing
 
     def run(self, flow):
-        """Read ROOT files from *flow* and yield objects they contain.
+        """Read ROOT files from *flow* and yield their contained objects
+        corresponding to the initialization keys.
 
         For file to be read,
         data part of the value must be a string (file's path) and
@@ -118,44 +78,66 @@ class ReadROOTFile():
             don't save yielded values to a list,
             or save copies of them.
         """
+        import ROOT
         from ROOT import TFile
         from lena.context import get_recursively, update_recursively
         from lena.flow import get_data_context
         from copy import deepcopy
+
         for val in flow:
             data, context = get_data_context(val)
 
+            ## Can be done with RunIf, Split and filters.
+            ## No need for a separate logic here.
+            #
             # skip not ROOT files
-            if sys.version_info.major == 2:
-                str_type = basestring
-            else:
-                str_type = str
-            if not isinstance(data, str_type) or not \
-                get_recursively(context, "input.read_root_file",
-                                             True):
-                yield val
-                continue
+            # if sys.version_info.major == 2:
+            #     str_type = basestring
+            # else:
+            #     str_type = str
+            # if not isinstance(data, str_type) or not \
+            #     get_recursively(context, "input.read_root_file", True):
+            #     yield val
+            #     continue
 
             root_file = TFile(data, "read")
-            # context of separate keys shall be updated
-            # when they are transformed to other types
-            # in other elements
+            # This could be done before this element,
+            # but update it here for better default tracking.
             update_recursively(
                 context, {"input": {"root_file_path": data}}
             )
 
             def get_key_names(fil):
                 return [key.GetName() for key in fil.GetListOfKeys()]
-            key_names = get_key_names(root_file)
 
-            for key_name in key_names:
-                # result of TFile.Get is not a TKey, but a proper type
-                obj = root_file.Get(key_name)
-                if self._selector:
-                    if not self._selector(obj):
-                        continue
-                yield (obj, deepcopy(context))
+            if self._keys is None:
+                # read all keys by default
+                keys = get_key_names(root_file)
+            else:
+                keys = self._keys
 
-            # will be closed after
-            # following elements used its data
+            for key in keys:
+                # Result of TFile.Get is a proper type.
+                # Get() returns the last cycle of the key.
+                obj = root_file.Get(key)
+                # does not work in PyROOT.
+                # if obj == ROOT.nullptr:
+                # Will fail is the obj can have a boolean value False.
+                # No better way to check that though. Thanks ROOT.
+                if not obj:
+                    # Probably one of our set keys is missing.
+                    # Can a nullptr be stored/retrieved
+                    # for an existing key? Ignore this question here.
+                    if self._raise_on_missing:
+                        raise LenaKeyError(
+                            "key {} not found in {}".format(key, data)
+                        )
+
+                new_context = deepcopy(context)
+                update_recursively(
+                    new_context, {"input": {"root_file_key": key}}
+                )
+                yield (obj, new_context)
+
+            # close after following elements used its data
             root_file.Close()
