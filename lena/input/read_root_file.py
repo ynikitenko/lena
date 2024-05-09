@@ -22,9 +22,6 @@ class ReadROOTFile():
         By default missing keys are ignored.
         """
         import ROOT
-        # why would we ever re-raise an ImportError?
-        # except ImportError:
-        #     raise ImportError("ROOT not installed")
 
         if keys is not None:
             if isinstance(keys, str):
@@ -44,31 +41,24 @@ class ReadROOTFile():
                 if any((not isinstance(key, basestring) for key in keys)):
                     raise key_error
 
-            # maybe
-            # todo: allow regular expressions
-            # todo: allow ROOT object versions
-            # ROOT files can store several keys with the same name
-            # but different cycles, see TDirectoryFile::GetKey at
-            # https://root.cern.ch/doc/master/classTDirectoryFile.html#a38ec87c7afc0158ec9da694db3f7a6e6
-            # With this design it would get all cycles for all keys.
-            # keys_selector = [lambda obj: obj.GetName() == key
-            #                  for key in keys]
-
         self._keys = keys
         self._raise_on_missing = raise_on_missing
+        # maybe todo: allow regular expressions,
+        # allow ROOT object versions.
+        # ROOT files can store several keys with the same name
+        # but different cycles, see TDirectoryFile::GetKey at
+        # https://root.cern.ch/doc/master/classTDirectoryFile.html#a38ec87c7afc0158ec9da694db3f7a6e6
 
     def run(self, flow):
         """Read ROOT files from *flow* and yield their contained objects
         corresponding to the initialization keys.
-
-        For file to be read,
-        data part of the value must be a string (file's path) and
-        *context.input.read_root_file* must not be `False`.
-        Other values pass unchanged.
-        After all entries from the file are yielded, it is closed.
+        data parts of values from *flow* must be paths to ROOT files.
+        After reading the files are closed.
 
         *context.input.root_file_path* is updated
         with the path to the ROOT file.
+        *input.root_file_key* is updated with the key
+        of the yielded object.
 
         Warning
         =======
@@ -87,22 +77,10 @@ class ReadROOTFile():
         for val in flow:
             data, context = get_data_context(val)
 
-            ## Can be done with RunIf, Split and filters.
-            ## No need for a separate logic here.
-            #
-            # skip not ROOT files
-            # if sys.version_info.major == 2:
-            #     str_type = basestring
-            # else:
-            #     str_type = str
-            # if not isinstance(data, str_type) or not \
-            #     get_recursively(context, "input.read_root_file", True):
-            #     yield val
-            #     continue
-
+            # can raise an OSError
             root_file = TFile(data, "read")
             # This could be done before this element,
-            # but update it here for better default tracking.
+            # but update it here for better default tracking
             update_recursively(
                 context, {"input": {"root_file_path": data}}
             )
@@ -123,11 +101,8 @@ class ReadROOTFile():
                 # does not work in PyROOT.
                 # if obj == ROOT.nullptr:
                 # Will fail is the obj can have a boolean value False.
-                # No better way to check that though. Thanks ROOT.
+                # No better way to check that.
                 if not obj:
-                    # Probably one of our set keys is missing.
-                    # Can a nullptr be stored/retrieved
-                    # for an existing key? Ignore this question here.
                     if self._raise_on_missing:
                         raise LenaKeyError(
                             "key {} not found in {}".format(key, data)
@@ -139,5 +114,4 @@ class ReadROOTFile():
                 )
                 yield (obj, new_context)
 
-            # close after following elements used its data
             root_file.Close()
