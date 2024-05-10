@@ -14,7 +14,7 @@ from lena.output import Write
 SYSVERSION = (sys.version_info[0], sys.version_info[1])
 # index in calls depending on Python version.
 # See the first comment on SYSVERSION.
-SYSIND = 0 if SYSVERSION < (3, 11) else 1
+SYSIND = 0 if SYSVERSION != (3, 11) else 1
 
 
 def test_write_makefilename():
