@@ -289,6 +289,25 @@ class Vectorize(object):
             self._seqs = [seq]
             self._seqs.extend([copy.deepcopy(seq) for _ in range(dim-1)])
 
+        # check what FillCompute elements have reset() method
+        nresets = 0
+        fc_els = []
+        for _seq in self._seqs:
+            try:
+                # real FillComputeSeq
+                fcel = _seq._fill_compute
+            except AttributeError:
+                # a FillCompute element
+                fcel = _seq
+            if hasattr(fcel, "reset") and callable(fcel.reset):
+                nresets += 1
+            fc_els.append(fcel)
+
+        if nresets == len(self._seqs):
+            self._fc_els = fc_els
+        else:
+            del self.reset
+
         # todo: get rid of construct,
         # a separate Lena element may be better.
         self._construct = construct
@@ -338,3 +357,12 @@ class Vectorize(object):
                 # we use standard tuples for them.
                 res = data
             yield _maybe_with_context(res, copy.deepcopy(self._cur_context))
+
+    def reset(self):
+        """If every sequence has a *reset()* method, this class
+        is reset by resetting each *FillCompute* element.
+        """
+        # reset every sequence
+        for fcel in self._fc_els:
+            fcel.reset()
+        self._cur_context = {}
