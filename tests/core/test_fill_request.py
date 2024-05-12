@@ -6,9 +6,8 @@ from lena.core import LenaTypeError, LenaValueError, LenaNotImplementedError
 from lena.core import (
     Call, FillInto, FillCompute, FillRequest, SourceEl, Run
 )
-from lena.flow import Slice, CountFrom, Print
+from lena.flow import Slice, CountFrom, Print, StoreFilled
 from lena.math import Sum
-from tests.examples.fill import StoreFilled
 from tests.examples.numeric import Add
 
 

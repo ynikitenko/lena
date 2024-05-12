@@ -6,9 +6,8 @@ from lena.core import LenaTypeError, LenaValueError, LenaNotImplementedError
 from lena.core import (
     Call, FillInto, FillCompute, FillRequest, SourceEl, Run
 )
-from lena.flow import Slice, CountFrom, Print
+from lena.flow import Slice, CountFrom, Print, StoreFilled
 from lena.math import Sum
-from tests.examples.fill import StoreFilled
 from tests.examples.numeric import Add
 
 
@@ -97,15 +96,15 @@ def test_fill_into():
     # with a class with a strangely named fill_into method 
     fi = FillInto(StrangeFillInto(), fill_into='strange_fill_into')
     fi.fill_into(store, 1)
-    assert store == [1]
+    assert store.group == [1]
     # with a callable class
     fi = FillInto(Add(0))
     fi.fill_into(store, 1)
-    assert store == [1, 1]
+    assert store.group == [1, 1]
     # with a lambda
     fi = FillInto(lambda val: val + 3)
     fi.fill_into(store, 1)
-    assert store == [1, 1, 4]
+    assert store.group == [1, 1, 4]
 
 
 def test_fill_request_init():

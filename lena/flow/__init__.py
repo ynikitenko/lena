@@ -1,6 +1,8 @@
 from .cache import Cache
 from .drop_context import DropContext
-from .elements import Count, End, RunIf, RunningChunkBy
+from .elements import (
+    Count, End, RunIf, RunningChunkBy, StoreFilled
+)
 from .functions import get_data, get_context, get_data_context, seq_map
 from .group_by import GroupBy
 from .group_plots import group_plots, GroupPlots, MapGroup
@@ -22,6 +24,7 @@ __all__ = [
     'Filter',
     'Print',
     'Progress',
+    'StoreFilled',
     # iterators
     'Chain',
     'CountFrom',

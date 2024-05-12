@@ -14,6 +14,7 @@ Flow
     Print
     Progress
     RunIf
+    StoreFilled
 
 ..    Transform
 
@@ -79,6 +80,8 @@ which didn't fit other categories.
 .. autoclass:: Progress
     :members:
 .. autoclass:: RunIf
+    :members:
+.. autoclass:: StoreFilled
     :members:
 
 Functions

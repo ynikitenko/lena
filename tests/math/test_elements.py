@@ -9,8 +9,8 @@ import hypothesis.strategies as st
 
 import lena
 from lena.core import LenaZeroDivisionError, LenaTypeError, LenaRuntimeError
+from lena.flow import StoreFilled
 from lena.math import vector3, Mean, Sum, DSum, Vectorize
-from tests.examples.fill import StoreFilled
 
 
 def test_mean():

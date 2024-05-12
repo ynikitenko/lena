@@ -7,10 +7,7 @@ from hypothesis import given
 
 import lena.flow
 from lena.core import Source, LenaStopFill
-from lena.flow import DropContext, CountFrom
-from lena.flow import Reverse
-from lena.flow import Slice
-from tests.examples.fill import StoreFilled
+from lena.flow import DropContext, CountFrom, Reverse, Slice, StoreFilled
 
 # all bugs converged to at most 3.
 hypo_int_max = 20
@@ -162,7 +159,7 @@ def test_islice_fill_into():
     isl = Slice(10, 15)
     for i in range(0, 15):
         isl.fill_into(store, i)
-    assert store.list == list(range(10, 15))
+    assert store.group == list(range(10, 15))
     with pytest.raises(LenaStopFill):
         isl = Slice(10, 15)
         for i in range(0, 16):
@@ -173,7 +170,7 @@ def test_islice_fill_into():
     # 18 will be filled last
     for i in range(0, 19):
         isl.fill_into(store, i)
-    assert store.list == list(range(10, 20, 2))
+    assert store.group == list(range(10, 20, 2))
 
     # found by hypothesis
     store = StoreFilled()
@@ -181,7 +178,7 @@ def test_islice_fill_into():
     data = [0]
     for val in data:
         isl.fill_into(store, val)
-    assert store.list == [0]
+    assert store.group == [0]
 
     store = StoreFilled()
     isl = Slice(None, 1, 2)
@@ -189,7 +186,7 @@ def test_islice_fill_into():
     with pytest.raises(LenaStopFill):
         for val in data:
             isl.fill_into(store, val)
-    assert store.list == [0]
+    assert store.group == [0]
 
     store = StoreFilled()
     isl = Slice(None, 2, 2)
@@ -197,7 +194,7 @@ def test_islice_fill_into():
     with pytest.raises(LenaStopFill):
         for val in data:
             isl.fill_into(store, val)
-    assert store.list == [0]
+    assert store.group == [0]
 
 
 start_stop_non_neg = s.one_of(s.none(),
@@ -226,14 +223,14 @@ def test_islice_hypothesis_fill_into(start, stop, step, data_len):
             for val in data:
                 isl.fill_into(store, val)
         except LenaStopFill:
-            assert store.list == data[start:stop:step]
+            assert store.group == data[start:stop:step]
         else:
-            assert store.list == data[start:stop:step]
+            assert store.group == data[start:stop:step]
             # assert "should had raised" and False
     else:
         for val in data:
             isl.fill_into(store, val)
-        assert store.list == data[start:stop:step]
+        assert store.group == data[start:stop:step]
 
 
 def test_reverse():

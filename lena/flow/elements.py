@@ -275,6 +275,50 @@ class RunningChunkBy(object):
                 yield container(*chunk)
 
 
+class StoreFilled(object):
+    """Store filled items."""
+
+    def __init__(self, yield_as_a_group=True):
+        """If *yield_as_a_group* is ``False``,
+        values are yielded one by one in :meth:`compute`.
+        By default they are yielded as a group.
+
+        A public attribute :attr:`group`
+        allows access to the list of filled values.
+
+        This class is memory unsafe by definition.
+        It is used mostly for testing purposes.
+        """
+        # that could be another container (set,...)
+        # if we allow that in the future
+        self.group = []
+        self._yield_as_a_group = yield_as_a_group
+
+    def fill(self, value):
+        """Add *value* to the collected items."""
+        self.group.append(value)
+
+    def __eq__(self, other):
+        if not isinstance(other, StoreFilled):
+            return NotImplemented
+        return (self.group == other.group and
+                self._yield_as_a_group == other._yield_as_a_group)
+
+    def compute(self):
+        """Yield the collected values."""
+        if self._yield_as_a_group:
+            # copy, because if we yield several times without reset,
+            # the results will be interdependent
+            yield self.group[:]
+        else:
+            for val in self.group:
+                yield val
+
+    def reset(self):
+        """Clear the group."""
+        self.group = []
+
+
 class End(object):
     """Stop sequence here."""
 

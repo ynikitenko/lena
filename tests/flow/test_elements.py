@@ -3,8 +3,7 @@ from collections import namedtuple
 import pytest
 
 import lena.core
-from lena.flow import Count, RunIf, End, Selector, RunningChunkBy
-from tests.examples.fill import StoreFilled
+from lena.flow import Count, RunIf, End, Selector, RunningChunkBy, StoreFilled
 
 
 @pytest.mark.parametrize("initial_count", [0, 3])
@@ -33,7 +32,7 @@ def test_count(initial_count):
     store = StoreFilled()
     for val in flow:
         c2.fill_into(store, val)
-    results = store.list
+    results = store.group
     assert len(results) == 4
     assert results[3] == ("foo", {'counter': 4})
 

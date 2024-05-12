@@ -1,7 +1,7 @@
 import pytest
 
 from lena.core import Sequence, Source, FillSeq, FillInto
-from tests.examples.fill import StoreFilled
+from lena.flow import StoreFilled
 from tests.examples.numeric import Add
 
 
@@ -26,26 +26,27 @@ def test_lena_sequence_fill():
 
 
 def test_fill():
-    store = StoreFilled()
+    store0 = StoreFilled()
 
-    s1 = FillSeq(store)
+    s1 = FillSeq(store0)
     # empty FillSeq sequence doesn't transform
     s1.fill(1)
-    assert store == [1]
+    assert store0.group == [1]
 
+    store = StoreFilled()
     s2 = FillSeq(Add(0), store)
     store.list = []
     s2.fill(1)
-    assert store == [1]
+    assert store.group == [1]
 
     # Store adds elements
     s3 = FillSeq(Add(1), store)
     s3.fill(1)
-    assert store.list == [1, 2]
+    assert store.group == [1, 2]
     # sequence of two elements
     s4 = FillSeq(Add(1), Add(-1), store)
     s4.fill(1)
-    assert store == [1, 2, 1]
+    assert store.group == [1, 2, 1]
 
     # nested long FillSeq
     # won't work here.
