@@ -7,9 +7,8 @@ from hypothesis import given
 
 import lena.flow
 from lena.core import Source, LenaStopFill
-from lena.flow import (
-    Chain, DropContext, CountFrom, Reverse, Slice, StoreFilled
-)
+from lena.flow import Chain, DropContext, CountFrom, Reverse, Slice
+from lena.flow import StoreFilled
 
 # all bugs converged to at most 3.
 hypo_int_max = 20
@@ -30,6 +29,8 @@ def test_chain():
     # equality testing works
     assert c0 == Chain()
     assert c2 == Chain(nums, lets)
+    assert c0 != c2
+    assert c0 != "c0"
 
     # representation works
     assert repr(c0) == "Chain()"
@@ -56,6 +57,8 @@ def test_count_from():
 
     # equality testing works
     assert itss == CountFrom(start=10, step=2)
+    assert itss != CountFrom(start=10)
+    assert itss != "count"
 
 
 def test_slice_run():
@@ -81,6 +84,11 @@ def test_slice_run():
     sl4 = Slice(0, 10, 2)
     assert repr(sl4) == "Slice(0, 10, 2)"
     list(sl4.run(count())) == list(range(0, 10, 2))
+
+    # equality works
+    assert sl2 == Slice(10, 10)
+    assert sl2 != sl1
+    assert sl2 != "s"
 
 
 def test_negative_islice():

@@ -165,7 +165,6 @@ class Slice(object):
         To obtain a negative step,
         use a composition with :class:`Reverse`.
         """
-        # todo: rename to Slice in the next release.
         from itertools import islice
         if all([val is None or val >= 0 for val in args]):
             # if step=0, then error is raised not here,
@@ -194,7 +193,7 @@ class Slice(object):
             else:
                 self.run = lambda flow: self._run_negative_islice(flow)
             self._step = step
-        # for repr
+        # for repr and eq
         self._args = args
 
     def fill_into(self, element, value):
@@ -301,6 +300,11 @@ class Slice(object):
                             return
                         ind += 1
 
+    def __eq__(self, other):
+        if not isinstance(other, Slice):
+            return NotImplemented
+        return self._args == other._args
+
     def __repr__(self):
         args_str = ", ".join((repr(arg) for arg in self._args))
         return "Slice({})".format(args_str)
@@ -308,4 +312,5 @@ class Slice(object):
     def run(self, flow):
         """Yield values from *flow* from *start* to *stop* with *step*.
         """
+        # todo: this should be changed to allow several runs.
         return self._islice(flow)
