@@ -22,14 +22,7 @@ class Source(LenaSequence):
 
         >>> from lena.flow import CountFrom, Slice
         >>> s = Source(CountFrom(), Slice(5))
-        >>> # iterate in a cycle
-        >>> for i in s():
-        ...     if i == 5:
-        ...         break
-        ...     print(i, end=" ")
-        0 1 2 3 4 
-        >>> # if called twice, results depend on the generator
-        >>> list(s()) == list(range(5, 10))
+        >>> list(s()) == list(range(5))
         True
 
         For a *sequence* that transforms the incoming flow

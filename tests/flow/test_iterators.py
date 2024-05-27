@@ -25,29 +25,25 @@ def test_chain():
 
 
 def test_count_from():
-    s = Source(CountFrom(),
-         # lambda i: (i, {str(i): i}),
-         # DropContext(
-         #     Slice(5),
-         #     lambda i: i + 1,
-         # ),
-         Slice(10),
+    s = Source(
+        CountFrom(),
+        Slice(10),
     )
     results = s()
     assert [result for result in s()] == list(range(10))
-    # [
-    #     (1, {'0': 0}), (2, {'1': 1}), (3, {'2': 2}), (4, {'3': 3}), (5, {'4': 4})
-    # ]
 
     # test start
-    it = CountFrom(start=10)
-    assert list(islice(it(), 5)) == list(range(10, 15))
+    itstart = CountFrom(start=10)
+    assert list(islice(itstart(), 5)) == list(range(10, 15))
     # test step
-    it = CountFrom(step=2)
-    assert list(islice(it(), 5)) == list(range(0, 10, 2))
+    itstep = CountFrom(step=2)
+    assert list(islice(itstep(), 5)) == list(range(0, 10, 2))
     # test start and step 
-    it = CountFrom(start=10, step=2)
-    assert list(islice(it(), 5)) == list(range(10, 20, 2))
+    itss = CountFrom(start=10, step=2)
+    assert list(islice(itss(), 5)) == list(range(10, 20, 2))
+
+    # equality testing works
+    assert itss == CountFrom(start=10, step=2)
 
 
 def test_slice_run():

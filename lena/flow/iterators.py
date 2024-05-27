@@ -43,14 +43,24 @@ class CountFrom(object):
     Similar to :func:`itertools.count`.
     """
     def __init__(self, start=0, step=1):
-        self._it = itertools.count(start, step)
+        # test types here, otherwise may get an error during runtime
+        # (with several Sources in Split)
+        try:
+            itertools.count(start, step)
+        except TypeError as err:
+            raise err
         self._start = start
         self._step = step
 
     def __call__(self):
         """Yield values from *start* to infinity with *step*."""
-        for val in self._it:
+        for val in itertools.count(self._start, self._step):
             yield val
+
+    def __eq__(self, other):
+        if not isinstance(other, CountFrom):
+            return NotImplemented
+        return self._start == other._start and self._step == other._step
 
     def __repr__(self):
         return "CountFrom(start={}, step={})".format(self._start, self._step)
