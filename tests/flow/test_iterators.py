@@ -7,7 +7,7 @@ from hypothesis import given
 
 import lena.flow
 from lena.core import Source, LenaStopFill
-from lena.flow import DropContext, CountFrom, Reverse, Slice, StoreFilled
+from lena.flow import Chain, DropContext, CountFrom, Reverse, Slice, StoreFilled
 
 # all bugs converged to at most 3.
 hypo_int_max = 20
@@ -16,12 +16,22 @@ hypo_int_max = 20
 def test_chain():
     nums = [1, 2, 3]
     lets = ['a', 'b']
-    # chain with two iterables works
-    c = lena.flow.Chain(nums, lets)
-    assert list(c()) == nums + lets
+
     # empty chain works
-    c = lena.flow.Chain()
-    assert list(c()) == []
+    c0 = Chain()
+    assert list(c0()) == []
+
+    # chain with two iterables works
+    c2 = Chain(nums, lets)
+    assert list(c2()) == nums + lets
+
+    # equality testing works
+    assert c0 == Chain()
+    assert c2 == Chain(nums, lets)
+
+    # representation works
+    assert repr(c0) == "Chain()"
+    assert repr(c2) == "Chain([1, 2, 3], ['a', 'b'])"
 
 
 def test_count_from():

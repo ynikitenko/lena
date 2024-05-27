@@ -24,17 +24,31 @@ class Chain(object):
     >>> list(c())
     [1, 2, 3, 'a', 'b']
     """
+
     def __init__(self, *iterables):
         """*iterables* will be chained during ``__call__()``,
         that is after the first one is exhausted,
         the second is called, etc.
         """
-        self._chain = itertools.chain(*iterables)
+        self._iterables = iterables
 
     def __call__(self):
         """Generate values from chained iterables."""
-        for val in self._chain:
+        for val in itertools.chain(*self._iterables):
             yield val
+
+    def __eq__(self, other):
+        if not isinstance(other, Chain):
+            return NotImplemented
+        # some iterables (e.g. generators) producing same results
+        # can compare unequal
+        return self._iterables == other._iterables
+
+    def __repr__(self):
+        if not self._iterables:
+            return "Chain()"
+        its = ", ".join((repr(it) for it in self._iterables))
+        return "Chain({})".format(its)
 
 
 class CountFrom(object):
