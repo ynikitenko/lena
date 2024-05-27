@@ -7,7 +7,9 @@ from hypothesis import given
 
 import lena.flow
 from lena.core import Source, LenaStopFill
-from lena.flow import Chain, DropContext, CountFrom, Reverse, Slice, StoreFilled
+from lena.flow import (
+    Chain, DropContext, CountFrom, Reverse, Slice, StoreFilled
+)
 
 # all bugs converged to at most 3.
 hypo_int_max = 20
@@ -241,9 +243,19 @@ def test_islice_hypothesis_fill_into(start, stop, step, data_len):
 
 def test_reverse():
     r = Reverse()
+    # empty list works
     assert list(r.run(iter([]))) == []
+    # a single element list works
     assert list(r.run(iter([1]))) == [1]
-    # it really works!
+
+    # works for two elements
     assert list(r.run(iter([1, 2]))) == [2, 1]
-    # just in case
+    # and for three too
     assert list(r.run(iter([1, 2, 3]))) == [3, 2, 1]
+
+    # equality testing works
+    assert r == Reverse()
+    assert r != "reverse"
+
+    # representation works
+    assert repr(r) == "Reverse()"

@@ -20,7 +20,7 @@ class Chain(object):
 
     Example:
 
-    >>> c = lena.flow.Chain([1, 2, 3], ['a', 'b'])
+    >>> c = Chain([1, 2, 3], ['a', 'b'])
     >>> list(c())
     [1, 2, 3, 'a', 'b']
     """
@@ -102,6 +102,12 @@ class Reverse():
         # no ideas yet. Maybe allow maxsize?
         # However, that is not implemented in list.__init__ .
         pass
+
+    def __eq__(self, other):
+        if not isinstance(other, Reverse):
+            return NotImplemented
+        # all Reverse elements have no state and are equal
+        return True
 
     def run(self, flow):
         """Consume the *flow* and yield values in reverse order."""
