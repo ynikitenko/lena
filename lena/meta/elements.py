@@ -38,6 +38,11 @@ class SetContext(object):
     def _get_context(self):
         return deepcopy(self._context)
 
+    def __eq__(self, other):
+        if not isinstance(other, SetContext):
+            return NotImplemented
+        return (self._key == other._key and self._value == other._value)
+
     def __repr__(self):
         val = self._value
         if isinstance(val, str):
@@ -60,6 +65,19 @@ class StoreContext():
             print("StoreContext({}): storing {}".format(self._name, context))
         self._context = context
 
+    def __eq__(self, other):
+        if not isinstance(other, StoreContext):
+            return NotImplemented
+        # todo: maybe _verbose should not be checked.
+        # It does not affect any logic.
+        # But this element is also only for debugging.
+        return (
+            self._name == other._name and
+            self._verbose == other._verbose and
+            # will be set in the sequence, not during the initialisation
+            self._context == other._context
+        )
+
     def __repr__(self):
         return "StoreContext({})".format(repr(self._context))
 
@@ -75,6 +93,11 @@ class UpdateContextFromStatic(object):
 
     def __init__(self):
         self._context = {}
+
+    def __eq__(self, other):
+        if not isinstance(other, UpdateContextFromStatic):
+            return NotImplemented
+        return self._context == other._context
 
     def _set_context(self, context):
         self._context = context
