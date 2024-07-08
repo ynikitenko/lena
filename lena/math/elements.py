@@ -2,6 +2,7 @@
 import copy
 import decimal
 import sys
+from collections import namedtuple
 from decimal import getcontext, Decimal, Inexact
 
 if sys.version_info.major == 2:
@@ -16,6 +17,8 @@ from lena.core import (
     is_fill_compute_el
 )
 import lena.flow
+
+VarMeanCount = namedtuple("VarMeanCount", "var,mean,count")
 
 
 # a helper class, shall be removed in 0.7
@@ -251,6 +254,132 @@ class Sum(object):
         """
         self._total = 0
         self._cur_context = {}
+
+
+class Var(object):
+    """Calculate the sample variance of input values."""
+
+    def __init__(self, sum_sq=None, sum_=None, corrected=True,
+                 pass_on_empty=False):
+        """*sum_sq* and *sum_* are FillCompute elements
+        calculating the sums of squares and of values
+        of the input sample (:class:`Sum` by default).
+
+        If *corrected* is ``True`` (default), the final variance
+        is multiplied by n/(n-1), where n is the count of filled values.
+
+        If *pass_on_empty* is ``True``, then if nothing was filled,
+        nothing is yielded.
+        By default an error is raised (see :meth:`compute`).
+        """
+        # todo: add population logic, that is
+        # allow the mean to be provided.
+        if sum_sq is None:
+            sum_sq = Sum()
+        else:
+            assert hasattr(sum_sq, "fill") and hasattr(sum_sq, "compute")
+            if not hasattr(sum_seq, "reset"):
+                self.reset = self._reset_missing
+        self._sum_sq = sum_sq
+
+        # copy of that for sum_sq
+        if sum_ is None:
+            sum_ = Sum()
+        else:
+            assert hasattr(sum_, "fill") and hasattr(sum_, "compute")
+            if not hasattr(sum_, "reset"):
+                # any of resets missing leads to no reset
+                self.reset = self._reset_missing
+        self._sum = sum_
+
+        # will be used only if sum_seq is not set
+        self._pass_on_empty = bool(pass_on_empty)
+        self._corrected = bool(corrected)
+        self._count = 0
+        self._cur_context = {}
+
+    def fill(self, value):
+        """Fill *self* with *value*.
+
+        The *value* can be a *(data, context)* pair.
+        The last *context* value (considered empty if missing)
+        is yielded in the output.
+        """
+        data, context = lena.flow.get_data_context(value)
+        # todo: optimise these fill-s out
+        self._sum_sq.fill(data**2)
+        self._sum.fill(data)
+        self._count += 1
+        self._cur_context = context
+
+    def compute(self):
+        """Calculate the mean, variance and yield.
+
+        A named tuple :class:`VarMeanCount` is yielded.
+        If the current context is not empty, it is added as its context.
+
+        If no values were filled (count is zero),
+        the mean can't be calculated and
+        :exc:`.LenaZeroDivisionError` is raised.
+        This can be changed to yielding nothing
+        if *pass_on_empty* was initialized to ``True``.
+        If the sample contained only one element
+        and *corrected* is ``True``,
+        :exc:`.LenaZeroDivisionError` is always raised.
+        """
+        if not self._count:
+            if self._pass_on_empty:
+                return
+            raise LenaZeroDivisionError(
+                "can't calculate average. No values were filled"
+            )
+        count = self._count
+
+        sum_sql = list(self._sum_sq.compute())
+        assert len(sum_sql) == 1
+        sum_sq = sum_sql[0]
+        if isinstance(sum_sq, int):
+            # if s.o. needs integers in the answer,
+            # they may convert that themselves.
+            # To avoid 3/2 = 1 from Python2.
+            mean_sq = sum_sq / float(count)
+        else:
+            # should work for floats, Decimals, etc.
+            mean_sq = sum_sq / count
+
+        # todo: write get_one(list).
+        suml = list(self._sum.compute())
+        assert len(suml) == 1
+        sum_ = suml[0]
+        if isinstance(sum_, int):
+            mean = sum_ / float(count)
+        else:
+            mean = sum_ / count
+
+        var = mean_sq - mean**2
+        if self._corrected:
+            if count == 1:
+                raise LenaZeroDivisionError(
+                    "can not get corrected variance from a sample "
+                    "with one element"
+                )
+            var *= count/float(count - 1)
+
+        res = VarMeanCount(var, mean, count)
+
+        yield _maybe_with_context(res, self._cur_context)
+
+    def reset(self):
+        r"""Reset sum_sq, sum\_, count and context."""
+        self._sum_sq.reset()
+        self._sum.reset()
+        self._count = 0
+        self._cur_context = {}
+
+    def _reset_missing(self):
+        raise lena.core.LenaAttributeError(
+            "one of sum elements has no reset method"
+        )
 
 
 class Vectorize(object):

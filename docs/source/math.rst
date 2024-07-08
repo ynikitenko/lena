@@ -24,6 +24,8 @@ Math
     DSum
     Mean
     Sum
+    Var
+    VarMeanCount
     Vectorize
 
 **3-dimensional vector:**

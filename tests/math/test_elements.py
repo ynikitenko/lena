@@ -10,7 +10,8 @@ import hypothesis.strategies as st
 import lena
 from lena.core import LenaZeroDivisionError, LenaTypeError, LenaRuntimeError
 from lena.flow import StoreFilled
-from lena.math import vector3, Mean, Sum, DSum, Vectorize
+from lena.math import vector3, Mean, Sum, DSum, Var, Vectorize
+from lena.math import VarMeanCount
 
 
 def test_mean():
@@ -55,6 +56,19 @@ def test_mean():
     m4 = Mean(ds)
     m4.reset()
     assert ds.total == 0.
+
+
+def test_var():
+    var = Var()
+    var.fill(0)
+    var.fill(1)
+    var.fill(2)
+    res = list(var.compute())
+    assert len(res) == 1
+    mean = 1
+    mean_sq = 5/3.
+    corr_fact = 3/2.  # Bessel's correction
+    assert res[0] == VarMeanCount(corr_fact*(mean_sq - mean**2), mean, 3)
 
 
 def dsum(iterable):
