@@ -59,16 +59,39 @@ def test_mean():
 
 
 def test_var():
+    # variance calculation is correct
     var = VarMeanCount()
+    # default settings work
+    assert var._sum_sq == Sum()
+    assert var._sum == Sum()
+
     var.fill(0)
     var.fill(1)
     var.fill(2)
     res = list(var.compute())
+    # exactly one value is filled
     assert len(res) == 1
     mean = 1
     mean_sq = 5/3.
     corr_fact = 3/2.  # Bessel's correction
     assert res[0] == var_mean_count(corr_fact*(mean_sq - mean**2), mean, 3)
+
+    # no correction works
+    var._corrected = False
+    res = list(var.compute())
+    assert res[0] == var_mean_count(mean_sq - mean**2, mean, 3)
+
+    # inequality works
+    assert var != VarMeanCount()
+    # reset works
+    var.reset()
+    # equality works
+    assert var == VarMeanCount(corrected=False)
+
+    # explicit arguments work
+    var1 = VarMeanCount(DSum(), DSum())
+    assert var1._sum_sq == DSum()
+    assert var1._sum == DSum()
 
 
 def dsum(iterable):
@@ -116,6 +139,10 @@ def test_sum():
     empty_context = {"context": "empty"}
     s0.fill((1, empty_context))
     assert list(s0.compute()) == [(1, empty_context)]
+
+    # comparison works
+    assert s0 != Sum()
+    assert Sum() == Sum()
 
     # math is correct
     s0.fill(3)

@@ -255,6 +255,12 @@ class Sum(object):
         self._total = 0
         self._cur_context = {}
 
+    def __eq__(self, other):
+        if not isinstance(other, Sum):
+            return NotImplemented
+        return (self._total == other._total
+                and self._cur_context == other._cur_context)
+
 
 class VarMeanCount(object):
     """Calculate the sample variance of input values."""
@@ -264,6 +270,8 @@ class VarMeanCount(object):
         """*sum_sq* and *sum_* are FillCompute elements
         calculating the sums of squares and of values
         of the input sample (:class:`Sum` by default).
+        If they both can be *reset*,
+        this object has also a *reset()* method.
 
         If *corrected* is ``True`` (default), the final variance
         is multiplied by n/(n-1), where n is the count of filled values.
@@ -278,8 +286,6 @@ class VarMeanCount(object):
             sum_sq = Sum()
         else:
             assert hasattr(sum_sq, "fill") and hasattr(sum_sq, "compute")
-            if not hasattr(sum_seq, "reset"):
-                self.reset = self._reset_missing
         self._sum_sq = sum_sq
 
         # copy of that for sum_sq
@@ -287,10 +293,10 @@ class VarMeanCount(object):
             sum_ = Sum()
         else:
             assert hasattr(sum_, "fill") and hasattr(sum_, "compute")
-            if not hasattr(sum_, "reset"):
-                # any of resets missing leads to no reset
-                self.reset = self._reset_missing
         self._sum = sum_
+
+        if hasattr(sum_sq, "reset") and hasattr(sum_, "reset"):
+            self.reset = self._reset
 
         # will be used only if sum_seq is not set
         self._pass_on_empty = bool(pass_on_empty)
@@ -369,17 +375,24 @@ class VarMeanCount(object):
 
         yield _maybe_with_context(res, self._cur_context)
 
-    def reset(self):
+    def _reset(self):
         r"""Reset sum_sq, sum\_, count and context."""
+        # This method is only present if sum_sq and sum_
+        # have reset methods. Therefore it is not autodocumented.
         self._sum_sq.reset()
         self._sum.reset()
         self._count = 0
         self._cur_context = {}
 
-    def _reset_missing(self):
-        raise lena.core.LenaAttributeError(
-            "one of sum elements has no reset method"
-        )
+    def __eq__(self, other):
+        if not isinstance(other, VarMeanCount):
+            return NotImplemented
+        return (self._sum_sq == other._sum_sq and
+                self._sum == other._sum and
+                self._cur_context == other._cur_context and
+                self._corrected == other._corrected and
+                self._pass_on_empty == other._pass_on_empty)
+
 
 
 class Vectorize(object):
@@ -443,7 +456,7 @@ class Vectorize(object):
         self._dim = len(self._seqs)
         self._cur_context = {}
         self._filled_once = False
-    
+
     def fill(self, val):
         """Fill sequences for each component of the data vector."""
         data, context = lena.flow.get_data_context(val)
