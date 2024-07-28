@@ -18,7 +18,7 @@ from lena.core import (
 )
 import lena.flow
 
-var_mean_count = namedtuple("var_mean_count", "var,mean,count")
+variance_mean_count = namedtuple("variance_mean_count", "variance,mean,count")
 
 
 # a helper class, shall be removed in 0.7
@@ -262,7 +262,7 @@ class Sum(object):
                 and self._cur_context == other._cur_context)
 
 
-class VarMeanCount(object):
+class VarianceMeanCount(object):
     """Calculate the sample variance of input values."""
 
     def __init__(self, sum_sq=None, sum_=None, corrected=True,
@@ -321,7 +321,7 @@ class VarMeanCount(object):
     def compute(self):
         """Calculate the mean, variance and yield.
 
-        A named tuple :class:`var_mean_count` is yielded.
+        A named tuple :class:`variance_mean_count` is yielded.
         If the current context is not empty, it is added as its context.
 
         If no values were filled (count is zero),
@@ -371,7 +371,7 @@ class VarMeanCount(object):
                 )
             var *= count/float(count - 1)
 
-        res = var_mean_count(var, mean, count)
+        res = variance_mean_count(var, mean, count)
 
         yield _maybe_with_context(res, self._cur_context)
 
@@ -385,7 +385,7 @@ class VarMeanCount(object):
         self._cur_context = {}
 
     def __eq__(self, other):
-        if not isinstance(other, VarMeanCount):
+        if not isinstance(other, VarianceMeanCount):
             return NotImplemented
         return (self._sum_sq == other._sum_sq and
                 self._sum == other._sum and

@@ -24,9 +24,9 @@ Math
     DSum
     Mean
     Sum
-    VarMeanCount
+    VarianceMeanCount
     Vectorize
-    var_mean_count
+    variance_mean_count
 
 **3-dimensional vector:**
 

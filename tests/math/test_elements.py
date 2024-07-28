@@ -10,8 +10,8 @@ import hypothesis.strategies as st
 import lena
 from lena.core import LenaZeroDivisionError, LenaTypeError, LenaRuntimeError
 from lena.flow import StoreFilled
-from lena.math import vector3, Mean, Sum, DSum, VarMeanCount, Vectorize
-from lena.math import var_mean_count
+from lena.math import vector3, Mean, Sum, DSum, VarianceMeanCount, Vectorize
+from lena.math import variance_mean_count
 
 
 def test_mean():
@@ -60,7 +60,7 @@ def test_mean():
 
 def test_var():
     # variance calculation is correct
-    var = VarMeanCount()
+    var = VarianceMeanCount()
     # default settings work
     assert var._sum_sq == Sum()
     assert var._sum == Sum()
@@ -74,22 +74,22 @@ def test_var():
     mean = 1
     mean_sq = 5/3.
     corr_fact = 3/2.  # Bessel's correction
-    assert res[0] == var_mean_count(corr_fact*(mean_sq - mean**2), mean, 3)
+    assert res[0] == variance_mean_count(corr_fact*(mean_sq - mean**2), mean, 3)
 
     # no correction works
     var._corrected = False
     res = list(var.compute())
-    assert res[0] == var_mean_count(mean_sq - mean**2, mean, 3)
+    assert res[0] == variance_mean_count(mean_sq - mean**2, mean, 3)
 
     # inequality works
-    assert var != VarMeanCount()
+    assert var != VarianceMeanCount()
     # reset works
     var.reset()
     # equality works
-    assert var == VarMeanCount(corrected=False)
+    assert var == VarianceMeanCount(corrected=False)
 
     # explicit arguments work
-    var1 = VarMeanCount(DSum(), DSum())
+    var1 = VarianceMeanCount(DSum(), DSum())
     assert var1._sum_sq == DSum()
     assert var1._sum == DSum()
 
