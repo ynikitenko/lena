@@ -93,17 +93,8 @@ class histogram():
 
         :attr:`n_out_of_range` is the number of entries filled
         outside the range of the histogram.
-
-        :attr:`overflow` and :attr:`underflow` for a one-dimensional
-        histogram are numbers of events above the highest
-        (respectively, below the lowest) edges range.
-        :attr:`n_out_of_range` is equal to the sum of
-        :attr:`overflow` and :attr:`underflow` in that case.
-        All these attributes are rescaled together with histogram bins
+        It is rescaled together with histogram bins
         during :meth:`set_nevents` and :meth:`scale`.
-        For multidimensional histograms overflows and underflows
-        are rarely used, and for efficiency reasons they are counted
-        only for the last coordinate.
 
         If subarrays of *edges* are not increasing
         or if any of them has length less than 2,
@@ -129,16 +120,19 @@ class histogram():
 
         # number of values filled outside of the histogram range.
         self.n_out_of_range = 0
-        # useful only for a one-dimensional histogram.
-        # Implemented that only because people on the internet
-        # regularly ask about that (and Excel has it).
-        # NumPy histograms don't have this logic, while ROOT
-        # histograms have it too complicated (and mixed with
-        # the histogram structure): 0th bin is underflow and
-        # the last bin is overflow (now imagine those arrays
-        # for multidimensional histograms).
-        self.overflow = 0
-        self.underflow = 0
+        ## useful only for a one-dimensional histogram.
+        ## Implemented that only because people on the internet
+        ## regularly ask about that (and Excel has it).
+        ## NumPy histograms don't have this logic, while ROOT
+        ## histograms have it too complicated (and mixed with
+        ## the histogram structure): 0th bin is underflow and
+        ## the last bin is overflow (now imagine those arrays
+        ## for multidimensional histograms).
+        # Removed because it does not help with the minimum and
+        # maximum of the outliers. Hard to maintain generality
+        # between 1 and multidimensional histograms if we have that.
+        # self.overflow = 0
+        # self.underflow = 0
 
         if hasattr(edges[0], "__iter__"):
             self.dim = len(edges)
@@ -199,8 +193,8 @@ class histogram():
         # (we have produced new bins anyway)
         new_hist = histogram(edges=copy.deepcopy(self.edges), bins=new_bins)
 
-        # this definition might be misleading, because
-        # if *self* had N overflow and *other* had N underflow,
+        # note that if *self* had N overflow
+        # and *other* had N underflow,
         # new n_out_of_range would be zero, which does not mean
         # that all values fell into the histogram range
         # (in fact, 2N missed that).
@@ -208,14 +202,12 @@ class histogram():
         # *other* + *new* = *self* .
         new_oorange = self.n_out_of_range + other.n_out_of_range * weight
         new_hist.n_out_of_range = new_oorange
-        new_hist.overflow = self.overflow + other.overflow * weight
-        new_hist.underflow = self.underflow + other.underflow * weight
 
         return new_hist
 
     def __eq__(self, other):
         """Two histograms are equal, if and only if they have
-        equal bins, edges and number of events outside of range.
+        equal bins, edges and numbers of outliers.
 
         If *other* is not a :class:`.histogram`, return ``False``.
 
@@ -226,8 +218,6 @@ class histogram():
             # in Python comparison between different types is allowed
             return False
         return (self.bins == other.bins and self.edges == other.edges
-                and self.overflow == other.overflow
-                and self.underflow == other.underflow
                 and self.n_out_of_range == other.n_out_of_range)
         # comparing n_out_of_range may seem redundant. However,
         # 1) it increases histogram cohesion. All attributes
@@ -248,9 +238,6 @@ class histogram():
         for ind in indices[:-1]:
             # underflow
             if ind < 0:
-                # we don't fill self.underflow here,
-                # because an underflow for one coordinate
-                # can be an overflow for another (later one)
                 self.n_out_of_range += weight
                 return
             try:
@@ -265,7 +252,6 @@ class histogram():
         # underflow
         if ind < 0:
             self.n_out_of_range += weight
-            self.underflow += weight
             return
 
         try:
@@ -273,7 +259,6 @@ class histogram():
             subarr[ind] += weight
         except IndexError:
             self.n_out_of_range += weight
-            self.overflow += weight
             return
 
     def get_nevents(self, include_out_of_range=False):
@@ -329,8 +314,6 @@ class histogram():
         scale = float(nevents/old_nevents)
 
         self.n_out_of_range *= scale
-        self.overflow  *= scale
-        self.underflow *= scale
 
         if scale == int(scale):
             scale = int(scale)
@@ -381,8 +364,6 @@ class histogram():
             self.bins = lena.math.md_map(lambda binc: binc*float(other) / scale,
                                          self.bins)
             self.n_out_of_range *= other/scale
-            self.overflow  *= other/scale
-            self.underflow *= other/scale
             self._scale = other
             return None
 
@@ -403,8 +384,6 @@ class histogram():
             "dim": self.dim,
             "nbins": self.nbins,
             "n_out_of_range": self.n_out_of_range,
-            "overflow": self.overflow,
-            "underflow": self.underflow,
             "ranges": self.ranges,
         }
 
