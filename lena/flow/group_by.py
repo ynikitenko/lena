@@ -31,8 +31,9 @@ class GroupBy(object):
         or an empty string if they were combined
         into one formatting string).
 
-        Setting *group_by* to an empty string (default)
-        adds all values from the flow into one group.
+        An empty string represents the entire context.
+        The default arguments add all values from the flow
+        into one group (that is merge takes priority over group_by).
 
         .. versionchanged:: 0.6
             *group_by* is no longer a function.
@@ -40,9 +41,15 @@ class GroupBy(object):
         .. versionadded:: 0.6
             *merge* allows ignoring keys.
         """
+        # adjust the default arguments
         if group_by == "" and merge == "":
-            # for default arguments we adjust them manually here.
-            merge = tuple()
+            # prioritize merge: default (empty) arguments
+            # group all input values. Object with no arguments
+            # does some useful work in that case.
+            group_by = tuple()
+            # the empty string means the whole context and should be
+            # present in exactly one of group_by or merge.
+            merge = ("",)
 
         try:
             self._iet = make_include_exclude_tree(

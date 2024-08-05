@@ -56,18 +56,23 @@ def test_group_by_include():
         (3, {"detector": "D1"})
     ]
     # we don't have to manually write merge=tuple()
-    g1 = GroupBy("")
+    g1 = GroupBy()
     for val in data1:
         g1.fill(val)
     assert set(g1.groups.keys()) == set([
-        '{"detector":"D1"}', '{"detector":"D2"}'
+        '{}'
+        # for default group_by (the entire context is considered):
+        # '{"detector":"D1"}', '{"detector":"D2"}'
     ])
     groups1 = list(g1.compute())
 
-    assert oeq(groups1, [
-        [(1, {'detector': 'D1'}), (3, {'detector': 'D1'})],
-        [(2, {'detector': 'D2'})]
-    ])
+    assert oeq(groups1,
+        [[(1, {'detector': 'D1'}), (2, {'detector': 'D2'}),
+          (3, {'detector': 'D1'})]]
+        # for default group_by
+        # [[(1, {'detector': 'D1'}), (3, {'detector': 'D1'})],
+        #  [(2, {'detector': 'D2'})]]
+    )
 
     data2 = [
         (1, {"value":
