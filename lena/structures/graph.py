@@ -312,6 +312,15 @@ class graph():
 
         return parsed_errors
 
+    def rows(self):
+        """Return an iterable on rows of the graph.
+
+        Each row is a tuple of graph coordinates.
+        Row representation is used to create tables in
+        :class:`.output.ToCSV`.
+        """
+        return iter(self)
+
     def _update_context(self, context):
         """Update *context* with the properties of this graph.
 
@@ -415,13 +424,7 @@ def _rescale_value(rescale, value):
 
 
 class Graph(object):
-    """
-    .. deprecated:: 0.5
-       use :class:`graph`.
-       This class may be used in the future,
-       but with a changed interface.
-
-    Function at given coordinates (arbitraty dimensions).
+    """Function at given coordinates (arbitraty dimensions).
 
     Graph points can be set during the initialization and
     during :meth:`fill`. It can be rescaled (producing a new :class:`Graph`).
@@ -465,9 +468,6 @@ class Graph(object):
         All filled values will be stored in it.
         To reduce data, use histograms.
         """
-        warnings.warn("Graph is deprecated since Lena 0.5. Use graph.",
-                      DeprecationWarning, stacklevel=2)
-
         self._points = points if points is not None else []
         # todo: add some sanity checks for points
         self._scale = scale
@@ -509,7 +509,7 @@ class Graph(object):
         # coords, val = point
         self._points.append(point)
 
-    def request(self):
+    def compute(self):
         """Yield graph with context.
 
         If *sort* was initialized ``True``, graph points will be sorted.
@@ -529,8 +529,9 @@ class Graph(object):
 
     @property
     def points(self):
-        """Get graph points (read only)."""
-        # sort points before giving them
+        # todo: should be a method, not property.
+        """Get graph points."""
+        # sort points before returning them
         self._update()
         return self._points
 
@@ -599,26 +600,15 @@ class Graph(object):
                               sort=self._sort)
             return new_graph
 
-    def to_csv(self, separator=",", header=None):
-        """.. deprecated:: 0.5 in Lena 0.5 to_csv is not used.
-              Iterables are converted to tables.
+    def rows(self):
+        """Return an iterable on rows of the Graph
+        (used to create tables in :class:`.output.ToCSV`).
 
-        Convert graph's points to CSV.
-
-        *separator* delimits values, the default is comma.
-
-        *header*, if not ``None``, is the first string of the output
-        (new line is added automatically).
-
-        Since a graph can be multidimensional,
-        for each point first its coordinate is converted to string
-        (separated by *separator*), then each part of its value.
-
-        To convert :class:`Graph` to CSV inside a Lena sequence,
-        use :class:`lena.output.ToCSV`.
+        Each row is a flat tuple of coordinates and their values.
         """
-        if self._sort:
-            self._update()
+        # the graph is updated automatically in points.
+        # if self._sort:
+        #     self._update()
 
         def unpack_pt(pt):
             coord = pt[0]
@@ -631,19 +621,22 @@ class Graph(object):
                 unpacked += list(value)
             else:
                 unpacked.append(value)
-            return unpacked
+            return tuple(unpacked)
 
-        def pt_to_str(pt, separ):
-            return separ.join([str(val) for val in unpack_pt(pt)])
+        return (unpack_pt(pt) for pt in self.points)
 
-        if header is not None:
-            # if one needs an empty header line, they may provide ""
-            lines = header + "\n"
-        else:
-            lines = ""
-        lines += "\n".join([pt_to_str(pt, separator) for pt in self.points])
+        # def pt_to_str(pt, separ):
+        #     return separ.join([str(coord) for coord in pt])
+        #     # return separ.join([str(val) for val in unpack_pt(pt)])
 
-        return lines
+        # if header is not None:
+        #     # if one needs an empty header line, they may provide ""
+        #     lines = [header]
+        # else:
+        #     lines = []
+        # lines.extend([pt_to_str(pt, separator) for pt in self.points])
+
+        # return lines
 
     #     *context* will be added to graph context.
     #     If it contains "scale", :meth:`scale` method will be available.

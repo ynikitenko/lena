@@ -161,7 +161,7 @@ def test_Graph():
     sorted_points = copy.deepcopy(points)
     random.shuffle(points)
     graph2 = Graph(points)
-    gr_points, gr_context = next(graph2.request())
+    gr_points, gr_context = next(graph2.compute())
     assert gr_points.points == sorted_points
 
     # test repr
@@ -225,8 +225,8 @@ def test_Graph():
     gr1 = Graph([(0, 1)], context=copy.deepcopy(context))
     gr2 = Graph()
     gr2.fill(((0, 1), copy.deepcopy(context)))
-    res1 = list(gr1.request())
-    res2 = list(gr2.request())
+    res1 = list(gr1.compute())
+    res2 = list(gr2.compute())
     assert res1 == res2
 
     # context must be a context, if set
@@ -264,22 +264,22 @@ def test_graph_equal():
 
 @pytest.mark.filterwarnings('ignore::DeprecationWarning')
 def test_graph_to_csv():
-    # to_csv works
-    gr2 = Graph([(0, 1)])
-    csv2 = gr2.to_csv()
-    assert csv2 == "0,1"
+    # rows work
+    gr1 = Graph([(0, 1)])
+    rows1 = list(gr1.rows())
+    assert rows1 == [(0, 1)]
 
-    # fill with a point with another dimension is prohibited
-    # should be moved to another method though...
-    gr2.fill((((0, 1, 2), (3, 4)), {}))
-    # in python3 it raises TypeError
-    with pytest.raises((lena.core.LenaValueError, TypeError)):
-        gr2.to_csv()
+    # # fill with a point with another dimension is prohibited
+    # # should be moved to another method though...
+    # gr2.fill((((0, 1, 2), (3, 4)), {}))
+    # # in python3 it raises TypeError
+    # with pytest.raises((lena.core.LenaValueError, TypeError)):
+    #     gr2.to_csv()
 
     # multidimensional to_csv works
     gr2 = Graph([(((0, 1, 2), (3, 4)))])
-    assert gr2.to_csv() == "0,1,2,3,4"
+    assert list(gr2.rows()) == [(0, 1, 2, 3, 4)]
 
-    # header works
-    header = "x,y,z,f,g"
-    assert gr2.to_csv(header=header) == header + '\n' + "0,1,2,3,4"
+    # # header works
+    # header = "x,y,z,f,g"
+    # assert gr2.to_csv(header=header) == header + '\n' + "0,1,2,3,4"

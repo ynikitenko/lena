@@ -82,9 +82,16 @@ def iterable_to_table(
 
     .. versionadded:: 0.5
     """
+    # todo: change this interface or maybe remove this function.
     if header:
         if header_fields:
+            # the downside of this design: header is coupled with
+            # header_fields.
+            # The upside: we can easier switch
+            # to new formats (leaving header fields intact).
             header = header.format(*header_fields)
+        # the downside of this header implementation is also that
+        # header structure can be different from row structure.
         yield header
 
     # one value per line may be not such a useful case
@@ -176,10 +183,10 @@ class ToCSV(object):
     """Convert data to CSV text.
 
     Can be converted:
-        * :class:`.histogram`
-          (implemented only for 1- and 2-dimensional histograms).
-        * any iterable object (including :class:`.graph`).
+        * :class:`.histogram` (implemented only for 1- and 2-dimensional histograms),
+        * any object with a method *rows* (for example, :class:`.Graph`).
     """
+    # * any iterable object (including :class:`.graph`).
 
     def __init__(self, separator=",", header=None, duplicate_last_bin=True):
         """*separator* delimits values in the output text.
@@ -193,11 +200,16 @@ class ToCSV(object):
         creating the last horizontal step.
         """
         self._separator = separator
+        # todo: remove header. It should be different for each value.
         self._header = header
         self._duplicate_last_bin = duplicate_last_bin
 
     def run(self, flow):
         """Convert values from *flow* to CSV text.
+
+        Convertible data types are histograms and those that implement
+        a method *rows()*, which returns an iterable of tuples
+        of columns for each row.
 
         *context.output* is updated with {"filetype": "csv"}.
         If a data structure has a method *\\_update_context(context)*,
@@ -264,19 +276,28 @@ class ToCSV(object):
             # There is no way to convert a string to csv
             # (even with explicit to_csv set to True),
             # because if really needed, this could be done elsewhere.
-            if isinstance(data, str):
-                yield val
-                continue
+            # if isinstance(data, str):
+            #     yield val
+            #     continue
 
-            ## iterable
+            rows = None
+            ## provides rows property.
+            # rows is a method (not a property), as it is
+            # in dict.keys(), items(), etc.
             try:
-                rows = iter(data)
-            except TypeError:
+                rows_iter = data.rows()
+            except AttributeError:
                 pass
             else:
-                rows = iterable_to_table(
-                    data, row_separator=self._separator, header=self._header
-                )
+                # todo: add a header method.
+                try:
+                    rows = iterable_to_table(
+                        rows_iter, row_separator=self._separator, header=self._header
+                    )
+                except TypeError:
+                    pass
+
+            if rows:
                 csv = "\n".join(rows)
                 if (hasattr(data, "_update_context") and
                         callable(data._update_context)):
@@ -290,4 +311,8 @@ class ToCSV(object):
             # to the output part, or use filters like RunIf.
 
             ## unknown type
+            # We yield value (not (data, context)), because
+            # if there was no context, we do not change that value.
+            # Inserting ToCSV does not affect output
+            # for irrelevant values.
             yield val
