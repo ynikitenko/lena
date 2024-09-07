@@ -53,33 +53,29 @@ class SetContext(object):
 class StoreContext():
     """Store static context. Use for debugging."""
 
-    def __init__(self, name="", verbose=False):
-        """*name* and *verbose* affect output and representation."""
-        self._name = name
-        self._context = {}
-        self._verbose = verbose
+    def __init__(self):
+        self.context = {}
+        # no need to print during setting context.
+        # Patch this code manually if needed.
+        # self._verbose = verbose
         self._has_no_data = True
 
     def _set_context(self, context):
-        if self._verbose:
-            print("StoreContext({}): storing {}".format(self._name, context))
-        self._context = context
+        self.context = context
 
     def __eq__(self, other):
         if not isinstance(other, StoreContext):
             return NotImplemented
-        # todo: maybe _verbose should not be checked.
-        # It does not affect any logic.
-        # But this element is also only for debugging.
         return (
-            self._name == other._name and
-            self._verbose == other._verbose and
             # will be set in the sequence, not during the initialisation
-            self._context == other._context
+            self.context == other.context
         )
 
     def __repr__(self):
-        return "StoreContext({})".format(repr(self._context))
+        # we want our element to be able to be initialised
+        # by copying its representation,
+        # and Python has no inline commentaries
+        return 'StoreContext() or "{}"'.format(repr(self.context))
 
 
 class UpdateContextFromStatic(object):

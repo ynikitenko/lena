@@ -6,40 +6,54 @@ from lena.core import Sequence, Source, Split
 
 from lena.meta.elements import SetContext, UpdateContextFromStatic, StoreContext
 
+set_context_far  = SetContext("data.detector", "far")
+set_context_near = SetContext("data.detector", "near")
+
 
 def test_set_context():
-    data = [(0, {})]
-    set_context_far = SetContext("data.detector", "far")
-
-    # repr works
+    # representation works
     assert repr(set_context_far) == 'SetContext("data.detector", "far")'
 
+    # equality works
+    set_context_far2  = SetContext("data.detector", "far")
+    assert set_context_far2 == set_context_far
+    assert set_context_near != set_context_far
+    assert set_context_near != "some other value"
+
+    # _get_context works
+    assert set_context_far._get_context() == {"data": {"detector": "far"}}
+
+
+def test_sequence():
+    # todo: move to core.
+    data = [(0, {})]
+
+    # todo: this should be changed.
     ## static context does not alter context
     # within a sequence
-    s0 = Sequence(set_context_far)
-    assert list(s0.run(deepcopy(data))) == data
-
-    # outside a sequence
-    set_context_near = SetContext("data.detector", "near")
-    s1 = Sequence(set_context_near, deepcopy(s0))
-    assert list(s1.run(deepcopy(data))) == data
-
-    # static context is updated after the element
-    s0u0 = Sequence(set_context_far, UpdateContextFromStatic())
-    res0u0 = list(s0u0.run(deepcopy(data)))
-    assert len(res0u0) == len(data)
-    assert res0u0[0][0] == data[0][0]
-    assert res0u0[0][1] == {'data': {'detector': 'far'}}
+    sfar = Sequence(set_context_far)
+    assert list(sfar.run(deepcopy(data))) == data
 
     # static context is updated after the sequence
-    s0u1 = Sequence(s0, UpdateContextFromStatic())
-    res0u1 = list(s0u1.run(deepcopy(data)))
-    assert res0u1[0][1] == {'data': {'detector': 'far'}}
+    sfar_u0 = Sequence(sfar, UpdateContextFromStatic())
+    resfar_u0 = list(sfar_u0.run(deepcopy(data)))
+    assert resfar_u0[0][1] == {'data': {'detector': 'far'}}
 
-    # external context overwrites internal (further) one
-    s1u0 = Sequence(s1, UpdateContextFromStatic())
-    res1u0 = list(s1u0.run(deepcopy(data)))
-    assert res1u0[0][1] == {'data': {'detector': 'near'}}
+    # static context is updated after the element
+    sfar_u1 = Sequence(set_context_far, UpdateContextFromStatic())
+    resfar_u1 = list(sfar_u1.run(deepcopy(data)))
+    assert len(resfar_u1) == len(data)
+    assert resfar_u1[0][0] == data[0][0]
+    assert resfar_u1[0][1] == {'data': {'detector': 'far'}}
+
+    # outside a sequence
+    snear = Sequence(deepcopy(sfar), set_context_near)
+    assert list(snear.run(deepcopy(data))) == data
+
+    # todo: internal context overwrites external (previous) one
+    sfar_u0 = Sequence(set_context_near, deepcopy(sfar), UpdateContextFromStatic())
+    resfar_u0 = list(sfar_u0.run(deepcopy(data)))
+    assert resfar_u0[0][1] == {'data': {'detector': 'near'}}
 
 
 def test_set_context_split():
@@ -47,7 +61,7 @@ def test_set_context_split():
     set_context_near = SetContext("data.detector", "near")
     set_context_common = SetContext("data.lost", True)
     call = lambda _: "we won't run this"
-    store1, store2, store3, store4 = [StoreContext(str(i)) for i in range(1, 5)]
+    store1, store2, store3, store4 = [StoreContext() for i in range(1, 5)]
 
     split = Split([
         (
@@ -75,15 +89,15 @@ def test_set_context_split():
         split,
         store4
     )
-    assert store1._context == {'data': {'cycle': 1, 'lost': True}}
-    assert store2._context == {
+    assert store1.context == {'data': {'cycle': 1, 'lost': True}}
+    assert store2.context == {
         'data': {'cycle': 1, 'detector': 'far', 'lost': True}
     }
-    assert store3._context == {
+    assert store3.context == {
         'data': {'cycle': 1, 'detector': 'near', 'lost': True}
     }
     # static context is the same for the same level of nesting
-    assert store4._context == store1._context
+    assert store4.context == store1.context
 
 
 def test_set_template_context_split():
@@ -91,7 +105,7 @@ def test_set_template_context_split():
     set_context_near = SetContext("data.detector", "near")
     set_context_common = SetContext("data.lost", True)
     call = lambda _: "we won't run this"
-    store1, store2, store3, store4 = [StoreContext(str(i)) for i in range(1, 5)]
+    store1, store2, store3, store4 = [StoreContext() for i in range(1, 5)]
 
     seq = Sequence(
         # common context updates the sequence containing Split
@@ -132,19 +146,38 @@ def test_set_template_context_split():
         split,
         store4
     )
-    assert store1._context == {
+    assert store1.context == {
         'data': {'cycle': 1, 'lost': True},
         'cycle': '1',
     }
-    assert store2._context == {
+    assert store2.context == {
         'data': {'cycle': 1, 'detector': 'far', 'lost': True},
         'cycle': '1',
     }
-    assert store3._context == {
+    assert store3.context == {
         'data': {'cycle': 1, 'detector': 'near', 'lost': True},
         'detector': 'maybe_near',
         'cycle': '1',
         # 'cycle': '2_indeed',
     }
     # static context is the same for the same level of nesting
-    assert store4._context == store1._context
+    assert store4.context == store1.context
+
+
+def test_store_context():
+    sc1 = StoreContext()
+    sc2 = StoreContext()
+    sc_empty = StoreContext()
+
+    # _set_context works
+    seq = Sequence(SetContext("a", "b"), sc1, sc2)
+
+    assert sc1.context == {"a": "b"}
+
+    # representation works
+    assert repr(sc1) == 'StoreContext() or "{\'a\': \'b\'}"'
+
+    # equality works
+    assert sc1 == sc2
+    assert sc1 != sc_empty
+    assert sc1 != "some other value"
