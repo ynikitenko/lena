@@ -1,9 +1,12 @@
+from copy import deepcopy
+
 import pytest
 
 import lena
 from lena.core import LenaTypeError, LenaKeyError, LenaValueError
 from lena.context import (
-    contains, difference, format_context, get_recursively,
+    contains, difference, format_context, format_update_with,
+    get_recursively,
     intersection,
     str_to_dict, str_to_list, to_string,
     update_recursively, update_nested,
@@ -161,6 +164,22 @@ def test_format_context():
     # not implemented
     # with pytest.raises(LenaValueError):
     #     format_context("{a_string")
+
+
+def test_format_update_with():
+    fuw = format_update_with
+
+    # key formatting and update works
+    d = {"detector": "FDI", "data_type": "data"}
+    d1 = deepcopy(d)
+    key, val = ("name", "{{detector}}_{{data_type}}")
+    fuw(key, val, d1)
+    assert d1 == {'data_type': 'data', 'detector': 'FDI',
+                  'name': 'FDI_data',}
+
+    # missing key raises
+    with pytest.raises(LenaKeyError):
+        fuw(key, val, {})
 
 
 def test_get_recursively():

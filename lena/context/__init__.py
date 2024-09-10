@@ -1,7 +1,9 @@
 from .context import Context
 from .functions import (
     contains,
-    difference, format_context, get_recursively,
+    difference, format_context,
+    format_update_with,
+    get_recursively,
     intersection,
     str_to_dict, str_to_list, to_string, update_nested, update_recursively,
 )
@@ -16,6 +18,7 @@ __all__ = [
     'Context',
     'UpdateContext',
     'contains', 'difference', 'format_context',
+    'format_update_with',
     'get_recursively',
     'intersection',
     'str_to_dict', 'str_to_list', 'to_string',

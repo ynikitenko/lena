@@ -16,6 +16,7 @@ Context
     contains
     difference
     format_context
+    format_update_with
     get_recursively
     intersection
     str_to_dict
@@ -46,6 +47,7 @@ Functions
 .. autofunction:: contains
 .. autofunction:: difference
 .. autofunction:: format_context
+.. autofunction:: format_update_with
 .. autofunction:: get_recursively
 .. autofunction:: intersection
 .. autofunction:: str_to_dict
