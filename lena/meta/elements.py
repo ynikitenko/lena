@@ -88,7 +88,10 @@ class StoreContext():
         self._has_no_data = True
 
     def _set_context(self, context):
-        self.context = context
+        # since there is no _get_context, we need to make
+        # a deep copy here, otherwise further elements
+        # might influence our context.
+        self.context = deepcopy(context)
 
     def __eq__(self, other):
         if not isinstance(other, StoreContext):

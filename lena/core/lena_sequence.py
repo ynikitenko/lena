@@ -39,63 +39,30 @@ class LenaSequence(object):
     get its length and get an item at the given index.
     """
     def __init__(self, *args):
-        from lena.context import update_recursively
-        # todo: this doesn't require jinja2,
-        # but we may want it to support template strings soon
         self._seq = args
-        seq = []
-
-        # for static (sequence initialisation time) context
-        need_context = []
-        unknown_contexts = []
-        context = {}
-
-        # get static context.
-        # External/earlier context takes precedence.
-        for el in reversed(args):
-            # we don't check whether they are callable here,
-            # because otherwise there will be an error
-            # during initialisation (not runtime)
-            if hasattr(el, "_unknown_contexts"):
-                # we don't expand in place even if we could,
-                # because external/top context has priority
-                unknown_contexts.extend(el._unknown_contexts)
-            if hasattr(el, "_get_context"):
-                el_context = el._get_context()
-                update_recursively(context, el_context)
-
-        # Render that context that we can. Context is updated.
-        _update_unknown_contexts(unknown_contexts, context)
-        # unknown_contexts of this sequence are left as they are.
-        # We shall set them every time we update context.
-        # unknown_contexts = _update_unknown_contexts(unknown_contexts, context)
-        # There is no way to check (during init)
-        # that all static context was set,
-        # because sequences are allowed to separate/wrap any elements.
+        data_seq  = []
+        with_static_context = []
 
         for el in args:
-            # orders of setters and getters are independent:
-            # context is same for the whole sequence
-            # (and external ones, but not for Split)
-            if hasattr(el, "_set_context"):
-                # if not unknown_contexts:
-                # we set context after all unknowns are known.
-                # el can't have unknown contexts
-                # (except subsequences of Split);
-                # at least not contexts
-                # that shall update the current context
-                el._set_context(context)
-                need_context.append(el)
+            # That would be bad design because of action at a distance,
+            # or, more precise, lack of causality (1-directionality).
+            # # orders of setters and getters are independent:
+            # # context is same for the whole sequence
+            # # (and external ones, but not for Split)
 
-            # todo 0.7: or has context
+            # todo v0.7: if _has_context
             if not hasattr(el, "_has_no_data"):
-                seq.append(el)
+                data_seq.append(el)
 
-        self._context = context
-        self._unknown_contexts = unknown_contexts
-        self._need_context = need_context
+            if hasattr(el, "_get_context") or hasattr(el, "_set_context"):
+                with_static_context.append(el)
 
-        self._data_seq = seq
+        self._data_seq = data_seq
+        # copied from meta.SetContext
+        try:
+            self._set_context({})
+        except LenaKeyError:
+            pass
 
     def __iter__(self):
         return self._seq.__iter__()
@@ -141,31 +108,46 @@ class LenaSequence(object):
         return self._repr_nested()
 
     def _set_context(self, context):
-        from lena.context import update_recursively
-        # parent context doesn't necessarily has our context
-        # (for example, when we are inside Split).
-        # We update current context with context.
-        update_recursively(self._context, context)
-        if hasattr(self, "_unknown_contexts"):
-            # Can be empty, this is fine.
-            # We don't update context with those rendered here,
-            # because we can be in Split. All common unknown contexts
-            # have already updated the common context.
-            # We update the current context, however.
-            _update_unknown_contexts(self._unknown_contexts[:],
-                                     self._context)
-            # containing Sequence may redefine some values,
-            # therefore we need to set unknown_contexts each time;
-            # however, we no longer update the external context.
-            # if unknown_contexts:
-            #     self._unknown_contexts = unknown_contexts
-            #     # don't set context for other elements
-            #     # until all contexts are known
-            #     return
-            # else:
-            #     del self._unknown_contexts
-        for el in self._need_context:
-            el._set_context(self._context)
+        """Set static context based on the external *context*."""
+        # Context must pass through every element of this sequence,
+        # since it not only updates context,
+        # but can also delete that (via Split).
+        # No optimisation for future contexts is possible.
+
+        # todo: get context only when necessary. Change the order.
+        # We could economise last _get_context here.
+        # For example, if the last element is a big Split, whose
+        # static context we don't need to know any more (it is the end).
+
+        for el in self._seq:
+            if hasattr(el, "_set_context") and context:
+                # skip empty context as an optimisation
+                # (el could be a big sequence).
+                # Every element with _set_context
+                # sets the empty context during its initialisation.
+                try:
+                    el._set_context(context)
+                except LenaKeyError:
+                    # needed keys are lacking in the context.
+                    # _static_context is not set.
+                    # If _static_context was already set,
+                    # we won't be here, since external context
+                    # can not delete local keys.
+                    return
+
+            if hasattr(el, "_get_context"):
+                # every element that has _get_context
+                # must also have _set_context
+                context = el._get_context()
+
+        self._static_context = context
 
     def _get_context(self):
-        return deepcopy(self._context)
+        # copied from meta.SetContext
+        try:
+            sc = self._static_context
+        except AttributeError:
+            raise LenaAttributeError(
+                "static context missing. Run _set_context to set that."
+            )
+        return deepcopy(sc)
