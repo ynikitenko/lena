@@ -181,6 +181,18 @@ def test_format_update_with():
     with pytest.raises(LenaKeyError):
         fuw(key, val, {})
 
+    # a trivial value updates context properly
+    key2, val2 = ("key", 1)
+    d2 = {}
+    fuw(key2, val2, d2)
+    assert d2 == {"key": 1}
+
+    # a string without formatting updates context properly
+    key3, val3 = ("key", "value")
+    d3 = {}
+    fuw(key3, val3, d3)
+    assert d3 == {"key": "value"}
+
 
 def test_get_recursively():
     # test wrong input parameters

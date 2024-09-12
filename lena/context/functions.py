@@ -201,8 +201,10 @@ def format_context(format_str):
 
 
 def format_update_with(key, value, d):
-    """Format *value* using the dictionary *d*
-    and update *d[key]* with the formatted value.
+    """Update *d[key]* with *value*.
+
+    If *value* is a formatting string,
+    first format *value* using the dictionary *d*.
 
     If *d* does not contain every key needed to format *value*,
     :exc:`.LenaKeyError` is raised.
@@ -213,10 +215,13 @@ def format_update_with(key, value, d):
         which does not update *d*, and :func:`.update_recursively`,
         which does not format its arguments.
     """
-    # todo: there is no context in that call. Maybe an optional arg?
-    # Or rename to context_formatter.
-    fc = format_context(value)
-    value_formatted = fc(d)
+    if isinstance(value, str) and '{' in value:
+        # todo: there is no context in that call. Maybe an optional arg?
+        # Or rename to context_formatter.
+        fc = format_context(value)
+        value_formatted = fc(d)
+    else:
+        value_formatted = value
     formatted_context = str_to_dict(key, value_formatted)
     # here could be further transformations, like key suffixes.
     update_recursively(d, formatted_context)
