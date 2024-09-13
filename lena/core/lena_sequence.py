@@ -2,7 +2,7 @@
 from copy import deepcopy
 
 import lena.context
-from .exceptions import LenaAttributeError, LenaKeyError
+from .exceptions import LenaKeyError
 
 
 class LenaSequence(object):
@@ -86,9 +86,10 @@ class LenaSequence(object):
         try:
             sc = self._static_context
         except AttributeError:
-            raise LenaAttributeError(
-                "static context missing. Run _set_context to set that."
-            )
+            # self._exc is present in that case,
+            # because there is always at least one
+            # _set_context before _get_context.
+            raise self._exc
         return deepcopy(sc)
 
     def _set_context(self, context):
@@ -111,12 +112,13 @@ class LenaSequence(object):
                 # sets the empty context during its initialisation.
                 try:
                     el._set_context(context)
-                except LenaKeyError:
+                except LenaKeyError as exc:
                     # needed keys are lacking in the context.
                     # _static_context is not set.
                     # If _static_context was already set,
                     # we won't be here, since external context
                     # can not delete local keys.
+                    self._exc = exc
                     return
 
             if hasattr(el, "_get_context"):
@@ -124,9 +126,8 @@ class LenaSequence(object):
                 # must also have _set_context
                 try:
                     context = el._get_context()
-                # todo: with LenaAttributeError we can't keep
-                # information about the original missing key.
-                except LenaAttributeError:
-                    raise LenaKeyError()
+                except LenaKeyError as exc:
+                    self._exc = exc
+                    raise exc
 
         self._static_context = context

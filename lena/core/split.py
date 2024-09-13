@@ -113,7 +113,7 @@ class LenaSplit(object):
             # (not intersecting the others with {}).
             if hasattr(seq, "_get_context"):
                 # if some of sequences was not set proper context yet,
-                # this will raise a LenaAttributeError.
+                # this will raise a LenaKeyError.
                 contexts.append(seq._get_context())
 
         # we don't store the static context of Split,

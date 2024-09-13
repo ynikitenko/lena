@@ -2,7 +2,7 @@ from copy import deepcopy
 
 import pytest
 
-from lena.core import Sequence, Source, Split, LenaAttributeError
+from lena.core import Sequence, Source, Split, LenaKeyError
 
 # we don't test them here, but use them for our tests.
 from lena.meta.elements import SetContext, UpdateContextFromStatic, StoreContext
@@ -120,8 +120,13 @@ def test_set_formatted_context():
         SetContext("cycle", "{{data.cycle}}"),
         call,
     )
-    with pytest.raises(LenaAttributeError):
+    with pytest.raises(LenaKeyError) as exc:
         s0._get_context()
+    # Sequence knows that the key "data" was missing
+    # while setting static context.
+    assert "data" in str(exc.value)
+    # the complete string is 'nested dict data not found in {}',
+    # but it might change.
 
     seq = Sequence(
         set_context_common1,

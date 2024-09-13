@@ -1,6 +1,6 @@
 from copy import deepcopy
 
-from lena.core import LenaAttributeError, LenaKeyError
+from lena.core import LenaKeyError
 from lena.context import format_update_with, update_recursively
 
 
@@ -21,6 +21,9 @@ class SetContext(object):
 
         *value* can be a formatting string.
         See :func:`.format_context` for details.
+
+        If *value* could not be formatted,
+        :exc:`.LenaKeyError` is raised.
         """
 
         # todo: key could be an entire dictionary
@@ -40,12 +43,9 @@ class SetContext(object):
         try:
             sc = self._static_context
         except AttributeError:
-            # one does not expect el._get_context() to raise
-            # AttributeError, but this is the meaning of that exception
-            # (a class field was not initialised).
-            raise LenaAttributeError(
-                "static context missing. Run _set_context to set that."
-            )
+            # KeyError stored during _set_context
+            # in order to assist the user in finding the error.
+            raise self._exc
         # we want to keep our context safe, therefore deepcopy.
         # It makes little difference to optimise in a Sequence.
         return deepcopy(sc)
@@ -55,6 +55,7 @@ class SetContext(object):
         try:
             format_update_with(self._key, self._value, context)
         except LenaKeyError as exc:
+            self._exc = exc
             raise exc
         else:
             self._static_context = context

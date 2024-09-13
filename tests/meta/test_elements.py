@@ -2,7 +2,7 @@ from copy import deepcopy
 
 import pytest
 
-from lena.core import LenaAttributeError
+from lena.core import LenaKeyError
 from lena.meta.elements import SetContext, UpdateContextFromStatic, StoreContext
 
 set_context_far  = SetContext("data.detector", "far")
@@ -35,9 +35,11 @@ def test_set_context():
 
     # missing context raises
     sc5 = SetContext("full_name", "{{detector}}")
-    with pytest.raises(LenaAttributeError):
+    with pytest.raises(LenaKeyError) as exc:
         # detector was not set
         sc5._get_context()
+    # missing key is stored in the exception
+    assert "detector" in str(exc.value)
 
 
 def test_store_context():
