@@ -2,11 +2,13 @@ from copy import deepcopy
 
 import pytest
 
-from lena.core import Sequence, Source, Split
+from lena.core import Sequence, Source, Split, LenaAttributeError
 
 # we don't test them here, but use them for our tests.
 from lena.meta.elements import SetContext, UpdateContextFromStatic, StoreContext
 
+# note that SetContext gets external context as well,
+# so it may be dangerous to reuse them in different sequences.
 set_context_far  = SetContext("data.detector", "far")
 set_context_near = SetContext("data.detector", "near")
 
@@ -51,30 +53,30 @@ def test_sequence():
     assert resfar_u0[0][1] == cfar
 
 
-def _test_set_context_split():
-    set_context_far = SetContext("data.detector", "far")
-    set_context_near = SetContext("data.detector", "near")
+def test_set_context_split():
     set_context_common = SetContext("data.lost", True)
     call = lambda _: "we won't run this"
-    store1, store2, store3, store4 = [StoreContext() for i in range(1, 5)]
+    store1, store_f2, store3, store_n4, store5 = [StoreContext() for _ in range(5)]
+    # [StoreContext()] * 5 wouldn't work here, the objects would be the same.
 
     split = Split([
         (
             set_context_common,
             call,
             set_context_far,
-            store2,
+            store_f2,
         ),
         (
-            # common context updates the sequence containing Split
             set_context_common,
             call,
             store3,
             set_context_near,
-            # external context overwrites internal one
             SetContext("data.cycle", 2),
+            store_n4,
         ),
     ])
+
+    # the resulting context is intersection of the inner contexts.
     assert split._get_context() == {'data': {'lost': True}}
 
     s0 = Source(
@@ -82,57 +84,70 @@ def _test_set_context_split():
         call,
         store1,
         split,
-        store4
+        store5
     )
-    assert store1.context == {'data': {'cycle': 1, 'lost': True}}
-    assert store2.context == {
+    # context before Split is correct
+    assert store1.context == {'data': {'cycle': 1}}
+
+    # external context is passed into sequences
+    assert store_f2.context == {
         'data': {'cycle': 1, 'detector': 'far', 'lost': True}
     }
     assert store3.context == {
-        'data': {'cycle': 1, 'detector': 'near', 'lost': True}
+        'data': {'cycle': 1, 'lost': True}
     }
-    # static context is the same for the same level of nesting
-    assert store4.context == store1.context
+    # external context is overwritten in further sequences
+    # (probably that should be tested in a Sequence).
+    assert store_n4.context == {
+        'data': {'cycle': 2, 'detector': 'near', 'lost': True}
+    }
+
+    # the resulting context is intersection of the inner contexts.
+    assert store5.context == {'data': {'lost': True}}
 
 
-def _test_set_template_context_split():
-    set_context_far = SetContext("data.detector", "far")
-    set_context_near = SetContext("data.detector", "near")
-    set_context_common = SetContext("data.lost", True)
+def test_set_formatted_context():
+    # this function tests at large, but is still useful.
+    set_context_common1 = SetContext("data.lost", True)
+    set_context_common2 = SetContext("data.lost", True)
     call = lambda _: "we won't run this"
-    store1, store2, store3, store4 = [StoreContext() for i in range(1, 5)]
+    store1, store_split, store3, store4 = [StoreContext() for _ in range(1, 5)]
+
+    # elements that could not set context raise
+    s0 = Sequence(
+        call,
+        store3,
+        SetContext("cycle", "{{data.cycle}}"),
+        call,
+    )
+    with pytest.raises(LenaAttributeError):
+        s0._get_context()
 
     seq = Sequence(
-        # common context updates the sequence containing Split
-        set_context_common,
+        set_context_common1,
         call,
         store3,
         set_context_near,
-        # external context overwrites internal one
+        # internal context overwrites external one
         SetContext("data.cycle", 2),
         SetContext("cycle", "{{data.cycle}}"),
-        # todo: this is too complicated for now
-        # # this will be overwritten
-        # SetContext("cycle", "{{cycle}}_indeed"),
-        SetContext("detector", "maybe_{{detector}}"),
         SetContext("detector", "{{data.detector}}"),
+        SetContext("detector", "maybe_{{detector}}"),
     )
-    # print(seq[-1]._context)
+    # context formatting works in Sequence reality.
     assert seq._get_context()["detector"] == "maybe_near"
 
     split = Split([
         (
-            set_context_common,
+            set_context_common2,
             call,
             # data.cycle is set externally (and correctly)
             SetContext("cycle", "{{data.cycle}}"),
-            # SetContext("cycle", "{{cycle}}_indeed"),
             set_context_far,
-            store2,
+            store_split,
         ),
         seq,
     ])
-    assert split._get_context() == {'data': {'lost': True}}
 
     s0 = Source(
         SetContext("data.cycle", 1),
@@ -141,19 +156,13 @@ def _test_set_template_context_split():
         split,
         store4
     )
-    assert store1.context == {
-        'data': {'cycle': 1, 'lost': True},
-        'cycle': '1',
-    }
-    assert store2.context == {
+    assert store1.context == {'data': {'cycle': 1}}
+    assert store_split.context == {
         'data': {'cycle': 1, 'detector': 'far', 'lost': True},
         'cycle': '1',
     }
     assert store3.context == {
-        'data': {'cycle': 1, 'detector': 'near', 'lost': True},
-        'detector': 'maybe_near',
-        'cycle': '1',
-        # 'cycle': '2_indeed',
+        'data': {'lost': True, 'cycle': 1,}
     }
-    # static context is the same for the same level of nesting
-    assert store4.context == store1.context
+    # intersection of Split branches, data.cycle is removed.
+    assert store4.context == {'data': {'lost': True}}

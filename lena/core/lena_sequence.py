@@ -2,33 +2,7 @@
 from copy import deepcopy
 
 import lena.context
-
-
-def _update_unknown_contexts(unknown_contexts, context):
-    """Update values in *unknown_contexts* from *context*
-    and update *context* with the new values.
-    """
-    from lena.context import (
-        format_context, str_to_dict, update_recursively
-    )
-    new_unknowns = []
-    for uc in unknown_contexts:
-        key, value = uc
-        fc = format_context(value)
-        try:
-            rendered = fc(context)
-        except lena.core.LenaKeyError:
-            new_unknowns.append(uc)
-        else:
-            rendered_context = str_to_dict(key, rendered)
-            update_recursively(context, rendered_context)
-
-    # if we could render something, try to render other elements
-    # with the updated context
-    if len(new_unknowns) != len(unknown_contexts):
-        new_unknowns = _update_unknown_contexts(new_unknowns, context)
-
-    return new_unknowns
+from .exceptions import LenaAttributeError, LenaKeyError
 
 
 class LenaSequence(object):
@@ -107,6 +81,16 @@ class LenaSequence(object):
         # and nested with str
         return self._repr_nested()
 
+    def _get_context(self):
+        # copied from meta.SetContext
+        try:
+            sc = self._static_context
+        except AttributeError:
+            raise LenaAttributeError(
+                "static context missing. Run _set_context to set that."
+            )
+        return deepcopy(sc)
+
     def _set_context(self, context):
         """Set static context based on the external *context*."""
         # Context must pass through every element of this sequence,
@@ -138,16 +122,11 @@ class LenaSequence(object):
             if hasattr(el, "_get_context"):
                 # every element that has _get_context
                 # must also have _set_context
-                context = el._get_context()
+                try:
+                    context = el._get_context()
+                # todo: with LenaAttributeError we can't keep
+                # information about the original missing key.
+                except LenaAttributeError:
+                    raise LenaKeyError()
 
         self._static_context = context
-
-    def _get_context(self):
-        # copied from meta.SetContext
-        try:
-            sc = self._static_context
-        except AttributeError:
-            raise LenaAttributeError(
-                "static context missing. Run _set_context to set that."
-            )
-        return deepcopy(sc)
