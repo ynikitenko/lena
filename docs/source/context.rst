@@ -6,6 +6,7 @@ Context
 .. autosummary::
 
     Context
+    DeleteContext
     UpdateContext
 
 **Functions:**
@@ -32,6 +33,9 @@ Elements
 .. autoclass:: Context
     :special-members: __call__
     :show-inheritance:
+
+.. autoclass:: DeleteContext
+    :special-members: __call__
 
 .. autoclass:: UpdateContext
     :special-members: __call__

@@ -1,4 +1,5 @@
 from .context import Context
+from .elements import DeleteContext
 from .functions import (
     contains,
     difference, format_context,
@@ -17,6 +18,7 @@ from .update_context import UpdateContext
 __all__ = [
     'Context',
     'UpdateContext',
+    'DeleteContext',
     'contains', 'difference', 'format_context',
     'format_update_with',
     'get_recursively',
