@@ -105,3 +105,25 @@ class HistToGraph():
                 scale=self._scale
             )
             yield (graph, context)
+
+
+class ScaleTo(object):
+
+    def __init__(self, scale_to):
+        """*scale_to* is the number to which the data will be scaled.
+
+        To scale a group of values, use :class:`lena.flow.GroupScale`.
+        """
+        self._scale_to = scale_to
+
+    def __call__(self, value):
+        """Scale the data part of the value.
+
+        If the structure has zero or unknown scale,
+        :exc:`.LenaValueError` or :exc:`.LenaAttributeError`
+        will be raised.
+        """
+        data, context = lena.flow.get_data_context(value)
+        # LenaValueError or LenaAttributeError can be raised
+        data.scale(self._scale_to)
+        return (data, context)

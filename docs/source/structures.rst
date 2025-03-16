@@ -26,10 +26,13 @@ Structures
     root_graph_errors
     ROOTGraphErrors
 
+**Elements:**
+
 .. currentmodule:: lena.structures.elements
 .. autosummary::
 
     HistToGraph
+    ScaleTo
 
 **Split into bins:**
 
@@ -108,8 +111,14 @@ Graph
 .. autoclass:: ROOTGraphErrors
     :members:
 
+Elements
+--------
+
 .. module:: lena.structures.elements
 .. autoclass:: HistToGraph
+    :members:
+
+.. autoclass:: ScaleTo
     :members:
 
 Split into bins

@@ -61,7 +61,8 @@ def scale_to(scale_to, group,
 class GroupScale(object):
     """Scale a group of data."""
 
-    def __init__(self, scale_to, allow_zero_scale=False, allow_unknown_scale=False):
+    def __init__(self, scale_to,
+                 allow_zero_scale=False, allow_unknown_scale=False):
         """*scale_to* defines the method of scaling.
         If a number is given, group items are scaled to that.
         Otherwise it is converted to a :class:`.Selector`,
@@ -74,6 +75,10 @@ class GroupScale(object):
         are set to ``True``,
         the corresponding errors are ignored
         and the structure remains unscaled.
+
+        .. hint ::
+            To scale only one value, use
+            :class:`lena.structures.ScaleTo <lena.structures.elements.ScaleTo>`.
         """
         self._scale_to = scale_to
         self._allow_zero_scale = allow_zero_scale

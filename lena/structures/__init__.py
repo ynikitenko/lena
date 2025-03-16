@@ -1,4 +1,4 @@
-from .elements import HistToGraph
+from .elements import HistToGraph, ScaleTo
 from .graph import graph, Graph
 from .histogram import histogram, Histogram
 from .hist_functions import (
