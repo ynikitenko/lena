@@ -122,6 +122,9 @@ class graph():
                 "field_names contains duplicates"
             )
 
+        # otherwise we won't be able to scale this graph
+        # (with the given code)
+        assert isinstance(coords, list)
         self.coords = coords
         self._scale = scale
 
@@ -259,8 +262,8 @@ class graph():
                 # https://stackoverflow.com/a/62399645/952234
                 # (because each time taking a value from an array
                 #  creates a Python object)
-                self.coords[ind] = list(map(partial(mul, rescale),
-                                            arr))
+                mappedl = list(map(partial(mul, rescale), arr))
+                self.coords[ind] = mappedl
 
         self._scale = other
 

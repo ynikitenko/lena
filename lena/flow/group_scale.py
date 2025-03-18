@@ -89,11 +89,10 @@ class GroupScale(object):
 
         If *group* is not iterable, :exc:`.LenaValueError` is raised.
         """
-        try:
-            scale_to(self._scale_to, group,
-                     self._allow_zero_scale, self._allow_unknown_scale)
-        except TypeError:
+        if not isinstance(group, (list, tuple)):
             raise lena.core.LenaValueError(
                 "value must be a list or other materialized iterable"
             )
+        scale_to(self._scale_to, group,
+                 self._allow_zero_scale, self._allow_unknown_scale)
         return group
