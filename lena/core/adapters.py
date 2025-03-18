@@ -18,6 +18,7 @@ Example:
 >>> list(my_run.run([1, 2, 3]))
 [1, 2, 3]
 """
+import inspect
 import itertools
 
 from . import exceptions
@@ -168,12 +169,21 @@ class FillInto(object):
         and fills the results into the output element.
         This can be done only if *explicit* is True.
         """
+        import lena
         if fill_into is _SENTINEL:
             fill_into_m = getattr(el, "fill_into", None)
             if callable(fill_into_m):
                 self.fill_into = fill_into_m
             # try to make possible convertions
-            elif callable(el):
+            elif (
+                callable(el) and
+                # this looks like a hack, but may be the best.
+                not isinstance(el, lena.core.Split)
+                # problems with inspect. But it is rather unstable.
+                # len(inspect.getargspec(el.__call__).args) != 1
+                ):
+                # use getfullargspec in Python 3.
+                # Source can't be used as FillInto.
                 # use default implementation
                 pass
             elif ct.is_run_el(el) and explicit:
