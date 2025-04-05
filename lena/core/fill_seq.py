@@ -64,7 +64,7 @@ class FillSeq(LenaSequence):
             else:
                 # try to convert to FillInto (e.g. Call)
                 try:
-                    fill_into_el = adapters.FillInto(el, explicit=False)
+                    fill_into_el = adapters.FillInto(el)
                 except exceptions.LenaTypeError:
                     raise exceptions.LenaTypeError(
                         "arguments must implement fill_into method, "

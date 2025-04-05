@@ -153,6 +153,9 @@ class RunIf(object):
         for more flexibility.
     """
 
+    # only the presence of this attribute is checked
+    _can_break_flow = True
+
     def __init__(self, select, *args):
         """*select* is a function that accepts a value
         (maybe with context) and returns a boolean.

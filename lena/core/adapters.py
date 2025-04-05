@@ -144,7 +144,7 @@ class FillCompute(object):
 class FillInto(object):
     """Adapter for a FillInto element."""
 
-    def __init__(self, el, fill_into=_SENTINEL, explicit=True):
+    def __init__(self, el, fill_into=_SENTINEL):
         """Element *el* must implement *fill_into* method,
         be callable or be a Run element.
 
@@ -167,7 +167,12 @@ class FillInto(object):
         for each value the *el* runs a flow
         consisting of this one value
         and fills the results into the output element.
-        This can be done only if *explicit* is True.
+        This can be done only if it has an attribute *_can_break_flow*
+        (note that the value of that attribute is not checked,
+        but only its presence).
+
+        .. versionchanged:: 0.6
+            remove the keyword argument *explicit*.
         """
         import lena
         if fill_into is _SENTINEL:
@@ -186,13 +191,13 @@ class FillInto(object):
                 # Source can't be used as FillInto.
                 # use default implementation
                 pass
-            elif ct.is_run_el(el) and explicit:
+            elif ct.is_run_el(el) and hasattr(el, "_can_break_flow"):
                 self.fill_into = self._run_fill_into
             else:
                 raise exceptions.LenaTypeError(
                     "element {} ".format(el)
                     + "must implement 'fill_into' method, "
-                    "or be callable or a Run element"
+                    "or be callable or a Run element that can break flow"
                 )
         elif callable(getattr(el, fill_into, None)):
             self.fill_into = getattr(el, fill_into)
@@ -202,7 +207,6 @@ class FillInto(object):
                 format(fill_into, el)
             )
         self._el = el
-        self._explicit = explicit
 
     def fill_into(self, element, value):
         """Fill *value* into an *element*.
