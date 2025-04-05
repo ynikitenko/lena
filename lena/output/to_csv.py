@@ -83,6 +83,7 @@ def iterable_to_table(
     .. versionadded:: 0.5
     """
     # todo: change this interface or maybe remove this function.
+    # rename row_separator to field_sep, if we use this.
     if header:
         if header_fields:
             # the downside of this design: header is coupled with
@@ -188,8 +189,13 @@ class ToCSV(object):
     """
     # * any iterable object (including :class:`.graph`).
 
-    def __init__(self, separator=",", header=None, duplicate_last_bin=True):
+    def __init__(self, separator=",", header=None,
+                 row_end="", last_row_end="",
+                 duplicate_last_bin=True):
         """*separator* delimits values in the output text.
+        Every row except the last one
+        is ended with *row_end* and a newline.
+        The last row is ended with *last_row_end* (by default empty).
         The result is yielded as one string starting from *header*.
 
         If *duplicate_last_bin* is ``True``, then for histograms
@@ -198,10 +204,21 @@ class ToCSV(object):
         if last bin is from 9 to 10, then the plot may end on 9,
         while this parameter allows to write bin content at 10,
         creating the last horizontal step.
+
+        .. versionadded:: 0.6
+           keyword arguments *row_end* and *last_row_end*.
         """
         self._separator = separator
         # todo: remove header. It should be different for each value.
         self._header = header
+        # note that row_end is not allowed by RFC 4180,
+        # "Common Format and MIME Type for Comma-Separated Values (CSV) Files"
+        # https://datatracker.ietf.org/doc/html/rfc4180
+        # However, we need it for some TeX packages to work well
+        # with our tables: memoize joins them into one line,
+        # so a new line would not be sufficient (causes an error).
+        self._row_end = row_end
+        self._last_row_end = last_row_end
         self._duplicate_last_bin = duplicate_last_bin
 
     def run(self, flow):
@@ -263,7 +280,8 @@ class ToCSV(object):
                     yield val
                     continue
 
-                csv = "\n".join(lines_iter)
+                row_sep = self._row_end + "\n"
+                csv = row_sep.join(lines_iter) + self._last_row_end
                 data._update_context(context)
                 lena.context.update_recursively(context, "output.filetype.csv")
                 yield (csv, context)
@@ -292,13 +310,14 @@ class ToCSV(object):
                 # todo: add a header method.
                 try:
                     rows = iterable_to_table(
-                        rows_iter, row_separator=self._separator, header=self._header
+                        rows_iter, row_separator=self._separator, header=self._header,
+                        row_end=self._row_end,
                     )
                 except TypeError:
                     pass
 
             if rows:
-                csv = "\n".join(rows)
+                csv = "\n".join(rows) + self._last_row_end
                 if (hasattr(data, "_update_context") and
                         callable(data._update_context)):
                     data._update_context(context)

@@ -19,7 +19,7 @@ def test_iterable_to_table():
 
 def test_to_csv():
     hist = histogram(edges=[0, 1, 2], bins=[1, 2])
-    gr0 = graph([[0, 1], [2.5, 3]])
+    gr0  = graph([[0, 1], [2.5, 3]])
     to_csv = ToCSV(separator=",", header=None, duplicate_last_bin=True)
 
     ## histogram and iterables work, other values passed unchanged
@@ -54,6 +54,18 @@ def test_to_csv():
     no_to_csv_context = {"output": {"to_csv": False}}
     res2 = list(to_csv.run([(gr0, no_to_csv_context)]))[0]
     assert res2 == (gr0, no_to_csv_context)
+
+    to_csv_re = ToCSV(separator=",", row_end="\\", header=None,
+                      duplicate_last_bin=True)
+    res_re = list(to_csv_re.run([hist]))
+    csv_re = res_re[0][0]
+    assert csv_re == "0.000000,1.000000\\\n1.000000,2.000000\\\n2.000000,2.000000"
+    to_csv_lre = ToCSV(
+        separator=",", row_end="\\", last_row_end="\\\n", header=None,
+        duplicate_last_bin=True
+    )
+    res_lre = list(to_csv_lre.run([hist]))
+    assert res_lre[0][0] == csv_re + "\\\n"
 
 
 def test_hist_to_csv():
