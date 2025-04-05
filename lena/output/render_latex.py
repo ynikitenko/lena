@@ -202,10 +202,10 @@ class RenderLaTeX(object):
                     print("# RenderLaTeX: selected", val)
                 template = self._environment.get_template(self._select_template(val))
                 context = lena.flow.get_context(val)
-                if not self._from_data:
-                    render_context = context
-                else:
+                if self._from_data:
                     render_context = lena.flow.get_data(val)
+                else:
+                    render_context = context
                 _update_recursively(context, {"output": {"filetype": "tex"}})
                 _update_recursively(context, {"output": {"fileext": "tex"}})
 
@@ -214,7 +214,11 @@ class RenderLaTeX(object):
                 # data part is not used during rendering,
                 # but can be used for selection.
                 # if not self._context_name:
-                data = template.render(render_context)
+                try:
+                    data = template.render(render_context)
+                except ValueError as err:
+                    print("could not render context:", render_context)
+                    raise err
                 # else:
                 #     data = template.render({self._context_name: render_context})
                 yield (data, context)
