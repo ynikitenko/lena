@@ -12,7 +12,7 @@ from .hist_functions import hist_to_graph
 class HistToGraph():
     """Transform a :class:`.histogram` to a :class:`.graph`."""
 
-    def __init__(self, make_value, get_coordinate="left",
+    def __init__(self, make_value=None, get_coordinate="left",
                  field_names=("x", "y"), scale=None):
         """*make_value* is a :class:`.Variable`
         that creates graph value from the bin value.
@@ -26,12 +26,21 @@ class HistToGraph():
         *scale* sets scales of resulting graphs. If it is ``True``,
         the scale is computed from the histogram.
 
-        See :func:`hist_to_graph` for details and examples.
+        See :func:`.hist_to_graph` for details and examples.
 
         Incorrect values for *make_value* or *get_coordinate* raise,
         respectively, :exc:`.LenaTypeError` or :exc:`.LenaValueError`.
+
+        .. versionadded:: 0.3
         """
-        if isinstance(make_value, lena.variables.Variable):
+        # todo: remove Variable logic.
+        # It could be done separately after this element.
+        if make_value is None:
+            # useful default
+            self._make_value = lena.variables.Variable(
+                "hist_bin", lambda bin_content: bin_content
+            )
+        elif isinstance(make_value, lena.variables.Variable):
             self._make_value = make_value
         else:
             raise lena.core.LenaTypeError(

@@ -41,6 +41,9 @@ def test_hist_to_graph():
         [(graph([[1], [1]], scale=None), nev_context)]
     assert list(HistToGraph(nevents, get_coordinate="middle").run([hist])) == \
         [(graph([[0.5], [1]], scale=None), nev_context)]
+    # default make_value works
+    assert list(HistToGraph().run([hist])) == \
+        [(graph([[0], [1]], scale=None), {'value': {'variable': {'name': 'hist_bin'}}})]
 
     val_with_error = collections.namedtuple("val_with_error",
                                             ["value", "error"])

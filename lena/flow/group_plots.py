@@ -108,6 +108,8 @@ def _update_with_group(context, new_grp_context, old_inter_context):
 class MapGroup(object):
     """Apply a sequence to groups."""
 
+    _can_break_flow = True
+
     def __init__(self, *seq, **map_scalars):
         """Arguments *seq* must form a *Sequence*.
         
@@ -176,6 +178,8 @@ class MapGroup(object):
             # apply seq to each value from group
             new_vals = []
             for i, dt in enumerate(data):
+                # todo: do we take into account the common context
+                # or only item specific context?.. Could be a bug.
                 res_i = list(self._seq.run([(dt, context["group"][i])]))
                 new_vals.append(res_i)
 
