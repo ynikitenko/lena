@@ -6,7 +6,7 @@ import lena.context
 from lena.core import LenaValueError, LenaTypeError
 import lena.flow
 import lena.math
-from lena.math import md_map
+from lena.math import isclose, md_map
 from . import hist_functions as hf
 
 
@@ -163,7 +163,7 @@ class histogram():
             self.ranges = [(edges[0], edges[-1])]
             self.nbins = [len(edges)-1]
 
-    def add(self, other, weight=1):
+    def add(self, other, weight=1, edges_abs_tol=0.0, edges_rel_tol=1e-9):
         """Add a histogram *other* to this one.
 
         For each bin, the corresponding bin of *other*
@@ -171,15 +171,16 @@ class histogram():
         For example, to subtract *other*, use *weight* -1.
 
         Histograms must have the same edges.
-        Note that floating numbers should be compared
-        approximately (using :func:`math.isclose`).
+        They are compared approximately using :func:`math.isclose`
+        with *edges_abs_tol* and *edges_rel_tol* tolerance levels.
         """
         if not isinstance(other, histogram):
             raise LenaTypeError("other must be a histogram")
-        # For now we make a complete check.
-        # # A simple check on their edges range and shape is performed.
-        # # More sophisticated tests can be implemented by user.
-        if self.edges != other.edges:
+        # check that their edges coincide.
+        # The user can separately compare their edges if they
+        # have different requirements.
+        if not isclose(self.edges, other.edges,
+                       abs_tol=edges_abs_tol, rel_tol=edges_rel_tol):
             raise LenaValueError("can not add histograms with different edges")
 
         if weight != 1:
