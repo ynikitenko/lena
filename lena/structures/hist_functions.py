@@ -612,30 +612,6 @@ def iter_cells(hist, ranges=None, coord_ranges=None):
                        ind)
 
 
-def make_hist_context(hist, context):
-    """Update a deep copy of *context* with the context
-    of a :class:`.histogram` *hist*.
-
-    .. deprecated:: 0.5
-       histogram context is updated automatically
-       during conversion in :class:`~.output.ToCSV`.
-       Use histogram._update_context explicitly if needed.
-    """
-    # absolutely unnecessary.
-    context = copy.deepcopy(context)
-
-    hist_context = {
-        "histogram": {
-            "dim": hist.dim,
-            "nbins": hist.nbins,
-            "ranges": hist.ranges
-        }
-    }
-    context.update(hist_context)
-    # just bad.
-    return context
-
-
 def unify_1_md(bins, edges):
     """Unify 1- and multidimensional bins and edges.
 

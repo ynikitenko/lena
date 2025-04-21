@@ -1,7 +1,6 @@
 """Fill data into a histogram using numpy histogram."""
 import lena.flow
 import lena.structures
-from . import hist_functions as hf
 
 
 class NumpyHistogram(object):
@@ -79,10 +78,10 @@ class NumpyHistogram(object):
         # complete information is conserved in the Histogram.
         hist = lena.structures.histogram(edges, bins)
         # deep copy is made here
-        context = hf.make_hist_context(hist, self._cur_context)
+        # hf.make_hist_context(hist, self._cur_context)
         if self._reset:
             self.reset()
-        yield (hist, context)
+        yield (hist, self._cur_context)
 
     def reset(self):
         """Reset data and context.

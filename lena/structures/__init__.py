@@ -14,7 +14,6 @@ from .hist_functions import (
     iter_bins,
     iter_bins_with_edges,
     iter_cells,
-    make_hist_context,
     unify_1_md
 )
 from .numpy_histogram import NumpyHistogram
@@ -48,7 +47,6 @@ __all__ = [
     'iter_bins',
     'iter_bins_with_edges',
     'iter_cells',
-    'make_hist_context',
     'unify_1_md',
     # split into bins
     'SplitIntoBins',
