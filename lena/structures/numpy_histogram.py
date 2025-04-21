@@ -1,6 +1,4 @@
 """Fill data into a histogram using numpy histogram."""
-from __future__ import print_function
-
 import lena.flow
 import lena.structures
 from . import hist_functions as hf
@@ -15,17 +13,16 @@ class NumpyHistogram(object):
 
     .. admonition:: Examples
 
-        With *NumpyHistogram()*
+        With the default arguments *NumpyHistogram()*,
         bins are automatically derived from data.
 
         With *NumpyHistogram(bins=list(range(0, 5)), density=True)*
         bins are set explicitly.
 
-    Warning
-    -------
-    as *numpy* histogram is computed from an existing array,
-    all values are stored in the internal data structure during *fill*,
-    which may take much memory.
+    .. warning::
+        as *numpy* histogram is computed from an existing array,
+        all values are stored in the internal data structure during *fill*,
+        which is memory unsafe.
     """
 
     def __init__(self, *args, **kwargs):
@@ -33,8 +30,12 @@ class NumpyHistogram(object):
 
         Default *bins* keyword argument is *auto*.
 
-        A keyword argument *reset* specifies the exact behaviour of *request*.
+        .. deprecated:: 0.6
+            A keyword argument *reset* specifies the exact behaviour of *request*.
         """
+        # todo: this interface is too broad.
+        # One may ask a partial constructor (a function)
+        # for the numpy histogram with proper arguments.
         import numpy
         self._create_hist = numpy.histogram
 
@@ -43,8 +44,10 @@ class NumpyHistogram(object):
         self._kwargs = kwargs
         if "bins" not in kwargs:
             self._kwargs.update({"bins": "auto"})
+        # self.reset()
         # numpy.array can't be extended on the fly
-        self.reset()
+        self._data = []
+        self._cur_context = {}
 
     def fill(self, val):
         """Add data to the internal storage."""
@@ -52,8 +55,19 @@ class NumpyHistogram(object):
         self._data.append(data)
         self._cur_context = context
 
+    def compute(self):
+        """Yield the computed :class:`.histogram` and context."""
+        bins, edges = self._create_hist(self._data, *self._args, **self._kwargs)
+        # since np.histogram returns exactly two arrays, bins and edges,
+        # complete information is conserved in the Histogram.
+        hist = lena.structures.histogram(edges, bins)
+        yield (hist, self._cur_context)
+
     def request(self):
-        """Compute the final histogram.
+        """
+        .. deprecated:: 0.6
+
+        Compute the final histogram.
 
         Return :class:`.histogram` with context.
 
