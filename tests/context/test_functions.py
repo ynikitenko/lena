@@ -311,6 +311,7 @@ def test_to_string():
     with pytest.raises(LenaValueError) as err:
         to_string({"a": set()})
     assert str(err.value) in (
+        """can not serialize. TypeError("Object of type \'set\' is not JSON serializable",)""",  # 3.6
         "can not serialize. TypeError('Object of type set is not JSON serializable')",
         "can not serialize. TypeError('set([]) is not JSON serializable',)"
     )

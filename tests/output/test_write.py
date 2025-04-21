@@ -1,6 +1,7 @@
 import copy
 import os
 import sys
+import unittest
 import warnings
 
 import pytest
@@ -12,9 +13,28 @@ from lena.output import Write
 
 # (major, minor)
 SYSVERSION = (sys.version_info[0], sys.version_info[1])
-# index in calls depending on Python version.
-# See the first comment on SYSVERSION.
-SYSIND = 0 if SYSVERSION != (3, 11) else 1
+
+
+def mock_compare(l1, l2):
+    """Compare two lists l1 and l2 ignoring objects in *ignore*."""
+    if SYSVERSION[0] == 2:
+        return l1 == l2
+    # unittest.mock is unavailable in Python 2,
+    # while mocker (available there) is unaccessible from module level
+    # (module_mocker looks different,
+    #  https://github.com/pytest-dev/pytest-mock/issues/136#issuecomment-615888027)
+    call = unittest.mock.call
+    ignore = [unittest.mock.call().close(),]
+    if SYSVERSION[1] == 11:
+        ignore.extend([
+            call().__enter__(),
+            call().read(-1),
+            call().__exit__(None, None, None),
+        ])
+    # prune lists. Not most optimal, but practical.
+    l1p = [el for el in l1 if el not in ignore]
+    l2p = [el for el in l2 if el not in ignore]
+    return l1p == l2p
 
 
 def test_write_makefilename():
@@ -119,7 +139,7 @@ def test_write_writes(mocker):
     # The first comment on SYSVERSION:
     # in Python3.11 there appeared a strange new call,
     # call.__eq__(<function test_write_changed_data.<locals>.<lambda> at ...>)
-    assert m.mock_calls == callres or m.mock_calls[1:] == callres
+    assert mock_compare(m.mock_calls, callres)  # or m.mock_calls[1:] == callres
     assert res == [("y.csv", {"output": {"filename": "y",
                                          "fileext": "csv",
                                          "filetype": "csv",
@@ -180,7 +200,7 @@ def test_write_changed(mocker):
         call("x.txt", "w"), call().__enter__(),
         call().write("1"), call().__exit__(None, None, None)
     ]
-    assert m.mock_calls[SYSIND:] == mock_calls
+    assert mock_compare(m.mock_calls, mock_calls)
 
     # context is updated in place
     assert data[0][1]["output"]["changed"] is True
@@ -219,10 +239,13 @@ def test_write_cached(mocker):
                      'filepath': 'x.txt'}})
     ]
     call = mocker.call
-    assert m.mock_calls[SYSIND:] == [
-        call("x.txt"), call().__enter__(),
-        call().read(-1), call().__exit__(None, None, None)
-    ]
+    assert mock_compare(
+        m.mock_calls,
+        [
+            call("x.txt"), call().__enter__(),
+            call().read(-1), call().__exit__(None, None, None)
+        ]
+    )
     m.reset_mock()
 
     # even if file is unchanged, context.output.changed remains the same
@@ -235,10 +258,11 @@ def test_write_cached(mocker):
                      'filepath': 'x.txt'}})
     ]
     # no writes were done, as before
-    assert m.mock_calls == [
-        call("x.txt"), call().__enter__(),
-        call().read(-1), call().__exit__(None, None, None)
-    ]
+    assert mock_compare(
+        m.mock_calls,
+        [call("x.txt"), call().__enter__(),
+         call().read(-1), call().__exit__(None, None, None)]
+    )
 
 
 def test_write_changed_data(mocker):
@@ -261,15 +285,18 @@ def test_write_changed_data(mocker):
     ]
     call = mocker.call
     # file is read and then written with 1
-    assert m.mock_calls[SYSIND:] == [
-        call("x_changed.txt"), call().__enter__(),
-        call().read(-1),
-        call().__exit__(None, None, None),
-        call('x_changed.txt', 'w'),
-        call().__enter__(),
-        call().write('1'),
-        call().__exit__(None, None, None)
-    ]
+    assert mock_compare(
+        m.mock_calls,
+        [
+            call("x_changed.txt"), call().__enter__(),
+            call().read(-1),
+            call().__exit__(None, None, None),
+            call('x_changed.txt', 'w'),
+            call().__enter__(),
+            call().write('1'),
+            call().__exit__(None, None, None)
+        ]
+    )
 
 
 def test_set_context():
