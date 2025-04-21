@@ -2,7 +2,7 @@ import sys
 from itertools import count, islice
 
 import pytest
-from hypothesis import strategies as s
+from hypothesis import strategies as st
 from hypothesis import given
 
 import lena.flow
@@ -157,12 +157,12 @@ def test_negative_islice():
     assert list(isl.run(iter(data))) == [0, 1]
 
 
-start_stop_s = s.one_of(s.none(),
-                        s.integers(-hypo_int_max, hypo_int_max))
-step_s       = s.integers(1, hypo_int_max)
+start_stop_s = st.one_of(st.none(),
+                         st.integers(-hypo_int_max, hypo_int_max))
+step_s       = st.integers(1, hypo_int_max)
 
 @given(start=start_stop_s, stop=start_stop_s, step=step_s,
-       data_len=s.integers(0, hypo_int_max))
+       data_len=st.integers(0, hypo_int_max))
 def test_islice_hypothesis(start, stop, step, data_len):
     data = list(range(data_len))
     isl = Slice(start, stop, step)
@@ -213,13 +213,13 @@ def test_islice_fill_into():
     assert store.group == [0]
 
 
-start_stop_non_neg = s.one_of(s.none(),
-                              s.integers(0, hypo_int_max))
+start_stop_non_neg = st.one_of(st.none(),
+                               st.integers(0, hypo_int_max))
 @given(start=start_stop_non_neg,
-       # stop=s.integers(0, hypo_int_max),
+       # stop=st.integers(0, hypo_int_max),
        stop=start_stop_non_neg,
        step=step_s,
-       data_len=s.integers(1, hypo_int_max))
+       data_len=st.integers(1, hypo_int_max))
 def test_islice_hypothesis_fill_into(start, stop, step, data_len):
     # data_len >= 1, because if the flow is empty,
     # there is nothing to check.

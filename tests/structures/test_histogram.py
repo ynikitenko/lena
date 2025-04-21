@@ -16,19 +16,23 @@ import sys
 
 import hypothesis
 import pytest
-import hypothesis.strategies as s
+import hypothesis.strategies as st
 from hypothesis import given
 
 from lena.core import LenaValueError, LenaTypeError
 from lena.structures import histogram, Histogram
 from lena.math import refine_mesh, isclose
 from lena.structures.hist_functions import iter_bins, integral
-from .histogram_strategy import generate_increasing_list, generate_data_in_range
+from .histogram_strategy import generate_increasing_list
 
+## builds(target, /, *args, **kwargs)[source]
+## Generates values by drawing from args and kwargs and passing them to the callable
+## (provided as the first positional argument) in the appropriate argument position.
+## https://hypothesis.readthedocs.io/en/latest/reference/strategies.html#hypothesis.strategies.builds
+Edges1dStrategy = generate_increasing_list
+# Edges1dStrategy = st.builds(generate_increasing_list)
 
-Edges1dStrategy = s.builds(generate_increasing_list)
-
-@given(Edges1dStrategy)
+@given(Edges1dStrategy())
 def test_init_scale_zero(edges):
     hist = histogram(edges)
     assert hist.scale() == 0
@@ -38,10 +42,10 @@ def test_init_scale_zero(edges):
 #     where False = isclose((2.2216311086621543 * 5e-324), 1.5e-323)
 # https://hypothesis.readthedocs.io/en/latest/data.html#hypothesis.strategies.floats
 if sys.version_info.major > 2:
-    floats_ = s.floats(allow_subnormal=False)
+    floats_ = st.floats(allow_subnormal=False)
 else:
     # in Python 2 allow_subnormal is not recognised
-    floats_ = s.floats()
+    floats_ = st.floats()
 
 
 def hypo_isclose(a, b):
@@ -53,17 +57,20 @@ def hypo_isclose(a, b):
         return isclose(a, b)
 
 
-@given(edges=Edges1dStrategy, weight=floats_,
-       refinement=s.integers(min_value=1, max_value=20),
-       data_samples=s.integers(min_value=1, max_value=50)
+@given(edges=Edges1dStrategy(),
+       weight=floats_,
+       refinement=st.integers(min_value=1, max_value=20),
+       # data_samples=st.integers(min_value=1, max_value=50),
+       # we set these 1 and 20 by hand
+       data=st.lists(st.floats(min_value=0, max_value=21, exclude_max=True))
 )
-def test_scale_linear_on_weight(edges, weight, refinement, data_samples):
+def test_scale_linear_on_weight(edges, weight, refinement, data):
     hist1 = histogram(edges)
     histw = histogram(edges)
     min_edge, max_edge = edges[0], edges[-1]
     # print(min_edge, max_edge)
     # data can be outside of range too.
-    data = generate_data_in_range(min_edge - 1, max_edge + 1, data_samples)
+    # data = generate_data_in_range(min_edge - 1, max_edge + 1, data_samples)
     data_in_range = [val for val in data if min_edge <= val and val < max_edge]
     # print("data =", data)
     for val in data:
