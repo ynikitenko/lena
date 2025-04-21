@@ -44,9 +44,14 @@ class histogram():
     # https://docs.scipy.org/doc/numpy/reference/generated/numpy.histogram.html
     # https://root.cern.ch/root/htmldoc/guides/users-guide/Histograms.html#bin-numbering
 
-    def __init__(self, edges, bins=None, initial_value=0):
+    def __init__(self, edges, bins=None, out_of_range=None, n_out_of_range=0,
+                 initial_value=0):
         """*edges* is a sequence of one-dimensional arrays,
         each containing strictly increasing bin edges.
+        *bins*, if not provided, are initialized with zeroes.
+
+        .. deprecated:: 0.6
+          create bins with the *initial_value* manually.
 
         Histogram's bins by default
         are initialized with *initial_value*.
@@ -91,10 +96,10 @@ class histogram():
         :attr:`dim` is the dimension of a histogram
         (length of its *edges* for a multidimensional histogram).
 
-        :attr:`n_out_of_range` is the number of entries filled
-        outside the range of the histogram.
-        It is rescaled together with histogram bins
-        during :meth:`set_nevents` and :meth:`scale`.
+        :attr:`out_of_range` is a list of *dim* lists,
+        each one corresponding to a coordinate.
+        Each *out_of_range* sublist contains two items,
+        the first one (index 0) for underflow, the second for overflow.
 
         If subarrays of *edges* are not increasing
         or if any of them has length less than 2,
@@ -118,8 +123,6 @@ class histogram():
         self.edges = edges
         self._scale = None
 
-        # number of values filled outside of the histogram range.
-        self.n_out_of_range = 0
         ## useful only for a one-dimensional histogram.
         ## Implemented that only because people on the internet
         ## regularly ask about that (and Excel has it).
@@ -156,12 +159,11 @@ class histogram():
             else:
                 if len(bins) != len(edges[0]) - 1:
                     raise wrong_bins_error
-        if self.dim > 1:
-            self.ranges = [(axis[0], axis[-1]) for axis in edges]
-            self.nbins =  [len(axis) - 1 for axis in edges]
-        else:
-            self.ranges = [(edges[0], edges[-1])]
-            self.nbins = [len(edges)-1]
+
+        if out_of_range is None:
+            out_of_range = [[0, 0] for _ in range(self.dim)]
+        self.out_of_range = out_of_range
+        self.n_out_of_range = n_out_of_range
 
     def add(self, other, weight=1, edges_abs_tol=0.0, edges_rel_tol=1e-9):
         """Add a histogram *other* to this one.
@@ -183,16 +185,17 @@ class histogram():
                        abs_tol=edges_abs_tol, rel_tol=edges_rel_tol):
             raise LenaValueError("can not add histograms with different edges")
 
-        if weight != 1:
-            obins = md_map(lambda val: val*weight, other.bins)
-        else:
+        if weight == 1:
             obins = other.bins
+            oout_of_range = other.out_of_range
+        else:
+            obins = md_map(lambda val: val*weight, other.bins)
+            oout_of_range = md_map(lambda val: val*weight, other.out_of_range)
         new_bins = md_map(add, self.bins, obins)
 
         # self.bins = new_bins
-        # functional approach, easier testing
+        # but we use functional approach
         # (we have produced new bins anyway)
-        new_hist = histogram(edges=copy.deepcopy(self.edges), bins=new_bins)
 
         # note that if *self* had N overflow
         # and *other* had N underflow,
@@ -201,8 +204,14 @@ class histogram():
         # (in fact, 2N missed that).
         # This should be considered a histogram *new*, such that
         # *other* + *new* = *self* .
-        new_oorange = self.n_out_of_range + other.n_out_of_range * weight
-        new_hist.n_out_of_range = new_oorange
+        new_noorange = self.n_out_of_range + other.n_out_of_range * weight
+        new_oorange = md_map(add, self.out_of_range, oout_of_range)
+
+        # todo: edges should be immutable
+        new_hist = histogram(
+            edges=copy.deepcopy(self.edges), bins=new_bins,
+            n_out_of_range=new_noorange, out_of_range=new_oorange
+        )
 
         return new_hist
 
@@ -215,14 +224,17 @@ class histogram():
         Note that floating numbers should be compared
         approximately (using :func:`math.isclose`).
         """
+        # todo: introduce isclose here.
         if not isinstance(other, histogram):
             # in Python comparison between different types is allowed
             return False
-        return (self.bins == other.bins and self.edges == other.edges
-                and self.n_out_of_range == other.n_out_of_range)
-        # comparing n_out_of_range may seem redundant. However,
+        return (self.bins == other.bins and
+                self.edges == other.edges and
+                self.out_of_range == other.out_of_range and
+                self.n_out_of_range == other.n_out_of_range)
+        # comparing out_of_range may seem redundant. However,
         # 1) it increases histogram cohesion. All attributes
-        #    are important.
+        #    are important. n_out_of_range is important for scaling.
         # 2) the probability that when we fill with different data
         #    and get same bin content, but different n_out_of_range
         #    is very low.
@@ -232,35 +244,56 @@ class histogram():
     def fill(self, coord, weight=1):
         """Fill histogram at *coord* with the given *weight*.
 
-        Coordinates outside the histogram edges are ignored.
+        Coordinates outside the histogram edges
+        are added to *n_out_of_range*.
+
+        No additional accounting for weights is being done.
+        For example, to calculate a sum of squares of weights like in ROOT,
+        do it separately in parallel.
         """
+        # `ROOT.TH1.GetSumw2() <https://root.cern.ch/doc/master/classTH1.html#ac79a1d40a4b33721a15e16d7cba4faaf>`_,
         indices = hf.get_bin_on_value(coord, self.edges)
-        subarr = self.bins
-        for ind in indices[:-1]:
+        subarr  = self.bins
+        oor = False
+        # to be initialized correctly for 1d-histograms
+        # if the cycle is not run.
+        coord_ind = -1
+
+        for coord_ind, ind in enumerate(indices[:-1]):
             # underflow
             if ind < 0:
-                self.n_out_of_range += weight
-                return
-            try:
-                ## finding the bin ##
-                subarr = subarr[ind]
-            # overflow
-            except IndexError:
-                self.n_out_of_range += weight
-                return
+                self.out_of_range[coord_ind][0] += weight
+                oor = True
+                # the exact index is no longer important,
+                # for we won't fill anything more.
+                subarr = subarr[0]
+            else:
+                try:
+                    ## finding the bin ##
+                    subarr = subarr[ind]
+                # overflow
+                except IndexError:
+                    self.out_of_range[coord_ind][1] += weight
+                    oor = True
+                    subarr = subarr[0]
 
         ind = indices[-1]
+        coord_ind += 1
         # underflow
         if ind < 0:
+            self.out_of_range[coord_ind][0] += weight
+            oor = True
+        # overflow
+        if ind >= len(subarr):
+            self.out_of_range[coord_ind][1] += weight
+            oor = True
+
+        if oor:
             self.n_out_of_range += weight
             return
 
-        try:
-            ## filling the found bin ##
-            subarr[ind] += weight
-        except IndexError:
-            self.n_out_of_range += weight
-            return
+        ## filling the found bin ##
+        subarr[ind] += weight
 
     def get_nevents(self, include_out_of_range=False):
         """Return number of entries in the histogram.
@@ -281,6 +314,17 @@ class histogram():
         if include_out_of_range:
             return n_in_range + self.n_out_of_range
         return n_in_range
+
+    # this function is wrong because n_out_of_range
+    # is the number of entries outside the histogram range.
+    # def get_n_out_of_range(self):
+    #     """Get number of entries filled
+    #     outside the range of the histogram.
+
+    #     It is rescaled together with histogram bins
+    #     during :meth:`set_nevents` and :meth:`scale`.
+    #     """
+    #     return sum(sum(coor) for coor in self.out_of_range)
 
     def set_nevents(self, nevents, include_out_of_range=False):
         """Scale histogram bins to contain *nevents*.
@@ -323,9 +367,16 @@ class histogram():
         )
 
     def __repr__(self):
-        # n_out_of_range is not here,
-        # because it is not used during __init__ .
-        return "histogram({}, bins={})".format(self.edges, self.bins)
+        # give a useful representation for the user to spot
+        # if a histogram has many outliers right from the flow.
+        app = ""
+        if self.n_out_of_range:
+            app = ", out_of_range={}, n_out_of_range={}".format(
+                self.out_of_range, self.n_out_of_range
+            )
+        return "histogram({}, bins={}".format(
+            self.edges, self.bins, self.out_of_range
+        ) + app + ")"
 
     def scale(self, other=None, recompute=False):
         """Compute or set scale (integral of the histogram).
@@ -381,21 +432,36 @@ class histogram():
         # actually this docstring is not openly published.
         # And this method is private.
 
+        # the fewer instance attributes we have,
+        # the better it is for pickling.
+        edges = self.edges
+        if self.dim == 1:
+            ranges = [(edges[0], edges[-1])]
+            nbins = [len(edges)-1]
+        else:
+            ranges = [(axis[0], axis[-1]) for axis in edges]
+            nbins =  [len(axis) - 1 for axis in edges]
+
         hist_context = {
             "dim": self.dim,
-            "nbins": self.nbins,
+            "nbins": nbins,
+            # we add out_of_range,
+            # for it could be used during plotting
+            "out_of_range": self.out_of_range,
+            # even if it is zero, it is good to have it in context
+            # for uniformity while plotting with others.
             "n_out_of_range": self.n_out_of_range,
-            "ranges": self.ranges,
+            "ranges": ranges,
         }
 
-        # bad design. Context should not depend on
-        # whether the scale was computed before or not.
-        # A scale is important (also to be consistent with graphs),
-        # but much less so after the histogram had been destroyed.
+        lena.context.update_recursively(context, {"histogram": hist_context})
+
+        ## bad design. Context should not depend on
+        ## whether the scale was computed before or not.
+        ## A scale is important (also to be consistent with graphs),
+        ## but much less so after the histogram had been destroyed.
         # if self._scale is not None:
         #     hist_context["scale"] = self._scale
-
-        lena.context.update_recursively(context, {"histogram": hist_context})
 
 
 class Histogram():
@@ -436,6 +502,10 @@ class Histogram():
 
         *value* can be a *(data, context)* pair. 
         Values outside the histogram edges are ignored.
+
+        .. note::
+            To allow weights, use :class:`.histogram` directly
+            (not as an element).
         """
         data, self._cur_context = lena.flow.get_data_context(value)
         self._hist.fill(data)

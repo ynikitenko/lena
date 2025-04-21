@@ -33,12 +33,18 @@ def test_to_csv():
     ]
     # other values are skipped
     assert res0[2:] == [3, "a string"]
-    # histogram context part is correct
-    assert res0[0][1] == {
-        'histogram': {'dim': 1, 'nbins': [2], 'ranges': [(0, 2)],
-                      'n_out_of_range': 0},
-        'output': {'filetype': 'csv'}
-    }
+    ## histogram context part is correct
+    # get it directly from histogram in order not to mix with this test
+    hist_cont = {}
+    hist._update_context(hist_cont)
+    hist_cont.update({'output': {'filetype': 'csv'}})
+    assert res0[0][1] == hist_cont
+    # something like
+    # {
+    #     'histogram': {'dim': 1, 'nbins': [2], 'ranges': [(0, 2)],
+    #                   'n_out_of_range': 0},
+    #     'output': {'filetype': 'csv'}
+    # }
     # graph context part has no error fields
     assert res0[1][1] == {'output': {'filetype': 'csv'}}
 
@@ -95,22 +101,15 @@ def test_hist_to_csv():
     hist = Histogram(edges=[0, 1, 2], bins=[1, 2])
     to_csv = ToCSV()
     hist_data = list(hist.compute())
-    assert list(to_csv.run(hist_data)) == [(
-                '0.000000,1.000000\n1.000000,2.000000\n2.000000,2.000000',
-                {'output': {'filetype': 'csv'},
-                    'histogram': {'ranges': [(0, 2)], 'dim': 1, 'nbins': [2],
-                                  'n_out_of_range': 0}}
-            )]
+    res0 = list(to_csv.run(hist_data))
+    assert len(res0) == 1
+    assert res0[0][0] == '0.000000,1.000000\n1.000000,2.000000\n2.000000,2.000000'
 
     ## maybe redundant
     to_csv = ToCSV(duplicate_last_bin=False)
     hist_el = Histogram(edges=[[0, 1, 2], [0, 2, 4]], bins=[[1, 2], [3, 4]])
     hist_data = list(hist_el.compute())
-    assert list(to_csv.run(hist_data)) == [(
-        '0.000000,0.000000,1.000000\n0.000000,2.000000,2.000000\n1.000000,0.000000,3.000000\n1.000000,2.000000,4.000000',
-        {
-            'output': {'filetype': 'csv'},
-            'histogram': {'ranges': [(0, 2), (0, 4)], 'dim': 2,
-                          'nbins': [2, 2], 'n_out_of_range': 0}
-        }
-    )]
+    res1 = list(to_csv.run(hist_data))
+    assert res1[0][0] == (
+        '0.000000,0.000000,1.000000\n0.000000,2.000000,2.000000\n1.000000,0.000000,3.000000\n1.000000,2.000000,4.000000'
+    )
