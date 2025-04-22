@@ -222,7 +222,7 @@ def test_histogram_1d():
     hist1.fill(10)
     assert hist1.bins == [0, 0]
     assert repr(hist1) == ('histogram([0, 1, 2], bins=[0, 0], '
-                           'out_of_range=[[1, 1]], n_out_of_range=2)')
+                           'out_of_range=[1, 1], n_out_of_range=2)')
 
     hist2 = histogram([0, 0.5, 1])
     hist2.fill(0.5)
@@ -234,9 +234,9 @@ def test_histogram_1d():
         "histogram":
             {
                 "dim": 1,
-                "nbins": [2],
-                "ranges": [(0, 1)],
-                "out_of_range": [[0, 0]],
+                "nbins": 2,
+                "ranges": (0, 1),
+                "out_of_range": [0, 0],
                 "n_out_of_range": 0,
             }
     }

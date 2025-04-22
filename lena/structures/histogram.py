@@ -21,17 +21,16 @@ class histogram():
 
     Examples:
 
+    >>> # a one-dimensional histogram
+    >>> hist = histogram([0, 1, 2])
+    >>> hist.fill(1)
+    >>> hist.bins
+    [0, 1]
     >>> # a two-dimensional histogram
     >>> hist = histogram([[0, 1, 2], [0, 1, 2]])
     >>> hist.fill([0, 1])
     >>> hist.bins
     [[0, 1], [0, 0]]
-    >>> values = [[0, 0], [1, 0], [1, 1]]
-    >>> # fill the histogram with values
-    >>> for v in values:
-    ...     hist.fill(v)
-    >>> hist.bins
-    [[1, 1], [1, 1]]
     """
     # Note the differences from existing packages.
     # Numpy 1.16 (numpy.histogram): all but the last
@@ -105,65 +104,70 @@ class histogram():
         or if any of them has length less than 2,
         :exc:`.LenaValueError` is raised.
 
-        .. admonition:: Programmer's note
+        .. admonition:: Developer's note
 
             one- and multidimensional histograms
-            have different *bins* and *edges* format.
-            To be unified, 1-dimensional edges should be
-            nested in a list (like *[[1, 2, 3]]*).
-            Instead, they are simply the x-edges list,
-            because it is more intuitive and one-dimensional histograms
-            are used more often.
-            To unify the interface for bins and edges in your code,
-            use :func:`.unify_1_md` function.
+            have different formats of *bins* and *edges*.
+            For a better user experience, 1-dimensional edges are simply
+            a list of x-edges, which is more intuitive,
+            and also one-dimensional histograms are used more often.
+            To be unified internally, 1-dimensional edges are nested
+            into a list (like *[[1, 2, 3]]*).
+            To unify 1- and multidimensional interfaces in your code,
+            use :func:`.unify_1_md`.
         """
-        # todo: allow creation of *edges* from tuples
-        # (without lena.math.mesh). Allow bin_size in this case.
-        hf.check_edges_increasing(edges)
-        self.edges = edges
-        self._scale = None
+        # it is easier and more flexible to use created edges
+        # than to complicate the interface here
+        # like histogram(xlow, xmax, nbins,...)
 
-        ## useful only for a one-dimensional histogram.
-        ## Implemented that only because people on the internet
-        ## regularly ask about that (and Excel has it).
-        ## NumPy histograms don't have this logic, while ROOT
-        ## histograms have it too complicated (and mixed with
-        ## the histogram structure): 0th bin is underflow and
-        ## the last bin is overflow (now imagine those arrays
-        ## for multidimensional histograms).
-        # Removed because it does not help with the minimum and
-        # maximum of the outliers. Hard to maintain generality
-        # between 1 and multidimensional histograms if we have that.
-        # self.overflow = 0
-        # self.underflow = 0
+        # it is fine that we have to kwarg no_check=False,
+        # since __init__ is not called during deep copying.
+        # We could simply use that if needed.
+        hf.check_edges_increasing(edges)
 
         if hasattr(edges[0], "__iter__"):
             self.dim = len(edges)
+            self._edges = edges
         else:
             self.dim = 1
+            # unify 1- and multidimensional histograms internally
+            self._edges = [edges]
 
-        # todo: add a kwarg no_check=False to disable bins testing
         if bins is None:
-            self.bins = hf.init_bins(self.edges, initial_value)
+            self.bins = hf.init_bins(self._edges, initial_value)
         else:
             self.bins = bins
-            # We can't make scale for an arbitrary histogram,
-            # because it may contain compound values.
-            # self._scale = self.make_scale()
-            wrong_bins_error = LenaValueError(
-                "bins of incorrect shape given, {}".format(bins)
-            )
-            if self.dim == 1:
-                if len(bins) != len(edges) - 1:
-                    raise wrong_bins_error
-            else:
-                if len(bins) != len(edges[0]) - 1:
-                    raise wrong_bins_error
+            # a simple check along the first coordinate
+            if len(bins) != len(self._edges[0]) - 1:
+                raise LenaValueError(
+                    "bins of incorrect shape given, {}".format(bins)
+                )
 
+        # out_of_range are implemented in Excel.
+        # NumPy histograms don't have that, while ROOT
+        # histograms have it too complicated (and mixed with
+        # the histogram structure): 0th bin is underflow and
+        # the last bin is overflow (now imagine those arrays
+        # for multidimensional histograms).
+
+        # In statistics an "outlier" is "a data point that differs
+        # significantly from other observations", which is charged.
+        # That is why we use a more neutral term "out_of_range".
         if out_of_range is None:
             out_of_range = [[0, 0] for _ in range(self.dim)]
-        self.out_of_range = out_of_range
+            self._out_of_range = out_of_range
+        elif self.dim == 1:
+            # out of range is a list of two elements
+            assert len(out_of_range) == 2
+            self._out_of_range = [out_of_range]
+        else:
+            # out of range is a list of two-element lists
+            assert all(len(oor) == 2 for oor in out_of_range)
+            self._out_of_range = out_of_range
         self.n_out_of_range = n_out_of_range
+
+        # ?..
+        self._scale = None
 
     def add(self, other, weight=1, edges_abs_tol=0.0, edges_rel_tol=1e-9):
         """Add a histogram *other* to this one.
@@ -178,10 +182,8 @@ class histogram():
         """
         if not isinstance(other, histogram):
             raise LenaTypeError("other must be a histogram")
-        # check that their edges coincide.
-        # The user can separately compare their edges if they
-        # have different requirements.
-        if not isclose(self.edges, other.edges,
+        # check that the edges coincide
+        if not isclose(self._edges, other._edges,
                        abs_tol=edges_abs_tol, rel_tol=edges_rel_tol):
             raise LenaValueError("can not add histograms with different edges")
 
@@ -193,27 +195,29 @@ class histogram():
             oout_of_range = md_map(lambda val: val*weight, other.out_of_range)
         new_bins = md_map(add, self.bins, obins)
 
-        # self.bins = new_bins
-        # but we use functional approach
-        # (we have produced new bins anyway)
-
-        # note that if *self* had N overflow
-        # and *other* had N underflow,
-        # new n_out_of_range would be zero, which does not mean
-        # that all values fell into the histogram range
-        # (in fact, 2N missed that).
-        # This should be considered a histogram *new*, such that
-        # *other* + *new* = *self* .
         new_noorange = self.n_out_of_range + other.n_out_of_range * weight
         new_oorange = md_map(add, self.out_of_range, oout_of_range)
 
         # todo: edges should be immutable
         new_hist = histogram(
-            edges=copy.deepcopy(self.edges), bins=new_bins,
+            edges=copy.deepcopy(self._edges), bins=new_bins,
             n_out_of_range=new_noorange, out_of_range=new_oorange
         )
 
         return new_hist
+
+    # read-only attributes to unify 1- and multidimensional histograms
+    @property
+    def edges(self):
+        if self.dim == 1:
+            return self._edges[0]
+        return self._edges
+
+    @property
+    def out_of_range(self):
+        if self.dim == 1:
+            return self._out_of_range[0]
+        return self._out_of_range
 
     def __eq__(self, other):
         """Two histograms are equal, if and only if they have
@@ -229,8 +233,8 @@ class histogram():
             # in Python comparison between different types is allowed
             return False
         return (self.bins == other.bins and
-                self.edges == other.edges and
-                self.out_of_range == other.out_of_range and
+                self._edges == other._edges and
+                self._out_of_range == other._out_of_range and
                 self.n_out_of_range == other.n_out_of_range)
         # comparing out_of_range may seem redundant. However,
         # 1) it increases histogram cohesion. All attributes
@@ -262,7 +266,7 @@ class histogram():
         for coord_ind, ind in enumerate(indices[:-1]):
             # underflow
             if ind < 0:
-                self.out_of_range[coord_ind][0] += weight
+                self._out_of_range[coord_ind][0] += weight
                 oor = True
                 # the exact index is no longer important,
                 # for we won't fill anything more.
@@ -273,7 +277,7 @@ class histogram():
                     subarr = subarr[ind]
                 # overflow
                 except IndexError:
-                    self.out_of_range[coord_ind][1] += weight
+                    self._out_of_range[coord_ind][1] += weight
                     oor = True
                     subarr = subarr[0]
 
@@ -281,11 +285,11 @@ class histogram():
         coord_ind += 1
         # underflow
         if ind < 0:
-            self.out_of_range[coord_ind][0] += weight
+            self._out_of_range[coord_ind][0] += weight
             oor = True
         # overflow
         if ind >= len(subarr):
-            self.out_of_range[coord_ind][1] += weight
+            self._out_of_range[coord_ind][1] += weight
             oor = True
 
         if oor:
@@ -314,17 +318,6 @@ class histogram():
         if include_out_of_range:
             return n_in_range + self.n_out_of_range
         return n_in_range
-
-    # this function is wrong because n_out_of_range
-    # is the number of entries outside the histogram range.
-    # def get_n_out_of_range(self):
-    #     """Get number of entries filled
-    #     outside the range of the histogram.
-
-    #     It is rescaled together with histogram bins
-    #     during :meth:`set_nevents` and :meth:`scale`.
-    #     """
-    #     return sum(sum(coor) for coor in self.out_of_range)
 
     def set_nevents(self, nevents, include_out_of_range=False):
         """Scale histogram bins to contain *nevents*.
@@ -375,7 +368,7 @@ class histogram():
                 self.out_of_range, self.n_out_of_range
             )
         return "histogram({}, bins={}".format(
-            self.edges, self.bins, self.out_of_range
+            self.edges, self.bins
         ) + app + ")"
 
     def scale(self, other=None, recompute=False):
@@ -403,7 +396,7 @@ class histogram():
                 # we can't take n_out_of_range into account
                 # (it has bins of infinite length).
                 self._scale = hf.integral(
-                    *hf.unify_1_md(self.bins, self.edges)
+                    *hf.unify_1_md(self.bins, self._edges)
                 )
             return self._scale
         else:
@@ -429,18 +422,16 @@ class histogram():
         in when converting it to a CSV text).
         See also graph._update_context.
         """
-        # actually this docstring is not openly published.
-        # And this method is private.
+        # this docstring is not openly published
+        # and this method is private.
 
         # the fewer instance attributes we have,
         # the better it is for pickling.
-        edges = self.edges
+        ranges = [(axis[0], axis[-1]) for axis in self._edges]
+        nbins  = [len(axis) - 1 for axis in self._edges]
         if self.dim == 1:
-            ranges = [(edges[0], edges[-1])]
-            nbins = [len(edges)-1]
-        else:
-            ranges = [(axis[0], axis[-1]) for axis in edges]
-            nbins =  [len(axis) - 1 for axis in edges]
+            ranges = ranges[0]
+            nbins  = nbins[0]
 
         hist_context = {
             "dim": self.dim,
