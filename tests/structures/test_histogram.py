@@ -8,13 +8,10 @@
 - if histogram bins are divided by N, its scale is divided by N.
 - Histogram and NumpyHistogram should be almost same (except for the upper edge).
 """
-import copy
-from copy import deepcopy
 import math
-from math import isnan
 import sys
+from copy import deepcopy
 
-import hypothesis
 import pytest
 import hypothesis.strategies as st
 from hypothesis import given
@@ -254,3 +251,25 @@ def test_histogram_1d():
     assert hist2.get_n_events() == 1
     hist2.set_nevents(3)
     assert hist2.bins == [0, 3]
+
+
+def test_mul():
+    ## multiplication of a 1-dimensional histogram works
+    hist1 = histogram([0, 1, 2], [0, 1], n_out_of_range=2)
+    # multiplication works
+    hm2 = hist1 * 2
+    assert hm2 == histogram([0, 1, 2], [0, 2], n_out_of_range=4)
+
+    # histogram is not changed
+    assert hist1 == histogram([0, 1, 2], [0, 1], n_out_of_range=2)
+
+    ## multiplication of a 2-dimensional histogram works
+    hist2 = histogram([[1, 2, 3], [1, 2, 3]])
+    hist2.fill((1, 1))
+    # multiplication in place works
+    hist2 *= 0.5
+    assert hist2 == histogram([[1, 2, 3], [1, 2, 3]], bins=[[0.5, 0], [0, 0]])
+
+    # a histogram can only be multiplied on the right
+    with pytest.raises(TypeError):
+        2 * hist2

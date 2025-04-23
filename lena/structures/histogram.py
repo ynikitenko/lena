@@ -121,9 +121,11 @@ class histogram():
         # like histogram(xlow, xmax, nbins,...)
 
         # it is fine that we have to kwarg no_check=False,
-        # since __init__ is not called during deep copying.
-        # We could simply use that if needed.
-        hf.check_edges_increasing(edges)
+        # just to simplify interface.
+        if bins is None:
+            # otherwise we assume that we create histogram
+            # from an existing one, and don't check its edges.
+            hf.check_edges_increasing(edges)
 
         if hasattr(edges[0], "__iter__"):
             self.dim = len(edges)
@@ -320,6 +322,14 @@ class histogram():
         bin_contents = (val[1] for val in hf.iter_bins(self.bins))
         return sum(bin_contents)
 
+    def get_scale(self):
+        """Calculate integral of the histogram.
+
+        The integral (area under the histogram) is the sum
+        of bin contents multiplied by bin size.
+        """
+        return hf.integral(self.bins, self._edges)
+
     def set_nevents(self, nevents, include_out_of_range=False):
         """Scale histogram bins to contain *nevents*.
 
@@ -359,6 +369,23 @@ class histogram():
         self.bins = lena.math.md_map(
             lambda binc: binc*scale, self.bins
         )
+
+    def __mul__(self, num):
+        """Multiply bins by *num* and return a new histogram.
+
+        Number of events outside of histogram range are also rescaled.
+
+        A histogram should be multiplied on the right.
+        An inplace multiplication with *= is supported.
+        """
+        new_bins = lena.math.md_map(
+            lambda binc: binc*num, self.bins
+        )
+        new_out_of_range = lena.math.md_map(
+            lambda binc: binc*num, self.out_of_range
+        )
+        nnoor = self.n_out_of_range * num
+        return histogram(copy.deepcopy(self.edges), new_bins, out_of_range=new_out_of_range, n_out_of_range=nnoor)
 
     def __repr__(self):
         # give a useful representation for the user to spot
