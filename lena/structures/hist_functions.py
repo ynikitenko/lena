@@ -365,7 +365,7 @@ def hist_to_graph(hist, make_value=None, get_coordinate="left",
     chain = itertools.chain
 
     if scale is True:
-        scale = hist.scale()
+        scale = hist.get_scale()
 
     for value, edges in iter_bins_with_edges(hist.bins, hist.edges):
         coord = get_coord(edges)

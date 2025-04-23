@@ -11,7 +11,7 @@ def scale_to(scale_to, group,
 
     The group is a sequence of *(structure, context)* pairs
     (not the result of :func:`group_plots`!).
-    Each structure must have a method *scale*.
+    Each structure must have a method *scale_to*.
     The original group is rescaled in place.
 
     If any item could not be rescaled and
@@ -37,13 +37,15 @@ def scale_to(scale_to, group,
             )
         else:
             cand = cands[0]
-        scale = lena.flow.get_data(cand).scale()
+        scale = lena.flow.get_data(cand).get_scale()
 
-    # rescale
-    for val in group:
+    ## rescale
+    new_group = []
+    for ind, val in enumerate(group):
+        # todo: do not rescale the selected value.
         data, context = lena.flow.get_data_context(val)
         try:
-            data.scale(scale)
+            data = data.scale_to(scale)
         except AttributeError as err:
             # scale was not set and can't be determined
             if not allow_unknown_scale:
@@ -55,7 +57,14 @@ def scale_to(scale_to, group,
             # scale is zero and can't be changed
             if not allow_zero_scale:
                 raise err
-    return None
+        # todo: this looks not good.
+        # Ideally we do not introduce a new context.
+        if context:
+            new_group.append((data, context))
+        else:
+            new_group.append(data)
+
+    return new_group
 
 
 class GroupScale(object):
@@ -93,6 +102,8 @@ class GroupScale(object):
             raise lena.core.LenaValueError(
                 "value must be a list or other materialized iterable"
             )
-        scale_to(self._scale_to, group,
-                 self._allow_zero_scale, self._allow_unknown_scale)
+        group = scale_to(
+            self._scale_to, group,
+            self._allow_zero_scale, self._allow_unknown_scale
+        )
         return group

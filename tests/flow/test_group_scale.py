@@ -47,12 +47,12 @@ def test_group_scale():
     gsnum = GroupScale(4, allow_zero_scale=True, allow_unknown_scale=True)
     data1 = copy.deepcopy(data)
     data2 = copy.deepcopy(data)
-    gs(data1)
-    gsnum(data2)
+    data1 = gs(data1)
+    data2 = gsnum(data2)
     assert data1 == data2
 
     # note that no context is added when we modify data in place!
-    get_scale = lambda val: val.scale()
+    get_scale = lambda val: val.get_scale()
     assert list(map(get_scale, data1)) == [0, 4, 4, None]
 
     # a single value instead of a group raises

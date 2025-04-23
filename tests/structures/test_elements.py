@@ -92,9 +92,8 @@ def test_scale_to():
         ScaleTo(1.)
     )
     hist1 = histogram([0, 1], bins=[2])
-    context1 = {}
-    res = list(seq.run([(hist1, context1)]))
+    res = list(seq.run([(hist1, {})]))
     assert len(res) == 1
     data, context = res[0]
-    assert context == context1
-    assert data.scale() == scale
+    assert context == {}
+    assert data.get_scale() == scale

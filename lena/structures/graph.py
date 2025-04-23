@@ -46,7 +46,8 @@ class graph():
         on the problem: "low", "high", "low_90%_cl", etc. Example:
         ("E", "time", "error_E_low", "error_time").
 
-        *scale* of the graph is a kind of its norm. It could be
+        *scale* of the graph is a kind of its norm related to plotting
+        that graph with other structures (like histograms). It could be
         the integral of the function or its other property.
         A scale of a normalised probability density
         function would be one.
@@ -147,8 +148,8 @@ class graph():
         self._coord_names = field_names[:dim]
         self.dim = dim
 
-        # todo: add subsequences of coords as attributes
-        # with field names.
+        # maybe todo: add subsequences of coords as attributes
+        # with field names, like graph.x .
         # In case if someone wants to create a graph of another function
         # at the same coordinates.
         # Should a) work when we rescale the graph
@@ -156,6 +157,55 @@ class graph():
 
         # Probably we won't add methods __del__(n), __add__(*coords),
         # since it might change the scale.
+
+    def __add__(self, other):
+        """Add last (highest) coordinates of two graphs.
+
+        A new graph is returned. Error fields are ignored.
+        """
+        # todo: make it method add(.., calculate_error=...)
+        if not isinstance(other, graph):
+            return NotImplemented
+        # but their errors may be different
+        assert self.dim == other.dim
+        dim = self.dim
+        # copied from scale
+        last_coord_ind = self.dim - 1
+        last_coord_name = self.field_names[last_coord_ind]
+
+        last_coord_indices = (
+            [last_coord_ind] + self._get_err_indices(last_coord_name)
+        )
+
+        all_same = all(((len(self.coords[i]) == len(other.coords[i]))
+                        for i in range(dim - 1)))
+        assert all_same
+        new_coords = [copy.copy(self.coords[i]) for i in range(dim - 1)]
+        new_vals = [
+            self.coords[last_coord_ind][i] + other.coords[last_coord_ind][i]
+            for i in range(len(self.coords[last_coord_ind]))
+        ]
+        # add can't use zipped values
+        # new_vals = list(map(operator.add, zip(self.coords[last_coord_ind], 
+        #                                       other.coords[last_coord_ind])))
+        new_coords.append(new_vals)
+        try:
+            scale0 = self.get_scale()
+            scale1 = other.get_scale()
+        except lena.core.LenaValueError:
+            scale = None
+        else:
+            if scale0 is not None and scale1 is not None:
+                scale = scale0 + scale1
+            else:
+                scale = None
+        return graph(coords=new_coords, field_names=self.field_names,
+                     scale=scale)
+
+        # for ind, arr in enumerate(self.coords):
+        #     if ind in last_coord_indices:
+        #         self.coords[ind] = list(map(partial(mul, rescale),
+        #                                     arr))
 
     def __eq__(self, other):
         """Two graphs are equal, if and only if they have
@@ -182,63 +232,21 @@ class graph():
                 err_indices.append(ind+dim)
         return err_indices
 
+    def get_scale(self):
+        return self._scale
+
     def __iter__(self):
         """Iterate graph coords one by one."""
         for val in zip(*self.coords):
             yield val
 
-    def __repr__(self):
-        return """graph({}, field_names={}, scale={})""".format(
-            self.coords, self.field_names, self._scale
-        )
-
-    def scale(self, other=None):
-        """Get or set the scale of the graph.
-
-        If *other* is ``None``, return the scale of this graph.
-
-        If a numeric *other* is provided, rescale to that value.
-        If the graph has unknown or zero scale,
-        rescaling that will raise :exc:`~.LenaValueError`.
-
-        To get meaningful results, graph's fields are used.
-        Only the last coordinate is rescaled.
-        For example, if the graph has *x* and *y* coordinates,
-        then *y* will be rescaled, and for a 3-dimensional graph
-        *z* will be rescaled.
-        All errors are rescaled together with their coordinate.
-        """
-        # this method is called scale() for uniformity with histograms
-        # And this looks really good: explicit for computations
-        # (not a subtle graph.scale, like a constant field (which is,
-        #  however, the case in graph - but not in other structures))
-        # and easy to remember (set_scale? rescale? change_scale_to?..)
-
-        # We modify the graph in place,
-        # because that would be redundant (not optimal)
-        # to create a new graph
-        # if we only want to change the scale of the existing one.
-
-        if other is None:
-            return self._scale
-
-        if not self._scale:
-            raise lena.core.LenaValueError(
-                "can't rescale a graph with zero or unknown scale"
-            )
-
+    def __mul__(self, num):
         last_coord_ind = self.dim - 1
         last_coord_name = self.field_names[last_coord_ind]
 
         last_coord_indices = ([last_coord_ind] +
                 self._get_err_indices(last_coord_name)
         )
-
-        # In Python 2 3/2 is 1, so we want to be safe;
-        # the downside is that integer-valued graphs
-        # will become floating, but that is doubtfully an issue.
-        # Remove when/if dropping support for Python 2.
-        rescale = float(other) / self._scale
 
         mul = operator.mul
         partial = functools.partial
@@ -256,19 +264,26 @@ class graph():
         # but it's unavailable in Python 2 (and anyway less readable).
 
         # rescale arrays of values and errors
+        new_coords = []
         for ind, arr in enumerate(self.coords):
             if ind in last_coord_indices:
                 # Python lists are faster than arrays,
                 # https://stackoverflow.com/a/62399645/952234
                 # (because each time taking a value from an array
                 #  creates a Python object)
-                mappedl = list(map(partial(mul, rescale), arr))
-                self.coords[ind] = mappedl
+                mappedl = list(map(partial(mul, num), arr))
+                new_coords.append(mappedl)
+            else:
+                new_coords.append(arr)
 
-        self._scale = other
+        if self._scale is not None:
+            new_scale = self._scale * num
+        else:
+            new_scale = None
 
-        # as suggested in PEP 8
-        return None
+        return graph(
+            coords=new_coords, field_names=self.field_names, scale=new_scale
+        )
 
     def _parse_error_names(self, field_names):
         # field_names is a parameter for easier testing,
@@ -315,6 +330,14 @@ class graph():
 
         return parsed_errors
 
+    def __repr__(self):
+        app = ""
+        if self._scale is not None:
+            app = ", scale={}".format(self._scale)
+        return """graph({}, field_names={}""".format(
+            self.coords, self.field_names
+        ) + app + ")"
+
     def rows(self):
         """Return an iterable on rows of the graph.
 
@@ -323,6 +346,43 @@ class graph():
         :class:`.output.ToCSV`.
         """
         return iter(self)
+
+    def scale_to(self, other):
+        """Return a new graph rescaled to *other*.
+
+        If a numeric *other* is provided, rescale to that value.
+        If the graph has unknown or zero scale,
+        rescaling that will raise :exc:`~.LenaValueError`.
+
+        To get meaningful results, graph's fields are used.
+        Only the last coordinate is rescaled.
+        For example, if the graph has *x* and *y* coordinates,
+        then *y* will be rescaled, and for a 3-dimensional graph
+        *z* will be rescaled.
+        All errors are rescaled together with their coordinate.
+        """
+        # this method was called scale() because it looked simple
+        # and easy to remember.
+        # However, scale_to looks more clear and less ambigous.
+
+        if not self._scale:
+            raise lena.core.LenaValueError(
+                "can't rescale a graph with zero or unknown scale"
+            )
+
+        # We return a new graph to be uniform with histograms.
+
+        # In Python 2 3/2 is 1, so we want to be safe;
+        # the downside is that integer-valued graphs
+        # will become floating, but that is doubtfully an issue.
+        # Remove when/if dropping support for Python 2.
+        if hasattr(other, "get_scale"):
+            oscale = float(other.get_scale())
+        else:
+            oscale = float(other)
+        rescale = oscale / self._scale
+
+        return self * rescale
 
     def _update_context(self, context):
         """Update *context* with the properties of this graph.
@@ -369,56 +429,6 @@ class graph():
                         # "value.error.{}.index".format(error_name),
                         error_ind
                     )
-
-    # emulating numeric types
-    def __add__(self, other):
-        """Add last (highest) coordinates of two graphs.
-
-        A new graph is returned. Error fields are ignored.
-        """
-        # todo: make it method add(.., calculate_error=...)
-        if not isinstance(other, graph):
-            return NotImplemented
-        # but their errors may be different
-        assert self.dim == other.dim
-        dim = self.dim
-        # copied from scale
-        last_coord_ind = self.dim - 1
-        last_coord_name = self.field_names[last_coord_ind]
-
-        last_coord_indices = (
-            [last_coord_ind] + self._get_err_indices(last_coord_name)
-        )
-
-        all_same = all(((len(self.coords[i]) == len(other.coords[i]))
-                        for i in range(dim - 1)))
-        assert all_same
-        new_coords = [copy.copy(self.coords[i]) for i in range(dim - 1)]
-        new_vals = [
-            self.coords[last_coord_ind][i] + other.coords[last_coord_ind][i]
-            for i in range(len(self.coords[last_coord_ind]))
-        ]
-        # add can't use zipped values
-        # new_vals = list(map(operator.add, zip(self.coords[last_coord_ind], 
-        #                                       other.coords[last_coord_ind])))
-        new_coords.append(new_vals)
-        try:
-            scale0 = self.scale()
-            scale1 = other.scale()
-        except lena.core.LenaValueError:
-            scale = None
-        else:
-            if scale0 is not None and scale1 is not None:
-                scale = scale0 + scale1
-            else:
-                scale = None
-        return graph(coords=new_coords, field_names=self.field_names,
-                     scale=scale)
-
-        # for ind, arr in enumerate(self.coords):
-        #     if ind in last_coord_indices:
-        #         self.coords[ind] = list(map(partial(mul, rescale),
-        #                                     arr))
 
 
 # used in deprecated Graph
@@ -549,6 +559,13 @@ class Graph(object):
         self._update()
         return ("Graph(points={}, scale={}, sort={})"
                 .format(self._points, self._scale, self._sort))
+
+    # A temporary fix for a deprecated class
+    def get_scale(self):
+        return self.scale(None)
+
+    def scale_to(self, other):
+        return self.scale(other)
 
     def scale(self, other=None):
         """Get or set the scale.

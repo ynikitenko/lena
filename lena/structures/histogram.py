@@ -168,9 +168,6 @@ class histogram():
             self._out_of_range = out_of_range
         self.n_out_of_range = n_out_of_range
 
-        # ?..
-        self._scale = None
-
     def add(self, other, weight=1, edges_abs_tol=0.0, edges_rel_tol=1e-9):
         """Add a histogram *other* to this one.
 
@@ -330,46 +327,6 @@ class histogram():
         """
         return hf.integral(self.bins, self._edges)
 
-    def set_nevents(self, nevents, include_out_of_range=False):
-        """Scale histogram bins to contain *nevents*.
-
-        *include_out_of_range* adds :attr:`n_out_of_range`
-        to the estimated number of entries to be rescaled.
-        For example, suppose we know the estimated number of events
-        for the signal and the background, and our histograms
-        have range encompassing only a part of data.
-        Then if we want to plot these two histograms together
-        scaled to the real number of events, we should take
-        into account the efficiencies of each histogram,
-        that is set *include_out_of_range* to ``True``.
-        On the other hand, let us have two spectra in the given range
-        and the data containing both of them. We fit the signals
-        to the data and get their relative contributions in that region.
-        After that we scale the histograms to those numbers of events
-        with *include_out_of_range* set to ``False`` (default).
-        In both examples :attr:`n_out_of_range` is scaled together
-        with the histogram bins.
-
-        Rescaling a histogram with zero entries raises a
-        :exc:`.LenaValueError`.
-        """
-        old_nevents = self.get_n_events()
-        if include_out_of_range:
-            old_nevents += self.n_out_of_range
-        if not old_nevents:
-            raise LenaValueError(
-                "can not rescale a histogram with zero events"
-            )
-        scale = float(nevents/old_nevents)
-
-        self.n_out_of_range *= scale
-
-        if scale == int(scale):
-            scale = int(scale)
-        self.bins = lena.math.md_map(
-            lambda binc: binc*scale, self.bins
-        )
-
     def __mul__(self, num):
         """Multiply bins by *num* and return a new histogram.
 
@@ -399,46 +356,53 @@ class histogram():
             self.edges, self.bins
         ) + app + ")"
 
-    def scale(self, other=None, recompute=False):
-        """Compute or set scale (integral of the histogram).
+    def scale_to(self, other):
+        """Return a histogram rescaled to *other*.
 
-        If *other* is ``None``, return scale of this histogram.
-        If its scale was not computed before,
-        it is computed and stored for subsequent use
-        (unless explicitly asked to *recompute*).
-        Note that after changing (filling) the histogram
-        one must explicitly recompute the scale
-        if it was computed before.
+        *other* must be a number or a structure
+        with a get_scale() method.
 
-        If a float *other* is provided, rescale self to *other*.
+        If outliers should be taken into account, use
+        :attr:`n_out_of_range` and the multiplication operator directly.
 
-        Histograms with scale equal to zero can't be rescaled.
-        :exc:`.LenaValueError` is raised if one tries to do that.
+        Histograms with scale equal to zero can not be rescaled,
+        or :exc:`.LenaValueError` is raised.
         """
-        # see graph.scale comments why this is called simply "scale"
-        # (not set_scale, get_scale, etc.)
-        if other is None:
-            # return scale
-            if self._scale is None or recompute:
-                # since scale is an integral,
-                # we can't take n_out_of_range into account
-                # (it has bins of infinite length).
-                self._scale = hf.integral(
-                    *hf.unify_1_md(self.bins, self._edges)
-                )
-            return self._scale
+        # Of course, get_scale(scale_to(a)) is a.
+        # On including events out of histogram range:
+        # For example, suppose we know the estimated number of events
+        # for the signal and the background, and our histograms
+        # have range encompassing only a part of data.
+        # Then if we want to plot these two histograms together
+        # scaled to the real number of events, we should take
+        # into account the efficiencies of each histogram,
+        # that is set *include_out_of_range* to ``True``.
+        # On the other hand, let us have two spectra in the given range
+        # and the data containing both of them. We fit the signals
+        # to the data and get their relative contributions in that region.
+        # After that we scale the histograms to those numbers of events
+        # with *include_out_of_range* set to ``False`` (default).
+
+        # we call this method scale_to, because this way it is clear
+        # that we don't change the *other*
+        # (compared to hist.scale(other)).
+
+        scale = float(self.get_scale())
+        if scale == 0:
+            raise LenaValueError(
+                "can not rescale histogram with zero scale"
+            )
+        if hasattr(other, "get_scale"):
+            oscale = other.get_scale()
+            mul = float(oscale) / scale
         else:
-            # rescale from other
-            scale = self.scale()
-            if scale == 0:
-                raise LenaValueError(
-                    "can not rescale histogram with zero scale"
-                )
-            self.bins = lena.math.md_map(lambda binc: binc*float(other) / scale,
-                                         self.bins)
-            self.n_out_of_range *= other/scale
-            self._scale = other
-            return None
+            # other is a number
+            try:
+                mul = float(other) / scale
+            except TypeError:
+                raise LenaTypeError("other must be a number "
+                                    "or a structure with a get_scale() method")
+        return self * mul
 
     def _update_context(self, context):
         """Update *context* with the properties of this histogram.

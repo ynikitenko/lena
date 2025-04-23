@@ -32,7 +32,7 @@ Edges1dStrategy = generate_increasing_list
 @given(Edges1dStrategy())
 def test_init_scale_zero(edges):
     hist = histogram(edges)
-    assert hist.scale() == 0
+    assert hist.get_scale() == 0
 
 # we disable subnormals, because in Python 3.10 sometimes (!)
 # the test failed with an error,
@@ -73,8 +73,8 @@ def test_scale_linear_on_weight(edges, weight, refinement, data):
     for val in data:
         hist1.fill(val)
         histw.fill(val, weight)
-    weight_scale = histw.scale()
-    h1_scale = hist1.scale()
+    weight_scale = histw.get_scale()
+    h1_scale = hist1.get_scale()
     if weight == 0:
         assert not weight_scale
     elif weight_scale == 0:
@@ -88,7 +88,7 @@ def test_scale_linear_on_weight(edges, weight, refinement, data):
     assert h1_scale >= 0
     # scale doesn't change if we didn't fill
     if not math.isnan(weight_scale):
-        assert histw.scale() == weight_scale
+        assert histw.get_scale() == weight_scale
 
     ## nevents is correct ##
 
@@ -114,7 +114,7 @@ def test_scale_linear_on_weight(edges, weight, refinement, data):
     hr = histogram(refined)
     for val in data:
         hr.fill(val)
-    assert isclose(h1_scale, refinement * hr.scale())
+    assert isclose(h1_scale, refinement * hr.get_scale())
 
 
 def test_add():
@@ -179,36 +179,29 @@ def test_histogram_3d():
 
     # get scale
     assert integral(hist.bins, hist.edges) == 2
-    assert hist._scale is None
-    assert hist.scale() == 2
+    assert hist.get_scale() == 2
     # change scale
-    hist.scale(2)
+    hist.scale_to(2)
     # assert h2.scale == 2
-    assert hist.scale() == 2
+    assert hist.get_scale() == 2
 
     # rescale
     h1 = deepcopy(hist)
-    h1.scale(1)
+    h1 = h1.scale_to(1)
     assert h1.bins[0][0] == [0.5, 0.5]
     # hist didn't change
     assert hist.bins[0][0] == [1, 1]
 
     # scale 0 can't be rescaled
     h0 = deepcopy(hist)
-    h0.scale(0)
-    assert h0.scale() == 0
+    h0 = h0.scale_to(0)
+    assert h0.get_scale() == 0
     with pytest.raises(LenaValueError):
-        h0.scale(0)
-    with pytest.raises(LenaValueError):
-        h0.set_nevents(0)
+        h0.scale_to(0)
 
     ## nevents work
     hnev = deepcopy(hist)
     assert hnev.get_n_events() == 2
-    hnev.set_nevents(4)
-    assert hnev.edges == hist.edges
-    assert hnev.get_n_events() == 4
-    assert [bin_[1] for bin_ in iter_bins(hnev.bins)] == [2, 2] + [0]*6
 
 
 def test_histogram_1d():
@@ -237,20 +230,10 @@ def test_histogram_1d():
             }
     }
 
-    ## scale works
-    # not initialized scale is set to None
-    assert hist2._scale is None
-
     # scale is computed correctly
-    assert hist2.scale() == 0.5
+    assert hist2.get_scale() == 0.5
 
-    # computed scale is saved
-    assert hist2._scale == 0.5
-
-    # nevents work
     assert hist2.get_n_events() == 1
-    hist2.set_nevents(3)
-    assert hist2.bins == [0, 3]
 
 
 def test_mul():

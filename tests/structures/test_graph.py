@@ -24,7 +24,7 @@ def test_graph():
     # iteration works
     assert list(gr0) == [(0, 2), (1, 3)]
 
-    assert gr0.scale() is None
+    assert gr0.get_scale() is None
 
     ## points work correctly
     # empty points raise
@@ -47,22 +47,22 @@ def test_graph():
         graph([xs, ys], "x")
     # unset scale raises
     with pytest.raises(LenaValueError):
-        gr0.scale(1)
+        gr0.scale_to(1)
 
     # rescaling when the scale is set works
     # 2d graph works
     gr1 = graph(copy.deepcopy([xs, ys]), scale=2)
-    assert gr1.scale() == 2
+    assert gr1.get_scale() == 2
     assert gr1.dim == 2
-    gr1.scale(1)
+    gr1 = gr1.scale_to(1)
     assert gr1.coords == [xs, [1, 1.5]]
-    assert gr1.scale() == 1
+    assert gr1.get_scale() == 1
 
     # 3d graph works
     gr2 = graph(copy.deepcopy([xs, ys, [1, 2]]), field_names="x,y,z", scale=2)
-    gr2.scale(3)
+    gr2 = gr2.scale_to(3)
     assert gr2.coords == [xs, ys, [1.5, 3.]]
-    assert gr2.scale() == 3
+    assert gr2.get_scale() == 3
     assert gr2.dim == 3
 
     # graph with errors works
@@ -70,12 +70,12 @@ def test_graph():
     gr3 = graph(copy.deepcopy([xs, ys, [1, 2]]), field_names="x, y, error_x", scale=2)
     # spaces in field_names work
     assert gr3.field_names == ("x", "y", "error_x")
-    gr3.scale(1)
+    gr3 = gr3.scale_to(1)
     assert gr3.coords == [xs, [1, 1.5], [1, 2]]
 
     # y errors and coords change
     gr4 = graph(copy.deepcopy([xs, ys, [1, 2]]), field_names="x,y,error_y", scale=2)
-    gr4.scale(1)
+    gr4 = gr4.scale_to(1)
     assert gr4.dim == 2
     assert gr4.coords == [xs, [1, 1.5], [0.5, 1]]
 
@@ -192,8 +192,8 @@ def test_Graph():
     points = list(zip(coords, values))
     graph2d = Graph(points)
     graph2d.fill((((2, 0), 2), {"scale": 1, "dim": 2}))
-    assert graph2d.scale() == 1
-    rescaled = graph2d.scale(2)
+    assert graph2d.get_scale() == 1
+    rescaled = graph2d.scale_to(2)
 
     # sorting works fine, scale too
     assert repr(rescaled) == (
@@ -205,16 +205,16 @@ def test_Graph():
     # rescale of composite values works
     pt = ((2, 3), (10, {"5th element": "5"}))
     rescaled.fill((pt, {}))
-    resc = rescaled.scale(1)
+    resc = rescaled.scale_to(1)
     assert resc.points[-1] == ((2, 3), 5.0)
 
     # can't rescale 0 or unknown scale
-    r0 = resc.scale(0)
+    r0 = resc.scale_to(0)
     with pytest.raises(lena.core.LenaValueError):
-        r0.scale(1)
+        r0.scale_to(1)
     r1 = Graph()
     with pytest.raises(lena.core.LenaAttributeError):
-        r1.scale()
+        r1.get_scale()
 
     # can't set points
     with pytest.raises(AttributeError):

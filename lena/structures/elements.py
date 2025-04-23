@@ -134,5 +134,5 @@ class ScaleTo(object):
         """
         data, context = lena.flow.get_data_context(value)
         # LenaValueError or LenaAttributeError can be raised
-        data.scale(self._scale_to)
+        data = data.scale_to(self._scale_to)
         return (data, context)

@@ -40,7 +40,7 @@ def test_numpy_histogram():
     true_bins = np.array([0.25, 0.25, 0.25, 0.25])
     for ind, bin_ in enumerate(true_bins):
         assert lhist.bins[ind] == bin_
-    assert lhist.scale() == 1
+    assert lhist.get_scale() == 1
 
     nhist1 = NumpyHistogram(bins=list(range(0, 5)), density=True, reset=False)
     for val in data:
