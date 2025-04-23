@@ -89,6 +89,10 @@ def isclose(a, b, rel_tol=1e-09, abs_tol=0.0):
     This function for scalar numbers
     appeared in ``math`` module in *Python 3.5*.
     """
+    # for non-numeric values, which can be present in histograms
+    if a == b:
+        return True
+
     if hasattr(a, 'isclose') and hasattr(b, 'isclose'):
         # isclose should be reflexive
         return a.isclose(b, rel_tol, abs_tol) \

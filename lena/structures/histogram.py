@@ -22,10 +22,10 @@ class histogram():
     Examples:
 
     >>> # a one-dimensional histogram
-    >>> hist = histogram([0, 1, 2])
+    >>> hist = histogram([1, 2, 3])
     >>> hist.fill(1)
     >>> hist.bins
-    [0, 1]
+    [1, 0]
     >>> # a two-dimensional histogram
     >>> hist = histogram([[0, 1, 2], [0, 1, 2]])
     >>> hist.fill([0, 1])
@@ -198,7 +198,7 @@ class histogram():
         new_noorange = self.n_out_of_range + other.n_out_of_range * weight
         new_oorange = md_map(add, self.out_of_range, oout_of_range)
 
-        # todo: edges should be immutable
+        # maybe todo: edges should be immutable
         new_hist = histogram(
             edges=copy.deepcopy(self._edges), bins=new_bins,
             n_out_of_range=new_noorange, out_of_range=new_oorange
@@ -219,23 +219,29 @@ class histogram():
             return self._out_of_range[0]
         return self._out_of_range
 
-    def __eq__(self, other):
+    def __eq__(self, other, abs_tol=0.0, rel_tol=1e-9):
         """Two histograms are equal, if and only if they have
         equal bins, edges and numbers of outliers.
 
-        If *other* is not a :class:`.histogram`, return ``False``.
-
-        Note that floating numbers should be compared
-        approximately (using :func:`math.isclose`).
+        Note that floating numbers are compared
+        approximately using :func:`math.isclose`.
         """
-        # todo: introduce isclose here.
         if not isinstance(other, histogram):
             # in Python comparison between different types is allowed
             return False
-        return (self.bins == other.bins and
-                self._edges == other._edges and
-                self._out_of_range == other._out_of_range and
-                self.n_out_of_range == other.n_out_of_range)
+        # everything is compared approximately,
+        # even n_out_of_range because of possible weights
+        isclose_ = lambda a, b: isclose(
+            a, b, abs_tol=abs_tol, rel_tol=rel_tol
+        )
+        return (isclose_(self.bins, other.bins) and
+                isclose_(self._edges, other._edges) and
+                isclose_(self._out_of_range, other._out_of_range) and
+                isclose_(self.n_out_of_range, other.n_out_of_range))
+        # return (self.bins == other.bins and
+        #         self._edges == other._edges and
+        #         self._out_of_range == other._out_of_range and
+        #         self.n_out_of_range == other.n_out_of_range)
         # comparing out_of_range may seem redundant. However,
         # 1) it increases histogram cohesion. All attributes
         #    are important. n_out_of_range is important for scaling.
@@ -299,25 +305,20 @@ class histogram():
         ## filling the found bin ##
         subarr[ind] += weight
 
-    def get_nevents(self, include_out_of_range=False):
-        """Return number of entries in the histogram.
+    def get_n_events(self):
+        """Return number of events in the histogram (with weights).
 
-        If the histogram was filled N times, return N.
-        If the histogram was filled with weights w_i,
-        return the sum of w_i.
-        Values filled outside the histogram range
-        are not counted unless *include_out_of_range* is ``True``.
+        If the histogram was filled N times (with weights w_i),
+        return N (sum of w_i).
+        To get events outside of the histogram range,
+        use :attr:`n_out_of_range`.
         """
         # An event in probability theory is a subset
         # of all possible outcomes.
         # For a histogram it is filling a specific bin.
         # See Wikipedia: Outcome (probability).
         bin_contents = (val[1] for val in hf.iter_bins(self.bins))
-        n_in_range = sum(bin_contents)
-
-        if include_out_of_range:
-            return n_in_range + self.n_out_of_range
-        return n_in_range
+        return sum(bin_contents)
 
     def set_nevents(self, nevents, include_out_of_range=False):
         """Scale histogram bins to contain *nevents*.
@@ -342,12 +343,12 @@ class histogram():
         Rescaling a histogram with zero entries raises a
         :exc:`.LenaValueError`.
         """
-        old_nevents = self.get_nevents(
-            include_out_of_range=include_out_of_range
-        )
+        old_nevents = self.get_n_events()
+        if include_out_of_range:
+            old_nevents += self.n_out_of_range
         if not old_nevents:
             raise LenaValueError(
-                "can not rescale a histogram containing zero events"
+                "can not rescale a histogram with zero events"
             )
         scale = float(nevents/old_nevents)
 
@@ -361,7 +362,7 @@ class histogram():
 
     def __repr__(self):
         # give a useful representation for the user to spot
-        # if a histogram has many outliers right from the flow.
+        # right from the flow whether a histogram has many outliers.
         app = ""
         if self.n_out_of_range:
             app = ", out_of_range={}, n_out_of_range={}".format(

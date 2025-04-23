@@ -96,17 +96,16 @@ def test_scale_linear_on_weight(edges, weight, refinement, data):
     ## nevents is correct ##
 
     # nevents without weight is correct
-    assert hist1.get_nevents() == len(data_in_range)
-    # include_out_of_range works
-    assert hist1.get_nevents(include_out_of_range=True) == len(data)
+    assert hist1.get_n_events() == len(data_in_range)
+    assert hist1.get_n_events() + hist1.n_out_of_range == len(data)
 
     ## nevents with weight is correct
     # unfortunately, we don't check it for different weights
     # to avoid 0*inf
     if len(data_in_range) == 0:
-        assert histw.get_nevents() == 0
+        assert histw.get_n_events() == 0
     else:
-        assert hypo_isclose(histw.get_nevents(), len(data_in_range) * weight)
+        assert hypo_isclose(histw.get_n_events(), len(data_in_range) * weight)
 
     # wrong for float edges.
     # n_of_filled_data = sum([1 for val in data if min_edge <= val < max_edge])
@@ -208,10 +207,10 @@ def test_histogram_3d():
 
     ## nevents work
     hnev = deepcopy(hist)
-    assert hnev.get_nevents() == 2
+    assert hnev.get_n_events() == 2
     hnev.set_nevents(4)
     assert hnev.edges == hist.edges
-    assert hnev.get_nevents() == 4
+    assert hnev.get_n_events() == 4
     assert [bin_[1] for bin_ in iter_bins(hnev.bins)] == [2, 2] + [0]*6
 
 
@@ -252,6 +251,6 @@ def test_histogram_1d():
     assert hist2._scale == 0.5
 
     # nevents work
-    assert hist2.get_nevents() == 1
+    assert hist2.get_n_events() == 1
     hist2.set_nevents(3)
     assert hist2.bins == [0, 3]
