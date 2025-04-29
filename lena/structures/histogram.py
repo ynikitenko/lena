@@ -43,22 +43,29 @@ class histogram():
     # https://docs.scipy.org/doc/numpy/reference/generated/numpy.histogram.html
     # https://root.cern.ch/root/htmldoc/guides/users-guide/Histograms.html#bin-numbering
 
+    # initial_value is not coupled with histogram structure and is used
+    # only during initialization. Even though it is not used in its
+    # representation, it is very convenient for histogram initialization
+    # (otherwise we should store edges separately
+    #  and call a separate function, or create personal shortcuts,
+    #  which might complicate things).
+    # Might reconsider when improving map_bins or like that.
+    #
+    # Bad: out_of_range and n_out_of_range should be consistent.
+    # A user should not be allowed to create e.g. n_out_of_range = 1
+    # and an empty out_of_range.
+
     def __init__(self, edges, bins=None, out_of_range=None, n_out_of_range=0,
                  initial_value=0):
         """*edges* is a sequence of one-dimensional arrays,
         each containing strictly increasing bin edges.
         *bins*, if not provided, are initialized with zeroes.
 
-        .. deprecated:: 0.6
-          create bins with the *initial_value* manually.
-
-        Histogram's bins by default
-        are initialized with *initial_value*.
-        It can be any object that supports addition with *weight*
-        during *fill* (but that is not necessary
-        if you don't plan to fill the histogram).
-        If the *initial_value* is compound and requires special copying,
-        create initial bins yourself (see :func:`.init_bins`).
+        Histogram bins are initialized with *initial_value*.
+        Use it for a simple case of a constant histogram.
+        A histogram bin can be any object that supports addition with
+        *weight* during *fill* (if you plan to fill the histogram).
+        See :func:`.init_bins` on how to create initial bins manually.
 
         A histogram can be created from existing *bins* and *edges*.
         In this case a simple check of the shape of *bins* is done
@@ -126,6 +133,11 @@ class histogram():
             # otherwise we assume that we create histogram
             # from an existing one, and don't check its edges.
             hf.check_edges_increasing(edges)
+        else:
+            if initial_value != 0:
+                raise LenaValueError(
+                    "initial_value is not allowed if bins are provided"
+                )
 
         if hasattr(edges[0], "__iter__"):
             self.dim = len(edges)
