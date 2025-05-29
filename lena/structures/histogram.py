@@ -180,6 +180,12 @@ class histogram():
             self._out_of_range = out_of_range
         self.n_out_of_range = n_out_of_range
 
+    def __add__(self, other, edges_abs_tol=0.0, edges_rel_tol=1e-9):
+        return self.add(other, 1, edges_abs_tol, edges_rel_tol)
+
+    def __sub__(self, other, edges_abs_tol=0.0, edges_rel_tol=1e-9):
+        return self.__add__(other*(-1), edges_abs_tol, edges_rel_tol)
+
     def add(self, other, weight=1, edges_abs_tol=0.0, edges_rel_tol=1e-9):
         """Add a histogram *other* to this one.
 
