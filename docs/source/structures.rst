@@ -77,6 +77,9 @@ Histograms
 .. autoclass:: histogram
     :members:
 
+    .. automethod:: __add__
+    .. automethod:: __mul__
+    .. automethod:: __sub__
     .. automethod:: __eq__
 ..
     Sphinx: it doesn't work with

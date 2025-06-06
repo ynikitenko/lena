@@ -180,22 +180,16 @@ class histogram():
             self._out_of_range = out_of_range
         self.n_out_of_range = n_out_of_range
 
+    # emulating numeric types
     def __add__(self, other, edges_abs_tol=0.0, edges_rel_tol=1e-9):
-        return self.add(other, 1, edges_abs_tol, edges_rel_tol)
-
-    def __sub__(self, other, edges_abs_tol=0.0, edges_rel_tol=1e-9):
-        return self.__add__(other*(-1), edges_abs_tol, edges_rel_tol)
-
-    def add(self, other, weight=1, edges_abs_tol=0.0, edges_rel_tol=1e-9):
         """Add a histogram *other* to this one.
 
-        For each bin, the corresponding bin of *other*
-        is added. It can be multiplied with *weight*.
-        For example, to subtract *other*, use *weight* -1.
+        For each bin, the corresponding bin of *other* is added.
 
         Histograms must have the same edges.
         They are compared approximately using :func:`math.isclose`
         with *edges_abs_tol* and *edges_rel_tol* tolerance levels.
+        Use :meth:`__sub__` for subtraction.
         """
         if not isinstance(other, histogram):
             raise LenaTypeError("other must be a histogram")
@@ -204,15 +198,11 @@ class histogram():
                        abs_tol=edges_abs_tol, rel_tol=edges_rel_tol):
             raise LenaValueError("can not add histograms with different edges")
 
-        if weight == 1:
-            obins = other.bins
-            oout_of_range = other.out_of_range
-        else:
-            obins = md_map(lambda val: val*weight, other.bins)
-            oout_of_range = md_map(lambda val: val*weight, other.out_of_range)
+        obins = other.bins
+        oout_of_range = other.out_of_range
         new_bins = md_map(add, self.bins, obins)
 
-        new_noorange = self.n_out_of_range + other.n_out_of_range * weight
+        new_noorange = self.n_out_of_range + other.n_out_of_range
         new_oorange = md_map(add, self.out_of_range, oout_of_range)
 
         # maybe todo: edges should be immutable
@@ -222,6 +212,31 @@ class histogram():
         )
 
         return new_hist
+
+    def __mul__(self, num):
+        r"""Multiply bins by *num* and return a new histogram.
+
+        Number of events outside of histogram range are also rescaled.
+
+        A histogram should be multiplied on the right,
+        *hist2 = hist \* 2*.
+        An inplace multiplication with \*= is also allowed.
+        """
+        new_bins = lena.math.md_map(
+            lambda binc: binc*num, self.bins
+        )
+        new_out_of_range = lena.math.md_map(
+            lambda binc: binc*num, self.out_of_range
+        )
+        nnoor = self.n_out_of_range * num
+        return histogram(copy.deepcopy(self.edges), new_bins, out_of_range=new_out_of_range, n_out_of_range=nnoor)
+
+    def __sub__(self, other, edges_abs_tol=0.0, edges_rel_tol=1e-9):
+        """Subtract *other* from this histogram and return the result.
+
+        See :meth:`__add__` on keyword arguments.
+        """
+        return self.__add__(other*(-1), edges_abs_tol, edges_rel_tol)
 
     # read-only attributes to unify 1- and multidimensional histograms
     @property
@@ -344,23 +359,6 @@ class histogram():
         of bin contents multiplied by bin size.
         """
         return hf.integral(self.bins, self._edges)
-
-    def __mul__(self, num):
-        """Multiply bins by *num* and return a new histogram.
-
-        Number of events outside of histogram range are also rescaled.
-
-        A histogram should be multiplied on the right.
-        An inplace multiplication with *= is supported.
-        """
-        new_bins = lena.math.md_map(
-            lambda binc: binc*num, self.bins
-        )
-        new_out_of_range = lena.math.md_map(
-            lambda binc: binc*num, self.out_of_range
-        )
-        nnoor = self.n_out_of_range * num
-        return histogram(copy.deepcopy(self.edges), new_bins, out_of_range=new_out_of_range, n_out_of_range=nnoor)
 
     def __repr__(self):
         # give a useful representation for the user to spot

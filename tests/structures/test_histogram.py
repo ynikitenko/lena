@@ -123,30 +123,31 @@ def test_add():
     hist2 = histogram([0., 1, 2.])
     hist1.fill(0)
     hist2.fill(1)
-    hadd = hist1.add(hist2)
+    hadd = hist1 + hist2
     assert hadd.edges == hist1.edges
     assert hadd.bins == [1, 1]
 
     # addition is commutative
-    assert hist1.add(hist2) == hist2.add(hist1)
+    assert hist1 + hist2 == hist2 + hist1
 
-    # weights work
-    hsub = hist1.add(hist2, weight=-1)
+    # subtraction works
+    hsub = hist1 - hist2
     assert hsub.bins == [1, -1]
 
+    # different edges raise
     hist2f = histogram([-1, 1, 2.])
     with pytest.raises(LenaValueError):
-        hist1.add(hist2f)
+        hist1 + hist2f
 
     # 3-dimensional histograms work
     hist3 = histogram([[1, 2, 3], [1, 2, 3], [1, 2, 3]])
     hist4 = histogram([[1, 2, 3], [1, 2, 3], [1, 2, 3]])
     hist3.fill([1, 1, 1])
     # adding a zero histogram changes nothing
-    assert hist3.add(hist4) == hist3
+    assert hist3 + hist4 == hist3
 
     hist4.fill([1, 2, 1], weight=2)
-    assert hist3.add(hist4).bins == [[[1, 0], [2, 0]], [[0, 0], [0, 0]]]
+    assert (hist3 + hist4).bins == [[[1, 0], [2, 0]], [[0, 0], [0, 0]]]
 
 
 def test_histogram_3d():
