@@ -43,26 +43,17 @@ class histogram():
     # https://docs.scipy.org/doc/numpy/reference/generated/numpy.histogram.html
     # https://root.cern.ch/root/htmldoc/guides/users-guide/Histograms.html#bin-numbering
 
-    # initial_value is not coupled with histogram structure and is used
-    # only during initialization. Even though it is not used in its
-    # representation, it is very convenient for histogram initialization
-    # (otherwise we should store edges separately
-    #  and call a separate function, or create personal shortcuts,
-    #  which might complicate things).
-    # Might reconsider when improving map_bins or like that.
-    #
-    # Bad: out_of_range and n_out_of_range should be consistent.
+    # Bad design: out_of_range and n_out_of_range should be consistent.
     # A user should not be allowed to create e.g. n_out_of_range = 1
-    # and an empty out_of_range.
+    # and an empty out_of_range. Todo: maybe a simple check.
+    # However, a user should not be generally allowed to create n_out_of_range
+    # for a new histogram (only during a copy).
 
-    def __init__(self, edges, bins=None, out_of_range=None, n_out_of_range=0,
-                 initial_value=0):
+    def __init__(self, edges, bins=None, out_of_range=None, n_out_of_range=0):
         """*edges* is a sequence of one-dimensional arrays,
         each containing strictly increasing bin edges.
         *bins*, if not provided, are initialized with zeroes.
 
-        Histogram bins are initialized with *initial_value*.
-        Use it for a simple case of a constant histogram.
         A histogram bin can be any object that supports addition with
         *weight* during *fill* (if you plan to fill the histogram).
         See :func:`.init_bins` on how to create initial bins manually.
@@ -133,11 +124,6 @@ class histogram():
             # otherwise we assume that we create histogram
             # from an existing one, and don't check its edges.
             hf.check_edges_increasing(edges)
-        else:
-            if initial_value != 0:
-                raise LenaValueError(
-                    "initial_value is not allowed if bins are provided"
-                )
 
         if hasattr(edges[0], "__iter__"):
             self.dim = len(edges)
@@ -148,7 +134,7 @@ class histogram():
             self._edges = [edges]
 
         if bins is None:
-            self.bins = hf.init_bins(self._edges, initial_value)
+            self.bins = hf.init_bins(self._edges, 0)
         else:
             self.bins = bins
             # a simple check along the first coordinate
@@ -466,14 +452,14 @@ class histogram():
 class Histogram():
     """An element to produce histograms."""
 
-    def __init__(self, edges, bins=None, make_bins=None, initial_value=0):
-        """*edges*, *bins* and *initial_value* have the same meaning
+    def __init__(self, edges, bins=None, make_bins=None):
+        """*edges* and *bins* have the same meaning
         as during creation of a :class:`histogram`.
 
         *make_bins* is a function without arguments
-        that creates new bins
-        (it will be called during :meth:`__init__` and :meth:`reset`).
-        *initial_value* in this case is ignored, but bin check is made.
+        that creates new bins if provided
+        (it will be called during :meth:`__init__` and :meth:`reset`),
+        bin check is made.
         If both *bins* and *make_bins* are provided,
         :exc:`.LenaTypeError` is raised.
         """
@@ -527,6 +513,6 @@ class Histogram():
         elif self._initial_bins is not None:
             self.bins = copy.deepcopy(self._initial_bins)
         else:
-            self.bins = hf.init_bins(self.edges, self._initial_value)
+            self.bins = hf.init_bins(self.edges, 0)
 
         self._cur_context = {}
