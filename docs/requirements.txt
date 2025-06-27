@@ -1,7 +1,3 @@
-# this constraint can be removed after
-# https://github.com/sphinx-doc/sphinx/issues/9777
-# is fixed.
-docutils<0.18
-
+docutils
 sphinx
 sphinxcontrib-napoleon
