@@ -19,13 +19,12 @@ def alter_sequence(seq):
         if hasattr(el, "alter_sequence") and callable(el.alter_sequence):
             new_seq = el.alter_sequence(seq)
             if new_seq == seq:
-                changed = False
+                continue
             else:
-                changed = True
-                new_seq = alter_sequence(new_seq)
-    if not changed:
-        return orig_seq
-    return seq
+                # call recursively for the new sequence
+                return alter_sequence(new_seq)
+    # not altered
+    return orig_seq
 
 
 def flatten(seq):

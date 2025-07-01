@@ -775,6 +775,8 @@ class SourceEl(object):
                     .format(call, el)
                 )
         self._el = el
+        # for equality testing (lambda can't be used)
+        self._orig_call = call
 
     def __call__(self):
         """Yield generated values."""
@@ -782,6 +784,12 @@ class SourceEl(object):
         # https://docs.python.org/3/reference/datamodel.html#special-lookup
         # Methods with other names will be monkey-patched correctly.
         return self._call()  # pylint: disable=no-member
+
+    def __eq__(self, other):
+        if not isinstance(other, SourceEl):
+            return NotImplemented
+        return (self._el == other._el and
+                self._orig_call == other._orig_call)
 
     def __repr__(self):
         return "SourceEl({})".format(repr(self._el))
