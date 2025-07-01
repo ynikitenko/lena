@@ -107,12 +107,17 @@ def test_split_sequence_with_cache(tmpdir):
     s = Source(ascii_uppercase, 
             Split([
                 lambda s: s.upper(), 
-                (lambda val: val, Cache(lowercase_cached_filename)),
+                (
+                    lambda val: val,
+                    Cache(lowercase_cached_filename)
+                ),
                 id_
             ])
         )
     assert "".join(s()) == \
         "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    # Cache sequence was actually altered
+    assert isinstance(s[1]._seqs[1], Source)
 
 
 def test_split_with_fill_computes():

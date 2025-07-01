@@ -7,7 +7,7 @@ def alter_sequence(seq):
     orig_seq = seq
     seq = flatten(seq)
     changed = False
-    if not isinstance(seq, lena_sequence.LenaSequence):
+    if not isinstance(seq, (lena_sequence.LenaSequence, tuple)):
         # an element
         el = seq
         if hasattr(el, "alter_sequence") and callable(el.alter_sequence):
