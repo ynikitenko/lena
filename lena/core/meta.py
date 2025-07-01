@@ -29,6 +29,7 @@ def alter_sequence(seq):
 
 
 def flatten(seq):
+    """Unnest sequences. Split is unaffected."""
     flattened = []
     flat = True
     if not isinstance(seq, (lena_sequence.LenaSequence, tuple)):

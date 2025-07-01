@@ -3,6 +3,8 @@ from __future__ import print_function
 import sys
 
 
+# do not develop this class much, for it will be most likely
+# substituted by the standard print.
 class Print():
     """Print values passing through."""
 
@@ -20,12 +22,19 @@ class Print():
         # *sep* and *end* keywords have the same semantics as in Python 3 *print()*.
         self.sep = sep
         self.end = end
-
-        if transform is None:
-            transform = lambda x: x
         self.transform = transform
 
     def __call__(self, value):
         """Print and return *value*."""
-        print(self.before, self.transform(value), sep=self.sep, end=self.end)
+        if self.transform is None:
+            print(self.before, value, sep=self.sep, end=self.end)
+        else:
+            print(self.before, self.transform(value),
+                  sep=self.sep, end=self.end)
         return value
+
+    def __eq__(self, other):
+        if not isinstance(other, Print):
+            return NotImplemented
+        return (self.before == other.before and self.sep == other.sep and
+                self.end == other.end and self.transform == other.transform)

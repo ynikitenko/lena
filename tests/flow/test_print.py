@@ -19,3 +19,8 @@ def test_print(capsys):
     list(seq2())
     captured = capsys.readouterr()
     assert captured.out == "0 1 2 3 4 "
+
+    # equality test works
+    assert printel == Print(end=' ')
+    assert printel != Print()
+    assert Print() == Print()
