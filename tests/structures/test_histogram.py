@@ -233,8 +233,13 @@ def test_histogram_1d():
 
     # scale is computed correctly
     assert hist2.get_scale() == 0.5
-
     assert hist2.get_n_events() == 1
+
+    # scale with n_events works
+    hsc = histogram([0, 1, 2], [1, 0])
+    assert hsc.get_n_events() == 1
+    hsc = hsc.scale_to(2, n_events=True)
+    assert hsc == histogram([0, 1, 2], [2, 0])
 
 
 def test_mul():

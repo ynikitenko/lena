@@ -358,11 +358,15 @@ class histogram():
             self.edges, self.bins
         ) + app + ")"
 
-    def scale_to(self, other):
+    def scale_to(self, other, n_events=False):
         """Return a histogram rescaled to *other*.
 
         *other* must be a number or a structure
-        with a get_scale() method.
+        with a method *get_scale()* (or *get_n_events()*).
+
+        If *n_events* is true, rescale histogram so that
+        the resulting number of events is set to *other*.
+        Otherwise rescale the integral of this histogram.
 
         If outliers should be taken into account, use
         :attr:`n_out_of_range` and the multiplication operator directly.
@@ -389,11 +393,33 @@ class histogram():
         # that we don't change the *other*
         # (compared to hist.scale(other)).
 
+        if n_events:
+            snev = float(self.get_n_events())
+            if not snev:
+                raise LenaValueError(
+                    "can not rescale histogram with no events filled"
+                )
+            if hasattr(other, "get_n_events"):
+                onev = other.get_n_events()
+                mul = float(onev) / snev
+            else:
+                # other is a number
+                try:
+                    mul = float(other) / snev
+                except TypeError:
+                    raise LenaTypeError(
+                        "other must be a number "
+                        "or a structure with a get_n_events() method"
+                    )
+            return self * mul
+
+        # use scale (integral)
         scale = float(self.get_scale())
-        if scale == 0:
+        if not scale:
             raise LenaValueError(
                 "can not rescale histogram with zero scale"
             )
+
         if hasattr(other, "get_scale"):
             oscale = other.get_scale()
             mul = float(oscale) / scale
