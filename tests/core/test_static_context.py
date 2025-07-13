@@ -3,6 +3,7 @@ from copy import deepcopy
 import pytest
 
 from lena.core import Sequence, Source, Split, LenaKeyError
+from lena.flow import Count
 
 # we don't test them here, but use them for our tests.
 from lena.meta.elements import SetContext, UpdateContextFromStatic, StoreContext
@@ -104,6 +105,15 @@ def test_set_context_split():
 
     # the resulting context is intersection of the inner contexts.
     assert store5.context == {'data': {'lost': True}}
+
+    # Split with an element without a static context works
+    store11 = StoreContext()
+    s1 = Source(
+        SetContext("cycle", 1),
+        Split([Count()]),
+        store11,
+    )
+    assert store11.context == {'cycle': 1}
 
 
 def test_set_formatted_context():

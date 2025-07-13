@@ -10,6 +10,7 @@ from . import check_sequence_type as ct
 from . import fill_request_seq
 from . import sequence
 from . import exceptions
+from .exceptions import LenaKeyError
 from . import source
 from . import meta
 
@@ -35,6 +36,9 @@ def _get_seq_with_type(seq, bufsize=None):
     ## If no explicit type is given, check seq's methods
     elif ct.is_fill_compute_seq(seq):
         seq_type = "fill_compute"
+        # not sure whether we should care about that.
+        # We probably should not economise on wrapping an element
+        # into a sequence. However, it is harmless now.
         if not ct.is_fill_compute_el(seq):
             seq = fill_compute_seq.FillComputeSeq(*seq)
     elif ct.is_fill_request_seq(seq):
@@ -106,34 +110,48 @@ class LenaSplit(object):
                         "([", mnl, elems, mnl, mbi, "])"])
 
     def _get_context(self):
-        contexts = []
-        for seq in self._seqs:
-            # if a sequence has no context at all,
-            # it will be static context transparent
-            # (not intersecting the others with {}).
-            if hasattr(seq, "_get_context"):
-                # if some of sequences was not set proper context yet,
-                # this will raise a LenaKeyError.
-                contexts.append(seq._get_context())
-
-        # we don't store the static context of Split,
-        # because that is already stored in an external sequence.
-        context = lena.context.intersection(*contexts)
-        # deep copy is already done in the intersection.
-        # return deepcopy(context)
-        return context
+        # copied from meta.SetContext and LenaSequence.
+        try:
+            sc = self._static_context
+        except AttributeError:
+            # self._exc is present in that case,
+            # because there is always at least one
+            # _set_context call before _get_context.
+            raise self._exc
+        return deepcopy(sc)
 
     def _set_context(self, context):
-        if not context:
+        if hasattr(self, "_static_context") and not context:
             # every sequence was already initialised with {}.
             return
         for seq in self._seqs:
             if hasattr(seq, "_set_context"):
-                # can raise LenaKeyError if some context
-                # formatting keys are missing.
-                seq._set_context(deepcopy(context))
-        # we don't track whether all contexts could be set here,
-        # because otherwise an exception will raise in _get_context.
+                try:
+                    seq._set_context(deepcopy(context))
+                except LenaKeyError as exc:
+                    # needed keys are lacking in the context.
+                    # _static_context is not set.
+                    # If _static_context was already set,
+                    # we won't be here, since external context
+                    # can not delete local keys.
+                    self._exc = exc
+                    return
+
+        contexts = []
+        for seq in self._seqs:
+            # a sequence without context is transparent
+            # (no need to intersect with others).
+            if hasattr(seq, "_get_context"):
+                # if some of sequences was not set proper context yet,
+                # this will raise a LenaKeyError.
+                # Hard to think about that case though.
+                contexts.append(seq._get_context())
+
+        if contexts:
+            context = lena.context.intersection(*contexts)
+        # deep copy is already done in the intersection
+        # or in get_context of a previous element.
+        self._static_context = context
 
     def __eq__(self, other):
         if not isinstance(other, LenaSplit):

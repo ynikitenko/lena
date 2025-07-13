@@ -88,7 +88,7 @@ class LenaSequence(object):
         except AttributeError:
             # self._exc is present in that case,
             # because there is always at least one
-            # _set_context before _get_context.
+            # _set_context call before _get_context.
             raise self._exc
         return deepcopy(sc)
 
@@ -99,10 +99,10 @@ class LenaSequence(object):
         # but can also delete that (via Split).
         # No optimisation for future contexts is possible.
 
-        # todo: get context only when necessary. Change the order.
-        # We could economise last _get_context here.
-        # For example, if the last element is a big Split, whose
-        # static context we don't need to know any more (it is the end).
+        # skip setting static context if it was already set
+        # and the incoming context is empty
+        if hasattr(self, "_static_context") and not context:
+            return
 
         for el in self._seq:
             if hasattr(el, "_set_context") and context:
@@ -122,12 +122,12 @@ class LenaSequence(object):
                     return
 
             if hasattr(el, "_get_context"):
-                # every element that has _get_context
-                # must also have _set_context
                 try:
                     context = el._get_context()
                 except LenaKeyError as exc:
                     self._exc = exc
                     raise exc
 
+        # here it is natural to set static context,
+        # for we have to propagate that till the end of this seq
         self._static_context = context
