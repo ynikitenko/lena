@@ -8,16 +8,21 @@ import sys
 class Print():
     """Print values passing through."""
 
-    def __init__(self, before='', sep='', end='\n', transform=None):
-        """*before* is a string appended before the first element in the item
+    def __init__(self, transform=None, before='', sep='', end='\n'):
+        """*transform* is a function which transforms passing items
+        (for example, it can select its specific fields).
+
+        *before* is a string appended before the first element in the item
         (which may be a container).
 
-        *sep* separates elements, *end* is appended after the last element.
+        The first argument is defined according to its type:
+        a function is considered *transform*, while a string is considered *before*.
 
-        *transform* is a function which transforms passing items
-        (for example, it can select its specific fields).
+        *sep* separates elements, *end* is appended after the last element.
         """
         # flush=True, file=sys.stdout
+        if isinstance(transform, str):
+            before, transform = (transform, before)
         self.before = before
         # *sep* and *end* keywords have the same semantics as in Python 3 *print()*.
         self.sep = sep
