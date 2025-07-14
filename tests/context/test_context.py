@@ -34,12 +34,25 @@ def test_context():
     d1 = copy.deepcopy(d)
     c = Context(d1)
     assert c.a == d["a"]
+    # nested attribute access works
+    assert c.a.b == "c d"
+
     # missing attributes raise
     with pytest.raises(lena.core.LenaAttributeError):
         c.b
+
+    ## setting attributes works
     c.b = 3
     d1["b"] = 3
     assert c == d1
+    # nested setting attributes works
+    c.a.b = "e"
+    assert c.a.b == "e"
+    # nested setting new attributes does not work
+    with pytest.raises(AttributeError):
+        c.d.e.f = "g"
+        # assert c.d.e.f == "g"
+
     # private attributes raise
     with pytest.raises(AttributeError):
         c._aaa = 3

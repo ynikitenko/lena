@@ -33,7 +33,7 @@ class Context(dict):
         can be retrieved or set using dot notation
         (for example, *context["data_path"]*
         is equal to *context.data_path*).
-        Only one level of nesting is accessible using dot notation.
+        Multiple levels of nesting using dot notation are allowed.
 
         Tip
         ---
@@ -94,7 +94,6 @@ class Context(dict):
         # because that would require creating proxy objects.
         # Use more sophisticated libraries for that.
         
-        # todo: should LenaAttributeError be used here at all?
         if name.startswith('_'):
             # this is not LenaAttributeError,
             # as it wouldn't be so for other Lena classes
@@ -102,11 +101,19 @@ class Context(dict):
             # Same is done for Variable.
             raise AttributeError(name)
         try:
-            return self[name]
+            val = self[name]
         except KeyError:
+            # todo: should LenaAttributeError be used here at all?
             raise lena.core.LenaAttributeError(
                 "{} missing".format(name)
             )
+        else:
+            if isinstance(val, dict):
+                # transform subdictionaries on the fly
+                if not isinstance(val, Context):
+                    val = self[name] = Context(val)
+                return val
+            return val
 
     def _repr_nested(self, base_indent="", indent=" "*4, el_separ=",\n"):
         # representation within a Lena Sequence.
