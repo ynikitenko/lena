@@ -102,9 +102,7 @@ class ReadROOTFile():
                 obj = root_file.Get(key)
                 # does not work in PyROOT.
                 # if obj == ROOT.nullptr:
-                # Will fail is the obj can have a boolean value False.
-                # No better way to check that.
-                if not obj:
+                if ROOT.addressof(obj) == 0:
                     if self._raise_on_missing:
                         raise LenaKeyError(
                             "key {} not found in {}".format(key, data)
