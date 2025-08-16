@@ -14,6 +14,14 @@ Reference
     structures <structures>
     variables <variables>
 
+Adapters
+========
+
+.. toctree::
+   :maxdepth: 1
+
+    ROOT <ROOT>
+
 Indices and tables
 ==================
 
