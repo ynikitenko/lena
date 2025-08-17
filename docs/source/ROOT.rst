@@ -6,12 +6,26 @@ ROOT is an open-source data analysis framework used by high energy physics and o
 
 To use any of these classes, `ROOT <https://root.cern/>`__ must be installed.
 
+**Input:**
+
+.. currentmodule:: lena.ROOT
+.. autosummary::
+
+    ReadROOTFile
+    ReadROOTTree
+
 **Output:**
 
 .. currentmodule:: lena.ROOT
 .. autosummary::
 
     WriteROOTFile
+
+Input
+-----
+
+.. autoclass:: ReadROOTFile
+.. autoclass:: ReadROOTTree
 
 Output
 ------

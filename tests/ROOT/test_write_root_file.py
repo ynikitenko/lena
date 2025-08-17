@@ -1,7 +1,8 @@
 import pytest
 import ROOT
 
-from lena.core import Sequence, LenaTypeError
+from lena.core import Sequence
+from lena.core import LenaEnvironmentError, LenaTypeError
 from lena.ROOT.write_root_file import WriteROOTFile
 
 ROOTFILE = "test.root"
@@ -17,6 +18,10 @@ def test_write_root_file():
     with pytest.raises(LenaTypeError):
         # "could not write key str to file test.root"
         list(s.run(data_nw))
+
+    with pytest.raises(LenaEnvironmentError) as err:
+        # "Failed to open file /not_allowed.root"
+        WriteROOTFile("/not_allowed.root", "new")
 
     ## data without root_key-s passes unchanged
     data_skipped = [("string", {}), "str2"]

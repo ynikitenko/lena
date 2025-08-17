@@ -1,8 +1,9 @@
-# needs ROOT installed
 import copy
 import inspect
 import sys
 
+import ROOT
+from ROOT import TFile
 import lena
 from lena.core import LenaKeyError, LenaTypeError
 
@@ -21,8 +22,6 @@ class ReadROOTFile():
         is raised if *raise_on_missing* is ``True``.
         By default missing keys are ignored.
         """
-        import ROOT
-
         if keys is not None:
             if isinstance(keys, str):
                 keys = [keys]
@@ -68,8 +67,6 @@ class ReadROOTFile():
             don't save yielded values to a list,
             or save copies of them.
         """
-        import ROOT
-        from ROOT import TFile
         from lena.context import get_recursively, update_recursively
         from lena.flow import get_data_context
         from copy import deepcopy

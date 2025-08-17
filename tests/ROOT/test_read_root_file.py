@@ -5,7 +5,7 @@ import ROOT
 
 import lena
 from lena.core import LenaKeyError, LenaTypeError
-from lena.input import ReadROOTFile
+from lena.ROOT import ReadROOTFile
 
 
 def test_read_root_file(rootfile):

@@ -31,9 +31,11 @@ docs/examples/performance/*
 # Sphinx
 docs/build
 docs/_build
-docs/source/lena.*.rst
-docs/source/lena.rst
-docs/source/modules.rst
+# These files do not exist.
+# Probably it was an error during initial release.
+# docs/source/lena.*.rst
+# docs/source/lena.rst
+# docs/source/modules.rst
 *.mo
 
 .tox

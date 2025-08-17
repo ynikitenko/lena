@@ -1,8 +1,8 @@
-# needs ROOT installed
 import collections
 import copy
 import sys
 
+import ROOT
 import lena
 from lena.core import LenaTypeError, LenaValueError
 
@@ -38,11 +38,6 @@ class ReadROOTTree():
             in *get_entries* (e.g. use *copy.deepcopy*).
             Otherwise all items will be the last value read.
         """
-        # This loads other classes faster,
-        # and if ROOT is not installed,
-        # still enables "from lena.flow import ReadROOTTree",
-        # instead of "from lena.flow.read_root_tree import ReadROOTTree"
-        import ROOT
         # todo: add tuple_name to kwargs
         # (otherwise T_entry can look weird/frightening)
 
@@ -186,7 +181,6 @@ class ReadROOTTree():
         To read leaves with the same name in several branches,
         specify branch names for them.
         """
-        import ROOT
         get_data_context = lena.flow.get_data_context
         update_recursively = lena.context.update_recursively
         deepcopy = copy.deepcopy

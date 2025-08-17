@@ -8,7 +8,7 @@ _sentinel = object()
 
 
 class WriteROOTFile():
-    """Write data to a ROOT file."""
+    """Write data from flow to a ROOT file."""
 
     def __init__(self, filename, mode="recreate", title="", compress=_sentinel):
         """*filename* is the name of the ROOT file (possibly with path).
