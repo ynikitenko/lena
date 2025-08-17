@@ -7,9 +7,13 @@ from hypothesis import given
 
 import lena.flow
 from lena.core import Source, LenaStopFill
-from lena.flow import Chain, DropContext, CountFrom, Reverse, Slice
+from lena.core import LenaTypeError
+from lena.flow import Chain, DropContext, CountFrom, Iter, Reverse, Slice
 from lena.flow import StoreFilled
 
+pytestmark = pytest.mark.filterwarnings(
+    "ignore:Chain is deprecated:DeprecationWarning",
+)
 # all bugs converged to at most 3.
 hypo_int_max = 20
 
@@ -89,6 +93,28 @@ def test_slice_run():
     assert sl2 == Slice(10, 10)
     assert sl2 != sl1
     assert sl2 != "s"
+
+
+def test_iter():
+    lst = [1, 2, 3]
+    # equality for equal containers works
+    it1 = Iter(lst)
+    it2 = Iter([1, 2, 3])
+    assert it1 == it2
+
+    # different objects compare unequal
+    assert not(it1 == lst)
+
+    # unequality works
+    assert not(it1 != it2)
+    assert it1 != lst
+
+    # generation of values works
+    assert list(it1()) == lst
+
+    # wrong argument raises
+    with pytest.raises(LenaTypeError):
+        Iter(1)
 
 
 def test_negative_islice():

@@ -1,13 +1,15 @@
 from .cache import Cache
 from .drop_context import DropContext
 from .elements import (
-    Count, End, RunIf, RunningChunkBy, StoreFilled
+    Count, End,
+    RunIf, RunningChunkBy,
+    StoreFilled,
 )
 from .functions import get_data, get_context, get_data_context, seq_map
 from .group_by import GroupBy
 from .group_plots import group_plots, GroupPlots, MapGroup
 from .group_scale import scale_to, GroupScale
-from .iterators import Chain, CountFrom, Slice, ISlice, Reverse
+from .iterators import Chain, CountFrom, Slice, Iter, ISlice, Reverse
 from .print_ import Print
 from .progress import Progress
 from .selectors import Not, Selector, SelectContext, And, Or

@@ -51,6 +51,7 @@ Flow
     Chain
     CountFrom
     ISlice
+    Iter
     Reverse
     Slice
 

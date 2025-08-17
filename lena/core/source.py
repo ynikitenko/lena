@@ -64,6 +64,8 @@ class Source(LenaSequence):
 
     def __call__(self):
         """Generate flow."""
+        # This method is called __call__ (not next),
+        # since next is for iterating the Source itself.
         first = self._first
         if callable(first):
             # a generator

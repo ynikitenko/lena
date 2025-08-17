@@ -11,10 +11,15 @@ import itertools
 import warnings
 
 import lena.core
+from lena.core import LenaTypeError
 
 
 class Chain(object):
-    """Chain generators.
+    """
+    .. deprecated:: 0.6
+       use itertools.chain and :class:`Iter`.
+
+    Chain generators.
 
     :class:`Chain` can be used as a ``Source`` to generate data.
 
@@ -30,6 +35,11 @@ class Chain(object):
         that is after the first one is exhausted,
         the second is called, etc.
         """
+        warnings.warn(
+            "Chain is deprecated since Lena 0.6. "
+            "Use itertools.chain and Iter. In:",
+            DeprecationWarning, stacklevel=2
+        )
         self._iterables = iterables
 
     def __call__(self):
@@ -90,12 +100,52 @@ def ISlice(*args, **kwargs):
     return Slice(*args, **kwargs)
 
 
+class Iter(object):
+    """Create a *Source* from an *iterable*.
+
+    Since :class:`lena.Source` uses a special iteration with
+    ``__call__()``, builtin iter(iterable) would not work to make
+    a *Source* element. A separate element also allows comparison
+    of iterators due to saving of the initial arguments.
+    Example::
+
+        src = Source(
+            # generate file names from the given list
+            Iter(["file1.csv", "file2.csv"]),
+            # read data from each file...
+        )
+
+    .. versionadded:: 0.6
+    """
+
+    def __init__(self, iterable):
+        if hasattr(iterable, "__iter__") and callable(iterable.__iter__):
+            self._it = iterable
+        else:
+            raise LenaTypeError("iterable must implement __iter__ protocol")
+
+    def __call__(self):
+        return iter(self._it)
+
+    def __eq__(self, other):
+        if isinstance(other, Iter):
+            # will give false negatives for e.g. generators,
+            # since generators are compared using their identities
+            return self._it == other._it
+        return NotImplemented
+
+    def __ne__(self, other):
+        # need to implement separately in Python 2, see
+        # https://stackoverflow.com/a/30676267/952234
+        return not (self == other)
+
+
 class Reverse():
     """Reverse the flow (yield values from last to first).
 
     Warning
     -------
-        This element will consume the whole flow.
+        This element will consume the entire flow.
     """
 
     def __init__(self):
