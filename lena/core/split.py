@@ -54,22 +54,32 @@ def _get_seq_with_type(seq, bufsize=None):
                 # without a buffer
                 buffer_input=True
             )
-    # Source is not checked,
-    # because it must be Source explicitly.
+    # Source or Sequence
     else:
-        try:
-            if isinstance(seq, tuple):
-                seq = sequence.Sequence(*seq)
+        if not isinstance(seq, tuple):
+            seqwrap = (seq,)
+        else:
+            seqwrap = seq
+
+        if not seqwrap:
+            seq_cls = sequence.Sequence
+            seq_type = "sequence"
+        else:
+            el0 = seqwrap[0]
+            if hasattr(el0, "_is_source_el"):
+                seq_cls = source.Source
+                seq_type = "source"
             else:
-                seq = sequence.Sequence(seq)
+                seq_cls = sequence.Sequence
+                seq_type = "sequence"
+        try:
+            seq = seq_cls(*seqwrap)
         except exceptions.LenaTypeError:
             raise exceptions.LenaTypeError(
                 "unknown argument type. Must be a "
                 "FillComputeSeq, FillRequestSeq or Source, "
                 "{} provided".format(seq)
             )
-        else:
-            seq_type = "sequence"
     return (seq, seq_type)
 
 
@@ -171,6 +181,14 @@ class Split(LenaSplit):
         If *seqs* is empty, *Split* acts as an empty *Sequence* and
         yields all values it receives.
 
+        Elements of *seqs* can be tuples. In that case they are
+        automatically converted into the corresponding Lena sequences.
+        Tuples with a FillCompute element are converted
+        into FillComputeSeq.
+        If the first element of the tuple has attribute ``_is_source_el``,
+        the tuple is converted to a Source, otherwise to a Sequence.
+        If automatic initialization fails, use an explicit one.
+
         *bufsize* is the size of the buffer for the input flow.
         If *bufsize* is ``None``,
         whole input flow is materialized in the buffer.
@@ -231,7 +249,8 @@ class Split(LenaSplit):
                 self.fill = self._fill
                 self.request = self._request
             elif seq_type == "source":
-                pass
+                # value is not important, only presence
+                self._is_source_el = True
         elif self._n_seq_types == 0:
             self.run = self._empty_run
 
@@ -256,7 +275,7 @@ class Split(LenaSplit):
         :class:`.Source`,
         otherwise runtime :exc:`.LenaAttributeError` is raised.
         """
-        if self._n_seq_types != 1 or not ct.is_source(self._seqs[0]):
+        if not hasattr(self, "_is_source_el"):
             raise exceptions.LenaAttributeError(
                 "Split has no method '__call__'. It should contain "
                 "only Source sequences to be callable"

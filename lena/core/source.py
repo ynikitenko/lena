@@ -62,6 +62,8 @@ class Source(LenaSequence):
         else:
             self._tail = ()
 
+        self._is_source_el = True
+
     def __call__(self):
         """Generate flow."""
         # This method is called __call__ (not next),

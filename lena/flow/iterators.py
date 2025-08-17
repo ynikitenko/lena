@@ -103,7 +103,7 @@ def ISlice(*args, **kwargs):
 class Iter(object):
     """Create a *Source* from an *iterable*.
 
-    Since :class:`lena.Source` uses a special iteration with
+    Since :class:`core.Source` uses a special iteration with
     ``__call__()``, builtin iter(iterable) would not work to make
     a *Source* element. A separate element also allows comparison
     of iterators due to saving of the initial arguments.
@@ -116,6 +116,10 @@ class Iter(object):
         )
 
     .. versionadded:: 0.6
+
+    .. seealso::
+       :class:`core.SourceEl` is a more general
+       and complicated alternative.
     """
 
     def __init__(self, iterable):
@@ -123,14 +127,20 @@ class Iter(object):
             self._it = iterable
         else:
             raise LenaTypeError("iterable must implement __iter__ protocol")
+        self._is_source_el = True
 
     def __call__(self):
+        """Yield values from *iterable*."""
         return iter(self._it)
 
     def __eq__(self, other):
+        """Compare *self* with *other*.
+
+        This method will give false negatives for generators,
+        since generators are compared using their identities,
+        even if the actually yielded values would be the same.
+        """
         if isinstance(other, Iter):
-            # will give false negatives for e.g. generators,
-            # since generators are compared using their identities
             return self._it == other._it
         return NotImplemented
 

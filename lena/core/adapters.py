@@ -751,6 +751,10 @@ class SourceEl(object):
 
         If :class:`SourceEl` failed to instantiate with *el* and *call*,
         :exc:`.LenaTypeError` is raised.
+
+        .. seealso::
+            :class:`flow.Iter` is a more readable alternative
+            for *el* a container or an iterator.
         """
         if call is _SENTINEL:
             # try to find call in el
@@ -777,6 +781,7 @@ class SourceEl(object):
         self._el = el
         # for equality testing (lambda can't be used)
         self._orig_call = call
+        self._is_source_el = True
 
     def __call__(self):
         """Yield generated values."""

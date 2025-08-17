@@ -104,6 +104,9 @@ class Cache(object):
                 # Python 3 optimal way
                 os.makedirs(cache_dir, exist_ok=True)
 
+        # Cache does not have _is_source_el,
+        # since alter_sequence automatically creates a Source.
+
     def cache_exists(self):
         """Return ``True`` if file with cache exists and is readable.
 
