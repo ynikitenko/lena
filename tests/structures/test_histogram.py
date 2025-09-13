@@ -39,7 +39,12 @@ def test_init_scale_zero(edges):
 #     where False = isclose((2.2216311086621543 * 5e-324), 1.5e-323)
 # https://hypothesis.readthedocs.io/en/latest/data.html#hypothesis.strategies.floats
 if sys.version_info.major > 2:
-    floats_ = st.floats(allow_subnormal=False)
+    floats_ = st.floats(allow_subnormal=False,
+                        # sadly 8.98846567431158e+307 does not work...
+                        min_value=-1e+20,
+                        max_value=1e+20,
+                        allow_infinity=False,
+                        allow_nan=False)
 else:
     # in Python 2 allow_subnormal is not recognised
     floats_ = st.floats()

@@ -1,5 +1,3 @@
-from __future__ import print_function
-
 import pytest
 
 from lena.core import LenaValueError
@@ -20,8 +18,11 @@ def test_numpy_histogram():
     filled_hist = histogram([0, 1, 2, 3, 4], bins=[0.25, 0.25, 0.25 ,0.25])
     # filled_context = {'histogram': {'ranges': [(0, 4)], 'dim': 1, 'nbins': [4]}}
 
-    empty_hist, empty_cont = next(nhist.compute())
-    assert empty_cont == {}
+    with pytest.warns(RuntimeWarning):
+        # /usr/lib/python3.13/site-packages/numpy/lib/_histograms_impl.py:897: RuntimeWarning: invalid value encountered in divide
+        # return n / db / n.sum(), bin_edges
+        empty_hist, empty_cont = next(nhist.compute())
+        assert empty_cont == {}
 
     data = list(range(0, 4))
     for val in data:
