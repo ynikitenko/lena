@@ -20,6 +20,11 @@ Flow
 
 **Functions:**
 
+.. currentmodule:: lena.flow.compose
+.. autosummary::
+
+    compose
+
 .. currentmodule:: lena.flow.functions
 .. autosummary::
 
@@ -87,9 +92,9 @@ which didn't fit other categories.
 
 Functions
 ---------
-.. automodule:: lena.flow.functions
+.. automodule:: lena.flow.compose
     :members:
-.. .. automodule:: lena.flow.shell
+.. automodule:: lena.flow.functions
     :members:
 
 Group plots

@@ -1,4 +1,5 @@
 from .cache import Cache
+from .compose import compose
 from .drop_context import DropContext
 from .elements import (
     Count, End,

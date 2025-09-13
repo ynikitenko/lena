@@ -2,7 +2,38 @@ import pytest
 
 import lena.core
 import lena.flow
-from lena.flow import seq_map, get_context, get_data, get_data_context
+from lena.core import LenaTypeError
+from lena.flow import compose, seq_map, get_context, get_data, get_data_context
+
+
+def test_compose():
+    mul2 = lambda x: 2 * x
+    add1 = lambda x: x + 1
+    # compose with any (2) elements works
+    cmp1 = compose(add1, mul2)
+    assert cmp1(1) == 4
+
+    # equality works
+    assert cmp1 == compose(add1, mul2)
+
+    # compose with 3 elements works
+    cmp2 = compose(add1, mul2, add1)
+    assert cmp2(1) == 5
+
+    # unequality works
+    assert cmp2 != cmp1
+
+    # compose with 1 element works
+    cmp3 = compose(add1)
+    assert cmp3(1) == 2
+
+    # empty compose raises
+    with pytest.raises(LenaTypeError):
+        compose()
+
+    # wrong arguments raise
+    with pytest.raises(LenaTypeError):
+        compose(add1, 2)
 
 
 def test_get_data_context():
