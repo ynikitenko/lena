@@ -7,6 +7,7 @@ Context
 
     Context
     DeleteContext
+    PrettyContext
     UpdateContext
 
 **Functions:**
@@ -30,7 +31,10 @@ Context
 Elements
 --------
 .. currentmodule:: lena.context
+
 .. autoclass:: Context
+
+.. autoclass:: PrettyContext
     :special-members: __call__
     :show-inheritance:
 

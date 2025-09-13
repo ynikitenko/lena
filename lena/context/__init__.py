@@ -1,4 +1,4 @@
-from .context import Context
+from .pretty_context import Context, PrettyContext
 from .elements import DeleteContext
 from .functions import (
     contains,
@@ -16,7 +16,7 @@ from .update_context import UpdateContext
 
 
 __all__ = [
-    'Context',
+    'PrettyContext',
     'UpdateContext',
     'DeleteContext',
     'contains', 'difference', 'format_context',
