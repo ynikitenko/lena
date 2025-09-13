@@ -18,6 +18,15 @@ Flow
 
 ..    Transform
 
+
+**Context managers:**
+
+.. currentmodule:: lena.flow.data_context
+.. autosummary::
+
+    Context
+
+
 **Functions:**
 
 .. currentmodule:: lena.flow.compose
@@ -88,6 +97,11 @@ which didn't fit other categories.
 .. autoclass:: RunIf
     :members:
 .. autoclass:: StoreFilled
+    :members:
+
+Context managers
+----------------
+.. automodule:: lena.flow.data_context
     :members:
 
 Functions
