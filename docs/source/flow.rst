@@ -24,6 +24,7 @@ Flow
 .. currentmodule:: lena.flow.data_context
 .. autosummary::
 
+    Data
     Context
 
 

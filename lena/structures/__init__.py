@@ -1,3 +1,4 @@
+from .dict_table import dict_table, DictTable
 from .elements import HistToGraph, ScaleTo
 from .graph import graph, Graph
 from .histogram import histogram, Histogram

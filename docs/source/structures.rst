@@ -26,6 +26,16 @@ Structures
     root_graph_errors
     ROOTGraphErrors
 
+
+**DictTable:**
+
+.. currentmodule:: lena.structures.dict_table
+.. autosummary::
+
+    dict_table
+    DictTable
+
+
 **Elements:**
 
 .. currentmodule:: lena.structures.elements
@@ -112,6 +122,15 @@ Graph
 
 .. autoclass:: ROOTGraphErrors
     :members:
+
+
+DictTable
+---------
+
+.. module:: lena.structures.dict_table
+.. autoclass:: dict_table
+.. autoclass:: DictTable
+
 
 Elements
 --------
