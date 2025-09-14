@@ -252,6 +252,8 @@ def get_recursively(d, keys, default=_sentinel):
     'x'
     >>> get_recursively(context, "output.latex.name")
     'x'
+    >>> # will raise LenaKeyError
+    >>> # get_recursively(context, "output.latex.name.x")
 
     .. note::
         Python's dict.get in case of a missing value
@@ -311,7 +313,7 @@ def get_recursively(d, keys, default=_sentinel):
             return default
         else:
             raise LenaKeyError(
-                "nested dict {} not found in {}".format(key, d)
+                "nested dict not found in {}['{}']".format(key, d)
             )
 
     if not keys:
@@ -500,7 +502,7 @@ def to_string(d):
         (though more optimal solutions for that may exist).
         *d* can be not only a dictionary, but for example to hash a list
         one can simply convert it to a tuple.
-        Use :class:`.Context` for a human-friendlier formatting.
+        Use :class:`.PrettyContext` for a human-friendlier formatting.
         Use ``json.dumps`` for more flexibility.
 
     If an item is unserializable (for example, *d* contains a *set*),
