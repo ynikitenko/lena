@@ -44,6 +44,15 @@ def test_dict_table():
         tab.filter_columns("detector.FDI")
 
 
+def test_dict_table_filter_rows():
+    dt = dict_table([{"accepted": True, "val": 3},
+                     {"accepted": False, "val": 2},])
+
+    # filtering on a value as a string is allowed
+    val = dt["accepted.True"]["val"]
+    assert val == 3
+
+
 def test_dict_table_el():
     dt = DictTable()
 

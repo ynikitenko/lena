@@ -60,6 +60,8 @@ class dict_table():
 
         Example:
 
+        >>> dt["accepted.True"]  # doctest: +SKIP
+        # boolean values can be used as strings
         >>> dt["mean"]  # doctest: +SKIP
         [3, 2.5]
 
@@ -215,6 +217,8 @@ class DictTable():
             # thus naming incoming values
             Data(lambda val: {"sum": val}),
             DictTable(),
+            # put dict_table into a subcontext for jinja
+            Data(lambda val: {"context": val}),
             # use a custom function to render LaTeX
             # from data part of values
             # my_render_latex("mytable.tex"),
