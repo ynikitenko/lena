@@ -32,3 +32,13 @@ def test_histogram_1d():
     assert res02[0][0].bins == hist.bins
     # cur_context is reset
     assert res02[0][1] == {}
+
+
+def test_weighted_histogram_1d():
+    hist = histogram([0, 1, 2])
+    h0 = Histogram(hist.edges, hist.bins, weighted=True)
+    # fills with weight 0.5
+    h0.fill((0.5, 0.5))
+    res0 = list(h0.compute())[0]
+    # histogram was filled with weight correctly
+    assert res0 == (histogram([0, 1, 2], bins=[0.5, 0]), {})

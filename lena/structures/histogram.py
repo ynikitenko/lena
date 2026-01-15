@@ -278,6 +278,15 @@ class histogram():
         No additional accounting for weights is being done.
         For example, to calculate a sum of squares of weights like in ROOT,
         do it separately in parallel.
+
+        Example:
+
+        .. code-block:: python
+
+            hist.fill((0, 1), 0.5)
+
+        fills a two-dimensional histogram at the bin containing
+        the point (0, 1) with a weight of 0.5.
         """
         # `ROOT.TH1.GetSumw2() <https://root.cern.ch/doc/master/classTH1.html#ac79a1d40a4b33721a15e16d7cba4faaf>`_,
         indices = hf.get_bin_on_value(coord, self.edges)
@@ -478,9 +487,11 @@ class histogram():
 class Histogram():
     """An element to produce histograms."""
 
-    def __init__(self, edges, bins=None, make_bins=None):
+    def __init__(self, edges, bins=None, make_bins=None, weighted=False):
         """*edges* and *bins* have the same meaning
         as during creation of a :class:`histogram`.
+
+        *weighted* is used during :meth:`fill`.
 
         *make_bins* is a function without arguments
         that creates new bins if provided
@@ -506,6 +517,8 @@ class Histogram():
             bins = make_bins()
         self._make_bins = make_bins
 
+        self._weighted = weighted
+
         self._cur_context = {}
 
     def fill(self, value):
@@ -513,13 +526,14 @@ class Histogram():
 
         *value* can be a *(data, context)* pair. 
         Values outside the histogram edges are ignored.
-
-        .. note::
-            To allow weights, use :class:`.histogram` directly
-            (not as an element).
+        If the Histogram was initialized weighted,
+        *data* is assumed to be a tuple *((bin coordinates), weight)*.
         """
         data, self._cur_context = lena.flow.get_data_context(value)
-        self._hist.fill(data)
+        if self._weighted:
+            self._hist.fill(*data)
+        else:
+            self._hist.fill(data)
         # filling with weight is only allowed in histogram structure
         # self._hist.fill(data, weight)
 
