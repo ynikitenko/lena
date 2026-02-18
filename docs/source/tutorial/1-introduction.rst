@@ -69,7 +69,7 @@ In this case use a sequence *Source*:
         s,
         Slice(10**6),
         lambda x: 4./x,
-        Sum(),
+        Sum(),  # defined in the next subsection
     )
     results = list(spi())
     # [3.1415916535897743]
